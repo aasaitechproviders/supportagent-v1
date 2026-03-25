@@ -7,50 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- FIX 1: shared.css loaded first so design tokens, sidebar, topbar, buttons, badges
+     toast, modals, fields, and responsive utilities are all properly defined.
+     The agent editor previously had no shared.css link, which caused the sidebar
+     to render without any nav/user/logo styles, making it look broken. -->
+<link rel="stylesheet" href="shared.css">
+
 <style>
-  :root {
-    --bg:#0b0c10;--surface:#12141c;--surface-2:#1a1d2b;--surface-3:#232736;
-    --text:#edf2ff;--text-2:#b3c0e6;--text-3:#6e7c9e;
-    --border:#252a3a;--border-md:#2e3446;--border-lg:#3e455b;
-    --accent:#7C6FFF;--accent-2:#8B7AFF;--accent-dim:rgba(124,111,255,0.12);--accent-soft:rgba(124,111,255,0.08);--accent-glow:rgba(124,111,255,0.4);
-    --green:#2dd4a0;--green-dim:rgba(45,212,160,0.1);--green-border:rgba(45,212,160,0.3);
-    --amber:#f5a523;--amber-dim:rgba(245,165,35,0.1);--amber-border:rgba(245,165,35,0.3);
-    --red:#f87171;--red-dim:rgba(248,113,113,0.1);--red-border:rgba(248,113,113,0.3);
-    --font:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
-    --mono:'JetBrains Mono',monospace;
-    --r-sm:12px;--r-lg:20px;--t:0.2s ease;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);font-family:var(--font);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;}
-  input,textarea,select{font-family:var(--font);color:var(--text);border:none;outline:none;}
-  textarea{resize:vertical;}
-  code{font-family:var(--mono);}
+  /* ── AGENT-EDITOR-SPECIFIC STYLES ONLY ─────────────────────────
+     FIX 2: Removed the hardcoded :root{} dark block and [data-theme="dark"]
+     block that were here before. They conflicted with shared.css's
+     light-default + [data-theme=dark] system and broke theme toggling.
+     shared.css now owns all design tokens.
+  ────────────────────────────────────────────────────────────────── */
 
   /* Layout */
-  .main-wrap{margin-left:280px;padding:24px 32px;transition:margin 0.2s;}
-  .sidebar{position:fixed;left:0;top:0;width:280px;height:100%;background:var(--surface);border-right:1px solid var(--border);z-index:30;transition:transform 0.25s ease;overflow-y:auto;}
   .editor-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
-
-  /* Topbar */
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
-  .topbar-left{display:flex;align-items:center;gap:12px;}
-  .topbar-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;}
-  .topbar-right{display:flex;align-items:center;gap:12px;}
-
-  /* Buttons */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;height:38px;border-radius:10px;font-weight:600;font-size:13px;font-family:var(--font);cursor:pointer;transition:var(--t);border:none;background:transparent;text-decoration:none;}
-  .btn-primary{background:var(--accent);color:#fff;}
-  .btn-primary:hover{background:#5b4de0;transform:scale(0.98);}
-  .btn-secondary{background:var(--surface-2);border:1px solid var(--border-md);color:var(--text-2);}
-  .btn-secondary:hover{background:var(--surface-3);}
-  .btn-green{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);}
-  .btn-green:hover{background:rgba(45,212,160,0.2);}
-  .btn-sm{height:34px;padding:0 14px;font-size:12px;}
-  .btn-lg{height:46px;padding:0 28px;font-size:14px;}
-  .btn-danger{background:var(--red-dim);border:1px solid var(--red-border);color:var(--red);}
-  .btn-danger:hover{background:rgba(248,113,113,0.2);}
-  .btn-icon{background:transparent;border:none;color:var(--text-3);cursor:pointer;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;}
-  .btn-icon:hover{background:var(--surface-2);color:var(--text);}
 
   /* Tabs */
   .tab-bar{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;scrollbar-width:none;}
@@ -60,35 +33,6 @@
   .tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:var(--accent);border-radius:2px;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
-
-  /* Card */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
-  .card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);}
-  .card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
-  .card-body{padding:18px;}
-
-  /* Badge */
-  .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;}
-  .badge-accent{background:var(--accent-dim);color:var(--accent-2);}
-  .badge-gray{background:var(--surface-2);color:var(--text-2);}
-  .badge-green{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);}
-  .badge-live{background:var(--green-dim);color:var(--green);}
-  .badge-draft{background:var(--surface-3);color:var(--text-3);}
-  .status-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:30px;}
-
-  /* Field */
-  .field{margin-bottom:18px;}
-  .field label{font-size:12.5px;font-weight:600;display:block;margin-bottom:6px;color:var(--text-2);}
-  .field-hint{font-size:11px;color:var(--text-3);margin-top:6px;}
-  .inp{width:100%;height:40px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);}
-  .ta{width:100%;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);}
-
-  /* Divider */
-  .divider{height:1px;background:var(--border);margin:14px 0;}
-
-  /* Color palette */
-  .color-swatch{width:32px;height:32px;border-radius:12px;cursor:pointer;transition:0.1s;border:2px solid transparent;}
-  .color-swatch.active{border-color:#fff;box-shadow:0 0 0 1px var(--accent);transform:scale(1.05);}
 
   /* Source items */
   .source-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
@@ -112,13 +56,8 @@
   .csv-drop:hover,.csv-drop.drag{border-color:var(--green);background:var(--green-dim);}
 
   /* Setup steps */
-  .setup-step{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--border);align-items:flex-start;}
-  .setup-step:last-child{border-bottom:none;}
   .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
   .step-num.done{background:var(--green-dim);border-color:var(--green);color:var(--green);}
-  .step-title{font-size:13px;font-weight:700;}
-  .step-desc{font-size:12px;color:var(--text-3);margin-top:3px;}
-  .step-action{margin-top:10px;}
 
   /* KB stats */
   .kb-stat{background:var(--surface-2);border:1px solid var(--border-md);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;}
@@ -164,64 +103,67 @@
   /* Embed box */
   .embed-box{background:var(--surface-2);padding:10px;font-family:var(--mono);font-size:11px;border-radius:12px;overflow-x:auto;white-space:pre-wrap;color:var(--text-2);}
 
-  /* Toggle */
-  .toggle-wrap{display:flex;align-items:center;cursor:pointer;}
-  .toggle-track{width:40px;height:20px;background:var(--surface-3);border-radius:40px;position:relative;transition:0.2s;}
-  .toggle-wrap input{display:none;}
-  .toggle-wrap input:checked+.toggle-track{background:var(--accent);}
-  .toggle-track:after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:0.2s;}
-  .toggle-wrap input:checked+.toggle-track:after{left:22px;}
-
   /* Import progress */
   .import-prog-wrap{background:var(--surface-2);border-radius:12px;padding:14px;display:none;}
   .import-prog-wrap.show{display:block;}
   .prog-track{background:var(--surface-3);border-radius:100px;height:6px;margin:10px 0;}
   .prog-fill{height:100%;background:var(--green);border-radius:100px;transition:width 0.3s;}
 
-  /* Modal */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 0.18s ease;}
-  .modal-overlay.open{opacity:1;pointer-events:all;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:28px;width:90%;max-width:640px;max-height:85vh;overflow-y:auto;transform:scale(0.96) translateY(8px);opacity:0;transition:transform 0.18s ease,opacity 0.18s ease;}
-  .modal-overlay.open .modal{transform:scale(1) translateY(0);opacity:1;}
-  .modal-header{display:flex;justify-content:space-between;align-items:flex-start;padding:20px 24px;border-bottom:1px solid var(--border);}
-  .modal-title{font-size:18px;font-weight:800;}
-  .modal-sub{font-size:12px;color:var(--text-3);margin-top:4px;}
-  .modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-3);}
-  .modal-footer{padding:16px 24px;display:flex;justify-content:flex-end;gap:12px;border-top:1px solid var(--border);}
+  /* Color palette swatches (agent-editor size override) */
+  .color-swatch{width:32px;height:32px;border-radius:12px;cursor:pointer;transition:0.1s;border:2px solid transparent;}
+  .color-swatch.active{border-color:#fff;box-shadow:0 0 0 1px var(--accent);transform:scale(1.05);}
 
-  /* Toast */
-  #toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;}
-  .toast-el{background:var(--surface);border:1px solid var(--border-md);padding:12px 16px;border-radius:12px;font-size:13px;font-weight:500;max-width:320px;display:flex;align-items:center;gap:8px;animation:slideUp 0.2s ease;}
-  @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-  /* Animations */
-  .spin-anim{display:inline-block;animation:spin 0.6s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .skel{background:var(--surface-3);border-radius:20px;animation:pulse 1.2s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:.7}}
-
-  /* Skeleton */
+  /* Skeleton (page-level) */
   #page-skeleton{padding:24px 24px 24px 312px;}
   .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px;}
   .skel-body{max-width:1360px;}
   @media(max-width:900px){#page-skeleton{padding:16px;}}
 
-  /* Mobile — defer to shared.css classes */
+  /* Conversations tab inner layout */
+  .convs-tab-inner{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);height:calc(100vh - 260px);min-height:420px;}
+  .session-item{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
+  .session-item:hover{background:var(--surface-2);}
+  .session-item.csi-active{background:var(--accent-dim);border-left:3px solid var(--accent);}
+
+  /* Spin animation */
+  .spin-anim{display:inline-block;animation:spin .6s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
   @media(max-width:900px){
     .main-wrap{margin-left:0;padding:16px;}
     .editor-layout{grid-template-columns:1fr;}
+    .convs-tab-inner{grid-template-columns:1fr;height:auto;}
   }
 </style>
+
+<script>
+;(function(){
+  var p=new URLSearchParams(location.search),t=p.get('token');
+  if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}
+  var d=localStorage.getItem('sg_theme')==='dark';
+  document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');
+  document.documentElement.style.background=d?'#07080D':'#F2F3F9';
+})();
+</script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
 </head>
 <body>
 
-<!-- Toast container -->
 <div id="toast-container"></div>
 
 <!-- Skeleton -->
 <div id="page-skeleton">
-  <div class="skel-topbar"><div class="skel" style="height:14px;width:200px;border-radius:6px"></div><div class="skel" style="height:30px;width:100px;border-radius:8px"></div></div>
-  <div class="skel-body"><div style="display:grid;grid-template-columns:1fr 300px;gap:20px"><div class="skel" style="height:500px;border-radius:18px"></div><div class="skel" style="height:300px;border-radius:18px"></div></div></div>
+  <div class="skel-topbar">
+    <div class="skel" style="height:14px;width:200px;border-radius:6px"></div>
+    <div class="skel" style="height:30px;width:100px;border-radius:8px"></div>
+  </div>
+  <div class="skel-body">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:20px">
+      <div class="skel" style="height:500px;border-radius:18px"></div>
+      <div class="skel" style="height:300px;border-radius:18px"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Mobile header -->
@@ -240,7 +182,6 @@
 <div class="sidebar" id="sidebar"></div>
 
 <div class="main-wrap">
-  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-left">
       <a href="agents.html" class="btn-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></a>
@@ -256,432 +197,406 @@
     </div>
   </div>
 
-  <!-- Main editor grid -->
-  <div class="editor-layout" id="main-content" style="display:none;">
+  <div class="content">
+    <!-- Main editor grid -->
+    <div class="editor-layout" id="main-content" style="display:none;">
 
-    <!-- LEFT: Editor panel -->
-    <div>
-      <div class="card" style="overflow:visible;">
-        <!-- Tab bar -->
-        <div class="tab-bar">
-          <button class="tab-btn active" onclick="switchTab('general',this)">⚙️ General</button>
-          <button class="tab-btn" onclick="switchTab('knowledge',this)">📚 Knowledge</button>
-          <button class="tab-btn" onclick="switchTab('shopping',this)">🛒 Shopping</button>
-          <button class="tab-btn" onclick="switchTab('publish',this)">🚀 Publish</button>
-          <button class="tab-btn" onclick="switchTab('conversations',this)">💬 Conversations</button>
-        </div>
+      <!-- LEFT: Editor panel -->
+      <div>
+        <div class="card" style="overflow:visible;">
+          <!-- Tab bar -->
+          <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('general',this)">⚙️ General</button>
+            <button class="tab-btn" onclick="switchTab('knowledge',this)">📚 Knowledge</button>
+            <button class="tab-btn" onclick="switchTab('shopping',this)">🛒 Shopping</button>
+            <button class="tab-btn" onclick="switchTab('publish',this)">🚀 Publish</button>
+            <button class="tab-btn" onclick="switchTab('conversations',this)">💬 Conversations</button>
+          </div>
 
-        <!-- ══ GENERAL TAB ══════════════════════════════════════════ -->
-        <div id="tab-general" class="tab-panel active" style="padding:22px;">
-          <div class="field">
-            <label>Agent Name *</label>
-            <input class="inp" type="text" id="f-name" oninput="livePreview()" placeholder="My Support Agent"/>
-          </div>
-          <div class="field">
-            <label>Welcome Message</label>
-            <input class="inp" type="text" id="f-welcome" oninput="livePreview()" placeholder="Hi! How can I help you today?"/>
-          </div>
-          <div class="field">
-            <label>System Prompt <span style="font-size:11px;color:var(--text-3);">(optional)</span></label>
-            <textarea class="ta" id="f-system-prompt" rows="4" placeholder="You are a helpful support agent. Answer questions based on the knowledge base. Be concise and friendly."></textarea>
-            <div class="field-hint">Guides the AI's personality and behaviour. Leave blank for sensible defaults.</div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <!-- ══ GENERAL TAB ══════════════════════════════════════════ -->
+          <div id="tab-general" class="tab-panel active" style="padding:22px;">
             <div class="field">
-              <label>Theme</label>
-              <select class="inp" id="f-theme" onchange="livePreview()">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-              </select>
+              <label>Agent Name *</label>
+              <input class="inp" type="text" id="f-name" oninput="livePreview()" placeholder="My Support Agent"/>
             </div>
             <div class="field">
-              <label>Brand Colour</label>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" id="color-palette">
-                <div class="color-swatch" style="background:#6C5FF5;" onclick="pickColor('#6C5FF5',this)"></div>
-                <div class="color-swatch" style="background:#2dd4a0;" onclick="pickColor('#2dd4a0',this)"></div>
-                <div class="color-swatch" style="background:#f5a523;" onclick="pickColor('#f5a523',this)"></div>
-                <div class="color-swatch" style="background:#f87171;" onclick="pickColor('#f87171',this)"></div>
-                <div class="color-swatch" style="background:#38bdf8;" onclick="pickColor('#38bdf8',this)"></div>
-                <div class="color-swatch" style="background:#fb923c;" onclick="pickColor('#fb923c',this)"></div>
-                <input type="color" id="color-custom" value="#6C5FF5" style="width:32px;height:32px;border-radius:12px;border:none;padding:0;cursor:pointer;" oninput="pickColor(this.value,null)"/>
-              </div>
+              <label>Welcome Message</label>
+              <input class="inp" type="text" id="f-welcome" oninput="livePreview()" placeholder="Hi! How can I help you today?"/>
             </div>
-          </div>
-          <div class="field">
-            <label>Logo</label>
-            <div style="display:flex;gap:14px;align-items:center;">
-              <div id="logo-preview" onclick="document.getElementById('logo-inp').click()" style="width:64px;height:64px;background:var(--surface-2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border-md);cursor:pointer;overflow:hidden;">🤖</div>
-              <div>
-                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-inp').click()">Upload Logo</button>
-                <button class="btn btn-sm" id="logo-remove" onclick="removeLogo()" style="display:none;color:var(--red);margin-left:6px;">Remove</button>
-                <div class="field-hint" style="margin-top:6px;">PNG or JPG — max 2MB</div>
-              </div>
+            <div class="field">
+              <label>System Prompt <span style="font-size:11px;color:var(--text-3);">(optional)</span></label>
+              <textarea class="ta" id="f-system-prompt" rows="4" placeholder="You are a helpful support agent. Answer questions based on the knowledge base. Be concise and friendly."></textarea>
+              <div class="field-hint">Guides the AI's personality and behaviour. Leave blank for sensible defaults.</div>
             </div>
-            <input type="file" id="logo-inp" accept="image/*" style="display:none;" onchange="handleLogo(this)"/>
-          </div>
-        </div>
-
-        <!-- ══ KNOWLEDGE TAB ════════════════════════════════════════ -->
-        <div id="tab-knowledge" class="tab-panel" style="padding:22px;">
-
-          <!-- How it works banner -->
-          <div class="info-banner" style="margin-bottom:18px;">
-            <div style="font-size:20px;flex-shrink:0;">💡</div>
-            <div>
-              <div class="info-banner-title">How the Knowledge Base works</div>
-              <div class="info-banner-desc">Upload your <strong>Products CSV</strong> and <strong>Categories CSV</strong> — the AI will answer customer questions from that data automatically. You can also add FAQs, website URLs, and documents as extra knowledge sources below.</div>
-            </div>
-          </div>
-
-          <!-- Stats row -->
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
-            <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px;">📦</span></div>
-            <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px;">🏷️</span></div>
-            <div class="kb-stat"><div><div class="kb-stat-label">Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px;">📄</span></div>
-          </div>
-
-          <!-- Token meter -->
-          <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px;">
-            <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <div style="flex:1;height:5px;background:var(--surface-3);border-radius:100px;"><div id="kb-fill" style="width:0%;height:100%;background:var(--accent);border-radius:100px;transition:width 0.4s;"></div></div>
-            <div style="font-size:11px;color:var(--text-3);white-space:nowrap;" id="kb-text">0 / 18k tokens used</div>
-          </div>
-
-          <!-- ── STEP 1: Products CSV ── -->
-          <div class="card" style="margin-bottom:14px;">
-            <div class="card-header">
-              <div class="card-title"><div class="step-num" id="step1-num" style="margin-right:4px;">1</div>Upload Products CSV</div>
-              <span class="badge badge-gray" id="prod-badge">0 products</span>
-            </div>
-            <div class="card-body">
-              <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
-                Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, price, category, description, sku, stock_qty, image_url</code>
-              </div>
-              <div class="csv-drop" id="prod-drop" onclick="document.getElementById('prod-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleProdCSVDrop(event)">
-                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                <div style="font-size:13px;font-weight:600;">Drop products.csv here or click to browse</div>
-                <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one product per row</div>
-              </div>
-              <input type="file" id="prod-csv-inp" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
-              <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                <button class="btn btn-secondary btn-sm" onclick="downloadSampleProductCSV()">⬇ Download Sample</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── STEP 2: Categories CSV ── -->
-          <div class="card" style="margin-bottom:14px;">
-            <div class="card-header">
-              <div class="card-title"><div class="step-num" id="step2-num" style="margin-right:4px;">2</div>Upload Categories CSV</div>
-              <span class="badge badge-gray" id="cat-badge">0 categories</span>
-            </div>
-            <div class="card-body">
-              <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
-                Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, description, slug</code>
-              </div>
-              <div class="csv-drop" id="cat-drop" onclick="document.getElementById('cat-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleCatCSVDrop(event)">
-                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <div style="font-size:13px;font-weight:600;">Drop categories.csv here or click to browse</div>
-                <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one category per row</div>
-              </div>
-              <input type="file" id="cat-csv-inp" accept=".csv" style="display:none;" onchange="handleCatCSVFile(this.files[0])"/>
-              <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                <button class="btn btn-secondary btn-sm" onclick="downloadSampleCategoryCSV()">⬇ Download Sample</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── STEP 3: Extra sources ── -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title"><div class="step-num" style="margin-right:4px;">3</div>Additional Knowledge Sources <span style="font-size:11px;font-weight:400;color:var(--text-3);">(optional)</span></div>
-              <span class="badge badge-gray" id="src-count-badge">0 sources</span>
-            </div>
-            <div class="card-body">
-              <div class="src-tab-bar">
-                <button class="src-tab active" onclick="switchSrcTab('text',this)">✍️ Text / FAQ</button>
-                <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 URL</button>
-                <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
-              </div>
-
-              <div id="src-text" class="src-panel active">
-                <div class="field-hint" style="margin-bottom:10px;">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
-                <textarea class="ta" id="src-text-inp" rows="4" placeholder="Q: What is your return policy?&#10;A: We offer 30-day hassle-free returns on all products..."></textarea>
-                <div style="display:flex;gap:8px;margin-top:8px;">
-                  <input class="inp" type="text" id="src-text-title" placeholder="Title (e.g. Return Policy)" style="flex:1;"/>
-                  <button class="btn btn-primary btn-sm" onclick="addTextSrc()">Add Source</button>
-                </div>
-              </div>
-
-              <div id="src-url" class="src-panel">
-                <div class="field-hint" style="margin-bottom:10px;">Enter a public webpage URL — its content will be fetched and indexed.</div>
-                <div style="display:flex;gap:8px;">
-                  <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1;"/>
-                  <button class="btn btn-primary" onclick="addUrlSrc()">Fetch & Add</button>
-                </div>
-              </div>
-
-              <div id="src-file" class="src-panel">
-                <div class="field-hint" style="margin-bottom:10px;">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
-                <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleKBFileDrop(event)">
-                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  <div style="font-size:13px;">Drop files or <strong>browse</strong></div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:4px;">PDF, DOCX, TXT</div>
-                </div>
-                <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt" onchange="handleKBFiles(this.files)"/>
-              </div>
-
-              <div id="sources-list" style="margin-top:16px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ══ SHOPPING TAB ═════════════════════════════════════════ -->
-        <div id="tab-shopping" class="tab-panel" style="padding:22px;">
-          <div class="info-banner" style="margin-bottom:18px;">
-            <div style="font-size:20px;flex-shrink:0;">🛒</div>
-            <div>
-              <div class="info-banner-title">Shopping Mode</div>
-              <div class="info-banner-desc">Enable to let customers browse products and checkout directly inside the chat. Requires Razorpay credentials.</div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-body">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                  <div style="font-weight:700;font-size:14px;">Enable Shopping Mode</div>
-                  <div style="font-size:12px;color:var(--text-3);margin-top:3px;">Customers can browse & buy in the chat window</div>
-                </div>
-                <label class="toggle-wrap"><input type="checkbox" id="shopping-toggle"/><div class="toggle-track"></div></label>
-              </div>
-            </div>
-          </div>
-
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-title">💳 Razorpay Credentials</div>
-              <span class="badge badge-accent">Grower+</span>
-            </div>
-            <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
               <div class="field">
-                <label>Key ID</label>
-                <input class="inp" type="text" id="rz-key-id" placeholder="rzp_live_... or rzp_test_..."/>
-                <div class="field-hint">Use <code>rzp_test_</code> for testing, switch to <code>rzp_live_</code> for production.</div>
-              </div>
-              <div class="field">
-                <label>Key Secret</label>
-                <input class="inp" type="password" id="rz-key-secret" placeholder="Leave blank to keep existing"/>
-                <div class="field-hint" id="rz-hint" style="color:var(--green);"></div>
-              </div>
-              <div class="field">
-                <label>Currency</label>
-                <select class="inp" id="rz-currency" style="width:auto;">
-                  <option value="INR">INR — Indian Rupee ₹</option>
-                  <option value="USD">USD — US Dollar $</option>
+                <label>Theme</label>
+                <select class="inp" id="f-theme" onchange="livePreview()">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
                 </select>
               </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-primary btn-sm" onclick="savePayment()">Save Settings</button>
-                <button class="btn btn-secondary btn-sm" onclick="verifyPayment()">✓ Verify Keys</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">📦 Products</div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-green btn-sm" onclick="document.getElementById('prod-csv-shop').click()">⬆ Import CSV</button>
-                <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
-                <input type="file" id="prod-csv-shop" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
-              </div>
-            </div>
-            <div id="products-list" style="padding:4px 18px 12px;"></div>
-          </div>
-        </div>
-
-        <!-- ══ PUBLISH TAB ══════════════════════════════════════════ -->
-        <div id="tab-publish" class="tab-panel" style="padding:22px;">
-
-          <!-- CTA -->
-          <div style="background:var(--accent-dim);border-radius:22px;padding:28px;text-align:center;margin-bottom:20px;">
-            <div style="font-size:40px;margin-bottom:10px;">🚀</div>
-            <div style="font-size:20px;font-weight:800;">Publish Your Agent</div>
-            <div style="margin:10px 0 20px;color:var(--text-2);font-size:13px;max-width:380px;margin-left:auto;margin-right:auto;">Your agent goes live at a dedicated subdomain: <code style="color:var(--accent-2);">{your-slug}.supportagent.aasaitech.in</code></div>
-            <button class="btn btn-primary btn-lg" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
-          </div>
-
-          <!-- Live links (shown after publish) -->
-          <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-title">🔗 Live Links</div>
-              <span class="badge badge-live">● Live</span>
-            </div>
-            <div class="card-body">
-              <div class="pub-url-label">Primary Subdomain URL</div>
-              <div class="pub-url-card primary">
-                <div class="url-copy-row">
-                  <a id="sub-url" href="#" target="_blank" class="url-copy-link green-link">—</a>
-                  <button class="url-copy-btn" onclick="copyText(document.getElementById('sub-url').href)">Copy</button>
-                  <a id="sub-url-open" href="#" target="_blank" class="btn btn-green btn-sm" style="text-decoration:none;padding:0 12px;height:30px;">Open ↗</a>
-                </div>
-                <div style="font-size:11px;color:var(--green);margin-top:8px;opacity:0.85;">✓ Share this URL with your customers — it's your agent's permanent home.</div>
-              </div>
-
-              <div class="pub-url-label" style="margin-top:16px;">Fallback URL</div>
-              <div class="pub-url-card">
-                <div class="url-copy-row">
-                  <a id="pub-url" href="#" target="_blank" class="url-copy-link">—</a>
-                  <button class="url-copy-btn" onclick="copyText(document.getElementById('pub-url').href)">Copy</button>
+              <div class="field">
+                <label>Brand Colour</label>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" id="color-palette">
+                  <div class="color-swatch" style="background:#6C5FF5;" onclick="pickColor('#6C5FF5',this)"></div>
+                  <div class="color-swatch" style="background:#2dd4a0;" onclick="pickColor('#2dd4a0',this)"></div>
+                  <div class="color-swatch" style="background:#f5a523;" onclick="pickColor('#f5a523',this)"></div>
+                  <div class="color-swatch" style="background:#f87171;" onclick="pickColor('#f87171',this)"></div>
+                  <div class="color-swatch" style="background:#38bdf8;" onclick="pickColor('#38bdf8',this)"></div>
+                  <div class="color-swatch" style="background:#fb923c;" onclick="pickColor('#fb923c',this)"></div>
+                  <input type="color" id="color-custom" value="#6C5FF5" style="width:32px;height:32px;border-radius:12px;border:none;padding:0;cursor:pointer;" oninput="pickColor(this.value,null)"/>
                 </div>
               </div>
-
-              <div class="divider"></div>
-              <div class="pub-url-label">Embed Widget</div>
-              <div class="embed-box" id="embed-box">—</div>
-              <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Embed Code</button>
+            </div>
+            <div class="field">
+              <label>Logo</label>
+              <div style="display:flex;gap:14px;align-items:center;">
+                <div id="logo-preview" onclick="document.getElementById('logo-inp').click()" style="width:64px;height:64px;background:var(--surface-2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border-md);cursor:pointer;overflow:hidden;">🤖</div>
+                <div>
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-inp').click()">Upload Logo</button>
+                  <button class="btn btn-sm" id="logo-remove" onclick="removeLogo()" style="display:none;color:var(--red);margin-left:6px;">Remove</button>
+                  <div class="field-hint" style="margin-top:6px;">PNG or JPG — max 2MB</div>
+                </div>
+              </div>
+              <input type="file" id="logo-inp" accept="image/*" style="display:none;" onchange="handleLogo(this)"/>
             </div>
           </div>
 
-          <!-- Custom domain -->
-          <div class="card" style="margin-bottom:16px;">
-            <div class="card-header">
-              <div class="card-title">🌐 Custom Domain</div>
-              <span class="badge badge-accent">Grower+</span>
-            </div>
-            <div class="card-body">
-              <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Point your own domain to this agent (e.g. <code>support.yourbrand.com</code>).</div>
-              <div id="domain-status-wrap" style="display:none;margin-bottom:12px;"></div>
-              <div style="display:flex;gap:8px;">
-                <input class="inp" type="text" id="domain-inp" placeholder="support.yourdomain.com" style="flex:1;"/>
-                <button class="btn btn-primary btn-sm" onclick="connectDomain()">Connect Domain</button>
+          <!-- ══ KNOWLEDGE TAB ════════════════════════════════════════ -->
+          <div id="tab-knowledge" class="tab-panel" style="padding:22px;">
+            <div class="info-banner" style="margin-bottom:18px;">
+              <div style="font-size:20px;flex-shrink:0;">💡</div>
+              <div>
+                <div class="info-banner-title">How the Knowledge Base works</div>
+                <div class="info-banner-desc">Upload your <strong>Products CSV</strong> and <strong>Categories CSV</strong> — the AI will answer customer questions from that data automatically. You can also add FAQs, website URLs, and documents as extra knowledge sources below.</div>
               </div>
-              <div class="dns-box">
-                <div class="dns-box-header">DNS SETUP — Add a CNAME record in your DNS provider</div>
-                <div class="dns-row">
-                  <span class="dns-type">CNAME</span>
-                  <div class="dns-val">
-                    Host: <strong>support</strong> &nbsp;→&nbsp; Value: <strong id="cname-target">agents.supportagent.aasaitech.in</strong>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
+              <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px;">📦</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px;">🏷️</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px;">📄</span></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px;">
+              <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <div style="flex:1;height:5px;background:var(--surface-3);border-radius:100px;"><div id="kb-fill" style="width:0%;height:100%;background:var(--accent);border-radius:100px;transition:width 0.4s;"></div></div>
+              <div style="font-size:11px;color:var(--text-3);white-space:nowrap;" id="kb-text">0 / 18k tokens used</div>
+            </div>
+            <!-- Step 1: Products CSV -->
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header">
+                <div class="card-title"><div class="step-num" id="step1-num" style="margin-right:4px;">1</div>Upload Products CSV</div>
+                <span class="badge badge-gray" id="prod-badge">0 products</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
+                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, price, category, description, sku, stock_qty, image_url</code>
+                </div>
+                <div class="csv-drop" id="prod-drop" onclick="document.getElementById('prod-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleProdCSVDrop(event)">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  <div style="font-size:13px;font-weight:600;">Drop products.csv here or click to browse</div>
+                  <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one product per row</div>
+                </div>
+                <input type="file" id="prod-csv-inp" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
+                <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                  <button class="btn btn-secondary btn-sm" onclick="downloadSampleProductCSV()">⬇ Download Sample</button>
+                </div>
+              </div>
+            </div>
+            <!-- Step 2: Categories CSV -->
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-header">
+                <div class="card-title"><div class="step-num" id="step2-num" style="margin-right:4px;">2</div>Upload Categories CSV</div>
+                <span class="badge badge-gray" id="cat-badge">0 categories</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
+                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, description, slug</code>
+                </div>
+                <div class="csv-drop" id="cat-drop" onclick="document.getElementById('cat-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleCatCSVDrop(event)">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <div style="font-size:13px;font-weight:600;">Drop categories.csv here or click to browse</div>
+                  <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one category per row</div>
+                </div>
+                <input type="file" id="cat-csv-inp" accept=".csv" style="display:none;" onchange="handleCatCSVFile(this.files[0])"/>
+                <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                  <button class="btn btn-secondary btn-sm" onclick="downloadSampleCategoryCSV()">⬇ Download Sample</button>
+                </div>
+              </div>
+            </div>
+            <!-- Step 3: Extra sources -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><div class="step-num" style="margin-right:4px;">3</div>Additional Knowledge Sources <span style="font-size:11px;font-weight:400;color:var(--text-3);">(optional)</span></div>
+                <span class="badge badge-gray" id="src-count-badge">0 sources</span>
+              </div>
+              <div class="card-body">
+                <div class="src-tab-bar">
+                  <button class="src-tab active" onclick="switchSrcTab('text',this)">✍️ Text / FAQ</button>
+                  <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 URL</button>
+                  <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
+                </div>
+                <div id="src-text" class="src-panel active">
+                  <div class="field-hint" style="margin-bottom:10px;">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
+                  <textarea class="ta" id="src-text-inp" rows="4" placeholder="Q: What is your return policy?&#10;A: We offer 30-day hassle-free returns on all products..."></textarea>
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    <input class="inp" type="text" id="src-text-title" placeholder="Title (e.g. Return Policy)" style="flex:1;"/>
+                    <button class="btn btn-primary btn-sm" onclick="addTextSrc()">Add Source</button>
                   </div>
-                  <button class="url-copy-btn" onclick="copyText(document.getElementById('cname-target').textContent)">Copy</button>
+                </div>
+                <div id="src-url" class="src-panel">
+                  <div class="field-hint" style="margin-bottom:10px;">Enter a public webpage URL — its content will be fetched and indexed.</div>
+                  <div style="display:flex;gap:8px;">
+                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1;"/>
+                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch & Add</button>
+                  </div>
+                </div>
+                <div id="src-file" class="src-panel">
+                  <div class="field-hint" style="margin-bottom:10px;">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
+                  <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleKBFileDrop(event)">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div style="font-size:13px;">Drop files or <strong>browse</strong></div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:4px;">PDF, DOCX, TXT</div>
+                  </div>
+                  <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt" onchange="handleKBFiles(this.files)"/>
+                </div>
+                <div id="sources-list" style="margin-top:16px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══ SHOPPING TAB ═════════════════════════════════════════ -->
+          <div id="tab-shopping" class="tab-panel" style="padding:22px;">
+            <div class="info-banner" style="margin-bottom:18px;">
+              <div style="font-size:20px;flex-shrink:0;">🛒</div>
+              <div>
+                <div class="info-banner-title">Shopping Mode</div>
+                <div class="info-banner-desc">Enable to let customers browse products and checkout directly inside the chat. Requires Razorpay credentials.</div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-body">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <div>
+                    <div style="font-weight:700;font-size:14px;">Enable Shopping Mode</div>
+                    <div style="font-size:12px;color:var(--text-3);margin-top:3px;">Customers can browse & buy in the chat window</div>
+                  </div>
+                  <label class="toggle-wrap"><input type="checkbox" id="shopping-toggle"/><div class="toggle-track"></div></label>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header">
+                <div class="card-title">💳 Razorpay Credentials</div>
+                <span class="badge badge-accent">Grower+</span>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label>Key ID</label>
+                  <input class="inp" type="text" id="rz-key-id" placeholder="rzp_live_... or rzp_test_..."/>
+                  <div class="field-hint">Use <code>rzp_test_</code> for testing, switch to <code>rzp_live_</code> for production.</div>
+                </div>
+                <div class="field">
+                  <label>Key Secret</label>
+                  <input class="inp" type="password" id="rz-key-secret" placeholder="Leave blank to keep existing"/>
+                  <div class="field-hint" id="rz-hint" style="color:var(--green);"></div>
+                </div>
+                <div class="field">
+                  <label>Currency</label>
+                  <select class="inp" id="rz-currency" style="width:auto;">
+                    <option value="INR">INR — Indian Rupee ₹</option>
+                    <option value="USD">USD — US Dollar $</option>
+                  </select>
+                </div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-primary btn-sm" onclick="savePayment()">Save Settings</button>
+                  <button class="btn btn-secondary btn-sm" onclick="verifyPayment()">✓ Verify Keys</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">📦 Products</div>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('prod-csv-shop').click()">⬆ Import CSV</button>
+                  <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
+                  <input type="file" id="prod-csv-shop" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
+                </div>
+              </div>
+              <div id="products-list" style="padding:4px 18px 12px;"></div>
+            </div>
+          </div>
+
+          <!-- ══ PUBLISH TAB ══════════════════════════════════════════ -->
+          <div id="tab-publish" class="tab-panel" style="padding:22px;">
+            <div style="background:var(--accent-dim);border-radius:22px;padding:28px;text-align:center;margin-bottom:20px;">
+              <div style="font-size:40px;margin-bottom:10px;">🚀</div>
+              <div style="font-size:20px;font-weight:800;">Publish Your Agent</div>
+              <div style="margin:10px 0 20px;color:var(--text-2);font-size:13px;max-width:380px;margin-left:auto;margin-right:auto;">Your agent goes live at a dedicated subdomain: <code style="color:var(--accent);">{your-slug}.supportagent.aasaitech.in</code></div>
+              <button class="btn btn-primary" style="height:46px;padding:0 28px;font-size:14px;" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
+            </div>
+            <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px;">
+              <div class="card-header">
+                <div class="card-title">🔗 Live Links</div>
+                <span class="badge badge-green">● Live</span>
+              </div>
+              <div class="card-body">
+                <div class="pub-url-label">Primary Subdomain URL</div>
+                <div class="pub-url-card primary">
+                  <div class="url-copy-row">
+                    <a id="sub-url" href="#" target="_blank" class="url-copy-link green-link">—</a>
+                    <button class="url-copy-btn" onclick="copyText(document.getElementById('sub-url').href)">Copy</button>
+                    <a id="sub-url-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">Open ↗</a>
+                  </div>
+                  <div style="font-size:11px;color:var(--green);margin-top:8px;opacity:0.85;">✓ Share this URL with your customers — it's your agent's permanent home.</div>
+                </div>
+                <div class="pub-url-label" style="margin-top:16px;">Fallback URL</div>
+                <div class="pub-url-card">
+                  <div class="url-copy-row">
+                    <a id="pub-url" href="#" target="_blank" class="url-copy-link">—</a>
+                    <button class="url-copy-btn" onclick="copyText(document.getElementById('pub-url').href)">Copy</button>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="pub-url-label">Embed Widget</div>
+                <div class="embed-box" id="embed-box">—</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Embed Code</button>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header">
+                <div class="card-title">🌐 Custom Domain</div>
+                <span class="badge badge-accent">Grower+</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Point your own domain to this agent (e.g. <code>support.yourbrand.com</code>).</div>
+                <div id="domain-status-wrap" style="display:none;margin-bottom:12px;"></div>
+                <div style="display:flex;gap:8px;">
+                  <input class="inp" type="text" id="domain-inp" placeholder="support.yourdomain.com" style="flex:1;"/>
+                  <button class="btn btn-primary btn-sm" onclick="connectDomain()">Connect Domain</button>
+                </div>
+                <div class="dns-box">
+                  <div class="dns-box-header">DNS SETUP — Add a CNAME record in your DNS provider</div>
+                  <div class="dns-row">
+                    <span class="dns-type">CNAME</span>
+                    <div class="dns-val">Host: <strong>support</strong> &nbsp;→&nbsp; Value: <strong id="cname-target">agents.supportagent.aasaitech.in</strong></div>
+                    <button class="url-copy-btn" onclick="copyText(document.getElementById('cname-target').textContent)">Copy</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="border-color:var(--red-border);">
+              <div class="card-header"><div class="card-title" style="color:var(--red);">⚠️ Danger Zone</div></div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">These actions are permanent and cannot be undone.</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button class="btn btn-danger btn-sm" onclick="clearConvs()">Clear All Conversations</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteAgent()">Delete Agent Permanently</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Danger zone -->
-          <div class="card" style="border-color:var(--red-border);">
-            <div class="card-header"><div class="card-title" style="color:var(--red);">⚠️ Danger Zone</div></div>
-            <div class="card-body">
-              <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">These actions are permanent and cannot be undone.</div>
-              <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <button class="btn btn-danger btn-sm" onclick="clearConvs()">Clear All Conversations</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteAgent()">Delete Agent Permanently</button>
+          <!-- ══ CONVERSATIONS TAB ════════════════════════════════════
+               FIX 3: This panel was previously placed OUTSIDE .main-wrap
+               entirely, so clicking the tab rendered nothing. It now lives
+               correctly inside the card alongside the other tab panels.
+          ══════════════════════════════════════════════════════════════ -->
+          <div id="tab-conversations" class="tab-panel" style="padding:18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;">Conversation Sessions</div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="convs-sub-tab">All sessions for this agent</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="text" class="inp" id="conv-search" placeholder="Search sessions…" style="width:180px;height:34px;" oninput="filterConvSessions()"/>
+                <button class="btn btn-danger btn-sm" onclick="clearConvs()">🗑 Clear All</button>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Preview & stats -->
-    <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px;">
-
-      <!-- Chat Preview -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">Chat Preview</div><span id="prev-theme-badge" class="badge badge-gray">dark</span></div>
-        <div class="card-body">
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
-            <div id="prev-logo" style="width:32px;height:32px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0;">🤖</div>
-            <div style="font-weight:700;" id="prev-name">Agent</div>
-            <div style="margin-left:auto;font-size:10px;color:var(--green);">● Online</div>
-          </div>
-          <div id="prev-welcome" style="background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;padding:9px 13px;margin-bottom:8px;font-size:13px;">Hi!</div>
-          <div style="background:var(--surface-2);border-radius:4px 18px 18px 18px;padding:9px 13px;font-size:13px;color:var(--text-2);">I'm here to help!</div>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">Agent Stats</div></div>
-        <div class="card-body" style="padding:14px 18px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Conversations</span><span id="st-convs" style="font-weight:700;">—</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Knowledge Sources</span><span id="st-srcs" style="font-weight:700;">—</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Products</span><span id="st-prods" style="font-weight:700;">—</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;"><span style="color:var(--text-3);font-size:13px;">Status</span><span id="st-status">—</span></div>
-        </div>
-      </div>
-
-      <!-- Agent URL (shown after publish) -->
-      <div class="card" id="agent-url-side-card" style="display:none;">
-        <div class="card-header"><div class="card-title">🔗 Your Agent URL</div></div>
-        <div class="card-body">
-          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Share this URL with your customers:</div>
-          <a id="side-agent-url" href="#" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--green);word-break:break-all;text-decoration:none;display:block;margin-bottom:10px;">—</a>
-          <button class="btn btn-green btn-sm" style="width:100%;" onclick="copyText(document.getElementById('side-agent-url').href)">📋 Copy Link</button>
-          <a id="side-agent-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="width:100%;margin-top:8px;text-decoration:none;display:flex;">👁 Open Chat</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-        <!-- ══ CONVERSATIONS TAB ════════════════════════════════════ -->
-        <div id="tab-conversations" class="tab-panel" style="padding:18px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div>
-              <div style="font-size:14px;font-weight:700;">Conversation Sessions</div>
-              <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="convs-sub-tab">All sessions for this agent</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <input type="text" class="inp" id="conv-search" placeholder="Search sessions…" style="width:180px;height:34px;" oninput="filterConvSessions()"/>
-              <button class="btn btn-danger btn-sm" onclick="clearConvs()">🗑 Clear All</button>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:280px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);height:calc(100vh - 260px);min-height:420px;" id="convs-layout-inner">
-            <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
-              <div style="padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);flex-shrink:0;">
-                <div style="font-size:13px;font-weight:700;">Sessions</div>
-                <span class="badge badge-gray" id="conv-sess-count">0</span>
-              </div>
-              <div style="flex:1;overflow-y:auto;scrollbar-width:thin;" id="conv-session-list">
-                <div style="padding:32px 20px;text-align:center;color:var(--text-3);font-size:13px;">Loading…</div>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;background:var(--bg);overflow:hidden;">
-              <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3);" id="conv-empty-right">
-                <div style="font-size:36px;opacity:.25;">💬</div>
-                <div style="font-size:14px;font-weight:700;color:var(--text-2);">Select a session</div>
-                <div style="font-size:12px;">Click any session on the left to view the conversation</div>
-              </div>
-              <div id="conv-msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
-                <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
-                  <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="conv-msg-title">Session</div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:2px;" id="conv-msg-meta"></div>
+            <div class="convs-tab-inner" id="convs-layout-inner">
+              <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
+                <div style="padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);flex-shrink:0;">
+                  <div style="font-size:13px;font-weight:700;">Sessions</div>
+                  <span class="badge badge-gray" id="conv-sess-count">0</span>
                 </div>
-                <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;" id="conv-msg-scroll"></div>
+                <div style="flex:1;overflow-y:auto;scrollbar-width:thin;" id="conv-session-list">
+                  <div style="padding:32px 20px;text-align:center;color:var(--text-3);font-size:13px;">Loading…</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;background:var(--bg);overflow:hidden;">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3);" id="conv-empty-right">
+                  <div style="font-size:36px;opacity:.25;">💬</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--text-2);">Select a session</div>
+                  <div style="font-size:12px;">Click any session on the left to view the conversation</div>
+                </div>
+                <div id="conv-msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+                  <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
+                    <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="conv-msg-title">Session</div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:2px;" id="conv-msg-meta"></div>
+                  </div>
+                  <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;" id="conv-msg-scroll"></div>
+                </div>
               </div>
             </div>
           </div>
+
+        </div><!-- /.card -->
+      </div><!-- /left column -->
+
+      <!-- RIGHT: Preview & stats (sticky sidebar) -->
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Chat Preview</div><span id="prev-theme-badge" class="badge badge-gray">dark</span></div>
+          <div class="card-body">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+              <div id="prev-logo" style="width:32px;height:32px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0;">🤖</div>
+              <div style="font-weight:700;" id="prev-name">Agent</div>
+              <div style="margin-left:auto;font-size:10px;color:var(--green);">● Online</div>
+            </div>
+            <div id="prev-welcome" style="background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;padding:9px 13px;margin-bottom:8px;font-size:13px;">Hi!</div>
+            <div style="background:var(--surface-2);border-radius:4px 18px 18px 18px;padding:9px 13px;font-size:13px;color:var(--text-2);">I'm here to help!</div>
+          </div>
         </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Agent Stats</div></div>
+          <div class="card-body" style="padding:14px 18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Conversations</span><span id="st-convs" style="font-weight:700;">—</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Knowledge Sources</span><span id="st-srcs" style="font-weight:700;">—</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Products</span><span id="st-prods" style="font-weight:700;">—</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;"><span style="color:var(--text-3);font-size:13px;">Status</span><span id="st-status">—</span></div>
+          </div>
+        </div>
+        <div class="card" id="agent-url-side-card" style="display:none;">
+          <div class="card-header"><div class="card-title">🔗 Your Agent URL</div></div>
+          <div class="card-body">
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Share this URL with your customers:</div>
+            <a id="side-agent-url" href="#" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--green);word-break:break-all;text-decoration:none;display:block;margin-bottom:10px;">—</a>
+            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="copyText(document.getElementById('side-agent-url').href)">📋 Copy Link</button>
+            <a id="side-agent-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="width:100%;margin-top:8px;text-decoration:none;display:flex;justify-content:center;">👁 Open Chat</a>
+          </div>
+        </div>
+      </div><!-- /right column -->
+
+    </div><!-- /.editor-layout -->
+  </div><!-- /.content -->
+</div><!-- /.main-wrap -->
 
 <!-- ── Product Modal ──────────────────────────────────────────────── -->
 <div class="modal-overlay" id="product-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:640px;">
     <div class="modal-header">
       <div><div class="modal-title" id="pm-title">Add Product</div><div class="modal-sub">Fill in product details for the chat store</div></div>
       <button class="modal-close" onclick="closeProductModal()">✕</button>
     </div>
     <input type="hidden" id="pm-id"/>
-    <div style="padding:16px 24px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Product Name *</label><input class="inp" type="text" id="pm-name"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Price *</label><input class="inp" type="number" id="pm-price" min="0"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Category</label><input class="inp" type="text" id="pm-category"/></div>
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Description</label><textarea class="ta" id="pm-desc" rows="2"></textarea></div>
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Image URL</label><input class="inp" type="url" id="pm-image"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">SKU</label><input class="inp" type="text" id="pm-sku"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Stock Qty</label><input class="inp" type="number" id="pm-stock" min="0"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 4px;">
+      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Product Name *</label><input class="inp" type="text" id="pm-name" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Price *</label><input class="inp" type="number" id="pm-price" min="0" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Category</label><input class="inp" type="text" id="pm-category" style="width:100%;"/></div>
+      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Description</label><textarea class="ta" id="pm-desc" rows="2" style="width:100%;"></textarea></div>
+      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Image URL</label><input class="inp" type="url" id="pm-image" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">SKU</label><input class="inp" type="text" id="pm-sku" style="width:100%;"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Stock Qty</label><input class="inp" type="number" id="pm-stock" min="0" style="width:100%;"/></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
@@ -697,47 +612,37 @@
       <div><div class="modal-title" id="csv-modal-title">Import CSV</div><div class="modal-sub" id="csv-modal-sub">Preview before importing</div></div>
       <button class="modal-close" onclick="closeCSVModal()">✕</button>
     </div>
-    <div style="padding:18px 24px;">
-      <!-- Progress -->
-      <div class="import-prog-wrap" id="import-prog-wrap">
-        <div style="font-size:13px;font-weight:600;" id="import-prog-label">Importing...</div>
-        <div class="prog-track"><div class="prog-fill" id="import-prog-bar" style="width:0%;"></div></div>
-        <div style="font-size:11px;color:var(--text-3);" id="import-prog-sub"></div>
-      </div>
-      <!-- Table preview -->
-      <div id="csv-preview-wrap" style="overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:12px;">
-        <table class="csv-tbl" id="csv-preview-tbl"></table>
-      </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--text-3);" id="csv-preview-note"></div>
+    <div class="import-prog-wrap" id="import-prog-wrap">
+      <div style="font-size:13px;font-weight:600;" id="import-prog-label">Importing...</div>
+      <div class="prog-track"><div class="prog-fill" id="import-prog-bar" style="width:0%;"></div></div>
+      <div style="font-size:11px;color:var(--text-3);" id="import-prog-sub"></div>
     </div>
+    <div id="csv-preview-wrap" style="overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:12px;margin-top:4px;">
+      <table class="csv-tbl" id="csv-preview-tbl"></table>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-3);" id="csv-preview-note"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeCSVModal()">Cancel</button>
-      <button class="btn btn-green" id="csv-do-import" onclick="executeImport()">⬆ Import All Rows</button>
+      <button class="btn btn-secondary" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green);" id="csv-do-import" onclick="executeImport()">⬆ Import All Rows</button>
     </div>
   </div>
 </div>
 
 <script>
-;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
-</script>
-<script src="api.js"></script>
-<script src="nav.js"></script>
-<script>
-const AGENT_ID = new URLSearchParams(location.search).get('id') || '';
-let agent=null, selectedColor='#6C5FF5', logoBase64=null;
-let _csvMode=null, _csvHeader=[], _csvRows=[];
+// FIX 4: SUBDOMAIN_BASE was used in fillForm() but never defined,
+// causing a ReferenceError on every agent load.
+const SUBDOMAIN_BASE = 'supportagent.aasaitech.in';
 
-// toast, copyText, apiFetch, confirmModal, initNav, fmtNum, fmtTokens,
-// fmtDate, timeAgo, dismissSkeleton — all provided by api.js + nav.js
+const AGENT_ID = new URLSearchParams(location.search).get('id') || '';
+let agent = null, selectedColor = '#6C5FF5', logoBase64 = null;
+let _csvMode = null, _csvHeader = [], _csvRows = [];
 
 // ══════════════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════════════
 async function loadAgent() {
-  if(!AGENT_ID){ toast('No agent ID in URL','error'); dismissSkeleton(); return; }
+  if (!AGENT_ID) { toast('No agent ID in URL', 'error'); dismissSkeleton(); return; }
   try {
-    // Parallel-fetch agent + sources + products for accurate stats
-    // GET /agents/:id doesn't return counts — sources + products do
     const [agentData, sources, products] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
@@ -749,7 +654,7 @@ async function loadAgent() {
     fillForm(agent);
     livePreview();
     updateStats(agent);
-    if(agent.published) updatePublishUI(agent);
+    if (agent.published) updatePublishUI(agent);
     document.getElementById('main-content').style.display = 'grid';
     dismissSkeleton();
   } catch(e) {
@@ -761,14 +666,14 @@ async function loadAgent() {
 function fillForm(a) {
   document.getElementById('page-agent-name').textContent = a.name;
   const slugURL = a.slug ? `${a.slug}.${SUBDOMAIN_BASE}` : '';
-  document.getElementById('page-agent-slug').textContent = (a.slug ? '/'+a.slug : '') + (slugURL ? '  ·  '+slugURL : '');
+  document.getElementById('page-agent-slug').textContent = (a.slug ? '/' + a.slug : '') + (slugURL ? '  ·  ' + slugURL : '');
   document.getElementById('f-name').value          = a.name || '';
   document.getElementById('f-welcome').value       = a.welcome_message || '';
   document.getElementById('f-system-prompt').value = a.system_prompt || '';
   document.getElementById('f-theme').value         = a.theme || 'dark';
   selectedColor = a.brand_color || '#6C5FF5';
-  document.getElementById('color-custom').value    = selectedColor;
-  if(a.logo_base64) {
+  document.getElementById('color-custom').value = selectedColor;
+  if (a.logo_base64) {
     logoBase64 = a.logo_base64;
     document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
     document.getElementById('logo-remove').style.display = 'inline-flex';
@@ -776,7 +681,7 @@ function fillForm(a) {
   document.getElementById('shopping-toggle').checked = !!a.shopping_enabled;
   const badge = document.getElementById('pub-badge');
   badge.style.display = 'inline-flex';
-  if(a.published) {
+  if (a.published) {
     badge.className = 'status-badge badge-live'; badge.innerHTML = '● Live';
     document.getElementById('preview-btn').style.display = 'flex';
   } else {
@@ -785,25 +690,25 @@ function fillForm(a) {
 }
 
 function updateStats(a) {
-  document.getElementById('st-convs').textContent = a.query_count    || '—';
-  document.getElementById('st-srcs').textContent  = a.sources_count  || 0;
-  document.getElementById('st-prods').textContent = a.products_count || 0;
-  document.getElementById('st-status').innerHTML  = a.published
+  document.getElementById('st-convs').textContent  = a.query_count    || '—';
+  document.getElementById('st-srcs').textContent   = a.sources_count  || 0;
+  document.getElementById('st-prods').textContent  = a.products_count || 0;
+  document.getElementById('st-status').innerHTML   = a.published
     ? '<span style="color:var(--green);font-weight:700;">● Live</span>'
     : '<span style="color:var(--text-3);">Draft</span>';
-  document.getElementById('stat-products').textContent = a.products_count || 0;
-  document.getElementById('stat-categories').textContent = a.sources_count || 0; // categories shown as text sources
-  document.getElementById('stat-sources').textContent  = a.sources_count || 0;
-  document.getElementById('prod-badge').textContent    = (a.products_count||0)+' products';
-  document.getElementById('cat-badge').textContent     = '(imported as sources)';
-  if((a.products_count||0)>0) markStep(1);
-  if((a.sources_count||0)>0)  markStep(2);
-  if(a.published) markStep(3);
+  document.getElementById('stat-products').textContent   = a.products_count || 0;
+  document.getElementById('stat-categories').textContent = a.sources_count  || 0;
+  document.getElementById('stat-sources').textContent    = a.sources_count  || 0;
+  document.getElementById('prod-badge').textContent      = (a.products_count || 0) + ' products';
+  document.getElementById('cat-badge').textContent       = '(imported as sources)';
+  if ((a.products_count || 0) > 0) markStep(1);
+  if ((a.sources_count  || 0) > 0) markStep(2);
+  if (a.published) markStep(3);
 }
 
 function markStep(n) {
   const el = document.getElementById(`step${n}-num`);
-  if(el && !el.classList.contains('done')) { el.classList.add('done'); el.textContent='✓'; }
+  if (el && !el.classList.contains('done')) { el.classList.add('done'); el.textContent = '✓'; }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -812,11 +717,11 @@ function markStep(n) {
 function livePreview() {
   const name    = document.getElementById('f-name').value    || 'Agent';
   const welcome = document.getElementById('f-welcome').value || 'Hi!';
-  const div = document.getElementById('prev-logo');
+  const div     = document.getElementById('prev-logo');
   div.style.background = selectedColor;
   div.innerHTML = logoBase64
     ? `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover;">`
-    : (name[0]?.toUpperCase()||'A');
+    : (name[0]?.toUpperCase() || 'A');
   document.getElementById('prev-name').textContent    = name;
   document.getElementById('prev-welcome').textContent = welcome;
   document.getElementById('prev-welcome').style.background = selectedColor;
@@ -825,15 +730,15 @@ function livePreview() {
 
 function pickColor(c, el) {
   selectedColor = c;
-  document.querySelectorAll('#color-palette .color-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
+  document.querySelectorAll('#color-palette .color-swatch').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
   document.getElementById('color-custom').value = c;
   livePreview();
 }
 
 function handleLogo(input) {
-  const file = input.files[0]; if(!file) return;
-  if(file.size > 2*1024*1024) return toast('Max 2MB','error');
+  const file = input.files[0]; if (!file) return;
+  if (file.size > 2 * 1024 * 1024) return toast('Max 2MB', 'error');
   const r = new FileReader();
   r.onload = e => {
     logoBase64 = e.target.result;
@@ -853,34 +758,34 @@ function removeLogo() {
 
 async function saveGeneral() {
   const btn = document.getElementById('save-btn');
-  btn.disabled=true; btn.textContent='Saving...';
+  btn.disabled = true; btn.textContent = 'Saving...';
   try {
-    await apiFetch(`/agents/${AGENT_ID}`, { method:'PUT', body:JSON.stringify({
-      name:            document.getElementById('f-name').value,
-      welcome_message: document.getElementById('f-welcome').value,
-      brand_color:     selectedColor,
-      logo_base64:     logoBase64,
-      system_prompt:   document.getElementById('f-system-prompt').value,
-      theme:           document.getElementById('f-theme').value,
-      shopping_enabled:document.getElementById('shopping-toggle').checked
+    await apiFetch(`/agents/${AGENT_ID}`, { method: 'PUT', body: JSON.stringify({
+      name:             document.getElementById('f-name').value,
+      welcome_message:  document.getElementById('f-welcome').value,
+      brand_color:      selectedColor,
+      logo_base64:      logoBase64,
+      system_prompt:    document.getElementById('f-system-prompt').value,
+      theme:            document.getElementById('f-theme').value,
+      shopping_enabled: document.getElementById('shopping-toggle').checked
     })});
-    toast('Changes saved!','success');
-  } catch(e){ toast(e.message,'error'); }
-  finally { btn.disabled=false; btn.textContent='Save Changes'; }
+    toast('Changes saved!', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════════════════════════════
 function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
   btn.classList.add('active');
-  if(tab==='knowledge')     loadSources();
-  if(tab==='shopping')      { loadProducts(); loadPaymentSettings(); }
-  if(tab==='publish')       updatePublishUI(agent);
-  if(tab==='conversations') loadConvSessions();
+  if (tab === 'knowledge')     loadSources();
+  if (tab === 'shopping')      { loadProducts(); loadPaymentSettings(); }
+  if (tab === 'publish')       updatePublishUI(agent);
+  if (tab === 'conversations') loadConvSessions();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -888,7 +793,9 @@ function switchTab(tab, btn) {
 // ══════════════════════════════════════════════════════════════════
 let _allConvSessions = [];
 
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>'); }
+function esc(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
+}
 
 async function loadConvSessions() {
   const list = document.getElementById('conv-session-list');
@@ -902,7 +809,7 @@ async function loadConvSessions() {
     _allConvSessions = d.sessions || [];
     document.getElementById('conv-sess-count').textContent = _allConvSessions.length;
     const sub = document.getElementById('convs-sub-tab');
-    if(sub) sub.textContent = _allConvSessions.length + ' sessions';
+    if (sub) sub.textContent = _allConvSessions.length + ' sessions';
     renderConvSessions(_allConvSessions);
   } catch(e) {
     list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--red);font-size:13px;">Failed to load: ${esc(e.message)}</div>`;
@@ -911,7 +818,7 @@ async function loadConvSessions() {
 
 function renderConvSessions(sessions) {
   const list = document.getElementById('conv-session-list');
-  if(!sessions.length) {
+  if (!sessions.length) {
     list.innerHTML = '<div style="padding:36px 20px;text-align:center;">'
       + '<div style="font-size:28px;opacity:.3;margin-bottom:10px;">💬</div>'
       + '<div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px;">No conversations yet</div>'
@@ -920,12 +827,12 @@ function renderConvSessions(sessions) {
     return;
   }
   list.innerHTML = sessions.map(s => {
-    const key = s._id || s.session_id || s.visitor_ip || '';
-    const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g,'_');
-    return `<div class="session-item" id="${safeId}" onclick="openConvSession(${JSON.stringify(key)},${JSON.stringify(s)})" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;">
-      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">${esc(s.first_question||'(No message)')}</div>
+    const key    = s._id || s.session_id || s.visitor_ip || '';
+    const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g, '_');
+    return `<div class="session-item" id="${safeId}" onclick="openConvSession(${JSON.stringify(key)},${JSON.stringify(s)})">
+      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">${esc(s.first_question || '(No message)')}</div>
       <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);">
-        <span>${s.message_count||1} msgs · ${fmtTokens(s.tokens_used||0)} tokens</span>
+        <span>${s.message_count || 1} msgs · ${fmtTokens(s.tokens_used || 0)} tokens</span>
         <span>${timeAgo(s.last_active)}</span>
       </div>
     </div>`;
@@ -935,51 +842,48 @@ function renderConvSessions(sessions) {
 function filterConvSessions() {
   const q = document.getElementById('conv-search').value.toLowerCase();
   renderConvSessions(_allConvSessions.filter(s =>
-    (s.first_question||'').toLowerCase().includes(q) || (s.visitor_ip||'').includes(q)
+    (s.first_question || '').toLowerCase().includes(q) || (s.visitor_ip || '').includes(q)
   ));
 }
 
 async function openConvSession(key, meta) {
-  document.querySelectorAll('#conv-session-list .session-item').forEach(el=>{
-    el.style.background=''; el.style.borderLeft='';
-  });
-  const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g,'_');
-  const sel = document.getElementById(safeId);
-  if(sel){ sel.style.background='var(--accent-dim)'; sel.style.borderLeft='3px solid var(--accent)'; }
+  document.querySelectorAll('#conv-session-list .session-item').forEach(el => el.classList.remove('csi-active'));
+  const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g, '_');
+  document.getElementById(safeId)?.classList.add('csi-active');
 
-  document.getElementById('conv-empty-right').style.display='none';
+  document.getElementById('conv-empty-right').style.display = 'none';
   const msgArea = document.getElementById('conv-msg-area');
-  msgArea.style.display='flex';
-  document.getElementById('conv-msg-title').textContent=(meta.first_question||'Session').slice(0,70);
-  document.getElementById('conv-msg-meta').textContent=`${meta.message_count||1} messages · ${timeAgo(meta.started_at)}${meta.visitor_ip?' · '+meta.visitor_ip:''}`;
+  msgArea.style.display = 'flex';
+  document.getElementById('conv-msg-title').textContent = (meta.first_question || 'Session').slice(0, 70);
+  document.getElementById('conv-msg-meta').textContent  = `${meta.message_count || 1} messages · ${timeAgo(meta.started_at)}${meta.visitor_ip ? ' · ' + meta.visitor_ip : ''}`;
 
   const scroll = document.getElementById('conv-msg-scroll');
-  scroll.innerHTML='<div style="display:flex;flex-direction:column;gap:12px;">'
-    +'<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:50%"></div>'
-    +'<div class="skel" style="height:72px;border-radius:10px;width:68%"></div>'
-    +'<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:42%"></div>'
-    +'</div>';
+  scroll.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px;">'
+    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:50%"></div>'
+    + '<div class="skel" style="height:72px;border-radius:10px;width:68%"></div>'
+    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:42%"></div>'
+    + '</div>';
   try {
-    const d = await apiFetch(`/agents/${AGENT_ID}/conversations/${encodeURIComponent(key)}`);
-    const msgs = d.messages||[];
-    if(!msgs.length){ scroll.innerHTML='<div style="text-align:center;padding:36px;color:var(--text-3);">No messages in this session.</div>'; return; }
-    scroll.innerHTML = msgs.map(m=>`
+    const d    = await apiFetch(`/agents/${AGENT_ID}/conversations/${encodeURIComponent(key)}`);
+    const msgs = d.messages || [];
+    if (!msgs.length) { scroll.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-3);">No messages in this session.</div>'; return; }
+    scroll.innerHTML = msgs.map(m => `
       <div>
         <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:78%;align-self:flex-end;word-break:break-word;margin-left:auto;">${esc(m.question)}</div>
-        <div style="background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;margin-top:6px;">${m.answer||''}</div>
-        <div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:3px;">🪙 ${fmtTokens(m.tokens_used||0)} tokens · ${timeAgo(m.created_at)}</div>
+        <div style="background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;margin-top:6px;">${m.answer || ''}</div>
+        <div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:3px;">🪙 ${fmtTokens(m.tokens_used || 0)} tokens · ${timeAgo(m.created_at)}</div>
       </div>`).join('');
     scroll.scrollTop = scroll.scrollHeight;
-  } catch(e){
-    scroll.innerHTML=`<div style="padding:24px;color:var(--red);">Failed to load: ${esc(e.message)}</div>`;
+  } catch(e) {
+    scroll.innerHTML = `<div style="padding:24px;color:var(--red);">Failed to load: ${esc(e.message)}</div>`;
   }
 }
 
 function switchSrcTab(t, btn) {
-  document.querySelectorAll('.src-tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.src-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.src-tab').forEach(b  => b.classList.remove('active'));
+  document.querySelectorAll('.src-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('src-'+t).classList.add('active');
+  document.getElementById('src-' + t).classList.add('active');
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -988,65 +892,65 @@ function switchSrcTab(t, btn) {
 async function loadSources() {
   try {
     const sources = await apiFetch(`/agents/${AGENT_ID}/sources`);
-    const total   = sources.reduce((a,s)=>a+Math.ceil((s.extracted_text||s.content||'').length/4),0);
-    const pct     = Math.min(100, Math.round(total/18000*100));
-    document.getElementById('kb-fill').style.width     = pct+'%';
-    document.getElementById('kb-text').textContent     = '~'+total.toLocaleString()+' / 18,000 tokens used';
-    document.getElementById('src-count-badge').textContent = sources.length+' sources';
+    const total   = sources.reduce((a, s) => a + Math.ceil((s.extracted_text || s.content || '').length / 4), 0);
+    const pct     = Math.min(100, Math.round(total / 18000 * 100));
+    document.getElementById('kb-fill').style.width     = pct + '%';
+    document.getElementById('kb-text').textContent     = '~' + total.toLocaleString() + ' / 18,000 tokens used';
+    document.getElementById('src-count-badge').textContent = sources.length + ' sources';
     document.getElementById('stat-sources').textContent    = sources.length;
     const list = document.getElementById('sources-list');
-    if(!sources.length){ list.innerHTML='<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px;">No extra sources yet. Add text, URLs, or files above.</div>'; return; }
-    list.innerHTML = sources.map(s=>`
+    if (!sources.length) { list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px;">No extra sources yet. Add text, URLs, or files above.</div>'; return; }
+    list.innerHTML = sources.map(s => `
       <div class="source-item">
         <span class="source-badge">${s.type}</span>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title||s.content?.slice(0,60)||'Untitled'}</div>
-          <div class="source-meta">${Math.ceil((s.extracted_text||s.content||'').length/4)} tokens</div>
+          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title || s.content?.slice(0, 60) || 'Untitled'}</div>
+          <div class="source-meta">${Math.ceil((s.extracted_text || s.content || '').length / 4)} tokens</div>
         </div>
         <button class="btn-icon" onclick="delSrc('${s._id}')">🗑️</button>
       </div>`).join('');
-  } catch(e){ toast(e.message,'error'); }
+  } catch(e) { toast(e.message, 'error'); }
 }
 
 async function addTextSrc() {
   const content = document.getElementById('src-text-inp').value.trim();
-  if(!content) return toast('Enter some text first','warning');
+  if (!content) return toast('Enter some text first', 'warning');
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`,{method:'POST',body:JSON.stringify({type:'text',content,title:document.getElementById('src-text-title').value})});
-    document.getElementById('src-text-inp').value='';
-    document.getElementById('src-text-title').value='';
-    toast('Source added!','success'); loadSources();
-  } catch(e){ toast(e.message,'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', content, title: document.getElementById('src-text-title').value }) });
+    document.getElementById('src-text-inp').value = '';
+    document.getElementById('src-text-title').value = '';
+    toast('Source added!', 'success'); loadSources();
+  } catch(e) { toast(e.message, 'error'); }
 }
 
 async function addUrlSrc() {
   const url = document.getElementById('src-url-inp').value.trim();
-  if(!url) return toast('Enter a URL','warning');
-  toast('Fetching URL...','info');
+  if (!url) return toast('Enter a URL', 'warning');
+  toast('Fetching URL...', 'info');
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`,{method:'POST',body:JSON.stringify({type:'url',content:url})});
-    document.getElementById('src-url-inp').value='';
-    toast('URL added!','success'); loadSources();
-  } catch(e){ toast(e.message,'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'url', content: url }) });
+    document.getElementById('src-url-inp').value = '';
+    toast('URL added!', 'success'); loadSources();
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-function handleKBFileDrop(e){ e.preventDefault(); document.getElementById('file-drop').classList.remove('drag'); handleKBFiles(e.dataTransfer.files); }
+function handleKBFileDrop(e) { e.preventDefault(); document.getElementById('file-drop').classList.remove('drag'); handleKBFiles(e.dataTransfer.files); }
 
 async function handleKBFiles(files) {
-  for(const file of files){
-    const fd=new FormData(); fd.append('file',file);
-    toast(`Uploading ${file.name}...`,'info');
+  for (const file of files) {
+    const fd = new FormData(); fd.append('file', file);
+    toast(`Uploading ${file.name}...`, 'info');
     try {
-      await apiFetch(`/agents/${AGENT_ID}/sources/file`,{method:'POST',body:fd});
-      toast(`${file.name} added!`,'success'); loadSources();
-    } catch(e){ toast(e.message,'error'); }
+      await apiFetch(`/agents/${AGENT_ID}/sources/file`, { method: 'POST', body: fd });
+      toast(`${file.name} added!`, 'success'); loadSources();
+    } catch(e) { toast(e.message, 'error'); }
   }
 }
 
-async function delSrc(id){
-  if(!confirm('Delete this source?')) return;
-  try { await apiFetch(`/agents/${AGENT_ID}/sources/${id}`,{method:'DELETE'}); toast('Deleted','success'); loadSources(); }
-  catch(e){ toast(e.message,'error'); }
+async function delSrc(id) {
+  if (!confirm('Delete this source?')) return;
+  try { await apiFetch(`/agents/${AGENT_ID}/sources/${id}`, { method: 'DELETE' }); toast('Deleted', 'success'); loadSources(); }
+  catch(e) { toast(e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1058,155 +962,138 @@ function parseCSV(text) {
   const rows   = lines.slice(1).map(l => {
     const cols = splitCSVLine(l);
     const obj  = {};
-    header.forEach((h,i) => obj[h] = (cols[i]||'').trim());
+    header.forEach((h, i) => obj[h] = (cols[i] || '').trim());
     return obj;
-  }).filter(r => Object.values(r).some(v=>v));
+  }).filter(r => Object.values(r).some(v => v));
   return { header, rows };
 }
 
 function splitCSVLine(line) {
-  const cols=[]; let cur='', inQ=false;
-  for(const ch of line){
-    if(ch==='"'){ inQ=!inQ; }
-    else if(ch===',' && !inQ){ cols.push(cur.trim().replace(/^"|"$/g,'')); cur=''; }
-    else cur+=ch;
+  const cols = []; let cur = '', inQ = false;
+  for (const ch of line) {
+    if (ch === '"') { inQ = !inQ; }
+    else if (ch === ',' && !inQ) { cols.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
+    else cur += ch;
   }
-  cols.push(cur.trim().replace(/^"|"$/g,''));
+  cols.push(cur.trim().replace(/^"|"$/g, ''));
   return cols;
 }
 
-function downloadBlob(content, filename, type='text/csv'){
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([content],{type}));
-  a.download=filename; a.click();
+function downloadBlob(content, filename, type = 'text/csv') {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename; a.click();
 }
 
-function downloadSampleProductCSV(){
+function downloadSampleProductCSV() {
   downloadBlob(
 `name,price,category,description,sku,stock_qty,image_url
 "Blue Denim Jacket",1299,Jackets,"Classic slim-fit denim jacket",BJK-001,50,https://example.com/jacket.jpg
-"White Sneakers",899,Footwear,"Lightweight canvas sneakers",SNK-W01,120,https://example.com/sneaker.jpg
-"Leather Wallet",499,Accessories,"Genuine bi-fold leather wallet",WLT-BK1,200,https://example.com/wallet.jpg`,
+"White Sneakers",899,Footwear,"Lightweight canvas sneakers",SNK-W01,120,https://example.com/sneaker.jpg`,
   'sample-products.csv');
-  toast('Sample products.csv downloaded','success');
+  toast('Sample products.csv downloaded', 'success');
 }
 
-function downloadSampleCategoryCSV(){
+function downloadSampleCategoryCSV() {
   downloadBlob(
 `name,description,slug
 Jackets,"Denim, leather, and bomber jackets",jackets
-Footwear,"Shoes, sneakers, and sandals",footwear
-Accessories,"Bags, wallets, belts, and more",accessories`,
+Footwear,"Shoes, sneakers, and sandals",footwear`,
   'sample-categories.csv');
-  toast('Sample categories.csv downloaded','success');
+  toast('Sample categories.csv downloaded', 'success');
 }
 
-// ── Products CSV ──────────────────────────────────────────────────
-function handleProdCSVDrop(e){ e.preventDefault(); document.getElementById('prod-drop').classList.remove('drag'); handleProdCSVFile(e.dataTransfer.files[0]); }
-function handleProdCSVFile(file){
-  if(!file) return;
-  const r=new FileReader();
-  r.onload=e=>{
+function handleProdCSVDrop(e) { e.preventDefault(); document.getElementById('prod-drop').classList.remove('drag'); handleProdCSVFile(e.dataTransfer.files[0]); }
+function handleProdCSVFile(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
     const { header, rows } = parseCSV(e.target.result);
-    _csvMode='products'; _csvHeader=header; _csvRows=rows;
-    openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0,5));
+    _csvMode = 'products'; _csvHeader = header; _csvRows = rows;
+    openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0, 5));
   };
   r.readAsText(file);
 }
 
-// ── Categories CSV ────────────────────────────────────────────────
-function handleCatCSVDrop(e){ e.preventDefault(); document.getElementById('cat-drop').classList.remove('drag'); handleCatCSVFile(e.dataTransfer.files[0]); }
-function handleCatCSVFile(file){
-  if(!file) return;
-  const r=new FileReader();
-  r.onload=e=>{
+function handleCatCSVDrop(e) { e.preventDefault(); document.getElementById('cat-drop').classList.remove('drag'); handleCatCSVFile(e.dataTransfer.files[0]); }
+function handleCatCSVFile(file) {
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
     const { header, rows } = parseCSV(e.target.result);
-    _csvMode='categories'; _csvHeader=header; _csvRows=rows;
-    openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0,5));
+    _csvMode = 'categories'; _csvHeader = header; _csvRows = rows;
+    openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0, 5));
   };
   r.readAsText(file);
 }
 
-function openCSVModal(title, sub, header, preview){
+function openCSVModal(title, sub, header, preview) {
   document.getElementById('csv-modal-title').textContent = title;
   document.getElementById('csv-modal-sub').textContent   = sub;
   document.getElementById('import-prog-wrap').classList.remove('show');
   document.getElementById('csv-preview-wrap').style.display = 'block';
   document.getElementById('csv-do-import').style.display    = 'flex';
   document.getElementById('csv-preview-note').textContent   = `${_csvRows.length} rows will be imported.`;
-  const thead = `<thead><tr>${header.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`;
-  const tbody = `<tbody>${preview.map(row=>`<tr>${header.map(h=>`<td>${row[h]||''}</td>`).join('')}</tr>`).join('')}</tbody>`;
-  document.getElementById('csv-preview-tbl').innerHTML = thead+tbody;
+  const thead = `<thead><tr>${header.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
+  const tbody = `<tbody>${preview.map(row => `<tr>${header.map(h => `<td>${esc(row[h] || '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  document.getElementById('csv-preview-tbl').innerHTML = thead + tbody;
   document.getElementById('csv-modal').classList.add('open');
 }
 
-function closeCSVModal(){ document.getElementById('csv-modal').classList.remove('open'); _csvMode=null; _csvRows=[]; }
+function closeCSVModal() { document.getElementById('csv-modal').classList.remove('open'); _csvMode = null; _csvRows = []; }
 
-async function executeImport(){
-  if(!_csvRows.length) return;
-  document.getElementById('csv-do-import').style.display  = 'none';
+async function executeImport() {
+  if (!_csvRows.length) return;
+  document.getElementById('csv-do-import').style.display    = 'none';
   document.getElementById('csv-preview-wrap').style.display = 'none';
   const prog  = document.getElementById('import-prog-wrap');
   const bar   = document.getElementById('import-prog-bar');
   const label = document.getElementById('import-prog-label');
-  const sub   = document.getElementById('import-prog-sub');
   prog.classList.add('show');
-
-  const isProds = _csvMode==='products';
+  const isProds = _csvMode === 'products';
   const total   = _csvRows.length;
-  let done=0, errs=0;
+  let done = 0, errs = 0;
 
-  if(isProds){
-    // Products: POST each row to /agents/:id/products
-    for(const row of _csvRows){
+  if (isProds) {
+    for (const row of _csvRows) {
       try {
-        await apiFetch(`/agents/${AGENT_ID}/products`,{method:'POST',body:JSON.stringify({
-          name:        row.name,
-          price:       parseFloat(row.price)||0,
-          category:    row.category||'General',
-          description: row.description||'',
-          sku:         row.sku||'',
-          stock_qty:   row.stock_qty?parseInt(row.stock_qty):null,
-          image_url:   row.image_url||''
+        await apiFetch(`/agents/${AGENT_ID}/products`, { method: 'POST', body: JSON.stringify({
+          name: row.name, price: parseFloat(row.price) || 0,
+          category: row.category || 'General', description: row.description || '',
+          sku: row.sku || '', stock_qty: row.stock_qty ? parseInt(row.stock_qty) : null,
+          image_url: row.image_url || ''
         })});
         done++;
-      } catch(e){ errs++; }
-      bar.style.width   = Math.round((done+errs)/total*100)+'%';
-      label.textContent = `Importing ${done+errs} of ${total}...`;
+      } catch(e) { errs++; }
+      bar.style.width  = Math.round((done + errs) / total * 100) + '%';
+      label.textContent = `Importing ${done + errs} of ${total}...`;
     }
-    bar.style.background = errs?'var(--amber)':'var(--green)';
-    label.textContent = `✓ Done — ${done} products imported${errs?', '+errs+' failed':''}`;
-    toast(`Imported ${done} products!`, done?'success':'error');
+    bar.style.background = errs ? 'var(--amber)' : 'var(--green)';
+    label.textContent = `✓ Done — ${done} products imported${errs ? ', ' + errs + ' failed' : ''}`;
+    toast(`Imported ${done} products!`, done ? 'success' : 'error');
     document.getElementById('stat-products').textContent = done;
-    document.getElementById('prod-badge').textContent    = done+' products';
+    document.getElementById('prod-badge').textContent    = done + ' products';
     markStep(1);
-    setTimeout(()=>{ closeCSVModal(); loadProducts(); }, 1800);
+    setTimeout(() => { closeCSVModal(); loadProducts(); }, 1800);
   } else {
-    // Categories: backend has no /categories endpoint.
-    // Instead, build a formatted text and save as a knowledge source.
     label.textContent = 'Processing categories…';
     bar.style.width   = '50%';
     try {
-      const text = _csvRows
-        .filter(r=>r.name)
-        .map(r=>`Category: ${r.name}${r.description?'\nDescription: '+r.description:''}${r.slug?'\nSlug: '+r.slug:''}`)
+      const text = _csvRows.filter(r => r.name)
+        .map(r => `Category: ${r.name}${r.description ? '\nDescription: ' + r.description : ''}${r.slug ? '\nSlug: ' + r.slug : ''}`)
         .join('\n\n');
-      await apiFetch(`/agents/${AGENT_ID}/sources`,{method:'POST',body:JSON.stringify({
-        type:    'text',
-        title:   'Product Categories',
-        content: text
-      })});
-      done = _csvRows.filter(r=>r.name).length;
-      bar.style.width='100%'; bar.style.background='var(--green)';
-      label.textContent=`✓ ${done} categories saved as knowledge source`;
-      toast(`${done} categories added to knowledge base!`,'success');
+      await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', title: 'Product Categories', content: text }) });
+      done = _csvRows.filter(r => r.name).length;
+      bar.style.width = '100%'; bar.style.background = 'var(--green)';
+      label.textContent = `✓ ${done} categories saved as knowledge source`;
+      toast(`${done} categories added to knowledge base!`, 'success');
       document.getElementById('stat-categories').textContent = done;
       markStep(2);
-      setTimeout(()=>{ closeCSVModal(); loadSources(); }, 1800);
-    } catch(e){
-      bar.style.background='var(--red)';
-      label.textContent='Import failed: '+e.message;
-      toast(e.message,'error');
+      setTimeout(() => { closeCSVModal(); loadSources(); }, 1800);
+    } catch(e) {
+      bar.style.background = 'var(--red)';
+      label.textContent = 'Import failed: ' + e.message;
+      toast(e.message, 'error');
     }
   }
 }
@@ -1214,53 +1101,53 @@ async function executeImport(){
 // ══════════════════════════════════════════════════════════════════
 //  PAYMENT
 // ══════════════════════════════════════════════════════════════════
-async function loadPaymentSettings(){
+async function loadPaymentSettings() {
   try {
-    const d=await apiFetch(`/agents/${AGENT_ID}/payment-settings`);
-    document.getElementById('rz-key-id').value   = d.razorpay_key_id||'';
-    document.getElementById('rz-currency').value = d.currency||'INR';
+    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings`);
+    document.getElementById('rz-key-id').value   = d.razorpay_key_id || '';
+    document.getElementById('rz-currency').value = d.currency || 'INR';
     document.getElementById('rz-hint').textContent = d.has_secret ? '🔒 Secret key is stored (encrypted)' : '';
-  } catch(e){}
+  } catch(e) {}
 }
 
-async function savePayment(){
+async function savePayment() {
   try {
-    await apiFetch(`/agents/${AGENT_ID}/payment-settings`,{method:'PUT',body:JSON.stringify({
-      razorpay_key_id:    document.getElementById('rz-key-id').value.trim(),
-      razorpay_key_secret:document.getElementById('rz-key-secret').value.trim(),
-      currency:           document.getElementById('rz-currency').value,
-      enabled:            true   // enable payment when credentials are saved
+    await apiFetch(`/agents/${AGENT_ID}/payment-settings`, { method: 'PUT', body: JSON.stringify({
+      razorpay_key_id:     document.getElementById('rz-key-id').value.trim(),
+      razorpay_key_secret: document.getElementById('rz-key-secret').value.trim(),
+      currency:            document.getElementById('rz-currency').value,
+      enabled:             true
     })});
-    document.getElementById('rz-key-secret').value='';
-    document.getElementById('rz-hint').textContent='🔒 Secret key stored (encrypted)';
-    toast('Payment settings saved!','success');
-  } catch(e){ toast(e.message,'error'); }
+    document.getElementById('rz-key-secret').value = '';
+    document.getElementById('rz-hint').textContent = '🔒 Secret key stored (encrypted)';
+    toast('Payment settings saved!', 'success');
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-async function verifyPayment(){
+async function verifyPayment() {
   try {
-    const d=await apiFetch(`/agents/${AGENT_ID}/payment-settings/verify`,{method:'POST'});
-    toast(d.message||'Keys verified ✓','success');
-  } catch(e){ toast('Verification failed: '+e.message,'error'); }
+    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings/verify`, { method: 'POST' });
+    toast(d.message || 'Keys verified ✓', 'success');
+  } catch(e) { toast('Verification failed: ' + e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  PRODUCTS CRUD
 // ══════════════════════════════════════════════════════════════════
-async function loadProducts(){
+async function loadProducts() {
   try {
-    const prods=await apiFetch(`/agents/${AGENT_ID}/products`);
+    const prods = await apiFetch(`/agents/${AGENT_ID}/products`);
     document.getElementById('stat-products').textContent = prods.length;
-    document.getElementById('prod-badge').textContent    = prods.length+' products';
-    const cur = document.getElementById('rz-currency')?.value==='USD'?'$':'₹';
+    document.getElementById('prod-badge').textContent    = prods.length + ' products';
+    const cur  = document.getElementById('rz-currency')?.value === 'USD' ? '$' : '₹';
     const list = document.getElementById('products-list');
-    if(!prods.length){ list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px;">No products yet. Add one manually or import a CSV.</div>'; return; }
-    list.innerHTML = prods.map(p=>`
+    if (!prods.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px;">No products yet. Add one manually or import a CSV.</div>'; return; }
+    list.innerHTML = prods.map(p => `
       <div class="product-item">
-        <div class="product-thumb">${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='📦'">` :'📦'}</div>
+        <div class="product-thumb">${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='📦'">` : '📦'}</div>
         <div class="product-info">
-          <div class="product-name">${p.name}</div>
-          <div class="product-cat">${p.category||'No category'}${p.sku?' · '+p.sku:''}</div>
+          <div class="product-name">${esc(p.name)}</div>
+          <div class="product-cat">${esc(p.category || 'No category')}${p.sku ? ' · ' + p.sku : ''}</div>
         </div>
         <div class="product-price">${cur}${p.price}</div>
         <div style="display:flex;gap:2px;">
@@ -1268,41 +1155,63 @@ async function loadProducts(){
           <button class="btn-icon" onclick="delProduct('${p._id}')">🗑️</button>
         </div>
       </div>`).join('');
-  } catch(e){ toast(e.message,'error'); }
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-function openProductModal(){ document.getElementById('pm-id').value=''; ['pm-name','pm-price','pm-category','pm-desc','pm-image','pm-sku','pm-stock'].forEach(id=>document.getElementById(id).value=''); document.getElementById('pm-title').textContent='Add Product'; document.getElementById('product-modal').classList.add('open'); }
-function editProduct(p){ document.getElementById('pm-id').value=p._id; document.getElementById('pm-name').value=p.name||''; document.getElementById('pm-price').value=p.price||''; document.getElementById('pm-category').value=p.category||''; document.getElementById('pm-desc').value=p.description||''; document.getElementById('pm-image').value=p.image_url||''; document.getElementById('pm-sku').value=p.sku||''; document.getElementById('pm-stock').value=p.stock_qty!=null?p.stock_qty:''; document.getElementById('pm-title').textContent='Edit Product'; document.getElementById('product-modal').classList.add('open'); }
-function closeProductModal(){ document.getElementById('product-modal').classList.remove('open'); }
+function openProductModal() {
+  document.getElementById('pm-id').value = '';
+  ['pm-name','pm-price','pm-category','pm-desc','pm-image','pm-sku','pm-stock'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pm-title').textContent = 'Add Product';
+  document.getElementById('product-modal').classList.add('open');
+}
+function editProduct(p) {
+  document.getElementById('pm-id').value      = p._id;
+  document.getElementById('pm-name').value    = p.name || '';
+  document.getElementById('pm-price').value   = p.price || '';
+  document.getElementById('pm-category').value = p.category || '';
+  document.getElementById('pm-desc').value    = p.description || '';
+  document.getElementById('pm-image').value   = p.image_url || '';
+  document.getElementById('pm-sku').value     = p.sku || '';
+  document.getElementById('pm-stock').value   = p.stock_qty != null ? p.stock_qty : '';
+  document.getElementById('pm-title').textContent = 'Edit Product';
+  document.getElementById('product-modal').classList.add('open');
+}
+function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
 
-async function saveProduct(){
-  const id=document.getElementById('pm-id').value;
-  const name=document.getElementById('pm-name').value.trim();
-  const price=document.getElementById('pm-price').value;
-  if(!name||!price) return toast('Name & price required','warning');
-  const body={name,price:parseFloat(price),category:document.getElementById('pm-category').value,description:document.getElementById('pm-desc').value,image_url:document.getElementById('pm-image').value,sku:document.getElementById('pm-sku').value,stock_qty:document.getElementById('pm-stock').value?parseInt(document.getElementById('pm-stock').value):null};
+async function saveProduct() {
+  const id    = document.getElementById('pm-id').value;
+  const name  = document.getElementById('pm-name').value.trim();
+  const price = document.getElementById('pm-price').value;
+  if (!name || !price) return toast('Name & price required', 'warning');
+  const body = {
+    name, price: parseFloat(price),
+    category:    document.getElementById('pm-category').value,
+    description: document.getElementById('pm-desc').value,
+    image_url:   document.getElementById('pm-image').value,
+    sku:         document.getElementById('pm-sku').value,
+    stock_qty:   document.getElementById('pm-stock').value ? parseInt(document.getElementById('pm-stock').value) : null
+  };
   try {
-    if(id) await apiFetch(`/agents/${AGENT_ID}/products/${id}`,{method:'PUT',body:JSON.stringify(body)});
-    else   await apiFetch(`/agents/${AGENT_ID}/products`,{method:'POST',body:JSON.stringify(body)});
-    closeProductModal(); loadProducts(); toast('Product saved!','success');
-  } catch(e){ toast(e.message,'error'); }
+    if (id) await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else     await apiFetch(`/agents/${AGENT_ID}/products`,       { method: 'POST', body: JSON.stringify(body) });
+    closeProductModal(); loadProducts(); toast('Product saved!', 'success');
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-async function delProduct(id){
-  if(!confirm('Delete this product?')) return;
-  try { await apiFetch(`/agents/${AGENT_ID}/products/${id}`,{method:'DELETE'}); loadProducts(); toast('Deleted','success'); }
-  catch(e){ toast(e.message,'error'); }
+async function delProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  try { await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'DELETE' }); loadProducts(); toast('Deleted', 'success'); }
+  catch(e) { toast(e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  PUBLISH
 // ══════════════════════════════════════════════════════════════════
-async function publishAgent(){
-  const btn=document.getElementById('publish-btn');
-  btn.disabled=true; btn.innerHTML='<span class="spin-anim">⟳</span> Publishing...';
+async function publishAgent() {
+  const btn = document.getElementById('publish-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin-anim">⟳</span> Publishing...';
   try {
-    await apiFetch(`/agents/${AGENT_ID}/publish`,{method:'POST'});
-    // Re-fetch; backend sets subdomain_url and published_url correctly
+    await apiFetch(`/agents/${AGENT_ID}/publish`, { method: 'POST' });
     const [updatedAgent, sources, products] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
@@ -1313,99 +1222,91 @@ async function publishAgent(){
     agent.products_count = products.length;
     agent.published = true;
     updatePublishUI(agent);
-    document.getElementById('pub-badge').className='status-badge badge-live';
-    document.getElementById('pub-badge').innerHTML='● Live';
-    document.getElementById('preview-btn').style.display='flex';
+    document.getElementById('pub-badge').className = 'status-badge badge-live';
+    document.getElementById('pub-badge').innerHTML = '● Live';
+    document.getElementById('preview-btn').style.display = 'flex';
     markStep(3);
-    toast('Agent published! 🎉','success');
-  } catch(e){ toast(e.message,'error'); }
-  finally { btn.disabled=false; btn.innerHTML='Publish Agent'; }
+    toast('Agent published! 🎉', 'success');
+  } catch(e) { toast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = 'Publish Agent'; }
 }
 
 function updatePublishUI(a) {
-  if(!a?.published) return;
-  const card=document.getElementById('publish-links-card');
-  if(card) card.style.display='block';
-  // Use URLs from backend — authoritative
+  if (!a?.published) return;
+  const card = document.getElementById('publish-links-card');
+  if (card) card.style.display = 'block';
   const subURL = a.subdomain_url || '#';
   const fbURL  = a.published_url || '#';
   setLink('sub-url', subURL, subURL);
   setLink('sub-url-open', subURL);
   setLink('pub-url', fbURL, fbURL);
-  const embed=document.getElementById('embed-box');
-  if(embed) embed.textContent=`<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`;
-  const sideCard=document.getElementById('agent-url-side-card');
-  const sideUrl=document.getElementById('side-agent-url');
-  const sideOpen=document.getElementById('side-agent-open');
-  if(sideCard) sideCard.style.display='block';
-  if(sideUrl)  { sideUrl.href=subURL; sideUrl.textContent=subURL; }
-  if(sideOpen) sideOpen.href=subURL;
-  if(a.slug){
-    const sub = subURL.replace('https://','').replace(/\/$/, '');
-    document.getElementById('page-agent-slug').textContent=`/${a.slug}  ·  ${sub}`;
+  const embed = document.getElementById('embed-box');
+  if (embed) embed.textContent = `<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`;
+  const sideCard = document.getElementById('agent-url-side-card');
+  const sideUrl  = document.getElementById('side-agent-url');
+  const sideOpen = document.getElementById('side-agent-open');
+  if (sideCard) sideCard.style.display = 'block';
+  if (sideUrl)  { sideUrl.href = subURL; sideUrl.textContent = subURL; }
+  if (sideOpen) sideOpen.href = subURL;
+  if (a.slug) {
+    const sub = subURL.replace('https://', '').replace(/\/$/, '');
+    document.getElementById('page-agent-slug').textContent = `/${a.slug}  ·  ${sub}`;
   }
 }
 
 function setLink(id, href, text) {
-  const el=document.getElementById(id); if(!el) return;
-  el.href=href||'#';
-  if(text!==undefined) el.textContent=text;
-  else if(!el.textContent.trim()||el.textContent==='—') el.textContent=href||'—';
+  const el = document.getElementById(id); if (!el) return;
+  el.href = href || '#';
+  if (text !== undefined) el.textContent = text;
+  else if (!el.textContent.trim() || el.textContent === '—') el.textContent = href || '—';
 }
 
-async function connectDomain(){
-  const domain=document.getElementById('domain-inp').value.trim();
-  if(!domain) return toast('Enter a domain first','warning');
+async function connectDomain() {
+  const domain = document.getElementById('domain-inp').value.trim();
+  if (!domain) return toast('Enter a domain first', 'warning');
   try {
-    await apiFetch(`/agents/${AGENT_ID}/custom-domain`,{method:'POST',body:JSON.stringify({domain})});
-    toast('Domain connected! DNS may take up to 24h to propagate.','success');
-    const wrap=document.getElementById('domain-status-wrap');
-    wrap.style.display='block';
-    wrap.innerHTML=`<div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green);">✓ ${domain} connected — waiting for DNS propagation</div>`;
-  } catch(e){ toast(e.message,'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/custom-domain`, { method: 'POST', body: JSON.stringify({ domain }) });
+    toast('Domain connected! DNS may take up to 24h to propagate.', 'success');
+    const wrap = document.getElementById('domain-status-wrap');
+    wrap.style.display = 'block';
+    wrap.innerHTML = `<div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green);">✓ ${domain} connected — waiting for DNS propagation</div>`;
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-async function clearConvs(){
-  const ok=await confirmModal({title:'Clear all conversations?',message:'This will permanently delete all conversations for this agent.',confirmText:'Clear All',danger:true});
-  if(!ok)return;
-  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`,{method:'POST'}); toast('Conversations cleared','success'); }
-  catch(e){ toast(e.message,'error'); }
+async function clearConvs() {
+  const ok = await confirmModal({ title: 'Clear all conversations?', message: 'This will permanently delete all conversations for this agent.', confirmText: 'Clear All', danger: true });
+  if (!ok) return;
+  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`, { method: 'POST' }); toast('Conversations cleared', 'success'); }
+  catch(e) { toast(e.message, 'error'); }
 }
 
-async function deleteAgent(){
-  const ok=await confirmModal({title:'Delete agent permanently?',message:'All sources, products, and conversations will be lost forever.',confirmText:'Delete Agent',danger:true});
-  if(!ok)return;
+async function deleteAgent() {
+  const ok = await confirmModal({ title: 'Delete agent permanently?', message: 'All sources, products, and conversations will be lost forever.', confirmText: 'Delete Agent', danger: true });
+  if (!ok) return;
   try {
-    await apiFetch(`/agents/${AGENT_ID}`,{method:'DELETE'});
-    toast('Agent deleted','success');
-    setTimeout(()=>location.href='agents.html', 1200);
-  } catch(e){ toast(e.message,'error'); }
+    await apiFetch(`/agents/${AGENT_ID}`, { method: 'DELETE' });
+    toast('Agent deleted', 'success');
+    setTimeout(() => location.href = 'agents.html', 1200);
+  } catch(e) { toast(e.message, 'error'); }
 }
 
-function previewAgent(){
-  const url=agent?.subdomain_url||agent?.published_url;
-  if(url&&url!=='#') window.open(url,'_blank');
-  else toast('Publish the agent first','warning');
+function previewAgent() {
+  const url = agent?.subdomain_url || agent?.published_url;
+  if (url && url !== '#') window.open(url, '_blank');
+  else toast('Publish the agent first', 'warning');
 }
 
-//  MOBILE SIDEBAR
-// ══════════════════════════════════════════════════════════════════
-// Mobile sidebar handled by nav.js initNav → _initMobile()
-// which uses .mob-open class consistent with shared.css
-
-// ══════════════════════════════════════════════════════════════════
-//  BOOT  — initNav authenticates, then loadAgent fetches data
-// ══════════════════════════════════════════════════════════════════
 // Close modals on backdrop click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if(e.target === overlay) overlay.classList.remove('open');
-  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
 });
 
+// ══════════════════════════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════════════════════════
 (async () => {
-  const { user } = await renderNav('agents');
-  if (!user) return;
+  const nav = await renderNav('agents');
+  if (!nav) return;
   await loadAgent();
 })();
 </script>
