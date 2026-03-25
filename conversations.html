@@ -126,11 +126,15 @@ async function loadSessions(){
 function renderSessions(sessions){
   const list=document.getElementById('session-list')
   if(!sessions.length){list.innerHTML='<div style="padding:36px 20px;text-align:center"><div style="font-size:28px;opacity:.3;margin-bottom:10px">💬</div><div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div><div style="font-size:12px;color:var(--text-3)">Sessions appear once users chat with your agent.</div></div>';return}
-  list.innerHTML=sessions.map(s=>`
-    <div class="session-item" id="si-${escId(s._id||s.session_id||s.visitor_ip)}" onclick="openSession(${JSON.stringify(s._id||s.session_id||s.visitor_ip)},${JSON.stringify(s)})">
-      <div class="session-q">${esc(s.first_question||'(No message)')}</div>
-      <div class="session-meta"><span>${s.message_count||1} msgs · ${fmtTokens(s.tokens_used||0)} tokens</span><span>${timeAgo(s.last_active)}</span></div>
-    </div>`).join('')
+  list.innerHTML=sessions.map(s=>{
+    const key = s._id || s.session_id || s.visitor_ip;
+    const safeKey = key.replace(/'/g, "\\'");   // ✅ escape single quotes
+    return `
+      <div class="session-item" id="si-${escId(key)}" onclick="openSession('${safeKey}', ${JSON.stringify(s)})">
+        <div class="session-q">${esc(s.first_question||'(No message)')}</div>
+        <div class="session-meta"><span>${s.message_count||1} msgs · ${fmtTokens(s.tokens_used||0)} tokens</span><span>${timeAgo(s.last_active)}</span></div>
+      </div>
+    `}).join('')
 }
 function filterSessions(){const q=document.getElementById('search-inp').value.toLowerCase();renderSessions(allSessions.filter(s=>(s.first_question||'').toLowerCase().includes(q)||(s.visitor_ip||'').includes(q)))}
 async function openSession(key,meta){
@@ -170,4 +174,5 @@ async function clearAllModal(){
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>')}
 function escId(s){return(s||'').toString().replace(/[^a-zA-Z0-9]/g,'_')}
 </script>
-</body></html>
+</body>
+</html>
