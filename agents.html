@@ -1,103 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>My Agents — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="shared.css">
-
 <style>
-.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:14px;}
-.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:var(--t);box-shadow:var(--sh-card);}
-.agent-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh);}
-.ac-stripe{height:4px;}
-.ac-header{display:flex;align-items:center;gap:12px;padding:16px 16px 12px;}
-.ac-logo{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#fff;overflow:hidden;}
-.ac-logo img{width:100%;height:100%;object-fit:cover;}
-.ac-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
-.ac-slug{font-size:10.5px;color:var(--text-3);font-family:var(--mono);}
-.ac-kpis{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-.ac-kpi{padding:10px 6px;text-align:center;border-right:1px solid var(--border);}
-.ac-kpi:last-child{border-right:none;}
-.ac-kpi-val{font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text);margin-bottom:2px;}
-.ac-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);}
-.ac-footer{display:flex;gap:8px;padding:12px;}
-.create-card{background:var(--surface);border:2px dashed var(--border-md);border-radius:var(--r-lg);padding:32px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;transition:var(--t);}
-.create-card:hover{border-color:var(--accent);background:var(--accent-dim);}
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.type-opt{padding:12px;border:1px solid var(--border-md);border-radius:12px;cursor:pointer;transition:var(--t);background:var(--surface-2);display:flex;gap:10px;align-items:flex-start;}
-.type-opt:hover,.type-opt.active{border-color:var(--accent);background:var(--accent-dim);}
-.type-opt-icon{font-size:20px;flex-shrink:0;}
-.type-opt-name{font-size:13px;font-weight:700;margin-bottom:2px;}
-.type-opt-sub{font-size:11px;color:var(--text-3);}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:14px}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:border-color .18s var(--ease),transform .18s var(--ease),box-shadow .18s var(--ease);box-shadow:var(--sh-sm);animation:cardIn .3s var(--ease) both}
+.agent-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--sh),0 0 0 1px var(--accent-dim)}
+.agent-card:nth-child(1){animation-delay:.04s}.agent-card:nth-child(2){animation-delay:.08s}
+.agent-card:nth-child(3){animation-delay:.12s}.agent-card:nth-child(4){animation-delay:.16s}
+.ac-stripe{height:3px;width:100%}
+.ac-header{display:flex;align-items:center;gap:11px;padding:14px 16px 10px}
+.ac-logo{width:38px;height:38px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;overflow:hidden;border:1px solid var(--border-md)}
+.ac-logo img{width:100%;height:100%;object-fit:cover}
+.ac-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ac-slug{font-size:10.5px;color:var(--text-3);font-family:var(--mono)}
+.ac-kpis{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ac-kpi{padding:9px 6px;text-align:center;border-right:1px solid var(--border);transition:background .12s}
+.ac-kpi:last-child{border-right:none}
+.ac-kpi:hover{background:var(--surface-2)}
+.ac-kpi-val{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text);margin-bottom:2px}
+.ac-kpi-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text-3)}
+.ac-footer{display:flex;gap:7px;padding:10px 13px}
+.create-card{background:var(--surface);border:2px dashed var(--border-md);border-radius:var(--r-lg);padding:32px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;transition:var(--t)}
+.create-card:hover{border-color:var(--accent);background:var(--accent-dim)}
+/* Create modal */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-opt{padding:12px;border:1px solid var(--border-md);border-radius:var(--r-sm);cursor:pointer;transition:var(--t);background:var(--surface-2);display:flex;gap:10px;align-items:flex-start}
+.type-opt:hover,.type-opt.active{border-color:var(--accent);background:var(--accent-dim)}
+.type-opt-icon{font-size:20px;flex-shrink:0}
+.type-opt-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.type-opt-sub{font-size:11px;color:var(--text-3)}
 </style>
+<link rel="stylesheet" href="shared.css">
+<script>
+;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
+</script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
 </head>
 <body>
-<div id="page-skeleton">
-  <div class="skel-topbar" style="padding:0 28px;"><div class="skel" style="height:14px;width:120px;border-radius:6px;"></div><div class="skel" style="height:32px;width:110px;border-radius:8px;"></div></div>
-  <div style="padding:0 28px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;"><div class="skel" style="height:180px;border-radius:16px;"></div><div class="skel" style="height:180px;border-radius:16px;"></div><div class="skel" style="height:180px;border-radius:16px;"></div></div>
-</div>
-<div class="mobile-topbar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="hamburger" id="mob-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-    <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
-  </div>
-  <button class="theme-toggle"></button>
-</div>
-<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-<aside class="sidebar" id="sidebar"></aside>
 <div id="toast-container"></div>
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button>
+    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:13px;width:120px;border-radius:4px"></div>
+    <div class="skel" style="height:34px;width:110px;border-radius:var(--r-sm)"></div>
+  </div>
+  <div class="skel-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+      <div class="skel" style="height:180px;border-radius:var(--r-lg)"></div>
+      <div class="skel" style="height:180px;border-radius:var(--r-lg);opacity:.7"></div>
+      <div class="skel" style="height:180px;border-radius:var(--r-lg);opacity:.45"></div>
+    </div>
+  </div>
+</div>
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <div><div class="page-title">My Agents</div><div class="page-sub" id="agents-sub">Loading…</div></div>
+      <div>
+        <div class="topbar-title">My Agents</div>
+        <div class="topbar-subtitle" id="agents-sub">Loading…</div>
+      </div>
     </div>
     <div class="topbar-right">
-      <button class="theme-toggle"></button>
-      <button class="btn btn-primary btn-sm create-btn" onclick="openCreate()">+ New Agent</button>
+      <button class="theme-toggle" style="font-size:15px"></button>
+      <button class="btn btn-primary" onclick="openCreate()">+ New Agent</button>
     </div>
   </div>
-  <div class="content" id="main-content" style="display:none;padding-top:22px;">
+  <div class="content" id="page-content" style="display:none">
     <div class="agents-grid" id="agents-grid"></div>
   </div>
 </div>
 
 <!-- Create Modal -->
 <div class="modal-overlay" id="create-modal">
-  <div class="modal">
+  <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <div><div class="modal-title">Create New Agent</div><div class="modal-sub">Takes less than 1 minute to set up</div></div>
+      <div>
+        <div class="modal-title">Create New Agent</div>
+        <div class="modal-sub">Takes less than a minute to set up</div>
+      </div>
       <button class="modal-close" onclick="closeCreate()">✕</button>
     </div>
-    <div class="modal-body">
-      <div class="field">
-        <label>Agent Name *</label>
-        <input id="cm-name" class="inp" type="text" placeholder="e.g. Support Bot, Sales Agent, FAQ Bot" autofocus/>
+    <div class="field">
+      <label>Agent Name *</label>
+      <input type="text" id="cm-name" placeholder="e.g. Support Bot, Sales Agent, FAQ Bot" autofocus>
+    </div>
+    <div class="field">
+      <label>Agent Type</label>
+      <div class="type-grid" id="type-grid">
+        <div class="type-opt active" onclick="selectType('support',this)"><div class="type-opt-icon">🎧</div><div><div class="type-opt-name">Support</div><div class="type-opt-sub">Handle customer queries</div></div></div>
+        <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name">Sales</div><div class="type-opt-sub">Sell products via chat</div></div></div>
+        <div class="type-opt" onclick="selectType('faq',this)"><div class="type-opt-icon">❓</div><div><div class="type-opt-name">FAQ Bot</div><div class="type-opt-sub">Answer common questions</div></div></div>
+        <div class="type-opt" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name">General</div><div class="type-opt-sub">Flexible assistant</div></div></div>
       </div>
-      <div class="field">
-        <label>Agent Type</label>
-        <div class="type-grid" id="type-grid">
-          <div class="type-opt active" onclick="selectType('support',this)"><div class="type-opt-icon">🎧</div><div><div class="type-opt-name">Support</div><div class="type-opt-sub">Handle customer queries</div></div></div>
-          <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name">Sales</div><div class="type-opt-sub">Sell products via chat</div></div></div>
-          <div class="type-opt" onclick="selectType('faq',this)"><div class="type-opt-icon">❓</div><div><div class="type-opt-name">FAQ Bot</div><div class="type-opt-sub">Answer common questions</div></div></div>
-          <div class="type-opt" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name">General</div><div class="type-opt-sub">Flexible assistant</div></div></div>
-        </div>
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>Brand Colour</label>
-        <div class="color-palette" id="cm-palette">
-          <div class="color-swatch active" style="background:#6C5FF5;" onclick="cmColor('#6C5FF5',this)"></div>
-          <div class="color-swatch" style="background:#F26B6B;" onclick="cmColor('#F26B6B',this)"></div>
-          <div class="color-swatch" style="background:#2DD4A0;" onclick="cmColor('#2DD4A0',this)"></div>
-          <div class="color-swatch" style="background:#F5A523;" onclick="cmColor('#F5A523',this)"></div>
-          <div class="color-swatch" style="background:#60A5FA;" onclick="cmColor('#60A5FA',this)"></div>
-          <div class="color-swatch" style="background:#EC4899;" onclick="cmColor('#EC4899',this)"></div>
-          <div class="color-swatch" style="background:#A78BFA;" onclick="cmColor('#A78BFA',this)"></div>
-          <div class="color-swatch" style="background:#14B8A6;" onclick="cmColor('#14B8A6',this)"></div>
-        </div>
+    </div>
+    <div class="field" style="margin-bottom:0">
+      <label>Brand Colour</label>
+      <div class="color-palette" id="cm-palette">
+        <div class="color-swatch active" style="background:#7C6FFF" onclick="cmColor('#7C6FFF',this)"></div>
+        <div class="color-swatch" style="background:#F26B6B" onclick="cmColor('#F26B6B',this)"></div>
+        <div class="color-swatch" style="background:#2DD4A0" onclick="cmColor('#2DD4A0',this)"></div>
+        <div class="color-swatch" style="background:#F5A523" onclick="cmColor('#F5A523',this)"></div>
+        <div class="color-swatch" style="background:#60A5FA" onclick="cmColor('#60A5FA',this)"></div>
+        <div class="color-swatch" style="background:#EC4899" onclick="cmColor('#EC4899',this)"></div>
+        <div class="color-swatch" style="background:#A78BFA" onclick="cmColor('#A78BFA',this)"></div>
+        <div class="color-swatch" style="background:#14B8A6" onclick="cmColor('#14B8A6',this)"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -107,19 +130,20 @@
   </div>
 </div>
 
-<script src="api.js"></script><script src="nav.js"></script>
 <script>
-let _cmColor='#6C5FF5', _cmType='support'
-const PROMPTS = {
-  support:'You are a helpful customer support agent. Answer from the knowledge base. Be empathetic and concise. If you cannot find the answer, direct the user to contact support.',
-  sales:'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, and guide them to purchase. Be enthusiastic and helpful.',
-  faq:'You are a friendly FAQ bot. Answer questions strictly from the knowledge base. Be concise. If a question is not covered, politely say so.',
-  general:'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.',
+let _cmColor='#7C6FFF',_cmType='support'
+const PROMPTS={
+  support:'You are a helpful customer support agent. Answer from the knowledge base. Be empathetic and concise.',
+  sales:'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, guide them to purchase.',
+  faq:'You are a friendly FAQ bot. Answer questions strictly from the knowledge base. Be concise.',
+  general:'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.'
 }
 ;(async()=>{
-  const{user}=await initNav('agents')
-  if(!user)return
-  if(new URLSearchParams(location.search).get('create')==='1') setTimeout(openCreate,400)
+  const nav=await renderNav('agents')
+  if(!nav)return
+  const{user}=nav
+  // Handle ?create=1
+  if(new URLSearchParams(location.search).get('create')==='1')setTimeout(openCreate,400)
   try{await loadAgents(user)}catch(e){toast(e.message,'error')}
   dismissSkeleton()
 })()
@@ -128,22 +152,22 @@ async function loadAgents(user){
   const planLimits={starter:3,grower:10,enterprise:Infinity}
   const limit=planLimits[user?.plan||'starter']||3
   document.getElementById('agents-sub').textContent=agents.length+' of '+(limit===Infinity?'∞':limit)+' agents'
-  document.getElementById('main-content').style.display='block'
+  document.getElementById('page-content').style.display='block'
   const grid=document.getElementById('agents-grid')
   if(!agents.length){
-    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">🤖</div><div class="empty-title">No agents yet</div><div class="empty-desc">Create your first AI agent to start handling customer queries via chat.</div><button class="btn btn-primary btn-lg" onclick="openCreate()">Create Your First Agent →</button></div></div>`
+    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">🤖</div><div class="empty-title">No agents yet</div><div class="empty-desc">Create your first AI agent to start handling customer queries.</div><button class="btn btn-primary" style="margin:0 auto" onclick="openCreate()">Create Your First Agent →</button></div></div>`
     return
   }
   grid.innerHTML=agents.map(a=>`
     <div class="agent-card" onclick="location.href='agent.html?id=${a._id}'">
-      <div class="ac-stripe" style="background:${a.brand_color||'#6C5FF5'}"></div>
+      <div class="ac-stripe" style="background:${a.brand_color||'#7C6FFF'}"></div>
       <div class="ac-header">
-        <div class="ac-logo" style="background:${a.brand_color||'#6C5FF5'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
-        <div style="flex:1;min-width:0;">
+        <div class="ac-logo" style="background:${a.brand_color||'#7C6FFF'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
+        <div style="flex:1;min-width:0">
           <div class="ac-name">${a.name}</div>
           <div class="ac-slug">/${a.slug||'—'}</div>
         </div>
-        <span class="badge ${a.published?'badge-live':'badge-draft'}">${a.published?'● Live':'Draft'}</span>
+        <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?'● Live':'Draft'}</span>
       </div>
       <div class="ac-kpis">
         <div class="ac-kpi"><div class="ac-kpi-val">${fmtNum(a.query_count||0)}</div><div class="ac-kpi-label">Chats</div></div>
@@ -151,24 +175,25 @@ async function loadAgents(user){
         <div class="ac-kpi"><div class="ac-kpi-val">${a.products_count||0}</div><div class="ac-kpi-label">Products</div></div>
       </div>
       <div class="ac-footer">
-        <a class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;" href="agent.html?id=${a._id}" onclick="event.stopPropagation()">⚙ Edit</a>
+        <a class="btn btn-secondary btn-sm" style="flex:1;justify-content:center" href="agent.html?id=${a._id}" onclick="event.stopPropagation()">⚙ Edit</a>
         ${a.published
-          ?`<a class="btn btn-green btn-sm" style="flex:1;justify-content:center;" href="${a.subdomain_url||a.published_url||"#"}" target="_blank" onclick="event.stopPropagation()">Open Chat ↗</a>`
-          :`<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" onclick="event.stopPropagation();quickPublish('${a._id}',this)">🚀 Publish</button>`}
+          ?`<a class="btn btn-accent-ghost btn-sm" style="flex:1;justify-content:center" href="${a.subdomain_url||a.published_url||'#'}" target="_blank" onclick="event.stopPropagation()">Open ↗</a>`
+          :`<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();quickPublish('${a._id}',this)">🚀 Publish</button>`}
       </div>
     </div>`).join('')+(agents.length<limit?`
     <div class="create-card" onclick="openCreate()">
-      <div style="font-size:40px;opacity:.4;">+</div>
-      <div style="font-size:14px;font-weight:700;">New Agent</div>
-      <div style="font-size:12px;color:var(--text-3);">Build another AI assistant</div>
-    </div>`:'')}
+      <div style="font-size:36px;opacity:.35">+</div>
+      <div style="font-size:14px;font-weight:700">New Agent</div>
+      <div style="font-size:12px;color:var(--text-3)">Build another AI assistant</div>
+    </div>`:'')
+}
 function selectType(t,el){_cmType=t;document.querySelectorAll('.type-opt').forEach(e=>e.classList.remove('active'));el.classList.add('active')}
 function cmColor(c,el){_cmColor=c;document.querySelectorAll('#cm-palette .color-swatch').forEach(s=>s.classList.remove('active'));el.classList.add('active')}
-function openCreate(){document.getElementById('create-modal').classList.add('open');document.getElementById('cm-name').focus()}
-function closeCreate(){document.getElementById('create-modal').classList.remove('open')}
+function openCreate(){document.getElementById('create-modal').classList.add('open');document.getElementById('cm-name').focus();document.body.style.overflow='hidden'}
+function closeCreate(){document.getElementById('create-modal').classList.remove('open');document.body.style.overflow=''}
 async function createAgent(){
   const name=document.getElementById('cm-name').value.trim()
-  if(!name){toast('Enter a name','error');return}
+  if(!name){toast('Enter an agent name','error');return}
   const btn=document.getElementById('cm-btn');btn.disabled=true;btn.textContent='Creating…'
   try{
     const a=await apiFetch('/agents',{method:'POST',body:JSON.stringify({name,brand_color:_cmColor,system_prompt:PROMPTS[_cmType],welcome_message:`Hi! I'm ${name}. How can I help you today?`})})
@@ -180,6 +205,9 @@ async function quickPublish(id,btn){
   try{await apiFetch(`/agents/${id}/publish`,{method:'POST'});toast('Published! 🎉','success');location.reload()}
   catch(e){toast(e.message,'error');btn.disabled=false;btn.textContent='🚀 Publish'}
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('create-modal').classList.contains('open'))createAgent()})
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.getElementById('create-modal').classList.contains('open'))closeCreate()
+  if(e.key==='Enter'&&document.getElementById('create-modal').classList.contains('open'))createAgent()
+})
 </script>
 </body></html>
