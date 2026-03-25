@@ -1,92 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Conversations — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="shared.css">
-
 <style>
-.convs-layout{display:grid;grid-template-columns:300px 1fr;gap:0;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);height:calc(100vh - 110px);min-height:500px;}
-.convs-left{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface);}
-.convs-left-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.search-wrap{position:relative;padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.search-inp{width:100%;height:36px;padding:0 12px 0 34px;border-radius:10px;border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-size:13px;outline:none;}
-.search-inp:focus{border-color:var(--accent);}
-.search-icon{position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--text-3);}
-.session-list{flex:1;overflow-y:auto;}
-.session-item{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
-.session-item:hover{background:var(--surface-2);}
-.session-item.active{background:var(--accent-dim);border-left:3px solid var(--accent);}
-.session-q{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
-.session-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);}
-.convs-right{display:flex;flex-direction:column;background:var(--bg);}
-.msg-hdr{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
-.msg-scroll{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
-.msg-q{background:var(--accent-dim);border:1px solid rgba(108,95,245,.15);border-radius:14px 14px 4px 14px;padding:11px 14px;font-size:13.5px;max-width:78%;align-self:flex-end;word-break:break-word;}
-.msg-a{background:var(--surface);border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:13px 16px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;}
-.msg-time{font-size:10.5px;color:var(--text-3);text-align:right;margin-top:4px;}
-.agent-filter{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-size:13px;outline:none;min-width:150px;}
-@media(max-width:860px){.convs-layout{grid-template-columns:1fr;height:auto;}.convs-left{height:320px;}.convs-right{height:calc(100vh - 430px);min-height:300px;}}
+.convs-layout{display:grid;grid-template-columns:300px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh-sm);height:calc(100vh - 112px);min-height:500px}
+.convs-left{border-right:1px solid var(--border);display:flex;flex-direction:column}
+.convs-left-hdr{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface-2)}
+.convs-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.convs-search-wrap{position:relative}
+.search-inp{width:100%;height:36px;padding:0 12px 0 34px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:var(--t)}
+.search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.search-inp::placeholder{color:var(--text-3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
+.session-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface-4) transparent}
+.session-item{padding:12px 15px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.session-item:last-child{border-bottom:none}
+.session-item:hover{background:var(--surface-2)}
+.session-item.active{background:var(--accent-dim);border-left:3px solid var(--accent)}
+.session-q{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.session-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
+.convs-right{display:flex;flex-direction:column;background:var(--bg)}
+.msg-hdr{padding:13px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.msg-scroll{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:13px;scrollbar-width:thin}
+.msg-q{background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13.5px;max-width:78%;align-self:flex-end;word-break:break-word}
+.msg-a{background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:12px 15px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word}
+.msg-time{font-size:10.5px;color:var(--text-3);text-align:right;margin-top:3px}
+.agent-filter{height:34px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;min-width:150px}
+@media(max-width:860px){.convs-layout{grid-template-columns:1fr;height:auto}.convs-left{height:320px}.convs-right{height:calc(100vh - 440px);min-height:280px}}
 </style>
+<link rel="stylesheet" href="shared.css">
+<script>
+;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
+</script>
+<script src="api.js"></script><script src="nav.js"></script>
 </head>
 <body>
-<div id="page-skeleton">
-  <div class="skel-topbar" style="padding:0 28px;"><div class="skel" style="height:14px;width:160px;border-radius:6px;"></div></div>
-  <div style="padding:0 28px;"><div class="skel" style="height:calc(100vh - 110px);border-radius:16px;"></div></div>
-</div>
-<div class="mobile-topbar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="hamburger" id="mob-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-    <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
-  </div>
-  <button class="theme-toggle"></button>
-</div>
-<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-<aside class="sidebar" id="sidebar"></aside>
 <div id="toast-container"></div>
+<div class="mobile-topbar">
+  <div class="mob-left"><button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button><a class="mob-logo" href="home.html">Support<span>Gent</span></a></div>
+  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<div id="page-skeleton">
+  <div class="skel-topbar"><div class="skel" style="height:13px;width:160px;border-radius:4px"></div><div class="skel" style="height:34px;width:180px;border-radius:var(--r-sm)"></div></div>
+  <div class="skel-body"><div class="skel" style="height:calc(100vh - 112px);border-radius:var(--r-lg)"></div></div>
+</div>
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <div><div class="page-title">Conversations</div><div class="page-sub" id="convs-sub">All sessions</div></div>
+      <div><div class="topbar-title">Conversations</div><div class="topbar-subtitle" id="convs-sub">All sessions</div></div>
     </div>
     <div class="topbar-right">
       <select class="agent-filter" id="agent-sel" onchange="loadSessions()"><option value="">All Agents</option></select>
-      <button class="theme-toggle"></button>
+      <button class="theme-toggle" style="font-size:15px"></button>
       <button class="btn btn-danger btn-sm" onclick="clearAllModal()">Clear All</button>
     </div>
   </div>
-  <div class="content" id="main-content" style="display:none;padding-top:16px;">
+  <div class="content" id="page-content" style="display:none;padding-top:16px">
     <div class="convs-layout">
       <div class="convs-left">
         <div class="convs-left-hdr">
-          <div style="font-size:13px;font-weight:700;">Sessions</div>
+          <div style="font-size:13px;font-weight:700">Sessions</div>
           <span class="badge badge-gray" id="sess-count">0</span>
         </div>
-        <div class="search-wrap">
-          <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="search-inp" type="text" id="search-inp" placeholder="Search sessions…" oninput="filterSessions()">
+        <div class="convs-search">
+          <div class="convs-search-wrap">
+            <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-inp" type="text" id="search-inp" placeholder="Search sessions…" oninput="filterSessions()">
+          </div>
         </div>
         <div class="session-list" id="session-list">
-          <div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px;">Select an agent to view sessions.</div>
+          <div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px">Select an agent to view sessions.</div>
         </div>
       </div>
       <div class="convs-right" id="convs-right">
-        <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text-3);" id="empty-right">
-          <div style="font-size:48px;opacity:.3;">💬</div>
-          <div style="font-size:15px;font-weight:700;color:var(--text-2);">Select a session</div>
-          <div style="font-size:13px;">Click any session on the left to view the conversation</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3)" id="empty-right">
+          <div style="font-size:40px;opacity:.3">💬</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text-2)">Select a session</div>
+          <div style="font-size:13px">Click any session to view the conversation</div>
         </div>
-        <div id="msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+        <div id="msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden">
           <div class="msg-hdr">
-            <div style="min-width:0;">
-              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="msg-title">Session</div>
-              <div style="font-size:11.5px;color:var(--text-3);margin-top:2px;" id="msg-meta"></div>
-            </div>
-            <button class="btn btn-secondary btn-sm" id="back-btn" style="display:none;" onclick="backToList()">← Back</button>
+            <div style="min-width:0"><div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="msg-title">Session</div><div style="font-size:11.5px;color:var(--text-3);margin-top:2px" id="msg-meta"></div></div>
+            <button class="btn btn-secondary btn-sm" id="back-btn" style="display:none" onclick="backToList()">← Back</button>
           </div>
           <div class="msg-scroll" id="msg-scroll"></div>
         </div>
@@ -94,26 +96,25 @@
     </div>
   </div>
 </div>
-<script src="api.js"></script><script src="nav.js"></script>
 <script>
-let allSessions=[], curAgentId=''
+let allSessions=[],curAgentId=''
 ;(async()=>{
-  const{user}=await initNav('conversations')
-  if(!user)return
+  const nav=await renderNav('conversations')
+  if(!nav)return
   try{
     const agents=await apiFetch('/agents')
     const sel=document.getElementById('agent-sel')
     agents.forEach(a=>{const o=document.createElement('option');o.value=a._id;o.textContent=a.name;sel.appendChild(o)})
     if(agents.length){sel.value=agents[0]._id;curAgentId=agents[0]._id;await loadSessions()}
   }catch(e){toast(e.message,'error')}
-  document.getElementById('main-content').style.display='block'
+  document.getElementById('page-content').style.display='block'
   dismissSkeleton()
 })()
 async function loadSessions(){
   curAgentId=document.getElementById('agent-sel').value
   const list=document.getElementById('session-list')
-  if(!curAgentId){list.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px;">Select an agent above.</div>';return}
-  list.innerHTML='<div style="padding:16px;display:flex;flex-direction:column;gap:8px;"><div class="skel" style="height:56px;border-radius:10px;"></div><div class="skel" style="height:56px;border-radius:10px;"></div><div class="skel" style="height:56px;border-radius:10px;"></div></div>'
+  if(!curAgentId){list.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px">Select an agent above.</div>';return}
+  list.innerHTML='<div style="padding:14px;display:flex;flex-direction:column;gap:7px"><div class="skel" style="height:52px;border-radius:var(--r-sm)"></div><div class="skel" style="height:52px;border-radius:var(--r-sm);opacity:.7"></div><div class="skel" style="height:52px;border-radius:var(--r-sm);opacity:.45"></div></div>'
   try{
     const d=await apiFetch(`/agents/${curAgentId}/conversations`)
     allSessions=d.sessions||[]
@@ -124,17 +125,14 @@ async function loadSessions(){
 }
 function renderSessions(sessions){
   const list=document.getElementById('session-list')
-  if(!sessions.length){list.innerHTML='<div style="padding:40px 20px;text-align:center;"><div style="font-size:32px;opacity:.3;margin-bottom:12px;">💬</div><div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px;">No conversations yet</div><div style="font-size:12px;color:var(--text-3);">Sessions appear here once users chat with your agent.</div></div>';return}
+  if(!sessions.length){list.innerHTML='<div style="padding:36px 20px;text-align:center"><div style="font-size:28px;opacity:.3;margin-bottom:10px">💬</div><div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div><div style="font-size:12px;color:var(--text-3)">Sessions appear once users chat with your agent.</div></div>';return}
   list.innerHTML=sessions.map(s=>`
     <div class="session-item" id="si-${escId(s._id||s.session_id||s.visitor_ip)}" onclick="openSession(${JSON.stringify(s._id||s.session_id||s.visitor_ip)},${JSON.stringify(s)})">
       <div class="session-q">${esc(s.first_question||'(No message)')}</div>
       <div class="session-meta"><span>${s.message_count||1} msgs · ${fmtTokens(s.tokens_used||0)} tokens</span><span>${timeAgo(s.last_active)}</span></div>
     </div>`).join('')
 }
-function filterSessions(){
-  const q=document.getElementById('search-inp').value.toLowerCase()
-  renderSessions(allSessions.filter(s=>(s.first_question||'').toLowerCase().includes(q)||(s.visitor_ip||'').includes(q)))
-}
+function filterSessions(){const q=document.getElementById('search-inp').value.toLowerCase();renderSessions(allSessions.filter(s=>(s.first_question||'').toLowerCase().includes(q)||(s.visitor_ip||'').includes(q)))}
 async function openSession(key,meta){
   document.querySelectorAll('.session-item').forEach(el=>el.classList.remove('active'))
   document.getElementById('si-'+escId(key))?.classList.add('active')
@@ -145,11 +143,11 @@ async function openSession(key,meta){
   document.getElementById('msg-title').textContent=(meta.first_question||'Session').slice(0,70)
   document.getElementById('msg-meta').textContent=`${meta.message_count||1} messages · ${timeAgo(meta.started_at)}${meta.visitor_ip?' · '+meta.visitor_ip:''}`
   const scroll=document.getElementById('msg-scroll')
-  scroll.innerHTML='<div style="display:flex;flex-direction:column;gap:14px;"><div class="skel" style="height:52px;border-radius:10px;align-self:flex-end;width:55%"></div><div class="skel" style="height:80px;border-radius:10px;width:70%"></div><div class="skel" style="height:52px;border-radius:10px;align-self:flex-end;width:45%"></div></div>'
+  scroll.innerHTML='<div style="display:flex;flex-direction:column;gap:12px"><div class="skel" style="height:48px;border-radius:10px;align-self:flex-end;width:55%"></div><div class="skel" style="height:72px;border-radius:10px;width:70%"></div><div class="skel" style="height:48px;border-radius:10px;align-self:flex-end;width:45%"></div></div>'
   try{
     const d=await apiFetch(`/agents/${curAgentId}/conversations/${encodeURIComponent(key)}`)
     const msgs=d.messages||[]
-    if(!msgs.length){scroll.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-3);">No messages in this session.</div>';return}
+    if(!msgs.length){scroll.innerHTML='<div style="text-align:center;padding:36px;color:var(--text-3)">No messages in this session.</div>';return}
     scroll.innerHTML=msgs.map(m=>`
       <div>
         <div class="msg-q">${esc(m.question)}</div>
@@ -157,26 +155,17 @@ async function openSession(key,meta){
         <div class="msg-time">🪙 ${fmtTokens(m.tokens_used||0)} tokens · ${timeAgo(m.created_at)}</div>
       </div>`).join('')
     scroll.scrollTop=scroll.scrollHeight
-  }catch(e){scroll.innerHTML=`<div style="padding:24px;color:var(--red);">Failed to load: ${e.message}</div>`}
+  }catch(e){scroll.innerHTML=`<div style="padding:24px;color:var(--red)">Failed to load: ${e.message}</div>`}
 }
 function backToList(){document.getElementById('msg-area').style.display='none';document.getElementById('empty-right').style.display='flex';document.querySelectorAll('.session-item').forEach(el=>el.classList.remove('active'))}
 async function clearAllModal(){
   const agentSel=document.getElementById('agent-sel')
-  const agentName = agentSel.options[agentSel.selectedIndex]?.text || 'this agent'
-  const agentId = agentSel.value
+  const agentName=agentSel.options[agentSel.selectedIndex]?.text||'this agent'
+  const agentId=agentSel.value
   if(!agentId){toast('Select an agent first','warning');return}
-  const c=await confirmModal({
-    title:'Clear conversations?',
-    message:`This will permanently delete all conversations for ${agentName}. This cannot be undone.`,
-    confirmText:'Clear All',
-    danger:true
-  })
-  if(!c)return
-  try{
-    await apiFetch(`/agents/${agentId}/clear-conversations`,{method:'POST'})
-    toast('Conversations cleared','success')
-    loadSessions()
-  }catch(e){toast(e.message,'error')}
+  const ok=await confirmModal({title:'Clear conversations?',message:`Permanently delete all conversations for "${agentName}". Cannot be undone.`,confirmText:'Clear All',danger:true})
+  if(!ok)return
+  try{await apiFetch(`/agents/${agentId}/clear-conversations`,{method:'POST'});toast('Conversations cleared','success');loadSessions()}catch(e){toast(e.message,'error')}
 }
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>')}
 function escId(s){return(s||'').toString().replace(/[^a-zA-Z0-9]/g,'_')}
