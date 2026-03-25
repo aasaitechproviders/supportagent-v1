@@ -1,184 +1,132 @@
-/* ══════════════════════════════════════════════════════════════════
-   nav.js — SupportGent Navigation Controller v2
-   Deps: api.js must be loaded first
+/* ══════════════════════════════════════════════════
+   nav.js — SupportGent Navigation v3
+   Deps: api.js must load first
    Usage: const { user } = await initNav('page-id')
-══════════════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════ */
 
 const _NAV = [
-  {
-    label: 'Workspace',
-    items: [
-      {
-        page:'dashboard', href:'home.html',
-        icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
-        label:'Dashboard'
-      },
-      {
-        page:'agents', href:'agents.html',
-        icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
-        label:'My Agents'
-      },
-      {
-        page:'conversations', href:'conversations.html',
-        icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
-        label:'Conversations'
-      },
-    ]
-  },
-  {
-    label: 'Account',
-    items: [
-      {
-        page:'payments', href:'payments.html',
-        icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
-        label:'Billing'
-      },
-      {
-        page:'account', href:'account.html',
-        icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-        label:'Account'
-      },
-    ]
-  }
+  { label:'Workspace', items:[
+    { page:'dashboard',     href:'home.html',          label:'Dashboard',     emoji:'🏠' },
+    { page:'agents',        href:'agents.html',        label:'My Agents',     emoji:'🤖' },
+    { page:'conversations', href:'conversations.html', label:'Conversations', emoji:'💬' },
+  ]},
+  { label:'Account', items:[
+    { page:'payments', href:'payments.html', label:'Billing', emoji:'⚡' },
+    { page:'account',  href:'account.html',  label:'Account', emoji:'👤' },
+  ]}
 ]
-
-// SVG icons for theme toggle
-const _ICON_MOON = `<svg class="icon-moon" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
-const _ICON_SUN  = `<svg class="icon-sun" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
 
 function _buildSidebar(activePage) {
   const sidebar = document.getElementById('sidebar')
   if (!sidebar) return
-
   sidebar.innerHTML = `
     <a class="sidebar-logo" href="home.html">
-      <div class="sidebar-logo-mark">S</div>
-      <span class="sidebar-logo-text">Support<span>Gent</span></span>
+      <div class="sidebar-logo-mark">S</div>Support<span>Gent</span>
     </a>
-
-    <div id="sidebar-user-skel" class="sidebar-user-skel">
-      <div class="skel" style="width:34px;height:34px;min-width:34px;border-radius:50%;"></div>
-      <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-        <div class="skel" style="height:11px;width:70%;border-radius:4px;"></div>
-        <div class="skel" style="height:9px;width:45%;border-radius:3px;"></div>
+    <div class="sidebar-body">
+      <div id="sidebar-user-skel" style="display:flex;align-items:center;gap:10px;padding:8px 4px;margin-bottom:6px;">
+        <div class="skel" style="width:34px;height:34px;min-width:34px;border-radius:50%;"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <div class="skel" style="height:10px;width:65%;border-radius:4px;"></div>
+          <div class="skel" style="height:8px;width:40%;border-radius:3px;"></div>
+        </div>
+      </div>
+      <div id="sidebar-user-real" class="sidebar-user" onclick="location.href='account.html'" title="Account" style="display:none;">
+        <div class="sidebar-avatar" id="nav-avatar">?</div>
+        <div style="flex:1;min-width:0;">
+          <div class="sidebar-user-name" id="nav-name">—</div>
+          <div class="sidebar-user-plan" id="nav-plan">—</div>
+        </div>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:var(--text-3);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div id="token-widget" class="token-widget" onclick="location.href='payments.html'" title="Billing" style="display:none;">
+        <div class="tw-top"><span class="tw-label">Monthly tokens</span><span class="tw-pct" id="tw-pct">0%</span></div>
+        <div class="tw-bar"><div class="tw-fill" id="tw-fill" style="width:0%"></div></div>
+        <div class="tw-nums"><span id="tw-used">0 used</span><span id="tw-cap">0</span></div>
+      </div>
+      ${_NAV.map(sec=>`
+        <div class="nav-section">
+          <div class="nav-section-label">${sec.label}</div>
+          ${sec.items.map(it=>`
+            <a class="nav-item ${it.page===activePage?'active':''}" href="${it.href}">
+              <span class="nav-icon" style="font-size:15px;">${it.emoji}</span>${it.label}
+            </a>`).join('')}
+        </div>`).join('')}
+      <div style="margin-top:12px;padding:12px;background:var(--accent-dim);border-radius:12px;">
+        <div style="font-size:10.5px;font-weight:700;color:var(--accent);margin-bottom:8px;">Quick Actions</div>
+        <button class="btn btn-primary btn-sm create-btn" style="width:100%;justify-content:center;margin-bottom:6px;" onclick="location.href='agents.html?create=1'">+ New Agent</button>
+        <a href="agents.html" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;">View All Agents</a>
       </div>
     </div>
-    <div id="sidebar-user-real" class="sidebar-user loading" onclick="location.href='account.html'" title="Account">
-      <div class="sidebar-avatar" id="nav-avatar">?</div>
-      <div class="sidebar-user-info">
-        <div class="sidebar-user-name" id="nav-name">—</div>
-        <div class="sidebar-user-plan" id="nav-plan">—</div>
-      </div>
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-3);flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>
-    </div>
-
-    <div id="token-sidebar-widget" class="token-sidebar-widget" onclick="location.href='payments.html'" title="Manage billing" style="display:none;">
-      <div class="tsw-header">
-        <span class="tsw-label">Monthly Tokens</span>
-        <span class="tsw-badge" id="tsw-badge">—</span>
-      </div>
-      <div class="tsw-bar"><div class="tsw-fill" id="tsw-fill" style="width:0%"></div></div>
-      <div class="tsw-sub">
-        <span id="tsw-used">—</span>
-        <span id="tsw-cap">—</span>
-      </div>
-    </div>
-
-    ${_NAV.map(section => `
-      <div class="nav-section">
-        <div class="nav-section-label">${section.label}</div>
-        ${section.items.map(item => `
-          <a class="nav-item ${item.page === activePage ? 'active' : ''}" href="${item.href}">
-            <span class="nav-icon">${item.icon}</span>
-            ${item.label}
-          </a>
-        `).join('')}
-      </div>
-    `).join('')}
-
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sign Out
       </button>
-    </div>
-  `
+    </div>`
 }
 
 function _populateUser(user) {
-  revealSidebarUser()
-  const { name = '', avatar = '', plan = 'starter', tokens } = user
-
-  const navAvatar = document.getElementById('nav-avatar')
-  if (navAvatar) {
+  document.getElementById('sidebar-user-skel').style.display = 'none'
+  const el = document.getElementById('sidebar-user-real')
+  el.style.display = 'flex'
+  const { name='', avatar='', plan='starter', tokens } = user
+  const nav = document.getElementById('nav-avatar')
+  if (nav) {
     if (avatar && (avatar.startsWith('data:') || avatar.startsWith('http')))
-      navAvatar.innerHTML = `<img src="${avatar}" alt=""/>`
-    else
-      navAvatar.textContent = name?.[0]?.toUpperCase() || '?'
+      nav.innerHTML = `<img src="${avatar}" alt=""/>`
+    else nav.textContent = name?.[0]?.toUpperCase() || '?'
   }
-
-  const el_name = document.getElementById('nav-name')
-  if (el_name) el_name.textContent = name || 'User'
-
-  const el_plan = document.getElementById('nav-plan')
-  if (el_plan) el_plan.textContent = (plan.charAt(0).toUpperCase() + plan.slice(1)) + ' Plan'
-
-  // Token widget
+  const planLabel = {starter:'Starter Plan',grower:'Grower Plan',enterprise:'Enterprise'}
+  const nn = document.getElementById('nav-name'); if(nn) nn.textContent = name || 'User'
+  const np = document.getElementById('nav-plan'); if(np) np.textContent = planLabel[plan] || plan
   if (tokens) {
-    const widget = document.getElementById('token-sidebar-widget')
-    if (widget) widget.style.display = 'block'
-    const used = tokens.monthly_used || 0
-    const cap  = tokens.monthly_cap  || 1
-    const pct  = Math.min(100, Math.round(used / cap * 100))
-    const fill = document.getElementById('tsw-fill')
-    if (fill) {
-      fill.style.width = pct + '%'
-      fill.className   = 'tsw-fill' + (pct >= 90 ? ' danger' : pct >= 70 ? ' warn' : '')
-    }
-    const badge  = document.getElementById('tsw-badge')
-    const usedEl = document.getElementById('tsw-used')
-    const capEl  = document.getElementById('tsw-cap')
-    if (badge)  badge.textContent  = pct + '%'
-    if (usedEl) usedEl.textContent = fmtTokens(used) + ' used'
-    if (capEl)  capEl.textContent  = fmtTokens(cap)
+    const w = document.getElementById('token-widget'); if(w) w.style.display='block'
+    const used = tokens.monthly_used||0, cap = tokens.monthly_cap||1
+    const pct = Math.min(100, Math.round(used/cap*100))
+    const fill = document.getElementById('tw-fill')
+    if(fill){ fill.style.width=pct+'%'; fill.className='tw-fill'+(pct>=90?' danger':pct>=70?' warn':'') }
+    const pe = document.getElementById('tw-pct'); if(pe) pe.textContent=pct+'%'
+    const ue = document.getElementById('tw-used'); if(ue) ue.textContent=fmtTokens(used)+' used'
+    const ce = document.getElementById('tw-cap');  if(ce) ce.textContent=fmtTokens(cap)
   }
 }
 
 function _initMobile() {
-  const sidebar  = document.getElementById('sidebar')
-  const backdrop = document.getElementById('sidebar-backdrop')
-  const btn      = document.getElementById('mob-menu-btn')
-  const close    = () => { sidebar?.classList.remove('mob-open'); backdrop?.classList.remove('open') }
-  btn?.addEventListener('click', () => {
-    sidebar?.classList.toggle('mob-open')
-    backdrop?.classList.toggle('open')
-  })
-  backdrop?.addEventListener('click', close)
+  const sb=document.getElementById('sidebar'), bd=document.getElementById('sidebar-backdrop'), btn=document.getElementById('mob-menu-btn')
+  const close=()=>{sb?.classList.remove('mob-open');bd?.classList.remove('open')}
+  btn?.addEventListener('click',()=>{sb?.classList.toggle('mob-open');bd?.classList.toggle('open')})
+  bd?.addEventListener('click',close)
 }
 
+function _initTheme() {
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.style.cssText='background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:8px;font-size:17px;line-height:1;'
+    const upd = () => btn.textContent = document.documentElement.getAttribute('data-theme')==='dark' ? '☀️' : '🌙'
+    upd()
+    btn.addEventListener('click', () => { toggleTheme(); upd() })
+  })
+  applyTheme(_theme.cur)
+}
+
+function dismissSkeleton() {
+  const el = document.getElementById('page-skeleton')
+  if (!el||el._done) return; el._done=true
+  el.style.opacity='0'; el.style.transition='opacity .25s'
+  setTimeout(()=>el?.remove(), 280)
+}
+function revealSidebarUser() {}
+
 async function initNav(activePage) {
-  // Handle ?token= from OAuth redirect
   const params = new URLSearchParams(location.search)
-  if (params.get('token')) { setToken(params.get('token')); history.replaceState({}, '', location.pathname) }
-
+  if (params.get('token')) { setToken(params.get('token')); history.replaceState({},''  ,location.pathname) }
   if (!getToken()) { location.replace('/'); return {} }
-
   _buildSidebar(activePage)
   _initMobile()
-
-  // Wire up theme toggles with SVG icons
-  document.querySelectorAll('.theme-toggle').forEach(b => {
-    b.innerHTML = _ICON_MOON + _ICON_SUN
-    b.addEventListener('click', toggleTheme)
-  })
-  // Apply current theme to icons
-  applyTheme(_theme.cur)
-
+  _initTheme()
   try {
     const user = await apiFetch('/auth/me')
     _populateUser(user)
     return { user }
-  } catch (e) {
-    clearToken(); location.replace('/'); return {}
-  }
+  } catch(e) { clearToken(); location.replace('/'); return {} }
 }
