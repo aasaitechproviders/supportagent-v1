@@ -1,346 +1,630 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Conversations — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-.convs-layout{display:grid;grid-template-columns:300px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh-sm);height:calc(100vh - 112px);min-height:500px}
-.convs-left{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
-.convs-left-hdr{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface-2)}
-.convs-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
-.convs-search-wrap{position:relative}
-.search-inp{width:100%;height:36px;padding:0 12px 0 34px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:var(--t);box-sizing:border-box}
-.search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-.search-inp::placeholder{color:var(--text-3)}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
-.session-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface-4) transparent;min-height:0}
-.session-item{padding:12px 15px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;user-select:none}
-.session-item:last-child{border-bottom:none}
-.session-item:hover{background:var(--surface-2)}
-.session-item.active{background:var(--accent-dim);border-left:3px solid var(--accent);padding-left:12px}
-.session-q{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;color:var(--text)}
-.session-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)}
-.convs-right{display:flex;flex-direction:column;background:var(--bg);min-height:0;overflow:hidden}
-.msg-hdr{padding:13px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.msg-scroll{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:13px;scrollbar-width:thin;min-height:0}
-.msg-q{background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13.5px;max-width:78%;align-self:flex-end;word-break:break-word;color:var(--text)}
-.msg-a{background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:12px 15px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word}
-.msg-time{font-size:10.5px;color:var(--text-3);text-align:right;margin-top:4px}
-.agent-filter{height:34px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;min-width:150px;cursor:pointer}
-#msg-area{display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0}
-#msg-area.visible{display:flex}
-#empty-right{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3)}
-#empty-right.hidden{display:none}
-@media(max-width:860px){.convs-layout{grid-template-columns:1fr;height:auto}.convs-left{height:320px}.convs-right{height:calc(100vh - 440px);min-height:280px}}
-</style>
 <link rel="stylesheet" href="shared.css">
+<style>
+/* ── Layout ──────────────────────────────────────────────────────── */
+.convs-wrap {
+  display: grid;
+  grid-template-columns: 288px 1fr;
+  height: calc(100vh - 109px);
+  min-height: 480px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+}
+
+/* ── Left panel ──────────────────────────────────────────────────── */
+.cv-left {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  min-height: 0;
+  background: var(--surface);
+}
+.cv-left-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+.cv-left-hdr-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.cv-search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.cv-search-wrap { position: relative; }
+.cv-search-icon {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-3);
+  pointer-events: none;
+}
+.cv-search-inp {
+  width: 100%;
+  height: 34px;
+  padding: 0 10px 0 32px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12.5px;
+  outline: none;
+  transition: var(--t);
+  box-sizing: border-box;
+}
+.cv-search-inp:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+  background: var(--surface-3);
+}
+.cv-search-inp::placeholder { color: var(--text-3); }
+
+/* Session list */
+.session-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) transparent;
+}
+.session-item {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background .12s;
+  user-select: none;
+}
+.session-item:last-child { border-bottom: none; }
+.session-item:hover { background: var(--surface-2); }
+.session-item.active {
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+}
+.session-q {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.session-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.session-item.active .session-q  { color: var(--accent); }
+.session-item.active .session-meta { color: var(--accent); opacity: .7; }
+
+/* ── Right panel ─────────────────────────────────────────────────── */
+.cv-right {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Empty state */
+.cv-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.cv-empty.hidden { display: none; }
+.cv-empty-icon  { font-size: 38px; opacity: .22; line-height: 1; }
+.cv-empty-title { font-size: 13.5px; font-weight: 700; color: var(--text-2); }
+.cv-empty-sub   { font-size: 12px; color: var(--text-3); }
+
+/* Message thread */
+.cv-thread {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.cv-thread.visible { display: flex; }
+
+/* Thread header */
+.cv-thread-hdr {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cv-thread-hdr-info { flex: 1; min-width: 0; }
+.cv-thread-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cv-thread-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* Scroll area */
+.cv-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) transparent;
+}
+.msg-pair { display: flex; flex-direction: column; gap: 6px; }
+
+/* User question bubble */
+.msg-q {
+  align-self: flex-end;
+  max-width: 78%;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-glow);
+  border-radius: 14px 14px 4px 14px;
+  padding: 9px 13px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+/* AI answer bubble */
+.msg-a {
+  max-width: 85%;
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: 4px 14px 14px 14px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.75;
+  word-break: break-word;
+}
+.msg-a p               { margin: 0 0 8px; }
+.msg-a p:last-child    { margin-bottom: 0; }
+.msg-a ul, .msg-a ol   { padding-left: 18px; margin: 0 0 8px; }
+.msg-a h3              { font-size: 13px; font-weight: 700; margin: 10px 0 5px; color: var(--text); }
+.msg-a table           { font-size: 12px; border-collapse: collapse; width: 100%; }
+.msg-a td, .msg-a th   { padding: 5px 8px; border: 1px solid var(--border-md); }
+
+/* Token + time footer */
+.msg-meta {
+  font-size: 10.5px;
+  color: var(--text-3);
+  text-align: right;
+  padding-right: 2px;
+}
+
+/* Agent dropdown in topbar */
+.agent-sel {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12.5px;
+  outline: none;
+  cursor: pointer;
+  transition: var(--t);
+  min-width: 148px;
+}
+.agent-sel:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.agent-sel option { background: var(--surface); color: var(--text); }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .convs-wrap {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .cv-left  { height: 300px; }
+  .cv-right { height: calc(100vh - 420px); min-height: 260px; }
+}
+@media (max-width: 648px) {
+  .convs-wrap { border-radius: var(--r); }
+  .cv-msgs    { padding: 12px 14px; }
+}
+</style>
 <script>
-;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
+;(function(){
+  var p = new URLSearchParams(location.search), t = p.get('token');
+  if (t) { localStorage.setItem('sg_token', t); history.replaceState({}, '', location.pathname); }
+  var dark = localStorage.getItem('sg_theme') === 'dark';
+  document.documentElement[dark ? 'setAttribute' : 'removeAttribute']('data-theme', 'dark');
+  document.documentElement.style.background = dark ? '#07080D' : '#F2F3F9';
+})();
 </script>
-<script src="api.js"></script><script src="nav.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
 </head>
 <body>
+
 <div id="toast-container"></div>
+
+<!-- Mobile topbar -->
 <div class="mobile-topbar">
-  <div class="mob-left"><button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button><a class="mob-logo" href="home.html">Support<span>Gent</span></a></div>
-  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()">
+      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
+    </button>
+    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right">
+    <button class="theme-toggle"></button>
+  </div>
 </div>
+
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
 <div class="sidebar" id="sidebar"></div>
 
+<!-- Page skeleton -->
 <div id="page-skeleton">
-  <div class="skel-topbar"><div class="skel" style="height:13px;width:160px;border-radius:4px"></div><div class="skel" style="height:34px;width:180px;border-radius:var(--r-sm)"></div></div>
-  <div class="skel-body"><div class="skel" style="height:calc(100vh - 112px);border-radius:var(--r-lg)"></div></div>
+  <div class="skel-topbar">
+    <div class="skel" style="height:12px;width:140px;border-radius:4px"></div>
+    <div class="skel" style="height:32px;width:160px;border-radius:var(--r-sm)"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel" style="height:calc(100vh - 109px);border-radius:var(--r-lg)"></div>
+  </div>
 </div>
 
+<!-- Main -->
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
       <div>
         <div class="topbar-title">Conversations</div>
-        <div class="topbar-subtitle" id="convs-sub">All sessions</div>
+        <div class="topbar-subtitle" id="convs-sub">Loading…</div>
       </div>
     </div>
     <div class="topbar-right">
-      <select class="agent-filter" id="agent-sel" onchange="loadSessions()"><option value="">All Agents</option></select>
-      <button class="theme-toggle" style="font-size:15px"></button>
+      <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
+        <option value="">— Select agent —</option>
+      </select>
+      <button class="theme-toggle"></button>
       <button class="btn btn-danger btn-sm" onclick="clearAllModal()">Clear All</button>
     </div>
   </div>
 
-  <div class="content" id="page-content" style="display:none;padding-top:16px">
-    <div class="convs-layout">
+  <div class="content" id="page-content" style="display:none;padding-top:20px">
+    <div class="convs-wrap">
 
-      <!-- LEFT: session list -->
-      <div class="convs-left">
-        <div class="convs-left-hdr">
-          <div style="font-size:13px;font-weight:700">Sessions</div>
+      <!-- LEFT -->
+      <div class="cv-left">
+        <div class="cv-left-hdr">
+          <span class="cv-left-hdr-title">Sessions</span>
           <span class="badge badge-gray" id="sess-count">0</span>
         </div>
-        <div class="convs-search">
-          <div class="convs-search-wrap">
-            <svg class="search-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input class="search-inp" type="text" id="search-inp" placeholder="Search sessions…" oninput="filterSessions()">
+        <div class="cv-search">
+          <div class="cv-search-wrap">
+            <svg class="cv-search-icon" width="13" height="13" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input class="cv-search-inp" type="text" id="search-inp"
+              placeholder="Search sessions…" oninput="filterSessions()" autocomplete="off">
           </div>
         </div>
         <div class="session-list" id="session-list">
-          <div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px">Select an agent to view sessions.</div>
-        </div>
-      </div>
-
-      <!-- RIGHT: message thread -->
-      <div class="convs-right" id="convs-right">
-        <div id="empty-right">
-          <div style="font-size:40px;opacity:.3">💬</div>
-          <div style="font-size:14px;font-weight:700;color:var(--text-2)">Select a session</div>
-          <div style="font-size:13px">Click any session on the left to view messages</div>
-        </div>
-        <div id="msg-area">
-          <div class="msg-hdr">
-            <div style="min-width:0;flex:1">
-              <div style="font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="msg-title">Session</div>
-              <div style="font-size:11.5px;color:var(--text-3);margin-top:2px" id="msg-meta"></div>
-            </div>
-            <button class="btn btn-secondary btn-sm" id="back-btn" style="display:none" onclick="backToList()">← Back</button>
+          <div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">
+            Select an agent above to see sessions.
           </div>
-          <div class="msg-scroll" id="msg-scroll"></div>
         </div>
       </div>
 
+      <!-- RIGHT -->
+      <div class="cv-right">
+
+        <div class="cv-empty" id="cv-empty">
+          <div class="cv-empty-icon">💬</div>
+          <div class="cv-empty-title">Select a session</div>
+          <div class="cv-empty-sub">Click any session on the left to read messages</div>
+        </div>
+
+        <div class="cv-thread" id="cv-thread">
+          <div class="cv-thread-hdr">
+            <div class="cv-thread-hdr-info">
+              <div class="cv-thread-title" id="thread-title"></div>
+              <div class="cv-thread-meta" id="thread-meta"></div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="back-btn"
+              style="display:none" onclick="backToList()">← Back</button>
+          </div>
+          <div class="cv-msgs" id="cv-msgs"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ── State ─────────────────────────────────────────────────────────────────────
-let allSessions = []      // raw array from API
-let sessionsMap = {}      // key → session meta, avoids inline JSON in onclick
-let curAgentId  = ''
-let activeKey   = null
+/* ── State ─────────────────────────────────────────────────────── */
+var allSessions = []
+var sessionsMap = {}   // key → session meta — never serialised into HTML
+var curAgentId  = ''
+var activeKey   = null
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-;(async () => {
-  const nav = await renderNav('conversations')
+/* ── Boot ──────────────────────────────────────────────────────── */
+;(async function () {
+  var nav = await renderNav('conversations')
   if (!nav) return
+
   try {
-    const agents = await apiFetch('/agents')
-    const sel = document.getElementById('agent-sel')
-    agents.forEach(a => {
-      const o = document.createElement('option')
-      o.value = a._id
-      o.textContent = a.name
-      sel.appendChild(o)
-    })
-    if (agents.length) {
-      sel.value = agents[0]._id
+    var agents = await apiFetch('/agents')
+    var sel    = document.getElementById('agent-sel')
+
+    if (!agents.length) {
+      document.getElementById('convs-sub').textContent = 'No agents yet'
+    } else {
+      agents.forEach(function (a) {
+        var o = document.createElement('option')
+        o.value = a._id; o.textContent = a.name
+        sel.appendChild(o)
+      })
+      sel.value  = agents[0]._id
       curAgentId = agents[0]._id
       await loadSessions()
     }
-  } catch (e) { toast(e.message, 'error') }
+  } catch (e) {
+    toast(e.message, 'error')
+    document.getElementById('convs-sub').textContent = 'Error loading agents'
+  }
+
   document.getElementById('page-content').style.display = 'block'
   dismissSkeleton()
-})()
+}())
 
-// ── Load sessions list ─────────────────────────────────────────────────────────
+/* ── Agent change ──────────────────────────────────────────────── */
+function onAgentChange() {
+  activeKey = null
+  showEmpty()
+  loadSessions()
+}
+
+/* ── Load sessions ─────────────────────────────────────────────── */
 async function loadSessions() {
   curAgentId = document.getElementById('agent-sel').value
-  activeKey  = null
-  showEmptyRight()
+  var list   = document.getElementById('session-list')
 
-  const list = document.getElementById('session-list')
   if (!curAgentId) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-3);font-size:13px">Select an agent above.</div>'
+    list.innerHTML = placeholderHtml('Select an agent above to see sessions.')
+    document.getElementById('sess-count').textContent = '0'
+    document.getElementById('convs-sub').textContent  = 'No agent selected'
     return
   }
 
-  list.innerHTML = `
-    <div style="padding:14px;display:flex;flex-direction:column;gap:7px">
-      <div class="skel" style="height:52px;border-radius:var(--r-sm)"></div>
-      <div class="skel" style="height:52px;border-radius:var(--r-sm);opacity:.7"></div>
-      <div class="skel" style="height:52px;border-radius:var(--r-sm);opacity:.45"></div>
-    </div>`
+  list.innerHTML = [
+    '<div style="padding:12px;display:flex;flex-direction:column;gap:7px">',
+    '  <div class="skel" style="height:50px;border-radius:var(--r-sm)"></div>',
+    '  <div class="skel" style="height:50px;border-radius:var(--r-sm);opacity:.7"></div>',
+    '  <div class="skel" style="height:50px;border-radius:var(--r-sm);opacity:.45"></div>',
+    '</div>'
+  ].join('')
 
   try {
-    const d = await apiFetch(`/agents/${curAgentId}/conversations`)
-    allSessions = d.sessions || []
+    var data  = await apiFetch('/agents/' + curAgentId + '/conversations')
+    allSessions = data.sessions || []
     sessionsMap = {}
-    allSessions.forEach(s => {
-      const key = sessionKey(s)
-      sessionsMap[key] = s
-    })
-    document.getElementById('sess-count').textContent = allSessions.length
-    document.getElementById('convs-sub').textContent  = allSessions.length + ' session' + (allSessions.length !== 1 ? 's' : '')
+    allSessions.forEach(function (s) { sessionsMap[sessionKey(s)] = s })
+
+    var count = allSessions.length
+    document.getElementById('sess-count').textContent = count
+    document.getElementById('convs-sub').textContent  =
+      count + ' session' + (count !== 1 ? 's' : '')
+
     renderSessions(allSessions)
-  } catch (e) { toast(e.message, 'error') }
+  } catch (e) {
+    toast(e.message, 'error')
+    list.innerHTML = '<div style="padding:24px;text-align:center;font-size:12.5px;color:var(--red)">' +
+      'Failed to load: ' + esc(e.message) + '</div>'
+  }
 }
 
-// ── Render session list ────────────────────────────────────────────────────────
+/* ── Session key ───────────────────────────────────────────────── */
 function sessionKey(s) {
-  // _id from the aggregation IS the session grouping key (session_id | visitor_id | visitor_ip)
-  return String(s._id || s.session_id || s.visitor_id || s.visitor_ip || '')
+  // _id is the $group key from the aggregation ($ifNull chain on session_id/visitor_id/visitor_ip)
+  var v = s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || '')))
+  return String(v)
 }
 
+/* ── Render list ───────────────────────────────────────────────── */
 function renderSessions(sessions) {
-  const list = document.getElementById('session-list')
+  var list = document.getElementById('session-list')
+
   if (!sessions.length) {
-    list.innerHTML = `
-      <div style="padding:36px 20px;text-align:center">
-        <div style="font-size:28px;opacity:.3;margin-bottom:10px">💬</div>
-        <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>
-        <div style="font-size:12px;color:var(--text-3)">Sessions appear once users chat with your agent.</div>
-      </div>`
+    list.innerHTML = [
+      '<div style="padding:40px 20px;text-align:center">',
+      '  <div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
+      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>',
+      '  <div style="font-size:12px;color:var(--text-3)">Sessions appear once visitors chat with your agent.</div>',
+      '</div>'
+    ].join('')
     return
   }
 
-  // Build HTML using data-key attributes — avoids any JSON/quote escaping problems
-  list.innerHTML = sessions.map(s => {
-    const key     = sessionKey(s)
-    const safeKey = escAttr(key)
-    const active  = key === activeKey ? ' active' : ''
-    return `
-      <div class="session-item${active}" id="si-${escId(key)}" data-key="${safeKey}">
-        <div class="session-q">${esc(s.first_question || '(No message)')}</div>
-        <div class="session-meta">
-          <span>${s.message_count || 1} msg${(s.message_count||1) !== 1 ? 's' : ''} · ${fmtTokens(s.tokens_used || 0)} tokens</span>
-          <span>${timeAgo(s.last_active)}</span>
-        </div>
-      </div>`
+  // Build with data-key — no JSON in attributes, no escaping edge-cases
+  list.innerHTML = sessions.map(function (s) {
+    var key     = sessionKey(s)
+    var active  = key === activeKey ? ' active' : ''
+    var msgs    = s.message_count || 1
+    return '<div class="session-item' + active + '" id="si-' + safeId(key) + '" data-key="' + escAttr(key) + '">' +
+      '<div class="session-q">' + esc(s.first_question || '(No message)') + '</div>' +
+      '<div class="session-meta">' +
+        '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tokens</span>' +
+        '<span>' + timeAgo(s.last_active) + '</span>' +
+      '</div>' +
+    '</div>'
   }).join('')
 
-  // Attach click handlers via JS — 100% safe, no inline JS with user data
-  list.querySelectorAll('.session-item').forEach(el => {
-    el.addEventListener('click', () => openSession(el.dataset.key))
+  // Attach click handlers via addEventListener — zero inline JS
+  list.querySelectorAll('.session-item[data-key]').forEach(function (el) {
+    el.addEventListener('click', function () { openSession(el.dataset.key) })
   })
 }
 
+/* ── Filter ────────────────────────────────────────────────────── */
 function filterSessions() {
-  const q = document.getElementById('search-inp').value.toLowerCase()
-  const filtered = allSessions.filter(s =>
-    (s.first_question || '').toLowerCase().includes(q) ||
-    (s.visitor_ip     || '').includes(q) ||
-    (s.session_id     || '').toLowerCase().includes(q)
-  )
-  renderSessions(filtered)
+  var q = document.getElementById('search-inp').value.toLowerCase().trim()
+  if (!q) { renderSessions(allSessions); return }
+  renderSessions(allSessions.filter(function (s) {
+    return (s.first_question || '').toLowerCase().includes(q) ||
+           (s.visitor_ip     || '').includes(q) ||
+           (s.session_id     || '').toLowerCase().includes(q)
+  }))
 }
 
-// ── Open a session ─────────────────────────────────────────────────────────────
+/* ── Open session ──────────────────────────────────────────────── */
 async function openSession(key) {
-  const meta = sessionsMap[key]
+  var meta = sessionsMap[key]
   if (!meta) return
 
   activeKey = key
+  document.querySelectorAll('.session-item').forEach(function (el) { el.classList.remove('active') })
+  var item = document.getElementById('si-' + safeId(key))
+  if (item) item.classList.add('active')
 
-  // Highlight active item
-  document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'))
-  document.getElementById('si-' + escId(key))?.classList.add('active')
+  showThread()
 
-  // Show msg panel
-  document.getElementById('empty-right').classList.add('hidden')
-  const msgArea = document.getElementById('msg-area')
-  msgArea.classList.add('visible')
-
-  // Show back button on mobile
+  // Back button visible only on mobile
   document.getElementById('back-btn').style.display = window.innerWidth < 860 ? 'flex' : 'none'
 
   // Header
-  document.getElementById('msg-title').textContent = (meta.first_question || 'Session').slice(0, 70)
-  document.getElementById('msg-meta').textContent  = [
-    `${meta.message_count || 1} message${(meta.message_count||1) !== 1 ? 's' : ''}`,
+  document.getElementById('thread-title').textContent =
+    (meta.first_question || 'Session').slice(0, 72)
+  var msgCount = meta.message_count || 1
+  document.getElementById('thread-meta').textContent = [
+    msgCount + ' message' + (msgCount !== 1 ? 's' : ''),
     timeAgo(meta.started_at),
-    meta.visitor_ip || null,
+    meta.visitor_ip || null
   ].filter(Boolean).join(' · ')
 
   // Loading skeleton
-  const scroll = document.getElementById('msg-scroll')
-  scroll.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <div class="skel" style="height:48px;border-radius:10px;align-self:flex-end;width:55%"></div>
-      <div class="skel" style="height:72px;border-radius:10px;width:70%"></div>
-      <div class="skel" style="height:48px;border-radius:10px;align-self:flex-end;width:45%"></div>
-      <div class="skel" style="height:88px;border-radius:10px;width:75%"></div>
-    </div>`
+  var msgs = document.getElementById('cv-msgs')
+  msgs.innerHTML = [
+    '<div style="display:flex;flex-direction:column;gap:12px">',
+    '  <div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:52%"></div>',
+    '  <div class="skel" style="height:68px;border-radius:12px;width:68%"></div>',
+    '  <div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:44%"></div>',
+    '  <div class="skel" style="height:80px;border-radius:12px;width:72%"></div>',
+    '</div>'
+  ].join('')
 
   try {
-    const d    = await apiFetch(`/agents/${curAgentId}/conversations/${encodeURIComponent(key)}`)
-    const msgs = d.messages || []
+    var data     = await apiFetch('/agents/' + curAgentId + '/conversations/' + encodeURIComponent(key))
+    var messages = data.messages || []
 
-    if (!msgs.length) {
-      scroll.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-3);font-size:13px">No messages in this session.</div>'
+    if (!messages.length) {
+      msgs.innerHTML = '<div style="text-align:center;padding:40px;font-size:12.5px;color:var(--text-3)">No messages in this session.</div>'
       return
     }
 
-    // Build message HTML — answers are AI-generated HTML so rendered as innerHTML
-    const html = msgs.map(m => `
-      <div class="msg-pair">
-        <div class="msg-q">${esc(m.question || '')}</div>
-        <div class="msg-a">${m.answer || '<em style="color:var(--text-3)">(no answer recorded)</em>'}</div>
-        <div class="msg-time">🪙 ${fmtTokens(m.tokens_used || 0)} tokens · ${timeAgo(m.created_at)}</div>
-      </div>`).join('')
+    // Answers are AI-generated trusted HTML — rendered as innerHTML intentionally
+    msgs.innerHTML = messages.map(function (m) {
+      return '<div class="msg-pair">' +
+        '<div class="msg-q">' + esc(m.question || '') + '</div>' +
+        '<div class="msg-a">' + (m.answer || '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>') + '</div>' +
+        '<div class="msg-meta">🪙 ' + fmtTokens(m.tokens_used || 0) + ' tokens · ' + timeAgo(m.created_at) + '</div>' +
+      '</div>'
+    }).join('')
 
-    scroll.innerHTML = html
-    // Scroll to bottom after render
-    requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight })
+    requestAnimationFrame(function () { msgs.scrollTop = msgs.scrollHeight })
 
   } catch (e) {
-    scroll.innerHTML = `<div style="padding:24px;color:var(--red);font-size:13px">Failed to load messages: ${esc(e.message)}</div>`
+    msgs.innerHTML = '<div style="padding:24px;font-size:13px;color:var(--red)">Failed to load messages: ' + esc(e.message) + '</div>'
   }
 }
 
-// ── Back to list (mobile) ──────────────────────────────────────────────────────
+/* ── Panel helpers ─────────────────────────────────────────────── */
+function showEmpty() {
+  document.getElementById('cv-empty').classList.remove('hidden')
+  document.getElementById('cv-thread').classList.remove('visible')
+}
+function showThread() {
+  document.getElementById('cv-empty').classList.add('hidden')
+  document.getElementById('cv-thread').classList.add('visible')
+}
 function backToList() {
-  showEmptyRight()
-  document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'))
+  showEmpty()
+  document.querySelectorAll('.session-item').forEach(function (el) { el.classList.remove('active') })
   activeKey = null
 }
 
-function showEmptyRight() {
-  document.getElementById('empty-right').classList.remove('hidden')
-  document.getElementById('msg-area').classList.remove('visible')
-}
-
-// ── Clear conversations ────────────────────────────────────────────────────────
+/* ── Clear all ─────────────────────────────────────────────────── */
 async function clearAllModal() {
-  const agentSel  = document.getElementById('agent-sel')
-  const agentName = agentSel.options[agentSel.selectedIndex]?.text || 'this agent'
-  const agentId   = agentSel.value
+  var sel       = document.getElementById('agent-sel')
+  var agentId   = sel.value
+  var agentName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'this agent'
   if (!agentId) { toast('Select an agent first', 'warning'); return }
-  const ok = await confirmModal({
-    title: 'Clear conversations?',
-    message: `Permanently hide all conversations for "${agentName}". Cannot be undone.`,
+
+  var ok = await confirmModal({
+    title:       'Clear conversations?',
+    message:     'All conversation history for "' + agentName + '" will be hidden. This cannot be undone.',
     confirmText: 'Clear All',
-    danger: true,
+    danger:      true
   })
   if (!ok) return
+
   try {
-    await apiFetch(`/agents/${agentId}/clear-conversations`, { method: 'POST' })
+    await apiFetch('/agents/' + agentId + '/clear-conversations', { method: 'POST' })
     toast('Conversations cleared', 'success')
-    loadSessions()
-  } catch (e) { toast(e.message, 'error') }
+    activeKey = null
+    showEmpty()
+    await loadSessions()
+  } catch (e) {
+    toast(e.message, 'error')
+  }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+/* ── Escape helpers ────────────────────────────────────────────── */
 function esc(s) {
-  return (s || '').toString()
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/\n/g, '<br>')
 }
-// Safe for use inside an HTML attribute value (double-quoted)
 function escAttr(s) {
-  return (s || '').toString()
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
-// Safe DOM id suffix — strip everything except alphanumeric
-function escId(s) { return (s || '').toString().replace(/[^a-zA-Z0-9]/g, '_') }
+function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
+function placeholderHtml(msg) {
+  return '<div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">' + msg + '</div>'
+}
 </script>
 </body>
 </html>
