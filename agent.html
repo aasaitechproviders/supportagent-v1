@@ -12,7 +12,7 @@
     --bg:#0b0c10;--surface:#12141c;--surface-2:#1a1d2b;--surface-3:#232736;
     --text:#edf2ff;--text-2:#b3c0e6;--text-3:#6e7c9e;
     --border:#252a3a;--border-md:#2e3446;--border-lg:#3e455b;
-    --accent:#6C5FF5;--accent-2:#8B7AFF;--accent-dim:rgba(108,95,245,0.12);--accent-soft:rgba(108,95,245,0.08);--accent-glow:rgba(108,95,245,0.4);
+    --accent:#7C6FFF;--accent-2:#8B7AFF;--accent-dim:rgba(124,111,255,0.12);--accent-soft:rgba(124,111,255,0.08);--accent-glow:rgba(124,111,255,0.4);
     --green:#2dd4a0;--green-dim:rgba(45,212,160,0.1);--green-border:rgba(45,212,160,0.3);
     --amber:#f5a523;--amber-dim:rgba(245,165,35,0.1);--amber-border:rgba(245,165,35,0.3);
     --red:#f87171;--red-dim:rgba(248,113,113,0.1);--red-border:rgba(248,113,113,0.3);
@@ -203,19 +203,10 @@
   .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px;}
   .skel-body{max-width:1360px;margin:0 auto;}
 
-  /* Mobile */
-  .mobile-topbar,.sidebar-backdrop,.hamburger{display:none;}
+  /* Mobile — defer to shared.css classes */
   @media(max-width:900px){
     .main-wrap{margin-left:0;padding:16px;}
     .editor-layout{grid-template-columns:1fr;}
-    .sidebar{transform:translateX(-100%);}
-    .sidebar.open{transform:translateX(0);}
-    .sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:25;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:0.2s;}
-    .sidebar-backdrop.show{opacity:1;pointer-events:auto;}
-    .mobile-topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;}
-    .mob-logo{font-weight:800;text-decoration:none;color:var(--text);font-size:18px;}
-    .mob-logo span{color:var(--accent);}
-    .hamburger{background:none;border:none;color:var(--text);cursor:pointer;width:32px;}
   }
 </style>
 </head>
@@ -232,13 +223,18 @@
 
 <!-- Mobile header -->
 <div class="mobile-topbar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="hamburger" id="mob-menu-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()">
+      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
+    </button>
     <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
   </div>
+  <div class="mob-right">
+    <button class="theme-toggle" style="font-size:15px"></button>
+  </div>
 </div>
-<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-<aside class="sidebar" id="sidebar"></aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
 
 <div class="main-wrap">
   <!-- Topbar -->
@@ -678,6 +674,9 @@
   </div>
 </div>
 
+<script>
+;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
+</script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
 <script>
@@ -1262,7 +1261,7 @@ function previewAgent(){
 //  BOOT  — initNav authenticates, then loadAgent fetches data
 // ══════════════════════════════════════════════════════════════════
 (async () => {
-  const { user } = await initNav('agents');   // 'agents' = highlight My Agents in nav
+  const { user } = await renderNav('agents');   // 'agents' = highlight My Agents in nav
   if (!user) return;                          // initNav redirects to / if not authed
   await loadAgent();
 })();
