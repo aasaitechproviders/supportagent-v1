@@ -1,137 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Account — SupportGent</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="shared.css"/>
-  <style>
-    .account-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;max-width:1100px;}
-    .account-side{position:sticky;top:72px;display:flex;flex-direction:column;gap:16px;}
-    .avatar-upload-wrap{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-    .avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9b93ff);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:white;flex-shrink:0;overflow:hidden;font-family:'Syne',sans-serif;}
-    .avatar-big img{width:100%;height:100%;object-fit:cover;}
-    @media(max-width:900px){.account-layout{grid-template-columns:1fr;}.account-side{position:static;}}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Account — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+.account-layout{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
+.account-side{position:sticky;top:80px;display:flex;flex-direction:column;gap:16px}
+
+/* Avatar section */
+.avatar-wrap{
+  display:flex;align-items:center;gap:16px;
+  padding:20px;background:linear-gradient(135deg,var(--accent-soft),transparent);
+  border:1px solid rgba(108,95,245,.15);border-radius:var(--r);margin-bottom:20px;
+}
+.avatar-big{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-3));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:white;flex-shrink:0;overflow:hidden;
+  box-shadow:0 6px 20px var(--accent-glow);border:3px solid var(--surface);
+}
+.avatar-big img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avatar-upload-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--r-sm);
+  background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);
+  color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:var(--t);
+}
+.avatar-upload-btn:hover{background:var(--accent-mid)}
+.avatar-upload-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Google connected row */
+.connected-row{
+  display:flex;align-items:center;gap:12px;padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.connected-row:last-child{border-bottom:none}
+.google-logo{
+  width:36px;height:36px;border-radius:9px;
+  background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* Danger zone */
+.danger-desc{font-size:13.5px;color:var(--text-2);margin-bottom:14px;line-height:1.7}
+
+/* Side plan card */
+.side-plan-name{
+  font-size:22px;font-weight:800;letter-spacing:-.04em;
+  color:var(--text);text-align:center;margin-bottom:3px;
+}
+.side-plan-sub{font-size:12px;color:var(--text-2);text-align:center;margin-bottom:16px}
+
+@media(max-width:900px){
+  .account-layout{grid-template-columns:1fr}
+  .account-side{position:static}
+}
+</style>
 </head>
 <body>
-<div id="page-skeleton" class="page-skeleton"><div style="display:flex;flex-direction:column;align-items:center;gap:12px;"><div class="skel-spinner"></div><div style="font-size:13px;color:var(--text3);font-family:'Sora',sans-serif;">Loading account…</div></div></div>
-<div class="mobile-topbar" id="mobile-topbar"><button class="mobile-menu-btn" id="mob-menu-btn"><span></span><span></span><span></span></button><div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;" id="mobile-topbar-logo"></div></div>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- Skeleton -->
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:14px;width:100px;border-radius:6px"></div>
+    <div class="skel" style="height:30px;width:120px;border-radius:8px"></div>
+  </div>
+  <div class="skel-body">
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="skel" style="height:260px;border-radius:18px"></div>
+        <div class="skel" style="height:120px;border-radius:18px"></div>
+        <div class="skel" style="height:100px;border-radius:18px"></div>
+      </div>
+      <div>
+        <div class="skel" style="height:280px;border-radius:18px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile topbar -->
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" id="mob-menu-btn">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <aside class="sidebar" id="sidebar"></aside>
 
-<main class="main">
+<div class="main-wrap">
   <div class="topbar">
-    <div><div class="page-title">Account</div><div class="page-sub">Manage your profile and preferences</div></div>
-    <button class="btn-primary" onclick="saveProfile()" id="save-profile-btn">Save Changes</button>
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title">Account</div>
+        <div class="topbar-subtitle">Manage your profile and preferences</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle"></button>
+      <button class="btn btn-primary btn-sm" onclick="saveProfile()" id="save-btn">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Changes
+      </button>
+    </div>
   </div>
-  <div class="content page-enter account-layout" id="main-content" style="display:none;">
-    <div style="display:flex;flex-direction:column;gap:20px;">
 
-      <div class="card">
-        <div class="card-header"><div class="card-title"><span class="card-icon">👤</span>Profile</div></div>
-        <div class="card-body">
-          <div class="avatar-upload-wrap">
-            <div class="avatar-big" id="profile-avatar"></div>
-            <div>
-              <label style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:rgba(var(--accent-rgb),.12);border:1px solid rgba(var(--accent-rgb),.25);border-radius:8px;color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;margin-bottom:5px;">
-                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Change Photo
-                <input type="file" id="avatar-inp" accept="image/*" style="display:none;" onchange="uploadAvatar(this)"/>
-              </label>
-              <div style="font-size:11px;color:var(--text3);">PNG, JPG · Max 2MB</div>
+  <div class="content" id="main-content" style="display:none">
+    <div class="account-layout">
+      <!-- Main -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <!-- Profile -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="card-icon">👤</span>Profile</div>
+          </div>
+          <div class="card-body">
+            <!-- Avatar -->
+            <div class="avatar-wrap">
+              <div class="avatar-big" id="profile-avatar"></div>
+              <div>
+                <label class="avatar-upload-btn">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Change Photo
+                  <input type="file" id="avatar-inp" accept="image/*" style="display:none" onchange="uploadAvatar(this)">
+                </label>
+                <div style="font-size:11px;color:var(--text-3);margin-top:6px">PNG, JPG · Max 2MB</div>
+              </div>
+            </div>
+
+            <div class="field-row" style="margin-bottom:14px">
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" id="f-name" placeholder="Your name">
+              </div>
+              <div class="field">
+                <label>Organisation</label>
+                <input type="text" id="f-org" placeholder="Your company or project">
+              </div>
+            </div>
+            <div class="field">
+              <label>Email <span style="font-size:11px;color:var(--text-3);font-weight:400">(cannot be changed)</span></label>
+              <input type="email" id="f-email" disabled style="opacity:.55;cursor:not-allowed">
+              <div class="field-hint">Linked to your Google account.</div>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Phone</label>
+              <input type="tel" id="f-phone" placeholder="+91 98765 43210">
             </div>
           </div>
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="f-name" class="input" placeholder="Your Name"/>
+        </div>
+
+        <!-- Connected Accounts -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><span class="card-icon">🔐</span>Connected Accounts</div>
           </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="f-email" class="input" disabled style="opacity:.5;cursor:not-allowed;"/>
-            <div class="input-hint">Email is linked to your Google account and cannot be changed.</div>
+          <div class="card-body">
+            <div class="connected-row">
+              <div class="google-logo">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:13.5px;font-weight:600">Google</div>
+                <div style="font-size:12px;color:var(--text-3)" id="google-email">—</div>
+              </div>
+              <span class="badge badge-green">Connected</span>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Organisation</label>
-            <input type="text" id="f-org" class="input" placeholder="Your Company or Project"/>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card" style="border-color:var(--red-border)">
+          <div class="card-header" style="border-color:var(--red-border)">
+            <div class="card-title" style="color:var(--red)">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Danger Zone
+            </div>
           </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label>Phone</label>
-            <input type="tel" id="f-phone" class="input" placeholder="+91 98765 43210"/>
+          <div class="card-body">
+            <div class="danger-desc">
+              Permanently delete your account, all agents, conversations, and data. This action is irreversible and cannot be undone.
+            </div>
+            <button class="btn btn-danger" onclick="deleteAccountModal()">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+              Delete My Account
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header"><div class="card-title"><span class="card-icon">🔐</span>Connected Accounts</div></div>
-        <div class="card-body">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;">
-            <div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-              <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      <!-- Side -->
+      <div class="account-side">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="font-size:13px"><span class="card-icon">💳</span>Plan Summary</div>
+          </div>
+          <div class="card-body">
+            <div class="side-plan-name" id="s-plan">—</div>
+            <div class="side-plan-sub" id="s-status">—</div>
+            <div class="divider" style="margin:0 0 14px"></div>
+            <div class="info-row">
+              <span class="info-row-label">Monthly Tokens</span>
+              <span class="info-row-val" id="s-mcap">—</span>
             </div>
-            <div style="flex:1;">
-              <div style="font-size:13.5px;font-weight:600;">Google</div>
-              <div style="font-size:12px;color:var(--text3);" id="google-email">—</div>
+            <div class="info-row">
+              <span class="info-row-label">Used This Month</span>
+              <span class="info-row-val" id="s-used">—</span>
             </div>
-            <span class="badge badge-green">Connected</span>
+            <div class="info-row">
+              <span class="info-row-label">Topup Balance</span>
+              <span class="info-row-val" id="s-topup">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Cap Resets</span>
+              <span class="info-row-val" id="s-reset">—</span>
+            </div>
+            <a href="payments.html" class="btn btn-accent-ghost" style="width:100%;justify-content:center;margin-top:14px">
+              Manage Billing →
+            </a>
           </div>
         </div>
-      </div>
 
-      <div class="card" style="border-color:rgba(248,113,113,.2);">
-        <div class="card-header"><div class="card-title" style="color:var(--red);">⚠️ Danger Zone</div></div>
-        <div class="card-body">
-          <div style="font-size:13.5px;color:var(--text2);margin-bottom:14px;line-height:1.6;">Permanently delete your account, all agents, conversations, and data. This action is irreversible.</div>
-          <button class="btn-danger" onclick="deleteAccount()">Delete My Account</button>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="font-size:13px"><span class="card-icon">📊</span>Account Info</div>
+          </div>
+          <div class="card-body">
+            <div class="info-row">
+              <span class="info-row-label">Member Since</span>
+              <span class="info-row-val" id="s-joined">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Total Agents</span>
+              <span class="info-row-val" id="s-agents">—</span>
+            </div>
+            <div class="info-row">
+              <span class="info-row-label">Last Login</span>
+              <span class="info-row-val" id="s-login">—</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- Side -->
-    <div class="account-side">
-      <div class="card">
-        <div class="card-header"><div class="card-title" style="font-size:13px;">Plan Summary</div></div>
-        <div class="card-body">
-          <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:14px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:6px;">Current Plan</div>
-            <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;" id="s-plan">—</div>
-            <div style="font-size:12px;color:var(--text2);" id="s-status">—</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Monthly Tokens</span><strong id="s-mcap">—</strong></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Used</span><strong id="s-used">—</strong></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Topup Balance</span><strong id="s-topup">—</strong></div>
-            <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Resets</span><strong id="s-reset">—</strong></div>
-          </div>
-          <a href="payments.html" class="btn-primary" style="width:100%;justify-content:center;margin-top:16px;">Manage Billing →</a>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title" style="font-size:13px;">Account Info</div></div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Member Since</span><strong id="s-joined">—</strong></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Total Agents</span><strong id="s-agents">—</strong></div>
-          <div style="display:flex;justify-content:space-between;"><span style="color:var(--text2);">Last Login</span><strong id="s-login">—</strong></div>
-        </div>
-      </div>
-    </div>
   </div>
-</main>
+</div>
 
 <script src="api.js"></script><script src="nav.js"></script>
 <script>
-let currentUser = null
-
 ;(async () => {
   const { user } = await initNav('account')
   if (!user) return
-  currentUser = user
   populateForm(user)
   const [dash] = await Promise.allSettled([apiFetch('/dashboard')])
-  if (dash.status==='fulfilled') {
-    document.getElementById('s-agents').textContent = dash.value.agents_count || 0
-  }
+  if (dash.status === 'fulfilled') document.getElementById('s-agents').textContent = dash.value.agents_count || 0
   document.getElementById('main-content').style.display = 'grid'
   dismissSkeleton()
 })()
@@ -142,47 +279,64 @@ function populateForm(u) {
   document.getElementById('f-org').value   = u.organisation || ''
   document.getElementById('f-phone').value = u.phone || ''
   document.getElementById('google-email').textContent = u.email || '—'
-  // Avatar
+
   const av = document.getElementById('profile-avatar')
   if (u.avatar) av.innerHTML = `<img src="${u.avatar}" alt=""/>`
   else av.textContent = u.name?.[0]?.toUpperCase() || '?'
-  // Plan summary
+
   const t = u.tokens || {}
   const planMap = { starter:'Starter', grower:'Grower', enterprise:'Enterprise' }
-  document.getElementById('s-plan').textContent  = planMap[t.plan||u.plan] || (t.plan||'—')
-  document.getElementById('s-status').textContent = t.trial_active ? 'Free Trial' : (t.subscription_status||'active')
-  document.getElementById('s-mcap').textContent   = formatTokens(t.monthly_cap||0)
-  document.getElementById('s-used').textContent   = formatTokens(t.monthly_used||0)
-  document.getElementById('s-topup').textContent  = formatTokens(t.topup_balance||0)
-  document.getElementById('s-reset').textContent  = t.cap_reset_at ? formatDate(t.cap_reset_at) : '—'
-  document.getElementById('s-joined').textContent = formatDate(u.created_at)
+  document.getElementById('s-plan').textContent   = planMap[t.plan || u.plan] || (t.plan || '—')
+  document.getElementById('s-status').textContent = t.trial_active ? 'Free Trial' : (t.subscription_status || 'Active')
+  document.getElementById('s-mcap').textContent   = fmtTokens(t.monthly_cap || 0)
+  document.getElementById('s-used').textContent   = fmtTokens(t.monthly_used || 0)
+  document.getElementById('s-topup').textContent  = fmtTokens(t.topup_balance || 0)
+  document.getElementById('s-reset').textContent  = t.cap_reset_at ? fmtDate(t.cap_reset_at) : '—'
+  document.getElementById('s-joined').textContent = fmtDate(u.created_at)
   document.getElementById('s-login').textContent  = timeAgo(u.last_login)
 }
 
 async function saveProfile() {
-  const btn = document.getElementById('save-profile-btn'); btn.disabled=true; btn.textContent='Saving…'
+  const btn = document.getElementById('save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
   try {
-    await apiFetch('/auth/profile', { method:'PUT', body:JSON.stringify({ name:document.getElementById('f-name').value, organisation:document.getElementById('f-org').value, phone:document.getElementById('f-phone').value })})
-    toast('Profile saved!')
-  } catch(e) { toast(e.message,'error') } finally { btn.disabled=false; btn.textContent='Save Changes' }
+    await apiFetch('/auth/profile', { method:'PUT', body:JSON.stringify({
+      name: document.getElementById('f-name').value,
+      organisation: document.getElementById('f-org').value,
+      phone: document.getElementById('f-phone').value
+    })})
+    toast('Profile saved!', 'success')
+  } catch(e) { toast(e.message, 'error') }
+  finally { btn.disabled = false; btn.innerHTML = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Changes` }
 }
 
-async function uploadAvatar(input) {
-  const file = input.files[0]; if (!file) return
-  if (file.size > 2*1024*1024) { toast('Image must be under 2MB','error'); return }
-  const fd = new FormData(); fd.append('avatar', file)
+async function uploadAvatar(inp) {
+  const f = inp.files[0]; if (!f) return
+  if (f.size > 2 * 1024 * 1024) { toast('Max 2MB', 'error'); return }
+  const fd = new FormData(); fd.append('avatar', f)
   try {
     const d = await apiFetch('/auth/avatar', { method:'POST', body:fd })
-    const av = document.getElementById('profile-avatar')
-    av.innerHTML = `<img src="${d.avatar_url}" alt=""/>`
-    toast('Avatar updated!')
-  } catch(e) { toast(e.message,'error') }
+    document.getElementById('profile-avatar').innerHTML = `<img src="${d.avatar_url}" alt=""/>`
+    toast('Avatar updated!', 'success')
+  } catch(e) { toast(e.message, 'error') }
 }
 
-function deleteAccount() {
-  if (!confirm('This will permanently delete your account, agents, and all data. Are you absolutely sure?')) return
-  if (!confirm('Last chance — this is IRREVERSIBLE. Continue?')) return
-  toast('Account deletion requested. Please contact support@supportgent.com to complete.', 'info')
+async function deleteAccountModal() {
+  const c1 = await confirmModal({
+    title: 'Delete your account?',
+    message: 'This will permanently delete all your agents, conversations, sources, and data.',
+    confirmText: 'Yes, continue',
+    danger: true
+  })
+  if (!c1) return
+  const c2 = await confirmModal({
+    title: 'Final warning',
+    message: 'This action is completely irreversible. All your data will be gone forever.',
+    confirmText: 'Delete Everything',
+    danger: true
+  })
+  if (!c2) return
+  toast('Contact support@supportgent.com to complete account deletion.', 'info', 6000)
 }
 </script>
 </body>
