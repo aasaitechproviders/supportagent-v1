@@ -377,11 +377,21 @@ function showTyping() {
 // cached_topics from backend: [{icon, title, desc, question, suggested_prompt}]
 function renderTopics(topics) {
   const wrap = document.getElementById('topics-wrap')
-  wrap.innerHTML = topics.map(t =>
-    `<button class="topic-chip" onclick="sendTopicChip(${JSON.stringify(t)})">
-      <span class="chip-icon">${t.icon || '💬'}</span>${t.title || t.question || ''}
-    </button>`
-  ).join('')
+  wrap.innerHTML = ''
+  topics.forEach((t, i) => {
+    // Store data on element — never inject JSON into onclick
+    const btn = document.createElement('button')
+    btn.className = 'topic-chip'
+    btn.dataset.topicIdx = i
+    btn.innerHTML = `<span class="chip-icon">${t.icon || '💬'}</span>${esc(t.title || t.question || '')}`
+    btn.addEventListener('click', () => sendTopicChip(t))
+    wrap.appendChild(btn)
+  })
+}
+
+// Minimal HTML escape for renderTopics
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
 function sendTopicChip(topic) {
