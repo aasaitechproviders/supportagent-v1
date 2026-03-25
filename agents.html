@@ -69,6 +69,7 @@
     </div>
   </div>
 </div>
+
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
@@ -131,83 +132,240 @@
 </div>
 
 <script>
-let _cmColor='#7C6FFF',_cmType='support'
-const PROMPTS={
-  support:'You are a helpful customer support agent. Answer from the knowledge base. Be empathetic and concise.',
-  sales:'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, guide them to purchase.',
-  faq:'You are a friendly FAQ bot. Answer questions strictly from the knowledge base. Be concise.',
-  general:'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.'
+/* ── State ─────────────────────────────────────────────────────── */
+let _cmColor = '#7C6FFF', _cmType = 'support'
+
+const PROMPTS = {
+  support: 'You are a helpful customer support agent. Answer from the knowledge base. Be empathetic and concise.',
+  sales:   'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, guide them to purchase.',
+  faq:     'You are a friendly FAQ bot. Answer questions strictly from the knowledge base. Be concise.',
+  general: 'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.'
 }
-;(async()=>{
-  const nav=await renderNav('agents')
-  if(!nav)return
-  const{user}=nav
-  // Handle ?create=1
-  if(new URLSearchParams(location.search).get('create')==='1')setTimeout(openCreate,400)
-  try{await loadAgents(user)}catch(e){toast(e.message,'error')}
+
+/* ── Boot ──────────────────────────────────────────────────────── */
+;(async () => {
+  const nav = await renderNav('agents')
+  if (!nav) return
+  const { user } = nav
+  if (new URLSearchParams(location.search).get('create') === '1') setTimeout(openCreate, 400)
+  try { await loadAgents(user) } catch(e) { toast(e.message, 'error') }
   dismissSkeleton()
 })()
-async function loadAgents(user){
-  const agents=await apiFetch('/agents')
-  const planLimits={starter:3,grower:10,enterprise:Infinity}
-  const limit=planLimits[user?.plan||'starter']||3
-  document.getElementById('agents-sub').textContent=agents.length+' of '+(limit===Infinity?'∞':limit)+' agents'
-  document.getElementById('page-content').style.display='block'
-  const grid=document.getElementById('agents-grid')
-  if(!agents.length){
-    grid.innerHTML=`<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">🤖</div><div class="empty-title">No agents yet</div><div class="empty-desc">Create your first AI agent to start handling customer queries.</div><button class="btn btn-primary" style="margin:0 auto" onclick="openCreate()">Create Your First Agent →</button></div></div>`
+
+/* ── Load & render agent grid ──────────────────────────────────── */
+async function loadAgents(user) {
+  const agents = await apiFetch('/agents')
+  const planLimits = { starter: 3, grower: 10, enterprise: Infinity }
+  const limit = planLimits[user?.plan || 'starter'] || 3
+  document.getElementById('agents-sub').textContent =
+    agents.length + ' of ' + (limit === Infinity ? '∞' : limit) + ' agents'
+  document.getElementById('page-content').style.display = 'block'
+
+  const grid = document.getElementById('agents-grid')
+  if (!agents.length) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1">
+        <div class="empty-state">
+          <div class="empty-icon">🤖</div>
+          <div class="empty-title">No agents yet</div>
+          <div class="empty-desc">Create your first AI agent to start handling customer queries.</div>
+          <button class="btn btn-primary" style="margin:0 auto" onclick="openCreate()">Create Your First Agent →</button>
+        </div>
+      </div>`
     return
   }
-  grid.innerHTML=agents.map(a=>`
-    <div class="agent-card" onclick="location.href='agent.html?id=${a._id}'">
-      <div class="ac-stripe" style="background:${a.brand_color||'#7C6FFF'}"></div>
-      <div class="ac-header">
-        <div class="ac-logo" style="background:${a.brand_color||'#7C6FFF'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
-        <div style="flex:1;min-width:0">
-          <div class="ac-name">${a.name}</div>
-          <div class="ac-slug">/${a.slug||'—'}</div>
-        </div>
-        <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?'● Live':'Draft'}</span>
-      </div>
-      <div class="ac-kpis">
-        <div class="ac-kpi"><div class="ac-kpi-val">${fmtNum(a.query_count||0)}</div><div class="ac-kpi-label">Chats</div></div>
-        <div class="ac-kpi"><div class="ac-kpi-val">${fmtNum(a.sources_count||0)}</div><div class="ac-kpi-label">Sources</div></div>
-        <div class="ac-kpi"><div class="ac-kpi-val">${a.products_count||0}</div><div class="ac-kpi-label">Products</div></div>
-      </div>
-      <div class="ac-footer">
-        <a class="btn btn-secondary btn-sm" style="flex:1;justify-content:center" href="agent.html?id=${a._id}" onclick="event.stopPropagation()">⚙ Edit</a>
-        ${a.published
-          ?`<a class="btn btn-accent-ghost btn-sm" style="flex:1;justify-content:center" href="${a.subdomain_url||a.published_url||'#'}" target="_blank" onclick="event.stopPropagation()">Open ↗</a>`
-          :`<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="event.stopPropagation();quickPublish('${a._id}',this)">🚀 Publish</button>`}
-      </div>
-    </div>`).join('')+(agents.length<limit?`
-    <div class="create-card" onclick="openCreate()">
+
+  // Build cards via DOM — avoids XSS from agent.name / brand_color / logo
+  grid.innerHTML = ''
+  agents.forEach((a, i) => {
+    const card = buildAgentCard(a, i, limit)
+    grid.appendChild(card)
+  })
+
+  // Create card
+  if (agents.length < limit) {
+    const cc = document.createElement('div')
+    cc.className = 'create-card'
+    cc.onclick = openCreate
+    cc.innerHTML = `
       <div style="font-size:36px;opacity:.35">+</div>
       <div style="font-size:14px;font-weight:700">New Agent</div>
-      <div style="font-size:12px;color:var(--text-3)">Build another AI assistant</div>
-    </div>`:'')
+      <div style="font-size:12px;color:var(--text-3)">Build another AI assistant</div>`
+    grid.appendChild(cc)
+  }
 }
-function selectType(t,el){_cmType=t;document.querySelectorAll('.type-opt').forEach(e=>e.classList.remove('active'));el.classList.add('active')}
-function cmColor(c,el){_cmColor=c;document.querySelectorAll('#cm-palette .color-swatch').forEach(s=>s.classList.remove('active'));el.classList.add('active')}
-function openCreate(){document.getElementById('create-modal').classList.add('open');document.getElementById('cm-name').focus();document.body.style.overflow='hidden'}
-function closeCreate(){document.getElementById('create-modal').classList.remove('open');document.body.style.overflow=''}
-async function createAgent(){
-  const name=document.getElementById('cm-name').value.trim()
-  if(!name){toast('Enter an agent name','error');return}
-  const btn=document.getElementById('cm-btn');btn.disabled=true;btn.textContent='Creating…'
-  try{
-    const a=await apiFetch('/agents',{method:'POST',body:JSON.stringify({name,brand_color:_cmColor,system_prompt:PROMPTS[_cmType],welcome_message:`Hi! I'm ${name}. How can I help you today?`})})
-    toast('Agent created!','success');closeCreate();location.href='agent.html?id='+a._id
-  }catch(e){toast(e.message,'error');btn.disabled=false;btn.textContent='Create Agent →'}
+
+function buildAgentCard(a, i, limit) {
+  const card = document.createElement('div')
+  card.className = 'agent-card'
+  card.style.animationDelay = (i * 0.04 + 0.04) + 's'
+  card.onclick = () => location.href = 'agent.html?id=' + a._id
+
+  // Stripe
+  const stripe = document.createElement('div')
+  stripe.className = 'ac-stripe'
+  stripe.style.background = sanitizeColor(a.brand_color)
+  card.appendChild(stripe)
+
+  // Header
+  const hdr = document.createElement('div')
+  hdr.className = 'ac-header'
+
+  const logo = document.createElement('div')
+  logo.className = 'ac-logo'
+  logo.style.background = sanitizeColor(a.brand_color)
+  if (a.logo_base64 && /^data:image\//.test(a.logo_base64)) {
+    const img = document.createElement('img')
+    img.src = a.logo_base64
+    img.alt = ''
+    logo.appendChild(img)
+  } else {
+    logo.textContent = (a.name?.[0] || 'A').toUpperCase()
+  }
+
+  const info = document.createElement('div')
+  info.style.cssText = 'flex:1;min-width:0'
+
+  const name = document.createElement('div')
+  name.className = 'ac-name'
+  name.textContent = a.name   // textContent — XSS safe
+
+  const slug = document.createElement('div')
+  slug.className = 'ac-slug'
+  slug.textContent = '/' + (a.slug || '—')
+
+  info.appendChild(name)
+  info.appendChild(slug)
+
+  const badge = document.createElement('span')
+  badge.className = 'badge ' + (a.published ? 'badge-green' : 'badge-gray')
+  badge.textContent = a.published ? '● Live' : 'Draft'
+
+  hdr.appendChild(logo)
+  hdr.appendChild(info)
+  hdr.appendChild(badge)
+  card.appendChild(hdr)
+
+  // KPIs
+  const kpis = document.createElement('div')
+  kpis.className = 'ac-kpis'
+  ;[
+    [fmtNum(a.query_count || 0), 'Chats'],
+    [fmtNum(a.sources_count || 0), 'Sources'],
+    [a.products_count || 0, 'Products'],
+  ].forEach(([val, label]) => {
+    const kpi = document.createElement('div')
+    kpi.className = 'ac-kpi'
+    kpi.innerHTML = `<div class="ac-kpi-val">${val}</div><div class="ac-kpi-label">${label}</div>`
+    kpis.appendChild(kpi)
+  })
+  card.appendChild(kpis)
+
+  // Footer buttons
+  const footer = document.createElement('div')
+  footer.className = 'ac-footer'
+
+  const editBtn = document.createElement('a')
+  editBtn.className = 'btn btn-secondary btn-sm'
+  editBtn.style.cssText = 'flex:1;justify-content:center'
+  editBtn.href = 'agent.html?id=' + a._id
+  editBtn.textContent = '⚙ Edit'
+  editBtn.onclick = e => e.stopPropagation()
+  footer.appendChild(editBtn)
+
+  if (a.published) {
+    const openBtn = document.createElement('a')
+    openBtn.className = 'btn btn-accent-ghost btn-sm'
+    openBtn.style.cssText = 'flex:1;justify-content:center'
+    openBtn.href = a.subdomain_url || a.published_url || '#'
+    openBtn.target = '_blank'
+    openBtn.textContent = 'Open ↗'
+    openBtn.onclick = e => e.stopPropagation()
+    footer.appendChild(openBtn)
+  } else {
+    const pubBtn = document.createElement('button')
+    pubBtn.className = 'btn btn-primary btn-sm'
+    pubBtn.style.cssText = 'flex:1;justify-content:center'
+    pubBtn.textContent = '🚀 Publish'
+    pubBtn.onclick = e => { e.stopPropagation(); quickPublish(a._id, pubBtn) }
+    footer.appendChild(pubBtn)
+  }
+
+  card.appendChild(footer)
+  return card
 }
-async function quickPublish(id,btn){
-  btn.disabled=true;btn.textContent='Publishing…'
-  try{await apiFetch(`/agents/${id}/publish`,{method:'POST'});toast('Published! 🎉','success');location.reload()}
-  catch(e){toast(e.message,'error');btn.disabled=false;btn.textContent='🚀 Publish'}
+
+// Only allow safe hex / rgb color values — prevent CSS injection
+function sanitizeColor(c) {
+  if (!c) return '#7C6FFF'
+  return /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : '#7C6FFF'
 }
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('create-modal').classList.contains('open'))closeCreate()
-  if(e.key==='Enter'&&document.getElementById('create-modal').classList.contains('open'))createAgent()
+
+/* ── Create agent ──────────────────────────────────────────────── */
+function selectType(t, el) {
+  _cmType = t
+  document.querySelectorAll('.type-opt').forEach(e => e.classList.remove('active'))
+  el.classList.add('active')
+}
+function cmColor(c, el) {
+  _cmColor = c
+  document.querySelectorAll('#cm-palette .color-swatch').forEach(s => s.classList.remove('active'))
+  el.classList.add('active')
+}
+function openCreate() {
+  document.getElementById('create-modal').classList.add('open')
+  document.getElementById('cm-name').focus()
+  document.body.style.overflow = 'hidden'
+}
+function closeCreate() {
+  document.getElementById('create-modal').classList.remove('open')
+  document.body.style.overflow = ''
+}
+async function createAgent() {
+  const name = document.getElementById('cm-name').value.trim()
+  if (!name) { toast('Enter an agent name', 'error'); return }
+  const btn = document.getElementById('cm-btn')
+  btn.disabled = true; btn.textContent = 'Creating…'
+  try {
+    const a = await apiFetch('/agents', { method: 'POST', body: JSON.stringify({
+      name, brand_color: _cmColor,
+      system_prompt: PROMPTS[_cmType],
+      welcome_message: `Hi! I'm ${name}. How can I help you today?`
+    })})
+    toast('Agent created!', 'success')
+    closeCreate()
+    location.href = 'agent.html?id=' + a._id
+  } catch(e) {
+    toast(e.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Create Agent →'
+  }
+}
+
+/* ── Quick publish ─────────────────────────────────────────────── */
+async function quickPublish(id, btn) {
+  btn.disabled = true; btn.textContent = 'Publishing…'
+  try {
+    await apiFetch(`/agents/${id}/publish`, { method: 'POST' })
+    toast('Published! 🎉', 'success')
+    location.reload()
+  } catch(e) {
+    toast(e.message, 'error')
+    btn.disabled = false
+    btn.textContent = '🚀 Publish'
+  }
+}
+
+/* ── Keyboard shortcuts ────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  const modal = document.getElementById('create-modal')
+  if (!modal.classList.contains('open')) return
+  if (e.key === 'Escape') closeCreate()
+  if (e.key === 'Enter' && e.target !== document.getElementById('cm-name')) createAgent()
+})
+document.getElementById('create-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCreate()
 })
 </script>
-</body></html>
+</body>
+</html>
