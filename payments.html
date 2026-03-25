@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Billing — SupportGent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .billing-layout{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start;}
+    .billing-main{display:flex;flex-direction:column;gap:20px;}
+    .billing-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:72px;}
+    .cycle-toggle{display:flex;gap:4px;padding:4px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:fit-content;margin-bottom:20px;}
+    .cycle-btn{padding:7px 18px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:13px;cursor:pointer;}
+    .cycle-btn.active{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+    .topup-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .topup-card{padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;text-align:center;}
+    .topup-card:hover{border-color:var(--accent);background:var(--accent-l);}
+    .topup-card.selected{border-color:var(--accent);background:var(--accent-l);}
+    .topup-tokens{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:3px;}
+    .topup-price{font-size:13px;color:var(--text2);}
+    @media(max-width:960px){.billing-layout{grid-template-columns:1fr;}.billing-side{position:static;}.plans-grid{grid-template-columns:1fr;}.topup-grid{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body>
+<div id="page-skeleton" class="page-skeleton"><div style="display:flex;flex-direction:column;align-items:center;gap:12px;"><div class="skel-spinner"></div><div style="font-size:13px;color:var(--text3);font-family:'Sora',sans-serif;">Loading billing…</div></div></div>
+<div class="mobile-topbar" id="mobile-topbar"><button class="mobile-menu-btn" id="mob-menu-btn"><span></span><span></span><span></span></button><div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;" id="mobile-topbar-logo"></div></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar" id="sidebar"></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div><div class="page-title">Billing</div><div class="page-sub">Manage your plan and token balance</div></div>
+  </div>
+  <div class="content page-enter billing-layout" id="main-content" style="display:none;">
+
+    <div class="billing-main">
+      <!-- Current Plan -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-icon">🎯</span>Current Plan</div></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;" id="cur-plan-name">—</div>
+              <div style="font-size:13px;color:var(--text2);margin-top:2px;" id="cur-plan-status">—</div>
+            </div>
+            <span class="badge" id="cur-plan-badge">—</span>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Monthly Token Usage</label>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar"><div class="usage-bar-fill" id="usage-fill" style="width:0%;"></div></div>
+              <div class="usage-labels"><span id="usage-used">0</span><span id="usage-cap">—</span></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+            <div style="text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="info-monthly">—</div><div style="font-size:11px;color:var(--text3);">Monthly Tokens</div></div>
+            <div style="text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="info-topup">—</div><div style="font-size:11px;color:var(--text3);">Topup Balance</div></div>
+            <div style="text-align:center;"><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;" id="info-reset">—</div><div style="font-size:11px;color:var(--text3);">Resets On</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upgrade Plans -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-icon">⚡</span>Upgrade Plan</div></div>
+        <div class="card-body">
+          <div class="cycle-toggle">
+            <button class="cycle-btn active" id="cycle-yearly" onclick="setCycle('yearly',this)">Yearly</button>
+            <button class="cycle-btn" id="cycle-monthly" onclick="setCycle('monthly',this)">Monthly</button>
+          </div>
+          <div class="plans-grid" id="plans-grid">
+            <div class="skel" style="height:280px;border-radius:var(--radius);"></div>
+            <div class="skel" style="height:280px;border-radius:var(--radius);"></div>
+            <div class="skel" style="height:280px;border-radius:var(--radius);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Token Topup -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span>Buy Token Credits</div></div>
+        <div class="card-body">
+          <p style="font-size:13.5px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Need more tokens this month? Top up instantly. Credits never expire and are used automatically when your monthly cap is reached.</p>
+          <div class="topup-grid" id="topup-grid"></div>
+          <button class="btn-primary" style="margin-top:16px;width:100%;justify-content:center;" onclick="buyTopup()" id="topup-btn">Buy Tokens</button>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-icon">📋</span>Billing History</div></div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap" style="border:none;border-radius:0;">
+            <table><thead><tr><th>Type</th><th>Plan / Amount</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="billing-history"><tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px;">No billing history yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side -->
+    <div class="billing-side">
+      <div class="card">
+        <div class="card-header"><div class="card-title" style="font-size:13px;">Token Balance</div></div>
+        <div class="card-body">
+          <div style="text-align:center;padding:8px 0 16px;">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Topup Balance</div>
+            <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;" id="side-topup">—</div>
+            <div style="font-size:12px;color:var(--text2);">extra tokens</div>
+          </div>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.6;padding-top:12px;border-top:1px solid var(--border);">Topup tokens are used after your monthly allocation is consumed. They never expire and roll over month to month.</div>
+        </div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(var(--accent-rgb),.08),rgba(155,147,255,.04));border-color:rgba(var(--accent-rgb),.2);">
+        <div class="card-body">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;">🎁 14-Day Free Trial</div>
+          <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:0;">You started on Grower plan with 500K tokens. Upgrade before your trial ends to keep all features.</p>
+          <div style="font-size:12px;color:var(--accent);margin-top:8px;font-weight:600;" id="trial-ends-label"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="api.js"></script><script src="nav.js"></script>
+<script>
+let billingData = null
+let billingCycle = 'yearly'
+let selectedTopup = null
+
+;(async () => {
+  const { user } = await initNav('payments')
+  if (!user) return
+  try {
+    billingData = await apiFetch('/billing/summary')
+    renderCurrentPlan(billingData.tokens, user)
+    renderTopupPacks(billingData.topup_packs)
+    renderHistory(billingData.events, billingData.topups)
+    await loadPlans()
+  } catch(e) { toast(e.message,'error') }
+  document.getElementById('main-content').style.display = 'grid'
+  dismissSkeleton()
+})()
+
+function renderCurrentPlan(t, user) {
+  if (!t) return
+  const planLabels = { starter:'Starter', grower:'Grower', enterprise:'Enterprise' }
+  document.getElementById('cur-plan-name').textContent = planLabels[t.plan] || t.plan
+  const isTrialing = t.trial_active
+  document.getElementById('cur-plan-status').textContent = isTrialing ? `Free trial · ${t.trial_ends_at ? 'Ends '+formatDate(t.trial_ends_at) : ''}` : t.subscription_end ? `Renews ${formatDate(t.subscription_end)}` : 'Active'
+  const badgeMap = { starter:'badge-gray', grower:'badge-accent', enterprise:'badge-yellow' }
+  const badge = document.getElementById('cur-plan-badge')
+  badge.className = 'badge ' + (badgeMap[t.plan]||'badge-gray')
+  badge.textContent = (planLabels[t.plan]||t.plan) + (isTrialing?' Trial':'')
+  const pct = t.monthly_cap ? Math.min(100, Math.round(t.monthly_used/t.monthly_cap*100)) : 0
+  const fill = document.getElementById('usage-fill')
+  fill.style.width = pct + '%'
+  fill.className = 'usage-bar-fill' + (pct>=90?' danger':pct>=70?' warning':'')
+  document.getElementById('usage-used').textContent = formatTokens(t.monthly_used) + ' used'
+  document.getElementById('usage-cap').textContent  = formatTokens(t.monthly_cap)
+  document.getElementById('info-monthly').textContent = formatTokens(t.monthly_cap)
+  document.getElementById('info-topup').textContent   = formatTokens(t.topup_balance)
+  document.getElementById('info-reset').textContent   = t.cap_reset_at ? new Date(t.cap_reset_at).getDate()+' '+new Date(t.cap_reset_at).toLocaleString('en',{month:'short'}) : '—'
+  document.getElementById('side-topup').textContent   = formatTokens(t.topup_balance)
+  if (isTrialing && t.trial_ends_at) document.getElementById('trial-ends-label').textContent = 'Trial ends ' + formatDate(t.trial_ends_at)
+}
+
+async function loadPlans() {
+  try {
+    const d = await apiFetch('/billing/plans')
+    renderPlans(d.plans)
+  } catch(e) { toast(e.message,'error') }
+}
+
+function setCycle(cycle, btn) {
+  billingCycle = cycle
+  document.querySelectorAll('.cycle-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderPlans(window._plans)
+}
+
+function renderPlans(plans) {
+  if (!plans) return
+  window._plans = plans
+  const currentPlan = billingData?.tokens?.plan || 'starter'
+  const grid = document.getElementById('plans-grid')
+  const planList = [
+    { key:'starter', features:['3 Agents','500K tokens/mo','10 sources/agent','Basic support','No shopping'] },
+    { key:'grower',  features:['10 Agents','2M tokens/mo','30 sources/agent','Custom domain','Shopping + Razorpay','Priority support'], recommended:true },
+    { key:'enterprise', features:['Unlimited agents','10M tokens/mo','Unlimited sources','Custom domain','Shopping + Razorpay','Dedicated support'] }
+  ]
+  grid.innerHTML = planList.map(({ key, features, recommended }) => {
+    const p = plans[key]; if (!p) return ''
+    const price  = billingCycle==='yearly' ? p.price_monthly : p.price_monthly_mo
+    const isCur  = key === currentPlan
+    return `
+      <div class="plan-card ${recommended?'recommended':''} ${isCur?'current':''}">
+        ${recommended ? `<div class="plan-badge">Most Popular</div>` : ''}
+        ${isCur ? `<div class="plan-badge" style="background:var(--green);">Current Plan</div>` : ''}
+        <div class="plan-name">${p.label}</div>
+        <div class="plan-price">
+          <span class="plan-price-amount">₹${price}</span>
+          <span class="plan-price-mo">/mo</span>
+        </div>
+        ${billingCycle==='yearly' ? `<div style="font-size:11.5px;color:var(--green);margin-bottom:12px;">Billed ₹${(price*12).toLocaleString()}/year</div>` : `<div style="font-size:11.5px;color:var(--text3);margin-bottom:12px;">Billed monthly</div>`}
+        <div class="plan-features">
+          ${features.map(f => `<div class="plan-feature ${f.startsWith('No ')?'no':''}"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">${f.startsWith('No ')?'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>':'<polyline points="20 6 9 17 4 12"/>'}</svg>${f}</div>`).join('')}
+        </div>
+        ${isCur
+          ? `<button class="btn-secondary" style="width:100%;justify-content:center;cursor:default;" disabled>Current Plan</button>`
+          : `<button class="btn-primary ${recommended?'':'btn-secondary'}" style="width:100%;justify-content:center;background:${recommended?'var(--accent)':'transparent'};" onclick="subscribePlan('${key}')">Upgrade to ${p.label}</button>`}
+      </div>`
+  }).join('')
+}
+
+function renderTopupPacks(packs) {
+  if (!packs) return
+  const grid = document.getElementById('topup-grid')
+  grid.innerHTML = packs.map(p => `
+    <div class="topup-card" id="tp-${p.id}" onclick="selectTopup('${p.id}',this)">
+      <div class="topup-tokens">${formatTokens(p.tokens)}</div>
+      <div class="topup-price">₹${p.price}</div>
+      <div style="font-size:10.5px;color:var(--text3);margin-top:3px;">${p.label}</div>
+    </div>
+  `).join('')
+  // auto-select first
+  const first = document.getElementById('tp-' + packs[0].id)
+  if (first) { selectedTopup = packs[0].id; first.classList.add('selected') }
+}
+function selectTopup(id, el) {
+  selectedTopup = id
+  document.querySelectorAll('.topup-card').forEach(c => c.classList.remove('selected'))
+  el.classList.add('selected')
+}
+
+function renderHistory(events, topups) {
+  const tbody = document.getElementById('billing-history')
+  const allItems = [
+    ...(events||[]).map(e => ({ ...e, kind:'subscription' })),
+    ...(topups||[]).filter(t=>t.status==='completed').map(t => ({ ...t, kind:'topup', type:'Token Topup' }))
+  ].sort((a,b) => new Date(b.created_at)-new Date(a.created_at))
+  if (!allItems.length) { tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:24px;">No billing history yet.</td></tr>'; return }
+  tbody.innerHTML = allItems.slice(0,20).map(item => `
+    <tr>
+      <td>${item.kind==='topup' ? '🪙 Token Topup' : '⚡ Subscription'}</td>
+      <td>${item.kind==='topup' ? formatTokens(item.tokens)+' tokens' : (item.plan||'—')+' · '+(item.billing_cycle||'')} ${item.amount ? ' · ₹'+item.amount : ''}</td>
+      <td>${formatDate(item.created_at||item.completed_at)}</td>
+      <td><span class="badge ${item.status==='paid'||item.status==='completed'?'badge-green':'badge-yellow'}">${item.status}</span></td>
+    </tr>
+  `).join('')
+}
+
+async function subscribePlan(plan) {
+  try {
+    const d = await apiFetch('/billing/subscribe', { method:'POST', body:JSON.stringify({ plan, billing_cycle:billingCycle })})
+    const rz = new Razorpay({
+      key: d.key_id, amount: d.amount, currency: 'INR', name: 'SupportGent',
+      description: d.description, order_id: d.order_id,
+      theme: { color:'#6c63ff' },
+      handler: async resp => {
+        try {
+          await apiFetch('/billing/subscribe/verify', { method:'POST', body:JSON.stringify(resp)})
+          toast('Plan upgraded successfully! 🎉'); location.reload()
+        } catch(e) { toast('Payment verification failed: '+e.message,'error') }
+      }
+    })
+    rz.open()
+  } catch(e) { toast(e.message,'error') }
+}
+
+async function buyTopup() {
+  if (!selectedTopup) { toast('Select a token pack first','error'); return }
+  const btn = document.getElementById('topup-btn'); btn.disabled=true; btn.textContent='Processing…'
+  try {
+    const d = await apiFetch('/billing/topup', { method:'POST', body:JSON.stringify({ pack_id:selectedTopup })})
+    const rz = new Razorpay({
+      key: d.key_id, amount: d.amount, currency:'INR', name:'SupportGent',
+      description: `${formatTokens(d.tokens)} Token Topup`,
+      order_id: d.order_id,
+      theme: { color:'#6c63ff' },
+      handler: async resp => {
+        try {
+          await apiFetch('/billing/topup/verify', { method:'POST', body:JSON.stringify(resp)})
+          toast(`${formatTokens(d.tokens)} tokens added! 🎉`); location.reload()
+        } catch(e) { toast('Verification failed: '+e.message,'error') }
+      }
+    })
+    rz.open()
+  } catch(e) { toast(e.message,'error') } finally { btn.disabled=false; btn.textContent='Buy Tokens' }
+}
+</script>
+</body>
+</html>

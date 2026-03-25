@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — SupportGent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+    .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .chart-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+    .chart-wrap{position:relative;height:180px;}
+    .recent-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+    .recent-agent-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+    .recent-agent-item:last-child{border-bottom:none;}
+    .recent-agent-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;flex-shrink:0;font-family:'Syne',sans-serif;}
+    .recent-agent-name{font-size:13.5px;font-weight:600;}
+    .recent-agent-meta{font-size:11.5px;color:var(--text3);}
+    .activity-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+    .activity-text{font-size:13px;color:var(--text2);line-height:1.5;}
+    .activity-time{font-size:11px;color:var(--text3);margin-top:2px;}
+    @media(max-width:900px){.recent-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div id="page-skeleton" class="page-skeleton"><div style="display:flex;flex-direction:column;align-items:center;gap:12px;"><div class="skel-spinner"></div><div style="font-size:13px;color:var(--text3);font-family:'Sora',sans-serif;">Loading dashboard…</div></div></div>
+
+<div class="mobile-topbar" id="mobile-topbar">
+  <button class="mobile-menu-btn" id="mob-menu-btn"><span></span><span></span><span></span></button>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;" id="mobile-topbar-logo"></div>
+</div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<aside class="sidebar" id="sidebar"></aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="greeting">Good day!</div>
+    </div>
+    <a href="agents.html" class="btn-primary">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Agent
+    </a>
+  </div>
+  <div class="content page-enter" id="main-content" style="display:none;">
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card c1"><div class="stat-label">Total Agents</div><div class="stat-value" id="s-agents">—</div><div class="stat-sub">Created agents</div></div>
+      <div class="stat-card c2"><div class="stat-label">Total Conversations</div><div class="stat-value" id="s-queries">—</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card c3"><div class="stat-label">Tokens Used</div><div class="stat-value" id="s-tokens">—</div><div class="stat-sub">This month</div></div>
+      <div class="stat-card c4"><div class="stat-label">Today's Chats</div><div class="stat-value" id="s-today">—</div><div class="stat-sub">Last 24 hours</div></div>
+    </div>
+
+    <!-- Chart + Activity -->
+    <div class="recent-grid" style="margin-bottom:24px;">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">Daily Conversations (14 days)</div>
+          <span class="badge badge-accent" id="chart-total">—</span>
+        </div>
+        <div class="chart-wrap"><canvas id="daily-chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Token Usage</div></div>
+        <div class="card-body">
+          <div style="text-align:center;padding:8px 0 18px;">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">This Month</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;" id="tok-used">—</div>
+            <div style="font-size:12px;color:var(--text2);">of <span id="tok-cap">—</span> tokens</div>
+          </div>
+          <div class="usage-bar" style="height:10px;margin-bottom:8px;"><div class="usage-bar-fill" id="tok-bar" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text2);margin-bottom:16px;">
+            <span id="tok-pct">0% used</span>
+            <span id="tok-reset">—</span>
+          </div>
+          <a href="payments.html" class="btn-secondary" style="width:100%;justify-content:center;">Manage Billing</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Agents -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>Recent Agents</div>
+        <a href="agents.html" class="btn-ghost" style="font-size:12px;">View all →</a>
+      </div>
+      <div class="card-body" style="padding:0 22px;">
+        <div id="recent-agents-list">
+          <div class="recent-agent-item"><div class="skel" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;"></div><div style="flex:1;"><div class="skel" style="height:14px;width:60%;margin-bottom:6px;"></div><div class="skel" style="height:11px;width:40%;"></div></div></div>
+          <div class="recent-agent-item"><div class="skel" style="width:38px;height:38px;border-radius:10px;flex-shrink:0;"></div><div style="flex:1;"><div class="skel" style="height:14px;width:55%;margin-bottom:6px;"></div><div class="skel" style="height:11px;width:35%;"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="api.js"></script>
+<script src="nav.js"></script>
+<script>
+(async () => {
+  // Check token from URL
+  const params = new URLSearchParams(location.search)
+  if (params.get('token')) { setToken(params.get('token')); history.replaceState({},'',location.pathname) }
+  const { user } = await initNav('dashboard')
+  if (!user) return
+  // Greeting
+  const hr = new Date().getHours()
+  document.getElementById('greeting').textContent = hr<12?`Good morning, ${user.name?.split(' ')[0]||''}!`:hr<17?`Good afternoon, ${user.name?.split(' ')[0]||''}!`:`Good evening, ${user.name?.split(' ')[0]||''}!`
+  // Load dashboard
+  try {
+    const d = await apiFetch('/dashboard')
+    document.getElementById('s-agents').textContent  = d.agents_count||0
+    document.getElementById('s-queries').textContent = (d.total_queries||0).toLocaleString()
+    document.getElementById('s-tokens').textContent  = formatTokens(d.tokens_used||0)
+    document.getElementById('s-today').textContent   = d.today_queries||0
+    // Token bar
+    const t = d.tokens||{}
+    document.getElementById('tok-used').textContent  = formatTokens(t.monthly_used||0)
+    document.getElementById('tok-cap').textContent   = formatTokens(t.monthly_cap||0)
+    const pct = t.monthly_cap ? Math.min(100,Math.round((t.monthly_used/t.monthly_cap)*100)) : 0
+    const tokBar = document.getElementById('tok-bar')
+    tokBar.style.width=pct+'%'
+    tokBar.className='usage-bar-fill'+(pct>=90?' danger':pct>=70?' warning':'')
+    document.getElementById('tok-pct').textContent=pct+'% used'
+    document.getElementById('tok-reset').textContent=t.cap_reset_at?'Resets '+formatDate(t.cap_reset_at):''
+    // Chart
+    const labels=[], values=[]
+    const last14=Array.from({length:14},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(13-i)); return d.toISOString().slice(0,10) })
+    const statMap={}; (d.daily_stats||[]).forEach(s=>statMap[s._id]=(s.queries||0))
+    last14.forEach(day=>{ labels.push(day.slice(5)); values.push(statMap[day]||0) })
+    document.getElementById('chart-total').textContent=(values.reduce((a,b)=>a+b,0)).toLocaleString()+' chats'
+    new Chart(document.getElementById('daily-chart').getContext('2d'),{
+      type:'bar',
+      data:{ labels, datasets:[{ data:values, backgroundColor:'rgba(108,99,255,0.25)', borderColor:'rgba(108,99,255,0.8)', borderWidth:1.5, borderRadius:4, hoverBackgroundColor:'rgba(108,99,255,0.4)' }] },
+      options:{ responsive:true,maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:'#13131f', titleColor:'#8b8aaa', bodyColor:'#eeedf8', borderColor:'rgba(108,99,255,.3)', borderWidth:1, padding:10, callbacks:{ title:i=>`${i[0].label}`, body:i=>`${i[0].raw} conversations` } } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:'#45445c', font:{ size:10 } } }, y:{ grid:{ color:'rgba(255,255,255,.04)' }, ticks:{ color:'#45445c', font:{ size:10 }, precision:0 }, beginAtZero:true } } }
+    })
+    // Recent agents
+    const list=document.getElementById('recent-agents-list')
+    if (!d.recent_agents||!d.recent_agents.length) {
+      list.innerHTML=`<div class="empty-state" style="padding:30px 0;"><div class="empty-state-icon">🤖</div><div class="empty-state-title" style="font-size:15px;">No agents yet</div><div class="empty-state-sub" style="font-size:13px;margin-bottom:14px;">Create your first AI agent</div><a href="agents.html" class="btn-primary">Create Agent</a></div>`
+    } else {
+      list.innerHTML=d.recent_agents.map(a=>`
+        <div class="recent-agent-item">
+          <div class="recent-agent-logo" style="background:${a.brand_color||'#6c63ff'};">${a.logo_base64?`<img src="${a.logo_base64}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;" alt=""/>`:a.name?.[0]?.toUpperCase()||'A'}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="recent-agent-name">${a.name}</div>
+            <div class="recent-agent-meta">${a.query_count||0} conversations · ${a.sources_count||0} sources</div>
+          </div>
+          <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?'Live':'Draft'}</span>
+          <a href="agent.html?id=${a._id}" class="btn-ghost" style="font-size:12px;margin-left:6px;">Edit →</a>
+        </div>
+      `).join('')
+    }
+  } catch(e) { toast(e.message,'error') }
+  document.getElementById('main-content').style.display='block'
+  dismissSkeleton()
+})()
+</script>
+</body>
+</html>
