@@ -8,255 +8,196 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="shared.css">
+
 <style>
-/* ── Page-specific ─────────────────────────────────────── */
-@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes kpiPulse{0%,100%{opacity:1}50%{opacity:.3}}
-.dash-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
-.dash-main{display:flex;flex-direction:column;gap:20px;min-width:0}
-.dash-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:72px}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm)}
-.chart-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
-.chart-title{font-size:13.5px;font-weight:700;color:var(--text);letter-spacing:-.02em}
-.chart-body{padding:20px;height:220px;position:relative}
-.agent-row{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-.agent-row:last-child{border-bottom:none}
-.agent-row:hover{background:var(--surface-2)}
-.agent-row-logo{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:white;flex-shrink:0;overflow:hidden;border:1px solid var(--border-md)}
-.agent-row-logo img{width:100%;height:100%;object-fit:contain;padding:3px}
-.agent-row-info{flex:1;min-width:0}
-.agent-row-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.agent-row-meta{font-size:11px;color:var(--text-3);margin-top:1px}
-.token-usage-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm)}
-.tu-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.tu-body{padding:20px}
-.tu-main{text-align:center;padding:8px 0 18px;border-bottom:1px solid var(--border);margin-bottom:16px}
-.tu-value{font-size:32px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em;color:var(--text);line-height:1;margin-bottom:4px}
-.tu-label{font-size:12px;color:var(--text-3)}
-.tu-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;margin-bottom:10px}
-.tu-row-label{color:var(--text-3)}
-.tu-row-val{font-weight:700;color:var(--text);font-family:var(--mono)}
-.trial-banner{background:linear-gradient(135deg,var(--accent-soft),rgba(124,111,255,.08));border:1px solid rgba(124,111,255,.2);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--sh-sm)}
-.trial-icon{font-size:22px;margin-bottom:8px}
-.trial-title{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.03em;margin-bottom:4px}
-.trial-sub{font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:12px}
-@media(max-width:1100px){.dash-grid{grid-template-columns:1fr}.dash-side{position:static}}
-@media(max-width:648px){.dash-side{position:static}}
+.dash-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+.chart-wrap{height:200px;position:relative;}
+.agent-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:var(--t);}
+.agent-row:last-child{border-bottom:none;}
+.agent-row:hover{background:var(--surface-2);}
+.agent-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;overflow:hidden;}
+.agent-logo img{width:100%;height:100%;object-fit:cover;}
+.quickstart{background:linear-gradient(135deg,var(--accent-dim),var(--accent-soft));border:1px solid rgba(108,95,245,.18);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:22px;display:flex;align-items:center;gap:20px;}
+.qs-icon{width:52px;height:52px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow);}
+@media(max-width:1000px){.dash-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<!-- Page skeleton -->
 <div id="page-skeleton">
-  <div class="skel-topbar"><div class="skel" style="height:14px;width:160px;border-radius:6px"></div><div class="skel" style="height:30px;width:100px;border-radius:8px"></div></div>
-  <div class="skel-body">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px"><div class="skel" style="height:94px;border-radius:14px"></div><div class="skel" style="height:94px;border-radius:14px"></div><div class="skel" style="height:94px;border-radius:14px"></div><div class="skel" style="height:94px;border-radius:14px"></div></div>
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px"><div class="skel" style="height:260px;border-radius:18px"></div><div class="skel" style="height:260px;border-radius:18px"></div></div>
-  </div>
+  <div class="skel-topbar"><div class="skel" style="height:14px;width:180px;border-radius:6px;"></div><div class="skel" style="height:32px;width:110px;border-radius:8px;"></div></div>
+  <div style="padding:0 28px;"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;"><div class="skel" style="height:86px;border-radius:16px;"></div><div class="skel" style="height:86px;border-radius:16px;"></div><div class="skel" style="height:86px;border-radius:16px;"></div><div class="skel" style="height:86px;border-radius:16px;"></div></div><div class="skel" style="height:360px;border-radius:16px;"></div></div>
 </div>
-
 <div class="mobile-topbar">
-  <div class="mob-left">
-    <button class="hamburger" id="mob-menu-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="hamburger" id="mob-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
     <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
   </div>
-  <div class="mob-right"><button class="theme-toggle" title="Toggle theme"></button></div>
+  <button class="theme-toggle"></button>
 </div>
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <aside class="sidebar" id="sidebar"></aside>
-
+<div id="toast-container"></div>
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-title" id="greeting">Dashboard</div>
+      <div><div class="page-title" id="greeting">Dashboard</div></div>
     </div>
     <div class="topbar-right">
-      <button class="theme-toggle" title="Toggle theme"></button>
-      <a href="agents.html" class="btn btn-primary btn-sm">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New Agent
-      </a>
+      <button class="theme-toggle"></button>
+      <a href="agents.html" class="btn btn-primary btn-sm">+ New Agent</a>
     </div>
   </div>
+  <div class="content" id="main-content" style="display:none;padding-top:22px;">
 
-  <div class="content" id="main-content" style="display:none;">
+    <!-- Quick start for new users -->
+    <div class="quickstart" id="quickstart-banner" style="display:none;">
+      <div class="qs-icon">🚀</div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px;">Welcome to SupportGent!</div>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Create your first AI agent in 3 easy steps: upload your knowledge, set up payment, and publish.</div>
+        <a href="agents.html" class="btn btn-primary btn-sm">Create Your First Agent →</a>
+      </div>
+      <button onclick="this.closest('.quickstart').style.display='none'" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:18px;padding:4px;flex-shrink:0;">✕</button>
+    </div>
+
     <!-- Stats -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-icon-wrap">🤖</div>
-        <div class="stat-info">
-          <div class="stat-label">Total Agents</div>
-          <div class="stat-value loading" id="s-agents">—</div>
-          <div class="stat-sub">Active agents</div>
-        </div>
+        <div><div class="stat-label">Total Agents</div><div class="stat-value" id="s-agents">—</div><div class="stat-sub" id="s-agents-sub">Active</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">💬</div>
-        <div class="stat-info">
-          <div class="stat-label">Conversations</div>
-          <div class="stat-value loading" id="s-queries">—</div>
-          <div class="stat-sub">All time</div>
-        </div>
+        <div><div class="stat-label">Conversations</div><div class="stat-value" id="s-queries">—</div><div class="stat-sub">All time</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">🪙</div>
-        <div class="stat-info">
-          <div class="stat-label">Tokens Used</div>
-          <div class="stat-value loading" id="s-tokens">—</div>
-          <div class="stat-sub">This month</div>
-        </div>
+        <div><div class="stat-label">Tokens Used</div><div class="stat-value" id="s-tokens">—</div><div class="stat-sub">This month</div></div>
       </div>
       <div class="stat-card">
         <div class="stat-icon-wrap">📅</div>
-        <div class="stat-info">
-          <div class="stat-label">Today</div>
-          <div class="stat-value loading" id="s-today">—</div>
-          <div class="stat-sub">Chats today</div>
-        </div>
+        <div><div class="stat-label">Today</div><div class="stat-value" id="s-today">—</div><div class="stat-sub">Chats today</div></div>
       </div>
     </div>
 
     <div class="dash-grid">
-      <div class="dash-main">
+      <div style="display:flex;flex-direction:column;gap:20px;">
         <!-- Chart -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <div class="chart-title">Daily Conversations <span style="color:var(--text-3);font-weight:400;font-size:12px;">(last 14 days)</span></div>
-            <span class="badge badge-accent" id="chart-total">— total</span>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📈 Conversations (last 14 days)</div>
+            <span class="badge badge-accent" id="chart-total">0 total</span>
           </div>
-          <div class="chart-body"><canvas id="daily-chart"></canvas></div>
+          <div style="padding:20px;"><div class="chart-wrap"><canvas id="daily-chart"></canvas></div></div>
         </div>
 
         <!-- Recent Agents -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon">🤖</span>Recent Agents</div>
-            <a href="agents.html" class="btn-ghost" style="font-size:12px;">View all →</a>
+            <div class="card-title">🤖 Your Agents</div>
+            <a href="agents.html" class="btn btn-ghost btn-sm">View all →</a>
           </div>
           <div id="recent-agents-wrap">
-            <div class="agent-row"><div class="skel" style="width:36px;height:36px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="skel" style="height:12px;width:50%"></div><div class="skel" style="height:10px;width:30%"></div></div></div>
-            <div class="agent-row"><div class="skel" style="width:36px;height:36px;border-radius:10px;flex-shrink:0"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="skel" style="height:12px;width:55%"></div><div class="skel" style="height:10px;width:35%"></div></div></div>
+            <div style="padding:24px;text-align:center;"><div class="skel" style="height:52px;border-radius:10px;margin-bottom:8px;"></div><div class="skel" style="height:52px;border-radius:10px;"></div></div>
           </div>
         </div>
       </div>
 
-      <div class="dash-side">
-        <!-- Token Usage -->
-        <div class="token-usage-card">
-          <div class="tu-header">
-            <div class="card-title" style="font-size:13px;"><span class="card-icon">🪙</span>Token Usage</div>
-            <a href="payments.html" class="btn-ghost" style="font-size:11px;">Top up →</a>
+      <!-- Right sidebar -->
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:70px;">
+        <!-- Token usage -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪙 Token Usage</div>
+            <a href="payments.html" class="btn btn-ghost btn-sm">Top up →</a>
           </div>
-          <div class="tu-body">
-            <div class="tu-main">
-              <div class="tu-value" id="tu-used">—</div>
-              <div class="tu-label">of <span id="tu-cap">—</span> monthly tokens</div>
+          <div class="card-body">
+            <div style="text-align:center;margin-bottom:14px;">
+              <div style="font-size:28px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em;" id="tu-used">—</div>
+              <div style="font-size:12px;color:var(--text-3);">of <span id="tu-cap">—</span> tokens this month</div>
             </div>
-            <div style="margin-bottom:14px;">
-              <div class="progress-bar" style="height:8px;"><div class="progress-fill" id="tu-bar" style="width:0%"></div></div>
-              <div style="display:flex;justify-content:space-between;margin-top:5px;">
-                <span style="font-size:11px;color:var(--text-3);" id="tu-pct">0% used</span>
-                <span style="font-size:11px;color:var(--text-3);" id="tu-reset">—</span>
-              </div>
+            <div class="progress-bar" style="height:8px;margin-bottom:6px;"><div class="progress-fill" id="tu-bar" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:14px;">
+              <span id="tu-pct">0% used</span><span id="tu-reset">—</span>
             </div>
-            <div class="tu-row"><span class="tu-row-label">Topup Balance</span><span class="tu-row-val" id="tu-topup">—</span></div>
-            <div class="tu-row" style="margin-bottom:0"><span class="tu-row-label">Plan</span><span class="tu-row-val" id="tu-plan">—</span></div>
-            <div class="divider"></div>
-            <a href="payments.html" class="btn btn-accent-ghost" style="width:100%;justify-content:center;">Manage Billing</a>
+            <div class="info-row"><span class="info-row-label">Plan</span><span class="info-row-val" id="tu-plan">—</span></div>
+            <div class="info-row"><span class="info-row-label">Topup Balance</span><span class="info-row-val" id="tu-topup">—</span></div>
+            <a href="payments.html" class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:14px;">Manage Billing</a>
           </div>
         </div>
 
-        <!-- Trial banner (shows only if trialing) -->
-        <div class="trial-banner" id="trial-banner" style="display:none;">
-          <div class="trial-icon">🎁</div>
-          <div class="trial-title">14-Day Free Trial</div>
-          <div class="trial-sub" id="trial-sub">You're on a free trial. Upgrade to keep all features after it ends.</div>
-          <a href="payments.html" class="btn btn-primary" style="width:100%;justify-content:center;">Upgrade Plan</a>
+        <!-- Quick links -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚡ Quick Links</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:14px 18px;">
+            <a href="agents.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>🤖</span> My Agents</a>
+            <a href="conversations.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>💬</span> Conversations</a>
+            <a href="payments.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>⚡</span> Billing & Plans</a>
+            <a href="account.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>👤</span> Account Settings</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script src="api.js"></script>
-<script src="nav.js"></script>
+<script src="api.js"></script><script src="nav.js"></script>
 <script>
 (async () => {
   const { user } = await initNav('dashboard')
   if (!user) return
-
-  // Greeting
   const hr = new Date().getHours()
-  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening'
-  document.getElementById('greeting').textContent = greet + ', ' + (user.name?.split(' ')[0] || 'there') + '! 👋'
-
+  const greet = hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'
+  document.getElementById('greeting').textContent = greet+', '+(user.name?.split(' ')[0]||'there')+' 👋'
   try {
     const d = await apiFetch('/dashboard')
-
-    // Stats
-    document.getElementById('s-agents').textContent  = fmtNum(d.agents_count || 0)
-    document.getElementById('s-queries').textContent = fmtNum(d.total_queries || 0)
-    document.getElementById('s-tokens').textContent  = fmtTokens(d.tokens_used || 0)
-    document.getElementById('s-today').textContent   = fmtNum(d.today_queries || 0)
-    document.querySelectorAll('.stat-value.loading').forEach(el => el.classList.remove('loading'))
-
-    // Token bar
-    const t = d.tokens || {}
-    document.getElementById('tu-used').textContent  = fmtTokens(t.monthly_used || 0)
-    document.getElementById('tu-cap').textContent   = fmtTokens(t.monthly_cap || 0)
-    document.getElementById('tu-topup').textContent = fmtTokens(t.topup_balance || 0)
-    const planMap = { starter:'Starter', grower:'Grower', enterprise:'Enterprise' }
-    document.getElementById('tu-plan').textContent = planMap[t.plan] || t.plan || '—'
-    const pct = t.monthly_cap ? Math.min(100, Math.round(t.monthly_used / t.monthly_cap * 100)) : 0
+    document.getElementById('s-agents').textContent  = fmtNum(d.agents_count||0)
+    document.getElementById('s-agents-sub').textContent = (d.agents_count||0)+' agent'+(d.agents_count!==1?'s':'')
+    document.getElementById('s-queries').textContent = fmtNum(d.total_queries||0)
+    document.getElementById('s-tokens').textContent  = fmtTokens(d.tokens_used||0)
+    document.getElementById('s-today').textContent   = fmtNum(d.today_queries||0)
+    const t = d.tokens||{}
+    document.getElementById('tu-used').textContent  = fmtTokens(t.monthly_used||0)
+    document.getElementById('tu-cap').textContent   = fmtTokens(t.monthly_cap||0)
+    document.getElementById('tu-topup').textContent = fmtTokens(t.topup_balance||0)
+    document.getElementById('tu-plan').textContent  = ({starter:'Starter',grower:'Grower',enterprise:'Enterprise'}[t.plan]||t.plan||'—')
+    const pct = t.monthly_cap?Math.min(100,Math.round(t.monthly_used/t.monthly_cap*100)):0
     const bar = document.getElementById('tu-bar')
-    bar.style.width = pct + '%'
-    bar.className = 'progress-fill' + (pct >= 90 ? ' danger' : pct >= 70 ? ' warn' : '')
-    document.getElementById('tu-pct').textContent   = pct + '% used'
-    document.getElementById('tu-reset').textContent = t.cap_reset_at ? 'Resets ' + fmtDate(t.cap_reset_at) : ''
-
-    // Trial
-    if (t.trial_active) {
-      document.getElementById('trial-banner').style.display = 'block'
-      document.getElementById('trial-sub').textContent = 'Trial ends ' + fmtDate(t.trial_ends_at) + '. Upgrade to keep Grower features.'
-    }
-
+    bar.style.width = pct+'%'; bar.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
+    document.getElementById('tu-pct').textContent  = pct+'% used'
+    document.getElementById('tu-reset').textContent = t.cap_reset_at?'Resets '+fmtDate(t.cap_reset_at):''
+    if (!d.agents_count) document.getElementById('quickstart-banner').style.display='flex'
     // Chart
-    const last14 = Array.from({ length:14 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (13 - i)); return d.toISOString().slice(0,10) })
-    const statMap = {}; (d.daily_stats || []).forEach(s => statMap[s._id] = s.queries || 0)
-    const labels = last14.map(day => { const [,m,dd] = day.split('-'); return dd + '/' + m })
-    const values = last14.map(day => statMap[day] || 0)
-    document.getElementById('chart-total').textContent = values.reduce((a,b) => a+b, 0).toLocaleString() + ' total'
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-    const gridColor = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)'
-    new Chart(document.getElementById('daily-chart').getContext('2d'), {
-      type: 'bar',
-      data: { labels, datasets: [{ data: values, backgroundColor: 'rgba(124,111,255,.25)', borderColor: 'rgba(124,111,255,.8)', borderWidth: 1.5, borderRadius: 4, hoverBackgroundColor: 'rgba(124,111,255,.4)' }] },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ backgroundColor:isDark?'#111420':'#fff', titleColor:isDark?'#878BAA':'#5A5E78', bodyColor:isDark?'#ECEDF4':'#0F1117', borderColor:isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.1)', borderWidth:1, padding:10, callbacks:{ title:i=>`${i[0].label}`, body:i=>`${i[0].raw} conversations` } } }, scales:{ x:{ grid:{ display:false }, ticks:{ color:isDark?'#474B65':'#9EA3BB', font:{ size:10, family:'Plus Jakarta Sans' } } }, y:{ grid:{ color:gridColor }, ticks:{ color:isDark?'#474B65':'#9EA3BB', font:{ size:10, family:'Plus Jakarta Sans' }, precision:0 }, beginAtZero:true } } }
+    const last14 = Array.from({length:14},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(13-i));return d.toISOString().slice(0,10)})
+    const statMap={};(d.daily_stats||[]).forEach(s=>statMap[s._id]=s.queries||0)
+    const labels=last14.map(day=>{const[,m,dd]=day.split('-');return dd+'/'+m})
+    const values=last14.map(day=>statMap[day]||0)
+    document.getElementById('chart-total').textContent=values.reduce((a,b)=>a+b,0).toLocaleString()+' total'
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark'
+    new Chart(document.getElementById('daily-chart').getContext('2d'),{
+      type:'bar',
+      data:{labels,datasets:[{data:values,backgroundColor:'rgba(108,95,245,.22)',borderColor:'rgba(108,95,245,.7)',borderWidth:1.5,borderRadius:5,hoverBackgroundColor:'rgba(108,95,245,.4)'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:isDark?'#0F111A':'#fff',titleColor:isDark?'#8084A8':'#53587A',bodyColor:isDark?'#ECEEF8':'#0D1021',borderColor:isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)',borderWidth:1,padding:10,callbacks:{title:i=>i[0].label,body:i=>i[0].raw+' conversations'}}},scales:{x:{grid:{display:false},ticks:{color:isDark?'#454A6A':'#9CA3BF',font:{size:10,family:'Plus Jakarta Sans'}}},y:{grid:{color:isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)'},ticks:{color:isDark?'#454A6A':'#9CA3BF',font:{size:10,family:'Plus Jakarta Sans'},precision:0},beginAtZero:true}}}
     })
-
     // Recent agents
-    const wrap = document.getElementById('recent-agents-wrap')
+    const wrap=document.getElementById('recent-agents-wrap')
     if (!d.recent_agents?.length) {
-      wrap.innerHTML = `<div class="empty-state" style="padding:30px;"><div class="empty-icon-wrap" style="width:56px;height:56px;font-size:22px;margin-bottom:12px;animation:none;">🤖</div><h3 style="font-size:15px;margin-bottom:6px;">No agents yet</h3><p style="font-size:13px;margin-bottom:14px;">Create your first AI agent to get started.</p><a href="agents.html" class="btn btn-primary">Create Agent</a></div>`
+      wrap.innerHTML='<div class="empty-state"><div class="empty-icon">🤖</div><div class="empty-title">No agents yet</div><div class="empty-desc">Create your first AI agent to get started handling customer queries.</div><a href="agents.html" class="btn btn-primary">Create Agent →</a></div>'
     } else {
-      wrap.innerHTML = d.recent_agents.map(a => `
+      wrap.innerHTML=d.recent_agents.map(a=>`
         <div class="agent-row" onclick="location.href='agent.html?id=${a._id}'">
-          <div class="agent-row-logo" style="background:${a.brand_color || '#6C5FF5'}">
-            ${a.logo_base64 ? `<img src="${a.logo_base64}" alt=""/>` : (a.name?.[0]?.toUpperCase() || 'A')}
+          <div class="agent-logo" style="background:${a.brand_color||'#6C5FF5'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.name}</div>
+            <div style="font-size:11px;color:var(--text-3);">${fmtNum(a.query_count||0)} chats · ${fmtNum(a.sources_count||0)} sources</div>
           </div>
-          <div class="agent-row-info">
-            <div class="agent-row-name">${a.name}</div>
-            <div class="agent-row-meta">${fmtNum(a.query_count||0)} chats · ${fmtNum(a.sources_count||0)} sources</div>
-          </div>
-          <span class="status-badge ${a.published ? 'badge-live' : 'badge-draft'}">${a.published ? 'Live' : 'Draft'}</span>
-          <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0;margin-left:4px"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      `).join('')
+          <span class="badge ${a.published?'badge-live':'badge-draft'}">${a.published?'● Live':'Draft'}</span>
+          <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>`).join('')
     }
-  } catch(e) { toast(e.message, 'error') }
-
-  document.getElementById('main-content').style.display = 'block'
+  } catch(e) { toast(e.message,'error') }
+  document.getElementById('main-content').style.display='block'
   dismissSkeleton()
 })()
 </script>
-</body>
-</html>
+</body></html>
