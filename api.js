@@ -2,7 +2,7 @@
 //  SupportGent — Frontend API Client
 //  Load order: api.js → nav.js → page script
 // ═══════════════════════════════════════════════════════════════
-const API = 'https://YOUR_LAMBDA_URL_HERE'  // Replace with actual Lambda URL
+const API = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'  // Replace with actual Lambda URL
 
 // ── Auth ──
 function getToken()     { return localStorage.getItem('sg_token') }
