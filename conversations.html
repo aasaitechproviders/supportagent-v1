@@ -1,166 +1,397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Conversations — SupportGent</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="shared.css"/>
-  <style>
-    .convs-layout{display:grid;grid-template-columns:320px 1fr;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--surface);min-height:calc(100vh - 120px);}
-    .convs-left{border-right:1px solid var(--border);display:flex;flex-direction:column;}
-    .convs-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
-    .convs-search{padding:0 14px 12px;border-bottom:1px solid var(--border);}
-    .session-list{flex:1;overflow-y:auto;}
-    .session-item{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
-    .session-item:hover{background:var(--surface2);}
-    .session-item.active{background:rgba(var(--accent-rgb),.1);border-left:3px solid var(--accent);}
-    .session-item-q{font-size:13.5px;font-weight:500;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .session-item-meta{font-size:11.5px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;}
-    .convs-right{display:flex;flex-direction:column;}
-    .msg-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-    .msg-scroll{flex:1;overflow-y:auto;padding:20px;}
-    .msg-item{margin-bottom:20px;}
-    .msg-q{background:rgba(var(--accent-rgb),.12);border:1px solid var(--accent-b);border-radius:12px 12px 4px 12px;padding:12px 16px;margin-bottom:8px;font-size:14px;color:var(--text);line-height:1.6;align-self:flex-end;max-width:80%;margin-left:auto;}
-    .msg-a{background:var(--surface2);border:1px solid var(--border);border-radius:4px 12px 12px 12px;padding:14px 16px;font-size:13.5px;color:var(--text);line-height:1.7;}
-    .msg-meta{font-size:11px;color:var(--text3);margin-top:5px;text-align:right;}
-    .agent-filter{padding:10px 14px;border-bottom:1px solid var(--border);}
-    .empty-msgs{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text3);}
-    @media(max-width:900px){.convs-layout{grid-template-columns:1fr;}.convs-right{display:none;}.convs-right.open{display:flex;position:fixed;inset:0;z-index:200;background:var(--surface);flex-direction:column;}}
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Conversations — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── Conversations layout ─────────────────────────────────── */
+.convs-layout{
+  border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;
+  background:var(--surface);box-shadow:var(--sh-card);
+  display:grid;grid-template-columns:320px 1fr;
+  height:calc(100vh - 120px);min-height:500px;
+}
+/* Left panel */
+.convs-left{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.convs-left-hdr{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;background:var(--surface-2);
+}
+.convs-left-hdr-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+.convs-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.convs-search-inp{
+  width:100%;height:36px;padding:0 12px 0 36px;
+  border-radius:var(--r-sm);border:1px solid var(--border-md);
+  background:var(--surface-2);color:var(--text);
+  font-family:var(--font);font-size:13px;outline:none;transition:var(--t);
+}
+.convs-search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+.convs-search-inp::placeholder{color:var(--text-3)}
+.convs-search-wrap{position:relative}
+.convs-search-wrap svg{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  color:var(--text-3);pointer-events:none;
+  width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+}
+
+/* Session list */
+.session-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface-4) transparent}
+.session-item{
+  padding:13px 16px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .12s;position:relative;
+}
+.session-item:last-child{border-bottom:none}
+.session-item:hover{background:var(--surface-2)}
+.session-item.active{
+  background:var(--accent-dim);
+  border-left:3px solid var(--accent);
+  padding-left:13px;
+}
+.session-item.active .session-q{color:var(--accent)}
+.session-q{
+  font-size:13px;font-weight:600;color:var(--text);
+  margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;line-height:1.4;
+}
+.session-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;color:var(--text-3);margin-bottom:3px;
+}
+.session-ip{
+  font-size:10.5px;color:var(--text-3);
+  font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;max-width:200px;
+}
+
+/* Right panel */
+.convs-right{display:flex;flex-direction:column;min-height:0;background:var(--bg)}
+.convs-right-empty{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;color:var(--text-3);
+}
+.convs-right-empty-icon{
+  width:64px;height:64px;border-radius:18px;
+  background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  margin-bottom:8px;
+}
+.convs-right-empty h3{font-size:15px;font-weight:700;color:var(--text-2)}
+.convs-right-empty p{font-size:13px;color:var(--text-3)}
+
+/* Message area */
+.msg-hdr{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.msg-hdr-info{min-width:0}
+.msg-hdr-title{font-size:13.5px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg-hdr-meta{font-size:11.5px;color:var(--text-3);margin-top:2px}
+.msg-scroll{
+  flex:1;overflow-y:auto;padding:20px;
+  display:flex;flex-direction:column;gap:16px;
+  scrollbar-width:thin;scrollbar-color:var(--surface-4) transparent;
+}
+.msg-pair{display:flex;flex-direction:column;gap:8px}
+.msg-q{
+  background:var(--accent-dim);border:1px solid rgba(108,95,245,.18);
+  border-radius:14px 14px 4px 14px;
+  padding:11px 15px;font-size:13.5px;color:var(--text);
+  line-height:1.65;max-width:80%;align-self:flex-end;
+  word-break:break-word;
+}
+.msg-a{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:4px 14px 14px 14px;
+  padding:13px 16px;font-size:13px;color:var(--text-2);
+  line-height:1.75;max-width:85%;word-break:break-word;
+}
+.msg-time{
+  font-size:10.5px;color:var(--text-3);
+  text-align:right;margin-top:4px;
+  font-family:var(--mono);
+}
+.msg-tokens-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:600;color:var(--text-3);
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:6px;padding:2px 7px;
+}
+
+/* Agent selector */
+.agent-select-wrap{display:flex;align-items:center;gap:10px}
+.agent-select-wrap select{
+  height:36px;padding:0 30px 0 12px;
+  border-radius:var(--r-sm);border:1px solid var(--border-md);
+  background:var(--surface-2);color:var(--text);
+  font-family:var(--font);font-size:13px;outline:none;
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%235A5E78' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  transition:var(--t);min-width:160px;
+}
+[data-theme="dark"] .agent-select-wrap select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23878BAA' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+.agent-select-wrap select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+
+/* Responsive */
+@media(max-width:900px){
+  .convs-layout{grid-template-columns:1fr;height:auto;min-height:0}
+  .convs-left{height:360px;flex-shrink:0}
+  .convs-right{height:calc(100vh - 480px);min-height:300px}
+}
+@media(max-width:648px){
+  .convs-layout{height:auto;border-radius:var(--r-sm)}
+  .convs-left{height:300px}
+  .convs-right{height:calc(100vh - 430px)}
+}
+</style>
 </head>
 <body>
-<div id="page-skeleton" class="page-skeleton"><div style="display:flex;flex-direction:column;align-items:center;gap:12px;"><div class="skel-spinner"></div><div style="font-size:13px;color:var(--text3);font-family:'Sora',sans-serif;">Loading conversations…</div></div></div>
-<div class="mobile-topbar" id="mobile-topbar"><button class="mobile-menu-btn" id="mob-menu-btn"><span></span><span></span><span></span></button><div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;" id="mobile-topbar-logo"></div></div>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- Skeleton -->
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:14px;width:160px;border-radius:6px"></div>
+    <div class="skel" style="height:30px;width:160px;border-radius:8px"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel" style="height:calc(100vh - 140px);border-radius:18px"></div>
+  </div>
+</div>
+
+<!-- Mobile topbar -->
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" id="mob-menu-btn">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 <aside class="sidebar" id="sidebar"></aside>
 
-<main class="main">
+<div class="main-wrap">
   <div class="topbar">
-    <div><div class="page-title">Conversations</div><div class="page-sub" id="convs-sub">All sessions across your agents</div></div>
-    <div style="display:flex;gap:8px;">
-      <select id="agent-select" class="select" style="width:200px;" onchange="loadSessions()"><option value="">All Agents</option></select>
-      <button class="btn-danger" style="padding:9px 16px;font-size:13px;" onclick="clearAll()">Clear All</button>
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title">Conversations</div>
+        <div class="topbar-subtitle" id="convs-sub">All sessions</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="agent-select-wrap">
+        <select id="agent-sel" onchange="loadSessions()">
+          <option value="">All Agents</option>
+        </select>
+      </div>
+      <button class="theme-toggle"></button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllModal()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+        Clear All
+      </button>
     </div>
   </div>
-  <div class="content page-enter" id="main-content" style="display:none;padding:0;">
+
+  <div class="content" id="main-content" style="display:none">
     <div class="convs-layout">
+      <!-- Left: session list -->
       <div class="convs-left">
-        <div class="convs-header">
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Sessions</div>
-          <span class="badge badge-gray" id="session-count">0</span>
+        <div class="convs-left-hdr">
+          <div class="convs-left-hdr-title">Sessions</div>
+          <span class="badge badge-gray" id="sess-count">0</span>
         </div>
         <div class="convs-search">
-          <input type="text" id="search-inp" class="input" style="margin:10px 0 0;" placeholder="🔍  Search conversations…" oninput="filterSessions()"/>
+          <div class="convs-search-wrap">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="convs-search-inp" id="search-inp" placeholder="Search sessions…" oninput="filterSessions()">
+          </div>
         </div>
         <div class="session-list" id="session-list">
-          <div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">Select an agent to view conversations.</div>
+          <div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Select an agent above.</div>
         </div>
       </div>
+
+      <!-- Right: message viewer -->
       <div class="convs-right" id="convs-right">
-        <div class="empty-msgs" id="empty-msgs">
-          <div style="font-size:30px;">💬</div>
-          <div style="font-size:14px;font-weight:600;">Select a session</div>
-          <div style="font-size:13px;">Click any session on the left to view messages</div>
+        <div class="convs-right-empty" id="empty-right">
+          <div class="convs-right-empty-icon">💬</div>
+          <h3>Select a session</h3>
+          <p>Click any session to view the conversation</p>
         </div>
-        <div id="msg-area" style="display:none;flex:1;display:flex;flex-direction:column;overflow:hidden;">
-          <div class="msg-header">
-            <div>
-              <div style="font-size:13.5px;font-weight:600;" id="msg-session-title">Session</div>
-              <div style="font-size:11.5px;color:var(--text3);" id="msg-session-meta"></div>
+        <div id="msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;min-height:0">
+          <div class="msg-hdr">
+            <div class="msg-hdr-info">
+              <div class="msg-hdr-title" id="msg-title">Session</div>
+              <div class="msg-hdr-meta" id="msg-meta"></div>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-ghost" style="font-size:12px;" id="mobile-back-btn" onclick="document.getElementById('convs-right').classList.remove('open')">← Back</button>
-            </div>
+            <button class="btn btn-secondary btn-sm" id="back-btn" style="display:none" onclick="backToList()">← Back</button>
           </div>
           <div class="msg-scroll" id="msg-scroll"></div>
         </div>
       </div>
     </div>
   </div>
-</main>
+</div>
 
 <script src="api.js"></script><script src="nav.js"></script>
 <script>
-let allSessions = []
-let currentAgentId = ''
+let allSessions = [], curAgentId = ''
 
 ;(async () => {
   const { user } = await initNav('conversations')
   if (!user) return
   try {
     const agents = await apiFetch('/agents')
-    const sel = document.getElementById('agent-select')
-    agents.forEach(a => { const o=document.createElement('option'); o.value=a._id; o.textContent=a.name; sel.appendChild(o) })
-    if (agents.length) { sel.value = agents[0]._id; currentAgentId = agents[0]._id; await loadSessions() }
-  } catch(e) { toast(e.message,'error') }
+    const sel = document.getElementById('agent-sel')
+    agents.forEach(a => {
+      const o = document.createElement('option')
+      o.value = a._id; o.textContent = a.name; sel.appendChild(o)
+    })
+    if (agents.length) {
+      sel.value = agents[0]._id
+      curAgentId = agents[0]._id
+      await loadSessions()
+    }
+  } catch(e) { toast(e.message, 'error') }
   document.getElementById('main-content').style.display = 'block'
   dismissSkeleton()
 })()
 
 async function loadSessions() {
-  currentAgentId = document.getElementById('agent-select').value
-  if (!currentAgentId) { document.getElementById('session-list').innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px;">Select an agent.</div>'; return }
+  curAgentId = document.getElementById('agent-sel').value
+  const list = document.getElementById('session-list')
+  if (!curAgentId) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Select an agent.</div>'
+    return
+  }
+  list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">
+    <div class="skel" style="height:56px;border-radius:10px;margin-bottom:8px"></div>
+    <div class="skel" style="height:56px;border-radius:10px;margin-bottom:8px"></div>
+    <div class="skel" style="height:56px;border-radius:10px"></div>
+  </div>`
   try {
-    const d = await apiFetch(`/agents/${currentAgentId}/conversations`)
+    const d = await apiFetch(`/agents/${curAgentId}/conversations`)
     allSessions = d.sessions || []
-    document.getElementById('session-count').textContent = allSessions.length
-    document.getElementById('convs-sub').textContent = `${allSessions.length} sessions`
+    document.getElementById('sess-count').textContent = allSessions.length
+    document.getElementById('convs-sub').textContent = allSessions.length + ' sessions'
     renderSessions(allSessions)
-  } catch(e) { toast(e.message,'error') }
+  } catch(e) { toast(e.message, 'error') }
 }
 
 function renderSessions(sessions) {
   const list = document.getElementById('session-list')
-  if (!sessions.length) { list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:13px;">No conversations yet for this agent.</div>'; return }
+  if (!sessions.length) {
+    list.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--text-3)">
+      <div style="font-size:24px;margin-bottom:10px">💬</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>
+      <div style="font-size:12px">Sessions will appear here once users chat with your agent.</div>
+    </div>`
+    return
+  }
   list.innerHTML = sessions.map(s => `
-    <div class="session-item" id="sess-${s._id}" onclick="openSession(${JSON.stringify(s._id||s.session_id||s.visitor_ip)},${JSON.stringify(s)})">
-      <div class="session-item-q">${s.first_question || '(No question)'}</div>
-      <div class="session-item-meta">
-        <span>${s.message_count || 1} message${(s.message_count||1)===1?'':'s'} · ${formatTokens(s.tokens_used||0)} tokens</span>
+    <div class="session-item" id="si-${escId(s._id||s.session_id||s.visitor_ip)}"
+         onclick="openSession(${JSON.stringify(s._id||s.session_id||s.visitor_ip)},${JSON.stringify(s)})">
+      <div class="session-q">${esc(s.first_question || '(No message)')}</div>
+      <div class="session-meta">
+        <span>${s.message_count||1} msg &middot; ${fmtTokens(s.tokens_used||0)} tokens</span>
         <span>${timeAgo(s.last_active)}</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px;">${s.visitor_ip||s.session_id||'—'}</div>
+      <div class="session-ip">${s.visitor_ip || s.session_id || '—'}</div>
     </div>
   `).join('')
 }
 
 function filterSessions() {
   const q = document.getElementById('search-inp').value.toLowerCase()
-  renderSessions(allSessions.filter(s => (s.first_question||'').toLowerCase().includes(q) || (s.visitor_ip||'').includes(q)))
+  renderSessions(allSessions.filter(s =>
+    (s.first_question || '').toLowerCase().includes(q) ||
+    (s.visitor_ip || '').includes(q)
+  ))
 }
 
 async function openSession(key, meta) {
   document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'))
-  document.getElementById(`sess-${key}`)?.classList.add('active')
-  document.getElementById('empty-msgs').style.display = 'none'
-  const msgArea = document.getElementById('msg-area'); msgArea.style.display = 'flex'
-  document.getElementById('msg-session-title').textContent = meta.first_question?.slice(0,60) || 'Session'
-  document.getElementById('msg-session-meta').textContent  = `${meta.message_count||1} messages · ${timeAgo(meta.started_at)} · ${meta.visitor_ip||''}`
-  document.getElementById('msg-scroll').innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Loading…</div>'
-  document.getElementById('convs-right').classList.add('open')
+  document.getElementById('si-' + escId(key))?.classList.add('active')
+
+  document.getElementById('empty-right').style.display = 'none'
+  const msgArea = document.getElementById('msg-area')
+  msgArea.style.display = 'flex'
+  document.getElementById('back-btn').style.display = window.innerWidth < 900 ? 'flex' : 'none'
+
+  document.getElementById('msg-title').textContent = (meta.first_question || 'Session').slice(0, 60)
+  document.getElementById('msg-meta').textContent =
+    `${meta.message_count||1} messages · ${timeAgo(meta.started_at)} · ${meta.visitor_ip || ''}`
+
+  const scroll = document.getElementById('msg-scroll')
+  scroll.innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
+    <div class="skel" style="height:56px;border-radius:10px;align-self:flex-end;width:60%"></div>
+    <div class="skel" style="height:80px;border-radius:10px;width:75%"></div>
+    <div class="skel" style="height:56px;border-radius:10px;align-self:flex-end;width:50%"></div>
+    <div class="skel" style="height:96px;border-radius:10px;width:80%"></div>
+  </div>`
+
   try {
-    const d = await apiFetch(`/agents/${currentAgentId}/conversations/${encodeURIComponent(key)}`)
+    const d = await apiFetch(`/agents/${curAgentId}/conversations/${encodeURIComponent(key)}`)
     const msgs = d.messages || []
-    if (!msgs.length) { document.getElementById('msg-scroll').innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);">No messages.</div>'; return }
-    document.getElementById('msg-scroll').innerHTML = msgs.map(m => `
-      <div class="msg-item">
-        <div class="msg-q">${escHtml(m.question)}</div>
+    if (!msgs.length) {
+      scroll.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">No messages in this session.</div>'
+      return
+    }
+    scroll.innerHTML = msgs.map(m => `
+      <div class="msg-pair">
+        <div class="msg-q">${esc(m.question)}</div>
         <div class="msg-a">${m.answer || ''}</div>
-        <div class="msg-meta">${formatTokens(m.tokens_used||0)} tokens · ${timeAgo(m.created_at)}</div>
+        <div class="msg-time">
+          <span class="msg-tokens-tag">
+            <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            ${fmtTokens(m.tokens_used||0)} tokens
+          </span>
+          &nbsp;${timeAgo(m.created_at)}
+        </div>
       </div>
     `).join('')
-    document.getElementById('msg-scroll').scrollTop = 999999
-  } catch(e) { document.getElementById('msg-scroll').innerHTML='<div style="padding:20px;color:var(--red);">Failed to load messages.</div>' }
+    scroll.scrollTop = scroll.scrollHeight
+  } catch(e) {
+    scroll.innerHTML = `<div style="padding:24px;color:var(--red);font-size:13px">Failed to load messages. ${e.message}</div>`
+  }
 }
 
-async function clearAll() {
-  if (!confirm('Clear ALL conversations across all agents?')) return
-  try { await apiFetch('/conversations/clear-all', { method:'POST' }); toast('All conversations cleared'); loadSessions() }
-  catch(e) { toast(e.message,'error') }
+function backToList() {
+  document.getElementById('msg-area').style.display = 'none'
+  document.getElementById('empty-right').style.display = 'flex'
+  document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'))
 }
 
-function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+async function clearAllModal() {
+  const confirmed = await confirmModal({
+    title: 'Clear all conversations?',
+    message: 'This will permanently delete all conversations across all agents. This action cannot be undone.',
+    confirmText: 'Clear All',
+    danger: true
+  })
+  if (!confirmed) return
+  try {
+    await apiFetch('/conversations/clear-all', { method: 'POST' })
+    toast('All conversations cleared', 'success')
+    loadSessions()
+  } catch(e) { toast(e.message, 'error') }
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>')
+}
+function escId(s) {
+  return (s || '').toString().replace(/[^a-zA-Z0-9]/g, '_')
+}
 </script>
 </body>
 </html>
