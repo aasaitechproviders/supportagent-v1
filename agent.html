@@ -1185,7 +1185,8 @@ function updatePublishUI(a) {
   if (!a?.published) return
   const card = document.getElementById('publish-links-card')
   if (card) card.style.display = 'block'
-  const subURL = a.subdomain_url || '#'
+  const subURLRaw = a.subdomain_url || ''
+  const subURL = (subURLRaw && !subURLRaw.includes('://undefined')) ? subURLRaw : '#'
   const fbURL  = a.published_url || '#'
   setLink('sub-url', subURL, subURL)
   setLink('sub-url-open', subURL)
