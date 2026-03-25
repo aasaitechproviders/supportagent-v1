@@ -360,10 +360,9 @@
                 </div>
                 <div id="src-url" class="src-panel">
                   <div class="field-hint" style="margin-bottom:10px">Enter a public webpage URL — its content will be fetched and indexed.</div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap">
-                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:2"/>
-                    <input class="inp" type="text" id="src-url-title" placeholder="Title (optional)" style="flex:1"/>
-                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch & Add</button>
+                  <div style="display:flex;gap:8px">
+                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1"/>
+                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch &amp; Add</button>
                   </div>
                 </div>
                 <div id="src-file" class="src-panel">
@@ -640,7 +639,7 @@
       <div style="font-size:11px;color:var(--text-3)" id="import-prog-sub"></div>
     </div>
     <div id="csv-preview-wrap" style="overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:12px;margin-top:4px">
-      <table class="csv-tbl" id="csv-preview-tbl"> </table>
+      <table class="csv-tbl" id="csv-preview-tbl"></table>
     </div>
     <div style="margin-top:10px;font-size:12px;color:var(--text-3)" id="csv-preview-note"></div>
     <div class="modal-footer">
@@ -882,31 +881,14 @@ async function addTextSrc() {
 }
 
 async function addUrlSrc() {
-  let url = document.getElementById('src-url-inp').value.trim();
-  if (!url) return toast('Enter a URL', 'warning');
-  // Ensure proper protocol
-  if (!/^https?:\/\//i.test(url)) {
-    url = 'https://' + url;
-  }
-  const title = document.getElementById('src-url-title').value.trim() || url;
-
-  toast('Fetching URL...', 'info');
+  const url = document.getElementById('src-url-inp').value.trim()
+  if (!url) return toast('Enter a URL', 'warning')
+  toast('Fetching URL...', 'info')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'url',
-        url: url,               // send as 'url' (most backends expect this)
-        title: title
-      })
-    });
-    document.getElementById('src-url-inp').value = '';
-    document.getElementById('src-url-title').value = '';
-    toast('URL added!', 'success');
-    loadSources();
-  } catch(e) {
-    toast(e.message, 'error');
-  }
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'url', content: url }) })
+    document.getElementById('src-url-inp').value = ''
+    toast('URL added!', 'success'); loadSources()
+  } catch(e) { toast(e.message, 'error') }
 }
 
 function handleKBFileDrop(e) {
