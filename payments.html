@@ -1,147 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Billing — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <link rel="stylesheet" href="shared.css">
-
-<style>
-.billing-grid{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;}
-.cycle-toggle{display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;width:fit-content;margin-bottom:20px;}
-.cycle-btn{padding:6px 18px;border-radius:8px;border:none;background:transparent;color:var(--text-2);font-size:12.5px;cursor:pointer;font-weight:600;transition:var(--t);}
-.cycle-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.10);}
-.save-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:10px;font-size:9.5px;font-weight:700;background:var(--green-dim);color:var(--green);margin-left:5px;}
-.plan-hero{display:flex;align-items:center;gap:18px;padding:18px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.15);border-radius:var(--r);margin-bottom:18px;}
-.plan-hero-icon{width:50px;height:50px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow);}
-.usage-bar-wrap{height:10px;background:var(--surface-3);border-radius:100px;overflow:hidden;margin-bottom:8px;}
-.usage-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .6s var(--ease);}
-.usage-bar-fill.warn{background:var(--amber);}
-.usage-bar-fill.danger{background:var(--red);}
-@media(max-width:960px){.billing-grid{grid-template-columns:1fr;}.plans-grid{grid-template-columns:1fr;}}
-</style>
+<script>
+;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
+</script>
+<script src="api.js"></script><script src="nav.js"></script>
 </head>
 <body>
-<div id="page-skeleton">
-  <div class="skel-topbar" style="padding:0 28px;"><div class="skel" style="height:14px;width:80px;border-radius:6px;"></div></div>
-  <div style="padding:0 28px;display:grid;grid-template-columns:1fr 280px;gap:20px;"><div style="display:flex;flex-direction:column;gap:16px;"><div class="skel" style="height:160px;border-radius:16px;"></div><div class="skel" style="height:320px;border-radius:16px;"></div><div class="skel" style="height:180px;border-radius:16px;"></div></div><div style="display:flex;flex-direction:column;gap:16px;"><div class="skel" style="height:180px;border-radius:16px;"></div></div></div>
-</div>
-<div class="mobile-topbar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="hamburger" id="mob-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
-    <a href="home.html" class="mob-logo">Support<span>Gent</span></a>
-  </div>
-  <button class="theme-toggle"></button>
-</div>
-<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-<aside class="sidebar" id="sidebar"></aside>
 <div id="toast-container"></div>
+<div class="mobile-topbar">
+  <div class="mob-left"><button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button><a class="mob-logo" href="home.html">Support<span>Gent</span></a></div>
+  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<div id="page-skeleton">
+  <div class="skel-topbar"><div class="skel" style="height:13px;width:80px;border-radius:4px"></div></div>
+  <div class="skel-body" style="display:grid;grid-template-columns:1fr 280px;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="skel" style="height:160px;border-radius:var(--r-lg)"></div>
+      <div class="skel" style="height:320px;border-radius:var(--r-lg)"></div>
+      <div class="skel" style="height:180px;border-radius:var(--r-lg)"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="skel" style="height:170px;border-radius:var(--r-lg)"></div>
+      <div class="skel" style="height:120px;border-radius:var(--r-lg)"></div>
+    </div>
+  </div>
+</div>
 <div class="main-wrap">
   <div class="topbar">
-    <div class="topbar-left">
-      <div><div class="page-title">Billing</div><div class="page-sub">Manage your plan and token balance</div></div>
-    </div>
-    <div class="topbar-right"><button class="theme-toggle"></button></div>
+    <div class="topbar-left"><div><div class="topbar-title">Billing</div><div class="topbar-subtitle">Manage your plan and token balance</div></div></div>
+    <div class="topbar-right"><button class="theme-toggle" style="font-size:15px"></button></div>
   </div>
-  <div class="content" id="main-content" style="display:none;padding-top:22px;">
-    <div class="billing-grid">
-      <div style="display:flex;flex-direction:column;gap:20px;">
+  <div class="content" id="page-content" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:18px">
+
         <!-- Current plan -->
         <div class="card">
-          <div class="card-header"><div class="card-title">🎯 Current Plan</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🎯</span>Current Plan</div></div>
           <div class="card-body">
-            <div class="plan-hero">
-              <div class="plan-hero-icon">⚡</div>
+            <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:16px">
+              <div style="width:48px;height:48px;border-radius:13px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow)">⚡</div>
               <div>
-                <div style="font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:4px;" id="cur-plan">—</div>
-                <div style="font-size:13px;color:var(--text-2);" id="cur-status">—</div>
+                <div style="font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:3px" id="cur-plan">—</div>
+                <div style="font-size:13px;color:var(--text-2)" id="cur-status">—</div>
               </div>
-              <span class="badge" id="cur-badge" style="margin-left:auto;">—</span>
+              <span class="badge" id="cur-badge" style="margin-left:auto">—</span>
             </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;">Monthly Token Usage</div>
-            <div class="usage-bar-wrap"><div class="usage-bar-fill" id="usage-fill" style="width:0%"></div></div>
-            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-bottom:14px;">
-              <span id="usage-used">0 used</span><span id="usage-cap">—</span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid var(--border);">
-              <div style="text-align:center;"><div style="font-size:16px;font-weight:800;font-family:var(--mono);" id="inf-mcap">—</div><div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Monthly Cap</div></div>
-              <div style="text-align:center;"><div style="font-size:16px;font-weight:800;font-family:var(--mono);" id="inf-topup">—</div><div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Topup Balance</div></div>
-              <div style="text-align:center;"><div style="font-size:16px;font-weight:800;font-family:var(--mono);" id="inf-reset">—</div><div style="font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;">Resets On</div></div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">Monthly Token Usage</div>
+            <div class="progress-bar" style="height:8px;margin-bottom:7px"><div class="progress-fill" id="usage-fill" style="width:0%"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-bottom:14px"><span id="usage-used">0 used</span><span id="usage-cap">—</span></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Monthly Cap</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Topup Balance</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-reset">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Resets On</div></div>
             </div>
           </div>
         </div>
-        <!-- Upgrade -->
+
+        <!-- Upgrade plan -->
         <div class="card">
-          <div class="card-header"><div class="card-title">🚀 Upgrade Plan</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🚀</span>Upgrade Plan</div></div>
           <div class="card-body">
-            <div class="cycle-toggle">
-              <button class="cycle-btn active" onclick="setCycle('yearly',this)">Yearly <span class="save-badge">Save 20%</span></button>
-              <button class="cycle-btn" onclick="setCycle('monthly',this)">Monthly</button>
+            <div style="display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);width:fit-content;margin-bottom:18px">
+              <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px">Save 20%</span></button>
+              <button class="btn btn-ghost btn-sm" id="cycle-monthly" onclick="setCycle('monthly',this)">Monthly</button>
             </div>
             <div class="plans-grid" id="plans-grid">
-              <div class="skel" style="height:280px;border-radius:16px;"></div>
-              <div class="skel" style="height:280px;border-radius:16px;"></div>
-              <div class="skel" style="height:280px;border-radius:16px;"></div>
+              <div class="skel" style="height:280px;border-radius:var(--r-lg)"></div>
+              <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.7"></div>
+              <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.4"></div>
             </div>
           </div>
         </div>
+
         <!-- Token topup -->
         <div class="card">
-          <div class="card-header"><div class="card-title">🪙 Buy Token Credits</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span>Buy Token Credits</div></div>
           <div class="card-body">
-            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7;">Top up instantly. Credits never expire and are used automatically when your monthly cap is reached.</p>
+            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7">Top up instantly. Credits never expire and are used after your monthly cap is reached.</p>
             <div class="topup-grid" id="topup-grid"></div>
-            <button class="btn btn-primary" style="margin-top:16px;width:100%;justify-content:center;height:44px;" onclick="buyTopup()" id="topup-btn">Buy Token Credits</button>
+            <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center;height:40px" onclick="buyTopup()" id="topup-btn">Buy Token Credits</button>
           </div>
         </div>
+
         <!-- History -->
         <div class="card">
-          <div class="card-header"><div class="card-title">📋 Billing History</div></div>
-          <div class="table-wrap" style="border:none;border-radius:0;box-shadow:none;">
-            <table><thead><tr><th>Type</th><th>Details</th><th>Date</th><th>Status</th></tr></thead><tbody id="billing-tbody"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px;">No billing history yet.</td></tr></tbody></table>
+          <div class="card-header"><div class="card-title"><span class="card-icon">📋</span>Billing History</div></div>
+          <div class="table-wrap" style="border:none;border-radius:0;box-shadow:none">
+            <table><thead><tr><th>Type</th><th>Details</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="billing-tbody"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px">No billing history yet.</td></tr></tbody></table>
           </div>
         </div>
       </div>
+
       <!-- Side -->
-      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:70px;">
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
         <div class="card">
-          <div class="card-header"><div class="card-title">🪙 Topup Balance</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span>Topup Balance</div></div>
           <div class="card-body">
-            <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:14px;">
-              <div style="font-size:30px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em;" id="side-topup">—</div>
-              <div style="font-size:12px;color:var(--text-3);">extra tokens</div>
+            <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:13px">
+              <div style="font-size:28px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em" id="side-topup">—</div>
+              <div style="font-size:12px;color:var(--text-3)">extra tokens</div>
             </div>
-            <p style="font-size:12.5px;color:var(--text-2);line-height:1.7;">Topup tokens are used after your monthly cap. They never expire.</p>
+            <p style="font-size:12.5px;color:var(--text-2);line-height:1.7">Topup tokens are used after your monthly cap. They never expire.</p>
           </div>
         </div>
-        <div id="trial-card" style="display:none;">
-          <div style="background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:var(--r-lg);padding:18px;">
-            <div style="font-size:14px;font-weight:800;margin-bottom:5px;">🎁 Free Trial Active</div>
-            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6;">You're on a free trial. Upgrade to keep all features after it ends.</div>
-            <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px;" id="trial-ends"></div>
-            <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center;">Upgrade Plan →</a>
+        <div id="trial-card" style="display:none">
+          <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.18);border-radius:var(--r-lg);padding:18px">
+            <div style="font-size:14px;font-weight:800;margin-bottom:5px">🎁 Free Trial Active</div>
+            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6">You started on Grower with 500K tokens. Upgrade to keep all features after your trial ends.</div>
+            <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px" id="trial-ends"></div>
+            <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center">Upgrade Now →</a>
           </div>
         </div>
         <div class="card">
-          <div class="card-body" style="display:flex;flex-direction:column;gap:8px;padding:14px 18px;">
-            <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:4px;">Quick Links</div>
-            <a href="agents.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>🤖</span>Manage Agents</a>
-            <a href="account.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px;"><span>👤</span>Account Settings</a>
+          <div class="card-body" style="padding:14px">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:10px">Quick Links</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <a href="agents.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>🤖</span>Manage Agents</a>
+              <a href="account.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>👤</span>Account Settings</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-<script src="api.js"></script><script src="nav.js"></script>
 <script>
-let billingData=null, billingCycle='yearly', selectedTopup=null
+let billingData=null,billingCycle='yearly',selectedTopup=null
 ;(async()=>{
-  const{user}=await initNav('payments')
-  if(!user)return
+  const nav=await renderNav('payments')
+  if(!nav)return
   try{
     billingData=await apiFetch('/billing/summary')
     renderCurrentPlan(billingData.tokens)
@@ -149,7 +149,7 @@ let billingData=null, billingCycle='yearly', selectedTopup=null
     renderHistory(billingData.events,billingData.topups)
     await loadPlans()
   }catch(e){toast(e.message,'error')}
-  document.getElementById('main-content').style.display='block'
+  document.getElementById('page-content').style.display='block'
   dismissSkeleton()
 })()
 function renderCurrentPlan(t){
@@ -157,12 +157,12 @@ function renderCurrentPlan(t){
   const planLabels={starter:'Starter',grower:'Grower',enterprise:'Enterprise'}
   document.getElementById('cur-plan').textContent=planLabels[t.plan]||t.plan||'—'
   document.getElementById('cur-status').textContent=t.trial_active?`Free trial · Ends ${fmtDate(t.trial_ends_at)}`:t.subscription_end?`Renews ${fmtDate(t.subscription_end)}`:'Active'
-  const badgeEl=document.getElementById('cur-badge')
-  badgeEl.className='badge '+(t.plan==='grower'?'badge-accent':t.plan==='enterprise'?'badge-green':'badge-gray')
-  badgeEl.textContent=(planLabels[t.plan]||t.plan)+(t.trial_active?' Trial':'')
+  const badge=document.getElementById('cur-badge')
+  badge.className='badge '+(t.plan==='grower'?'badge-accent':t.plan==='enterprise'?'badge-green':'badge-gray')
+  badge.textContent=(planLabels[t.plan]||t.plan)+(t.trial_active?' Trial':'')
   const pct=t.monthly_cap?Math.min(100,Math.round(t.monthly_used/t.monthly_cap*100)):0
   const fill=document.getElementById('usage-fill')
-  fill.style.width=pct+'%';fill.className='usage-bar-fill'+(pct>=90?' danger':pct>=70?' warn':'')
+  fill.style.width=pct+'%';fill.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
   document.getElementById('usage-used').textContent=fmtTokens(t.monthly_used)+' used'
   document.getElementById('usage-cap').textContent=fmtTokens(t.monthly_cap)
   document.getElementById('inf-mcap').textContent=fmtTokens(t.monthly_cap)
@@ -175,28 +175,34 @@ function renderCurrentPlan(t){
 async function loadPlans(){
   try{const d=await apiFetch('/billing/plans');window._plans=d.plans;renderPlans(d.plans)}catch(e){toast(e.message,'error')}
 }
-function setCycle(c,btn){billingCycle=c;document.querySelectorAll('.cycle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(window._plans)renderPlans(window._plans)}
+function setCycle(c,btn){
+  billingCycle=c
+  document.getElementById('cycle-yearly').style.background=c==='yearly'?'var(--surface)':'transparent'
+  document.getElementById('cycle-yearly').style.boxShadow=c==='yearly'?'0 1px 3px rgba(0,0,0,.08)':'none'
+  document.getElementById('cycle-monthly').style.background=c==='monthly'?'var(--surface)':'transparent'
+  document.getElementById('cycle-monthly').style.boxShadow=c==='monthly'?'0 1px 3px rgba(0,0,0,.08)':'none'
+  if(window._plans)renderPlans(window._plans)
+}
 function renderPlans(plans){
   const cur=billingData?.tokens?.plan||'starter'
-  const planDefs=[
+  const defs=[
     {key:'starter',features:['3 Agents','500K tokens/mo','10 sources/agent','Email support'],no:['Shopping & Razorpay','Custom domain']},
     {key:'grower',features:['10 Agents','2M tokens/mo','30 sources/agent','Custom domain','Shopping + Razorpay','Priority support'],recommended:true},
     {key:'enterprise',features:['Unlimited agents','10M tokens/mo','Unlimited sources','Custom domain','Shopping + Razorpay','Dedicated support']}
   ]
-  document.getElementById('plans-grid').innerHTML=planDefs.map(({key,features,no=[],recommended})=>{
+  const featHtml=(f,yes)=>`<div class="plan-feature${yes?'':' no'}"><div class="pf-icon ${yes?'yes':'no'}"><svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">${yes?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg></div>${f}</div>`
+  document.getElementById('plans-grid').innerHTML=defs.map(({key,features,no=[],recommended})=>{
     const p=plans[key];if(!p)return''
     const price=billingCycle==='yearly'?p.price_monthly:p.price_monthly_mo
     const isCur=key===cur
-    const feat=(f,yes)=>`<div class="plan-feature${yes?'':' no'}"><div class="pf-icon ${yes?'yes':'no'}"><svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">${yes?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg></div>${f}</div>`
     return`<div class="plan-card ${recommended?'recommended':''} ${isCur?'current':''}">
       ${recommended?'<div class="plan-recommend-badge">Most Popular</div>':''}
-      ${isCur?'<div class="plan-recommend-badge" style="background:var(--green);">Current Plan</div>':''}
+      ${isCur?'<div class="plan-recommend-badge" style="background:var(--green)">Current Plan</div>':''}
       <div class="plan-name">${p.label}</div>
-      <div class="plan-price"><sup>₹</sup>${price}<span style="font-size:14px;font-weight:500;color:var(--text-3);">/mo</span></div>
-      <div class="plan-price-note">${billingCycle==='yearly'?`<span style="color:var(--green);">Billed ₹${(price*12).toLocaleString()}/yr — 20% off</span>`:'Billed monthly'}</div>
-      <div class="plan-features">${features.map(f=>feat(f,true)).join('')}${no.map(f=>feat(f,false)).join('')}</div>
-      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default;" disabled>Current Plan</button>`:
-              `<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center;" onclick="subscribePlan('${key}')">Upgrade to ${p.label} →</button>`}
+      <div class="plan-price"><sup style="font-size:15px;vertical-align:top;margin-top:6px">₹</sup>${price}<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo</span></div>
+      <div class="plan-price-note">${billingCycle==='yearly'?`<span style="color:var(--green)">Billed ₹${(price*12).toLocaleString()}/yr — 20% off</span>`:'Billed monthly'}</div>
+      <div class="plan-features">${features.map(f=>featHtml(f,true)).join('')}${no.map(f=>featHtml(f,false)).join('')}</div>
+      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled>Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Upgrade to ${p.label} →</button>`}
     </div>`}).join('')
 }
 function renderTopupPacks(packs){
@@ -208,13 +214,13 @@ function selectTopup(id,el){selectedTopup=id;document.querySelectorAll('.topup-c
 function renderHistory(events,topups){
   const tbody=document.getElementById('billing-tbody')
   const all=[...(events||[]).map(e=>({...e,kind:'sub'})),...(topups||[]).filter(t=>t.status==='completed').map(t=>({...t,kind:'topup'}))].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
-  if(!all.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px;">No billing history yet.</td></tr>';return}
+  if(!all.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px">No billing history yet.</td></tr>';return}
   tbody.innerHTML=all.slice(0,20).map(item=>`<tr><td>${item.kind==='topup'?'🪙 Token Topup':'⚡ Subscription'}</td><td>${item.kind==='topup'?fmtTokens(item.tokens)+' tokens':(item.plan||'—')+' · '+(item.billing_cycle||'')+(item.amount?' · ₹'+item.amount:'')}</td><td>${fmtDate(item.created_at||item.completed_at)}</td><td><span class="badge ${item.status==='paid'||item.status==='completed'?'badge-green':'badge-amber'}">${item.status}</span></td></tr>`).join('')
 }
 async function subscribePlan(plan){
   try{
     const d=await apiFetch('/billing/subscribe',{method:'POST',body:JSON.stringify({plan,billing_cycle:billingCycle})})
-    const rz=new Razorpay({key:d.key_id,amount:d.amount,currency:'INR',name:'SupportGent',description:d.description,order_id:d.order_id,theme:{color:'#6C5FF5'},
+    const rz=new Razorpay({key:d.key_id,amount:d.amount,currency:'INR',name:'SupportGent',description:d.description,order_id:d.order_id,theme:{color:'#7C6FFF'},
       handler:async resp=>{try{await apiFetch('/billing/subscribe/verify',{method:'POST',body:JSON.stringify(resp)});toast('Plan upgraded! 🎉','success');location.reload()}catch(e){toast('Verification failed: '+e.message,'error')}}
     });rz.open()
   }catch(e){toast(e.message,'error')}
@@ -224,7 +230,7 @@ async function buyTopup(){
   const btn=document.getElementById('topup-btn');btn.disabled=true;btn.textContent='Processing…'
   try{
     const d=await apiFetch('/billing/topup',{method:'POST',body:JSON.stringify({pack_id:selectedTopup})})
-    const rz=new Razorpay({key:d.key_id,amount:d.amount,currency:'INR',name:'SupportGent',description:`${fmtTokens(d.tokens)} Token Topup`,order_id:d.order_id,theme:{color:'#6C5FF5'},
+    const rz=new Razorpay({key:d.key_id,amount:d.amount,currency:'INR',name:'SupportGent',description:`${fmtTokens(d.tokens)} Token Topup`,order_id:d.order_id,theme:{color:'#7C6FFF'},
       handler:async resp=>{try{await apiFetch('/billing/topup/verify',{method:'POST',body:JSON.stringify(resp)});toast(`${fmtTokens(d.tokens)} tokens added! 🎉`,'success');location.reload()}catch(e){toast('Verification failed','error')}}
     });rz.open()
   }catch(e){toast(e.message,'error')}
