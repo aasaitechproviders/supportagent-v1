@@ -188,7 +188,7 @@
   .modal-footer{padding:16px 24px;display:flex;justify-content:flex-end;gap:12px;border-top:1px solid var(--border);}
 
   /* Toast */
-  #toast-c{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;}
+  #toast-container{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;}
   .toast-el{background:var(--surface);border:1px solid var(--border-md);padding:12px 16px;border-radius:12px;font-size:13px;font-weight:500;max-width:320px;display:flex;align-items:center;gap:8px;animation:slideUp 0.2s ease;}
   @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
@@ -222,7 +222,7 @@
 <body>
 
 <!-- Toast container -->
-<div id="toast-c"></div>
+<div id="toast-container"></div>
 
 <!-- Skeleton -->
 <div id="page-skeleton">
@@ -678,66 +678,32 @@
   </div>
 </div>
 
+<script src="api.js"></script>
+<script src="nav.js"></script>
 <script>
-// ══════════════════════════════════════════════════════════════════
-//  CONFIG
-// ══════════════════════════════════════════════════════════════════
-const SUBDOMAIN_BASE = 'supportagent.aasaitech.in';
-
-// ══════════════════════════════════════════════════════════════════
-//  MOCK API  (replace with real api.js in production)
-// ══════════════════════════════════════════════════════════════════
-window.apiFetch = async (url, opts) => {
-  // Simulate small network delay
-  await new Promise(r => setTimeout(r, 120));
-  if(url.includes('/agents/') && !opts) return {
-    _id:'mock', name:'Demo Agent', welcome_message:'Hey! How can I help?',
-    brand_color:'#6C5FF5', theme:'dark', shopping_enabled:false,
-    published:false, query_count:23, sources_count:2, products_count:0,
-    categories_count:0, slug:'demo-agent',
-    published_url:`https://${SUBDOMAIN_BASE}/chat?agent=mockid`,
-    subdomain_url:`https://demo-agent.${SUBDOMAIN_BASE}/`
-  };
-  if(url.includes('/sources') && !opts) return [];
-  if(url.includes('/products') && !opts) return [];
-  if(url.includes('/payment-settings') && !opts) return { razorpay_key_id:'', has_secret:false, currency:'INR' };
-  return { ok:true };
-};
-window.initNav       = async () => ({ user:{ id:1 } });
-window.timeAgo       = () => 'just now';
-window.fmtNum        = n => n;
-window.dismissSkeleton = () => { const el=document.getElementById('page-skeleton'); if(el) el.style.display='none'; };
-
-const AGENT_ID = new URLSearchParams(location.search).get('id') || 'mockid';
+const AGENT_ID = new URLSearchParams(location.search).get('id') || '';
 let agent=null, selectedColor='#6C5FF5', logoBase64=null;
 let _csvMode=null, _csvHeader=[], _csvRows=[];
 
-// ══════════════════════════════════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════════════════════════════════
-function toast(msg, type='success') {
-  const c = document.getElementById('toast-c');
-  const colors = { success:'var(--green)', error:'var(--red)', info:'var(--accent)', warning:'var(--amber)' };
-  const icons  = { success:'✓', error:'✕', info:'ℹ', warning:'⚠' };
-  const el = document.createElement('div');
-  el.className = 'toast-el';
-  el.style.borderLeft = `3px solid ${colors[type]||colors.info}`;
-  el.innerHTML = `<span style="color:${colors[type]||colors.info};font-size:14px;">${icons[type]||'ℹ'}</span><span>${msg}</span>`;
-  c.appendChild(el);
-  setTimeout(()=>{ el.style.transition='0.3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3200);
-}
-window.copyText = (txt) => {
-  navigator.clipboard?.writeText(txt)
-    .then(()=>toast('Copied!','success'))
-    .catch(()=>toast('Copy failed','error'));
-};
+// toast, copyText, apiFetch, confirmModal, initNav, fmtNum, fmtTokens,
+// fmtDate, timeAgo, dismissSkeleton — all provided by api.js + nav.js
 
 // ══════════════════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════════════════
 async function loadAgent() {
+  if(!AGENT_ID){ toast('No agent ID in URL','error'); dismissSkeleton(); return; }
   try {
-    agent = await apiFetch(`/agents/${AGENT_ID}`);
+    // Parallel-fetch agent + sources + products for accurate stats
+    // GET /agents/:id doesn't return counts — sources + products do
+    const [agentData, sources, products] = await Promise.all([
+      apiFetch(`/agents/${AGENT_ID}`),
+      apiFetch(`/agents/${AGENT_ID}/sources`),
+      apiFetch(`/agents/${AGENT_ID}/products`)
+    ]);
+    agent = agentData;
+    agent.sources_count  = sources.length;
+    agent.products_count = products.length;
     fillForm(agent);
     livePreview();
     updateStats(agent);
@@ -777,19 +743,19 @@ function fillForm(a) {
 }
 
 function updateStats(a) {
-  document.getElementById('st-convs').textContent = a.query_count    || 0;
+  document.getElementById('st-convs').textContent = a.query_count    || '—';
   document.getElementById('st-srcs').textContent  = a.sources_count  || 0;
   document.getElementById('st-prods').textContent = a.products_count || 0;
   document.getElementById('st-status').innerHTML  = a.published
     ? '<span style="color:var(--green);font-weight:700;">● Live</span>'
     : '<span style="color:var(--text-3);">Draft</span>';
-  document.getElementById('stat-products').textContent   = a.products_count   || 0;
-  document.getElementById('stat-categories').textContent = a.categories_count || 0;
-  document.getElementById('stat-sources').textContent    = a.sources_count    || 0;
-  document.getElementById('prod-badge').textContent      = (a.products_count||0)+' products';
-  document.getElementById('cat-badge').textContent       = (a.categories_count||0)+' categories';
-  if((a.products_count||0)>0)   markStep(1);
-  if((a.categories_count||0)>0) markStep(2);
+  document.getElementById('stat-products').textContent = a.products_count || 0;
+  document.getElementById('stat-categories').textContent = a.sources_count || 0; // categories shown as text sources
+  document.getElementById('stat-sources').textContent  = a.sources_count || 0;
+  document.getElementById('prod-badge').textContent    = (a.products_count||0)+' products';
+  document.getElementById('cat-badge').textContent     = '(imported as sources)';
+  if((a.products_count||0)>0) markStep(1);
+  if((a.sources_count||0)>0)  markStep(2);
   if(a.published) markStep(3);
 }
 
@@ -1051,39 +1017,63 @@ async function executeImport(){
   const sub   = document.getElementById('import-prog-sub');
   prog.classList.add('show');
 
-  const isProds  = _csvMode==='products';
-  const endpoint = isProds ? `/agents/${AGENT_ID}/products` : `/agents/${AGENT_ID}/categories`;
-  const total    = _csvRows.length;
+  const isProds = _csvMode==='products';
+  const total   = _csvRows.length;
   let done=0, errs=0;
 
-  for(const row of _csvRows){
-    try {
-      const body = isProds
-        ? { name:row.name, price:parseFloat(row.price)||0, category:row.category, description:row.description, sku:row.sku, stock_qty:row.stock_qty?parseInt(row.stock_qty):null, image_url:row.image_url }
-        : { name:row.name, description:row.description, slug:row.slug };
-      await apiFetch(endpoint,{method:'POST',body:JSON.stringify(body)});
-      done++;
-    } catch(e){ errs++; }
-    bar.style.width   = Math.round((done+errs)/total*100)+'%';
-    label.textContent = `Importing ${done+errs} of ${total}...`;
-  }
-
-  bar.style.background = errs ? 'var(--amber)' : 'var(--green)';
-  label.textContent = `✓ Done — ${done} imported${errs ? ', '+errs+' failed' : ''}`;
-  sub.textContent   = '';
-  toast(`Imported ${done} ${isProds?'products':'categories'}!`, done?'success':'error');
-
   if(isProds){
+    // Products: POST each row to /agents/:id/products
+    for(const row of _csvRows){
+      try {
+        await apiFetch(`/agents/${AGENT_ID}/products`,{method:'POST',body:JSON.stringify({
+          name:        row.name,
+          price:       parseFloat(row.price)||0,
+          category:    row.category||'General',
+          description: row.description||'',
+          sku:         row.sku||'',
+          stock_qty:   row.stock_qty?parseInt(row.stock_qty):null,
+          image_url:   row.image_url||''
+        })});
+        done++;
+      } catch(e){ errs++; }
+      bar.style.width   = Math.round((done+errs)/total*100)+'%';
+      label.textContent = `Importing ${done+errs} of ${total}...`;
+    }
+    bar.style.background = errs?'var(--amber)':'var(--green)';
+    label.textContent = `✓ Done — ${done} products imported${errs?', '+errs+' failed':''}`;
+    toast(`Imported ${done} products!`, done?'success':'error');
     document.getElementById('stat-products').textContent = done;
     document.getElementById('prod-badge').textContent    = done+' products';
     markStep(1);
+    setTimeout(()=>{ closeCSVModal(); loadProducts(); }, 1800);
   } else {
-    document.getElementById('stat-categories').textContent = done;
-    document.getElementById('cat-badge').textContent       = done+' categories';
-    markStep(2);
+    // Categories: backend has no /categories endpoint.
+    // Instead, build a formatted text and save as a knowledge source.
+    label.textContent = 'Processing categories…';
+    bar.style.width   = '50%';
+    try {
+      const text = _csvRows
+        .filter(r=>r.name)
+        .map(r=>`Category: ${r.name}${r.description?'\nDescription: '+r.description:''}${r.slug?'\nSlug: '+r.slug:''}`)
+        .join('\n\n');
+      await apiFetch(`/agents/${AGENT_ID}/sources`,{method:'POST',body:JSON.stringify({
+        type:    'text',
+        title:   'Product Categories',
+        content: text
+      })});
+      done = _csvRows.filter(r=>r.name).length;
+      bar.style.width='100%'; bar.style.background='var(--green)';
+      label.textContent=`✓ ${done} categories saved as knowledge source`;
+      toast(`${done} categories added to knowledge base!`,'success');
+      document.getElementById('stat-categories').textContent = done;
+      markStep(2);
+      setTimeout(()=>{ closeCSVModal(); loadSources(); }, 1800);
+    } catch(e){
+      bar.style.background='var(--red)';
+      label.textContent='Import failed: '+e.message;
+      toast(e.message,'error');
+    }
   }
-
-  setTimeout(()=>{ closeCSVModal(); if(isProds) loadProducts(); }, 1800);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1101,16 +1091,23 @@ async function loadPaymentSettings(){
 async function savePayment(){
   try {
     await apiFetch(`/agents/${AGENT_ID}/payment-settings`,{method:'PUT',body:JSON.stringify({
-      razorpay_key_id:document.getElementById('rz-key-id').value,
-      razorpay_key_secret:document.getElementById('rz-key-secret').value,
-      currency:document.getElementById('rz-currency').value
+      razorpay_key_id:    document.getElementById('rz-key-id').value.trim(),
+      razorpay_key_secret:document.getElementById('rz-key-secret').value.trim(),
+      currency:           document.getElementById('rz-currency').value,
+      enabled:            true   // enable payment when credentials are saved
     })});
     document.getElementById('rz-key-secret').value='';
+    document.getElementById('rz-hint').textContent='🔒 Secret key stored (encrypted)';
     toast('Payment settings saved!','success');
   } catch(e){ toast(e.message,'error'); }
 }
 
-async function verifyPayment(){ toast('Keys verified ✓','success'); }
+async function verifyPayment(){
+  try {
+    const d=await apiFetch(`/agents/${AGENT_ID}/payment-settings/verify`,{method:'POST'});
+    toast(d.message||'Keys verified ✓','success');
+  } catch(e){ toast('Verification failed: '+e.message,'error'); }
+}
 
 // ══════════════════════════════════════════════════════════════════
 //  PRODUCTS CRUD
@@ -1165,22 +1162,20 @@ async function delProduct(id){
 // ══════════════════════════════════════════════════════════════════
 //  PUBLISH
 // ══════════════════════════════════════════════════════════════════
-function buildSubdomainURL(a) {
-  const slug = a?.slug;
-  if(!slug) return null;
-  // Pattern: https://{slug}.supportagent.aasaitech.in/
-  return `https://${slug}.${SUBDOMAIN_BASE}/`;
-}
-
 async function publishAgent(){
   const btn=document.getElementById('publish-btn');
   btn.disabled=true; btn.innerHTML='<span class="spin-anim">⟳</span> Publishing...';
   try {
     await apiFetch(`/agents/${AGENT_ID}/publish`,{method:'POST'});
-    agent = await apiFetch(`/agents/${AGENT_ID}`);
-    // Ensure URLs are correct regardless of what the API returns
-    agent.subdomain_url = buildSubdomainURL(agent);
-    if(!agent.published_url) agent.published_url = `https://${SUBDOMAIN_BASE}/chat?agent=${AGENT_ID}`;
+    // Re-fetch; backend sets subdomain_url and published_url correctly
+    const [updatedAgent, sources, products] = await Promise.all([
+      apiFetch(`/agents/${AGENT_ID}`),
+      apiFetch(`/agents/${AGENT_ID}/sources`),
+      apiFetch(`/agents/${AGENT_ID}/products`)
+    ]);
+    agent = updatedAgent;
+    agent.sources_count  = sources.length;
+    agent.products_count = products.length;
     agent.published = true;
     updatePublishUI(agent);
     document.getElementById('pub-badge').className='status-badge badge-live';
@@ -1194,39 +1189,33 @@ async function publishAgent(){
 
 function updatePublishUI(a) {
   if(!a?.published) return;
-
-  const subURL = buildSubdomainURL(a) || a.subdomain_url;
-  const fbURL  = a.published_url || `https://${SUBDOMAIN_BASE}/chat?agent=${AGENT_ID}`;
-
-  // Show publish card
-  const card = document.getElementById('publish-links-card');
-  if(card) card.style.display = 'block';
-
-  // Primary subdomain URL
-  setLink('sub-url', subURL); setLink('sub-url-open', subURL);
-
-  // Fallback
-  setLink('pub-url', fbURL);
-
-  // Embed
-  const embed = document.getElementById('embed-box');
-  if(embed) embed.textContent = `<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`;
-
-  // Side card
-  document.getElementById('agent-url-side-card').style.display = 'block';
-  setLink('side-agent-url', subURL, subURL);
-  setLink('side-agent-open', subURL);
-
-  // Update slug hint in topbar
-  if(a.slug) document.getElementById('page-agent-slug').textContent = `/${a.slug}  ·  ${a.slug}.${SUBDOMAIN_BASE}`;
+  const card=document.getElementById('publish-links-card');
+  if(card) card.style.display='block';
+  // Use URLs from backend — authoritative
+  const subURL = a.subdomain_url || '#';
+  const fbURL  = a.published_url || '#';
+  setLink('sub-url', subURL, subURL);
+  setLink('sub-url-open', subURL);
+  setLink('pub-url', fbURL, fbURL);
+  const embed=document.getElementById('embed-box');
+  if(embed) embed.textContent=`<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`;
+  const sideCard=document.getElementById('agent-url-side-card');
+  const sideUrl=document.getElementById('side-agent-url');
+  const sideOpen=document.getElementById('side-agent-open');
+  if(sideCard) sideCard.style.display='block';
+  if(sideUrl)  { sideUrl.href=subURL; sideUrl.textContent=subURL; }
+  if(sideOpen) sideOpen.href=subURL;
+  if(a.slug){
+    const sub = subURL.replace('https://','').replace(/\/$/, '');
+    document.getElementById('page-agent-slug').textContent=`/${a.slug}  ·  ${sub}`;
+  }
 }
 
 function setLink(id, href, text) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.href = href || '#';
-  if(text !== undefined) el.textContent = text;
-  else if(el.textContent === '—' || !el.textContent.trim()) el.textContent = href || '—';
+  const el=document.getElementById(id); if(!el) return;
+  el.href=href||'#';
+  if(text!==undefined) el.textContent=text;
+  else if(!el.textContent.trim()||el.textContent==='—') el.textContent=href||'—';
 }
 
 async function connectDomain(){
@@ -1242,13 +1231,15 @@ async function connectDomain(){
 }
 
 async function clearConvs(){
-  if(!confirm('Clear ALL conversations? This cannot be undone.')) return;
+  const ok=await confirmModal({title:'Clear all conversations?',message:'This will permanently delete all conversations for this agent.',confirmText:'Clear All',danger:true});
+  if(!ok)return;
   try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`,{method:'POST'}); toast('Conversations cleared','success'); }
   catch(e){ toast(e.message,'error'); }
 }
 
 async function deleteAgent(){
-  if(!confirm('Permanently delete this agent? All data will be lost.')) return;
+  const ok=await confirmModal({title:'Delete agent permanently?',message:'All sources, products, and conversations will be lost forever.',confirmText:'Delete Agent',danger:true});
+  if(!ok)return;
   try {
     await apiFetch(`/agents/${AGENT_ID}`,{method:'DELETE'});
     toast('Agent deleted','success');
@@ -1257,27 +1248,24 @@ async function deleteAgent(){
 }
 
 function previewAgent(){
-  const url = buildSubdomainURL(agent) || agent?.published_url;
-  if(url && url !== '#') window.open(url,'_blank');
+  const url=agent?.subdomain_url||agent?.published_url;
+  if(url&&url!=='#') window.open(url,'_blank');
   else toast('Publish the agent first','warning');
 }
 
-// ══════════════════════════════════════════════════════════════════
 //  MOBILE SIDEBAR
 // ══════════════════════════════════════════════════════════════════
-document.getElementById('mob-menu-btn')?.addEventListener('click',()=>{
-  document.querySelector('.sidebar')?.classList.toggle('open');
-  document.getElementById('sidebar-backdrop')?.classList.toggle('show');
-});
-document.getElementById('sidebar-backdrop')?.addEventListener('click',()=>{
-  document.querySelector('.sidebar')?.classList.remove('open');
-  document.getElementById('sidebar-backdrop')?.classList.remove('show');
-});
+// Mobile sidebar handled by nav.js initNav → _initMobile()
+// which uses .mob-open class consistent with shared.css
 
 // ══════════════════════════════════════════════════════════════════
-//  BOOT
+//  BOOT  — initNav authenticates, then loadAgent fetches data
 // ══════════════════════════════════════════════════════════════════
-loadAgent();
+(async () => {
+  const { user } = await initNav('agents');   // 'agents' = highlight My Agents in nav
+  if (!user) return;                          // initNav redirects to / if not authed
+  await loadAgent();
+})();
 </script>
 </body>
 </html>
