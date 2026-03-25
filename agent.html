@@ -7,135 +7,139 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-<!-- FIX 1: shared.css loaded first so design tokens, sidebar, topbar, buttons, badges
-     toast, modals, fields, and responsive utilities are all properly defined.
-     The agent editor previously had no shared.css link, which caused the sidebar
-     to render without any nav/user/logo styles, making it look broken. -->
 <link rel="stylesheet" href="shared.css">
-
 <style>
-  /* ── AGENT-EDITOR-SPECIFIC STYLES ONLY ─────────────────────────
-     FIX 2: Removed the hardcoded :root{} dark block and [data-theme="dark"]
-     block that were here before. They conflicted with shared.css's
-     light-default + [data-theme=dark] system and broke theme toggling.
-     shared.css now owns all design tokens.
-  ────────────────────────────────────────────────────────────────── */
-
   /* Layout */
-  .editor-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;}
+  .editor-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
 
   /* Tabs */
-  .tab-bar{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;scrollbar-width:none;}
-  .tab-bar::-webkit-scrollbar{display:none;}
-  .tab-btn{padding:11px 14px;font-size:12.5px;font-weight:600;background:transparent;border:none;color:var(--text-3);cursor:pointer;transition:var(--t);position:relative;white-space:nowrap;flex-shrink:0;}
-  .tab-btn.active{color:var(--accent);}
-  .tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:var(--accent);border-radius:2px;}
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;}
+  .tab-bar{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;scrollbar-width:none}
+  .tab-bar::-webkit-scrollbar{display:none}
+  .tab-btn{padding:11px 14px;font-size:12.5px;font-weight:600;background:transparent;border:none;color:var(--text-3);cursor:pointer;transition:var(--t);position:relative;white-space:nowrap;flex-shrink:0}
+  .tab-btn.active{color:var(--accent)}
+  .tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;width:100%;height:2px;background:var(--accent);border-radius:2px}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
 
   /* Source items */
-  .source-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
-  .source-badge{font-size:9px;font-weight:800;text-transform:uppercase;background:var(--surface-3);padding:4px 8px;border-radius:20px;letter-spacing:0.5px;}
-  .source-meta{font-size:10px;color:var(--text-3);}
+  .source-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .source-badge{font-size:9px;font-weight:800;text-transform:uppercase;background:var(--surface-3);padding:4px 8px;border-radius:20px;letter-spacing:.5px;color:var(--text-2)}
+  .source-meta{font-size:10px;color:var(--text-3)}
 
   /* Product items */
-  .product-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
-  .product-thumb{width:48px;height:48px;background:var(--surface-2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0;}
-  .product-info{flex:1;min-width:0;}
-  .product-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .product-cat{font-size:10px;color:var(--text-3);}
-  .product-price{font-family:var(--mono);font-weight:600;font-size:13px;white-space:nowrap;}
+  .product-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+  .product-thumb{width:48px;height:48px;background:var(--surface-2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0}
+  .product-info{flex:1;min-width:0}
+  .product-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .product-cat{font-size:10px;color:var(--text-3)}
+  .product-price{font-family:var(--mono);font-weight:600;font-size:13px;white-space:nowrap}
 
   /* File drop */
-  .file-drop{border:2px dashed var(--border-lg);background:var(--surface-2);border-radius:18px;padding:28px 20px;text-align:center;cursor:pointer;transition:0.2s;}
-  .file-drop:hover,.file-drop.drag{border-color:var(--accent);background:var(--accent-dim);}
+  .file-drop{border:2px dashed var(--border-lg);background:var(--surface-2);border-radius:18px;padding:28px 20px;text-align:center;cursor:pointer;transition:.2s}
+  .file-drop:hover,.file-drop.drag{border-color:var(--accent);background:var(--accent-dim)}
 
   /* CSV drop zones */
-  .csv-drop{border:2px dashed var(--border-lg);background:var(--surface-2);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:0.2s;}
-  .csv-drop:hover,.csv-drop.drag{border-color:var(--green);background:var(--green-dim);}
+  .csv-drop{border:2px dashed var(--border-lg);background:var(--surface-2);border-radius:14px;padding:20px 16px;text-align:center;cursor:pointer;transition:.2s}
+  .csv-drop:hover,.csv-drop.drag{border-color:var(--green);background:var(--green-dim)}
 
   /* Setup steps */
-  .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
-  .step-num.done{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+  .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .step-num.done{background:var(--green-dim);border-color:var(--green);color:var(--green)}
 
   /* KB stats */
-  .kb-stat{background:var(--surface-2);border:1px solid var(--border-md);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;}
-  .kb-stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;}
-  .kb-stat-val{font-size:20px;font-weight:800;font-family:var(--mono);}
+  .kb-stat{background:var(--surface-2);border:1px solid var(--border-md);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+  .kb-stat-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
+  .kb-stat-val{font-size:20px;font-weight:800;font-family:var(--mono)}
 
   /* Info banners */
-  .info-banner{background:var(--accent-dim);border:1px solid rgba(108,95,245,0.2);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;}
-  .info-banner.green{background:var(--green-dim);border-color:var(--green-border);}
-  .info-banner-title{font-size:13px;font-weight:700;}
-  .info-banner-desc{font-size:12px;color:var(--text-3);margin-top:3px;}
+  .info-banner{background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+  .info-banner.green{background:var(--green-dim);border-color:var(--green-border)}
+  .info-banner-title{font-size:13px;font-weight:700}
+  .info-banner-desc{font-size:12px;color:var(--text-3);margin-top:3px}
 
   /* src tabs */
-  .src-tab-bar{display:flex;gap:6px;margin-bottom:14px;}
-  .src-tab{background:var(--surface-2);border:1px solid var(--border-md);color:var(--text-3);font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;cursor:pointer;transition:0.15s;}
-  .src-tab:hover{background:var(--surface-3);}
-  .src-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
-  .src-panel{display:none;}
-  .src-panel.active{display:block;}
+  .src-tab-bar{display:flex;gap:6px;margin-bottom:14px}
+  .src-tab{background:var(--surface-2);border:1px solid var(--border-md);color:var(--text-3);font-size:12px;font-weight:600;padding:7px 14px;border-radius:10px;cursor:pointer;transition:.15s}
+  .src-tab:hover{background:var(--surface-3)}
+  .src-tab.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+  .src-panel{display:none}
+  .src-panel.active{display:block}
 
   /* CSV preview table */
-  .csv-tbl{width:100%;border-collapse:collapse;font-size:12px;}
-  .csv-tbl th{background:var(--surface-3);padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);}
-  .csv-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .csv-tbl tr:last-child td{border-bottom:none;}
+  .csv-tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .csv-tbl th{background:var(--surface-3);padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-3)}
+  .csv-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text-2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .csv-tbl tr:last-child td{border-bottom:none}
 
   /* Publish URL cards */
-  .pub-url-card{background:var(--surface-2);border:1px solid var(--border-md);border-radius:14px;padding:14px;margin-bottom:12px;}
-  .pub-url-card.primary{background:var(--green-dim);border-color:var(--green-border);}
-  .pub-url-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
-  .url-copy-row{display:flex;align-items:center;gap:8px;}
-  .url-copy-link{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;flex:1;word-break:break-all;}
-  .url-copy-link.green-link{color:var(--green);}
-  .url-copy-btn{background:var(--surface-3);border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-2);white-space:nowrap;}
+  .pub-url-card{background:var(--surface-2);border:1px solid var(--border-md);border-radius:14px;padding:14px;margin-bottom:12px}
+  .pub-url-card.primary{background:var(--green-dim);border-color:var(--green-border)}
+  .pub-url-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .url-copy-row{display:flex;align-items:center;gap:8px}
+  .url-copy-link{font-family:var(--mono);font-size:11px;color:var(--accent);text-decoration:none;flex:1;word-break:break-all}
+  .url-copy-link.green-link{color:var(--green)}
+  .url-copy-btn{background:var(--surface-3);border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-2);white-space:nowrap}
 
   /* DNS box */
-  .dns-box{border:1px solid var(--border-md);border-radius:12px;overflow:hidden;margin-top:14px;}
-  .dns-box-header{background:var(--surface-3);padding:8px 12px;font-size:9px;font-weight:700;letter-spacing:0.8px;color:var(--text-3);}
-  .dns-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap;}
-  .dns-type{font-size:11px;font-weight:700;background:var(--accent-dim);color:var(--accent);padding:3px 8px;border-radius:6px;font-family:var(--mono);}
-  .dns-val{font-family:var(--mono);font-size:11px;color:var(--text-2);flex:1;}
+  .dns-box{border:1px solid var(--border-md);border-radius:12px;overflow:hidden;margin-top:14px}
+  .dns-box-header{background:var(--surface-3);padding:8px 12px;font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--text-3)}
+  .dns-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap}
+  .dns-type{font-size:11px;font-weight:700;background:var(--accent-dim);color:var(--accent);padding:3px 8px;border-radius:6px;font-family:var(--mono)}
+  .dns-val{font-family:var(--mono);font-size:11px;color:var(--text-2);flex:1}
 
   /* Embed box */
-  .embed-box{background:var(--surface-2);padding:10px;font-family:var(--mono);font-size:11px;border-radius:12px;overflow-x:auto;white-space:pre-wrap;color:var(--text-2);}
+  .embed-box{background:var(--surface-2);padding:10px;font-family:var(--mono);font-size:11px;border-radius:12px;overflow-x:auto;white-space:pre-wrap;color:var(--text-2)}
 
   /* Import progress */
-  .import-prog-wrap{background:var(--surface-2);border-radius:12px;padding:14px;display:none;}
-  .import-prog-wrap.show{display:block;}
-  .prog-track{background:var(--surface-3);border-radius:100px;height:6px;margin:10px 0;}
-  .prog-fill{height:100%;background:var(--green);border-radius:100px;transition:width 0.3s;}
+  .import-prog-wrap{background:var(--surface-2);border-radius:12px;padding:14px;display:none}
+  .import-prog-wrap.show{display:block}
+  .prog-track{background:var(--surface-3);border-radius:100px;height:6px;margin:10px 0}
+  .prog-fill{height:100%;background:var(--green);border-radius:100px;transition:width .3s}
 
-  /* Color palette swatches (agent-editor size override) */
-  .color-swatch{width:32px;height:32px;border-radius:12px;cursor:pointer;transition:0.1s;border:2px solid transparent;}
-  .color-swatch.active{border-color:#fff;box-shadow:0 0 0 1px var(--accent);transform:scale(1.05);}
+  /* Color swatches */
+  .color-swatch{width:32px;height:32px;border-radius:12px;cursor:pointer;transition:.1s;border:2px solid transparent}
+  .color-swatch.active{border-color:#fff;box-shadow:0 0 0 1px var(--accent);transform:scale(1.05)}
 
-  /* Skeleton (page-level) */
-  #page-skeleton{padding:24px 24px 24px 312px;}
-  .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px;}
-  .skel-body{max-width:1360px;}
-  @media(max-width:900px){#page-skeleton{padding:16px;}}
+  /* Conversations tab */
+  .convs-tab-inner{
+    display:grid;grid-template-columns:280px 1fr;
+    border:1px solid var(--border);border-radius:var(--r-lg);
+    overflow:hidden;background:var(--surface);
+    height:calc(100vh - 260px);min-height:420px;
+  }
+  .conv-left-col{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .conv-left-hdr{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);flex-shrink:0}
+  .conv-session-list{flex:1;overflow-y:auto;min-height:0;scrollbar-width:thin}
+  .conv-right-col{display:flex;flex-direction:column;background:var(--bg);min-height:0;overflow:hidden}
 
-  /* Conversations tab inner layout */
-  .convs-tab-inner{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);height:calc(100vh - 260px);min-height:420px;}
-  .session-item{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
-  .session-item:hover{background:var(--surface-2);}
-  .session-item.csi-active{background:var(--accent-dim);border-left:3px solid var(--accent);}
+  /* Session item */
+  .session-item{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;border-left:3px solid transparent;user-select:none}
+  .session-item:hover{background:var(--surface-2)}
+  .session-item.csi-active{background:var(--accent-dim);border-left-color:var(--accent)}
 
-  /* Spin animation */
-  .spin-anim{display:inline-block;animation:spin .6s linear infinite;}
+  /* Conv right panels */
+  .conv-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3)}
+  .conv-empty.hidden{display:none}
+  .conv-thread{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
+  .conv-thread.visible{display:flex}
+  .conv-thread-hdr{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+  .conv-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:thin}
+
+  /* Spin */
+  .spin-anim{display:inline-block;animation:spin .6s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
+  /* Skeleton override */
+  #page-skeleton{padding:24px 24px 24px 312px}
+  .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px}
+  .skel-body{max-width:1360px}
+
   @media(max-width:900px){
-    .main-wrap{margin-left:0;padding:16px;}
-    .editor-layout{grid-template-columns:1fr;}
-    .convs-tab-inner{grid-template-columns:1fr;height:auto;}
+    #page-skeleton{padding:16px}
+    .editor-layout{grid-template-columns:1fr}
+    .convs-tab-inner{grid-template-columns:1fr;height:auto}
   }
 </style>
-
 <script>
 ;(function(){
   var p=new URLSearchParams(location.search),t=p.get('token');
@@ -184,37 +188,38 @@
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <a href="agents.html" class="btn-icon"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></a>
+      <a href="agents.html" class="btn-icon">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
       <div>
         <div class="topbar-title" id="page-agent-name">Agent Editor</div>
-        <div style="font-size:11px;color:var(--text-3);margin-top:1px;" id="page-agent-slug"></div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:1px" id="page-agent-slug"></div>
       </div>
     </div>
     <div class="topbar-right">
-      <span class="status-badge" id="pub-badge" style="display:none;"></span>
-      <button class="btn btn-secondary btn-sm" id="preview-btn" onclick="previewAgent()" style="display:none;">👁 Open Chat</button>
+      <span class="status-badge" id="pub-badge" style="display:none"></span>
+      <button class="btn btn-secondary btn-sm" id="preview-btn" onclick="previewAgent()" style="display:none">👁 Open Chat</button>
       <button class="btn btn-primary btn-sm" id="save-btn" onclick="saveGeneral()">Save Changes</button>
     </div>
   </div>
 
   <div class="content">
-    <!-- Main editor grid -->
-    <div class="editor-layout" id="main-content" style="display:none;">
+    <div class="editor-layout" id="main-content" style="display:none">
 
       <!-- LEFT: Editor panel -->
       <div>
-        <div class="card" style="overflow:visible;">
+        <div class="card" style="overflow:visible">
           <!-- Tab bar -->
           <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('general',this)">⚙️ General</button>
-            <button class="tab-btn" onclick="switchTab('knowledge',this)">📚 Knowledge</button>
-            <button class="tab-btn" onclick="switchTab('shopping',this)">🛒 Shopping</button>
-            <button class="tab-btn" onclick="switchTab('publish',this)">🚀 Publish</button>
-            <button class="tab-btn" onclick="switchTab('conversations',this)">💬 Conversations</button>
+            <button class="tab-btn active"  onclick="switchTab('general',this)">⚙️ General</button>
+            <button class="tab-btn"         onclick="switchTab('knowledge',this)">📚 Knowledge</button>
+            <button class="tab-btn"         onclick="switchTab('shopping',this)">🛒 Shopping</button>
+            <button class="tab-btn"         onclick="switchTab('publish',this)">🚀 Publish</button>
+            <button class="tab-btn"         onclick="switchTab('conversations',this)">💬 Conversations</button>
           </div>
 
-          <!-- ══ GENERAL TAB ══════════════════════════════════════════ -->
-          <div id="tab-general" class="tab-panel active" style="padding:22px;">
+          <!-- ══ GENERAL TAB ═══════════════════════════════════════════ -->
+          <div id="tab-general" class="tab-panel active" style="padding:22px">
             <div class="field">
               <label>Agent Name *</label>
               <input class="inp" type="text" id="f-name" oninput="livePreview()" placeholder="My Support Agent"/>
@@ -224,11 +229,11 @@
               <input class="inp" type="text" id="f-welcome" oninput="livePreview()" placeholder="Hi! How can I help you today?"/>
             </div>
             <div class="field">
-              <label>System Prompt <span style="font-size:11px;color:var(--text-3);">(optional)</span></label>
+              <label>System Prompt <span style="font-size:11px;color:var(--text-3)">(optional)</span></label>
               <textarea class="ta" id="f-system-prompt" rows="4" placeholder="You are a helpful support agent. Answer questions based on the knowledge base. Be concise and friendly."></textarea>
-              <div class="field-hint">Guides the AI's personality and behaviour. Leave blank for sensible defaults.</div>
+              <div class="field-hint">Guides the AI's personality and behaviour.</div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="field">
                 <label>Theme</label>
                 <select class="inp" id="f-theme" onchange="livePreview()">
@@ -238,88 +243,97 @@
               </div>
               <div class="field">
                 <label>Brand Colour</label>
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" id="color-palette">
-                  <div class="color-swatch" style="background:#6C5FF5;" onclick="pickColor('#6C5FF5',this)"></div>
-                  <div class="color-swatch" style="background:#2dd4a0;" onclick="pickColor('#2dd4a0',this)"></div>
-                  <div class="color-swatch" style="background:#f5a523;" onclick="pickColor('#f5a523',this)"></div>
-                  <div class="color-swatch" style="background:#f87171;" onclick="pickColor('#f87171',this)"></div>
-                  <div class="color-swatch" style="background:#38bdf8;" onclick="pickColor('#38bdf8',this)"></div>
-                  <div class="color-swatch" style="background:#fb923c;" onclick="pickColor('#fb923c',this)"></div>
-                  <input type="color" id="color-custom" value="#6C5FF5" style="width:32px;height:32px;border-radius:12px;border:none;padding:0;cursor:pointer;" oninput="pickColor(this.value,null)"/>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap" id="color-palette">
+                  <div class="color-swatch" style="background:#6C5FF5" onclick="pickColor('#6C5FF5',this)"></div>
+                  <div class="color-swatch" style="background:#2dd4a0" onclick="pickColor('#2dd4a0',this)"></div>
+                  <div class="color-swatch" style="background:#f5a523" onclick="pickColor('#f5a523',this)"></div>
+                  <div class="color-swatch" style="background:#f87171" onclick="pickColor('#f87171',this)"></div>
+                  <div class="color-swatch" style="background:#38bdf8" onclick="pickColor('#38bdf8',this)"></div>
+                  <div class="color-swatch" style="background:#fb923c" onclick="pickColor('#fb923c',this)"></div>
+                  <input type="color" id="color-custom" value="#6C5FF5"
+                    style="width:32px;height:32px;border-radius:12px;border:none;padding:0;cursor:pointer"
+                    oninput="pickColor(this.value,null)"/>
                 </div>
               </div>
             </div>
             <div class="field">
               <label>Logo</label>
-              <div style="display:flex;gap:14px;align-items:center;">
-                <div id="logo-preview" onclick="document.getElementById('logo-inp').click()" style="width:64px;height:64px;background:var(--surface-2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border-md);cursor:pointer;overflow:hidden;">🤖</div>
+              <div style="display:flex;gap:14px;align-items:center">
+                <div id="logo-preview" onclick="document.getElementById('logo-inp').click()"
+                  style="width:64px;height:64px;background:var(--surface-2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border-md);cursor:pointer;overflow:hidden">🤖</div>
                 <div>
                   <button class="btn btn-secondary btn-sm" onclick="document.getElementById('logo-inp').click()">Upload Logo</button>
-                  <button class="btn btn-sm" id="logo-remove" onclick="removeLogo()" style="display:none;color:var(--red);margin-left:6px;">Remove</button>
-                  <div class="field-hint" style="margin-top:6px;">PNG or JPG — max 2MB</div>
+                  <button class="btn btn-sm" id="logo-remove" onclick="removeLogo()" style="display:none;color:var(--red);margin-left:6px">Remove</button>
+                  <div class="field-hint" style="margin-top:6px">PNG or JPG — max 2MB</div>
                 </div>
               </div>
-              <input type="file" id="logo-inp" accept="image/*" style="display:none;" onchange="handleLogo(this)"/>
+              <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="handleLogo(this)"/>
             </div>
           </div>
 
           <!-- ══ KNOWLEDGE TAB ════════════════════════════════════════ -->
-          <div id="tab-knowledge" class="tab-panel" style="padding:22px;">
-            <div class="info-banner" style="margin-bottom:18px;">
-              <div style="font-size:20px;flex-shrink:0;">💡</div>
+          <div id="tab-knowledge" class="tab-panel" style="padding:22px">
+            <div class="info-banner" style="margin-bottom:18px">
+              <div style="font-size:20px;flex-shrink:0">💡</div>
               <div>
                 <div class="info-banner-title">How the Knowledge Base works</div>
                 <div class="info-banner-desc">Upload your <strong>Products CSV</strong> and <strong>Categories CSV</strong> — the AI will answer customer questions from that data automatically. You can also add FAQs, website URLs, and documents as extra knowledge sources below.</div>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
-              <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px;">📦</span></div>
-              <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px;">🏷️</span></div>
-              <div class="kb-stat"><div><div class="kb-stat-label">Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px;">📄</span></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+              <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px">📦</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px">🏷️</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px">📄</span></div>
             </div>
-            <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px;">
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px">
               <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <div style="flex:1;height:5px;background:var(--surface-3);border-radius:100px;"><div id="kb-fill" style="width:0%;height:100%;background:var(--accent);border-radius:100px;transition:width 0.4s;"></div></div>
-              <div style="font-size:11px;color:var(--text-3);white-space:nowrap;" id="kb-text">0 / 18k tokens used</div>
+              <div style="flex:1;height:5px;background:var(--surface-3);border-radius:100px"><div id="kb-fill" style="width:0%;height:100%;background:var(--accent);border-radius:100px;transition:width .4s"></div></div>
+              <div style="font-size:11px;color:var(--text-3);white-space:nowrap" id="kb-text">0 / 18k tokens used</div>
             </div>
             <!-- Step 1: Products CSV -->
-            <div class="card" style="margin-bottom:14px;">
+            <div class="card" style="margin-bottom:14px">
               <div class="card-header">
-                <div class="card-title"><div class="step-num" id="step1-num" style="margin-right:4px;">1</div>Upload Products CSV</div>
+                <div class="card-title"><div class="step-num" id="step1-num" style="margin-right:4px">1</div>Upload Products CSV</div>
                 <span class="badge badge-gray" id="prod-badge">0 products</span>
               </div>
               <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
-                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, price, category, description, sku, stock_qty, image_url</code>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">
+                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px">name, price, category, description, sku, stock_qty, image_url</code>
                 </div>
-                <div class="csv-drop" id="prod-drop" onclick="document.getElementById('prod-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleProdCSVDrop(event)">
-                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                  <div style="font-size:13px;font-weight:600;">Drop products.csv here or click to browse</div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one product per row</div>
+                <div class="csv-drop" id="prod-drop" onclick="document.getElementById('prod-csv-inp').click()"
+                  ondragover="event.preventDefault();this.classList.add('drag')"
+                  ondragleave="this.classList.remove('drag')"
+                  ondrop="handleProdCSVDrop(event)">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  <div style="font-size:13px;font-weight:600">Drop products.csv here or click to browse</div>
+                  <div style="font-size:11px;color:var(--text-3);margin-top:4px">CSV file — one product per row</div>
                 </div>
-                <input type="file" id="prod-csv-inp" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
-                <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                <input type="file" id="prod-csv-inp" accept=".csv" style="display:none" onchange="handleProdCSVFile(this.files[0])"/>
+                <div style="display:flex;justify-content:flex-end;margin-top:10px">
                   <button class="btn btn-secondary btn-sm" onclick="downloadSampleProductCSV()">⬇ Download Sample</button>
                 </div>
               </div>
             </div>
             <!-- Step 2: Categories CSV -->
-            <div class="card" style="margin-bottom:14px;">
+            <div class="card" style="margin-bottom:14px">
               <div class="card-header">
-                <div class="card-title"><div class="step-num" id="step2-num" style="margin-right:4px;">2</div>Upload Categories CSV</div>
+                <div class="card-title"><div class="step-num" id="step2-num" style="margin-right:4px">2</div>Upload Categories CSV</div>
                 <span class="badge badge-gray" id="cat-badge">0 categories</span>
               </div>
               <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px;">
-                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px;">name, description, slug</code>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">
+                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px">name, description, slug</code>
                 </div>
-                <div class="csv-drop" id="cat-drop" onclick="document.getElementById('cat-csv-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleCatCSVDrop(event)">
-                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  <div style="font-size:13px;font-weight:600;">Drop categories.csv here or click to browse</div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:4px;">CSV file — one category per row</div>
+                <div class="csv-drop" id="cat-drop" onclick="document.getElementById('cat-csv-inp').click()"
+                  ondragover="event.preventDefault();this.classList.add('drag')"
+                  ondragleave="this.classList.remove('drag')"
+                  ondrop="handleCatCSVDrop(event)">
+                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  <div style="font-size:13px;font-weight:600">Drop categories.csv here or click to browse</div>
+                  <div style="font-size:11px;color:var(--text-3);margin-top:4px">CSV file — one category per row</div>
                 </div>
-                <input type="file" id="cat-csv-inp" accept=".csv" style="display:none;" onchange="handleCatCSVFile(this.files[0])"/>
-                <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+                <input type="file" id="cat-csv-inp" accept=".csv" style="display:none" onchange="handleCatCSVFile(this.files[0])"/>
+                <div style="display:flex;justify-content:flex-end;margin-top:10px">
                   <button class="btn btn-secondary btn-sm" onclick="downloadSampleCategoryCSV()">⬇ Download Sample</button>
                 </div>
               </div>
@@ -327,7 +341,7 @@
             <!-- Step 3: Extra sources -->
             <div class="card">
               <div class="card-header">
-                <div class="card-title"><div class="step-num" style="margin-right:4px;">3</div>Additional Knowledge Sources <span style="font-size:11px;font-weight:400;color:var(--text-3);">(optional)</span></div>
+                <div class="card-title"><div class="step-num" style="margin-right:4px">3</div>Additional Knowledge Sources <span style="font-size:11px;font-weight:400;color:var(--text-3)">(optional)</span></div>
                 <span class="badge badge-gray" id="src-count-badge">0 sources</span>
               </div>
               <div class="card-body">
@@ -337,55 +351,58 @@
                   <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
                 </div>
                 <div id="src-text" class="src-panel active">
-                  <div class="field-hint" style="margin-bottom:10px;">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
+                  <div class="field-hint" style="margin-bottom:10px">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
                   <textarea class="ta" id="src-text-inp" rows="4" placeholder="Q: What is your return policy?&#10;A: We offer 30-day hassle-free returns on all products..."></textarea>
-                  <div style="display:flex;gap:8px;margin-top:8px;">
-                    <input class="inp" type="text" id="src-text-title" placeholder="Title (e.g. Return Policy)" style="flex:1;"/>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <input class="inp" type="text" id="src-text-title" placeholder="Title (e.g. Return Policy)" style="flex:1"/>
                     <button class="btn btn-primary btn-sm" onclick="addTextSrc()">Add Source</button>
                   </div>
                 </div>
                 <div id="src-url" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:10px;">Enter a public webpage URL — its content will be fetched and indexed.</div>
-                  <div style="display:flex;gap:8px;">
-                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1;"/>
-                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch & Add</button>
+                  <div class="field-hint" style="margin-bottom:10px">Enter a public webpage URL — its content will be fetched and indexed.</div>
+                  <div style="display:flex;gap:8px">
+                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1"/>
+                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch &amp; Add</button>
                   </div>
                 </div>
                 <div id="src-file" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:10px;">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
-                  <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleKBFileDrop(event)">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <div style="font-size:13px;">Drop files or <strong>browse</strong></div>
-                    <div style="font-size:11px;color:var(--text-3);margin-top:4px;">PDF, DOCX, TXT</div>
+                  <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
+                  <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag')"
+                    ondragleave="this.classList.remove('drag')"
+                    ondrop="handleKBFileDrop(event)">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div style="font-size:13px">Drop files or <strong>browse</strong></div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF, DOCX, TXT</div>
                   </div>
                   <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt" onchange="handleKBFiles(this.files)"/>
                 </div>
-                <div id="sources-list" style="margin-top:16px;"></div>
+                <div id="sources-list" style="margin-top:16px"></div>
               </div>
             </div>
           </div>
 
           <!-- ══ SHOPPING TAB ═════════════════════════════════════════ -->
-          <div id="tab-shopping" class="tab-panel" style="padding:22px;">
-            <div class="info-banner" style="margin-bottom:18px;">
-              <div style="font-size:20px;flex-shrink:0;">🛒</div>
+          <div id="tab-shopping" class="tab-panel" style="padding:22px">
+            <div class="info-banner" style="margin-bottom:18px">
+              <div style="font-size:20px;flex-shrink:0">🛒</div>
               <div>
                 <div class="info-banner-title">Shopping Mode</div>
                 <div class="info-banner-desc">Enable to let customers browse products and checkout directly inside the chat. Requires Razorpay credentials.</div>
               </div>
             </div>
-            <div class="card" style="margin-bottom:16px;">
+            <div class="card" style="margin-bottom:16px">
               <div class="card-body">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div style="font-weight:700;font-size:14px;">Enable Shopping Mode</div>
-                    <div style="font-size:12px;color:var(--text-3);margin-top:3px;">Customers can browse & buy in the chat window</div>
+                    <div style="font-weight:700;font-size:14px">Enable Shopping Mode</div>
+                    <div style="font-size:12px;color:var(--text-3);margin-top:3px">Customers can browse &amp; buy in the chat window</div>
                   </div>
                   <label class="toggle-wrap"><input type="checkbox" id="shopping-toggle"/><div class="toggle-track"></div></label>
                 </div>
               </div>
             </div>
-            <div class="card" style="margin-bottom:16px;">
+            <div class="card" style="margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">💳 Razorpay Credentials</div>
                 <span class="badge badge-accent">Grower+</span>
@@ -399,16 +416,16 @@
                 <div class="field">
                   <label>Key Secret</label>
                   <input class="inp" type="password" id="rz-key-secret" placeholder="Leave blank to keep existing"/>
-                  <div class="field-hint" id="rz-hint" style="color:var(--green);"></div>
+                  <div class="field-hint" id="rz-hint" style="color:var(--green)"></div>
                 </div>
                 <div class="field">
                   <label>Currency</label>
-                  <select class="inp" id="rz-currency" style="width:auto;">
+                  <select class="inp" id="rz-currency" style="width:auto">
                     <option value="INR">INR — Indian Rupee ₹</option>
                     <option value="USD">USD — US Dollar $</option>
                   </select>
                 </div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px">
                   <button class="btn btn-primary btn-sm" onclick="savePayment()">Save Settings</button>
                   <button class="btn btn-secondary btn-sm" onclick="verifyPayment()">✓ Verify Keys</button>
                 </div>
@@ -417,25 +434,27 @@
             <div class="card">
               <div class="card-header">
                 <div class="card-title">📦 Products</div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px">
                   <button class="btn btn-secondary btn-sm" onclick="document.getElementById('prod-csv-shop').click()">⬆ Import CSV</button>
                   <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
-                  <input type="file" id="prod-csv-shop" accept=".csv" style="display:none;" onchange="handleProdCSVFile(this.files[0])"/>
+                  <input type="file" id="prod-csv-shop" accept=".csv" style="display:none" onchange="handleProdCSVFile(this.files[0])"/>
                 </div>
               </div>
-              <div id="products-list" style="padding:4px 18px 12px;"></div>
+              <div id="products-list" style="padding:4px 18px 12px"></div>
             </div>
           </div>
 
           <!-- ══ PUBLISH TAB ══════════════════════════════════════════ -->
-          <div id="tab-publish" class="tab-panel" style="padding:22px;">
-            <div style="background:var(--accent-dim);border-radius:22px;padding:28px;text-align:center;margin-bottom:20px;">
-              <div style="font-size:40px;margin-bottom:10px;">🚀</div>
-              <div style="font-size:20px;font-weight:800;">Publish Your Agent</div>
-              <div style="margin:10px 0 20px;color:var(--text-2);font-size:13px;max-width:380px;margin-left:auto;margin-right:auto;">Your agent goes live at a dedicated subdomain: <code style="color:var(--accent);">{your-slug}.supportagent.aasaitech.in</code></div>
-              <button class="btn btn-primary" style="height:46px;padding:0 28px;font-size:14px;" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
+          <div id="tab-publish" class="tab-panel" style="padding:22px">
+            <div style="background:var(--accent-dim);border-radius:22px;padding:28px;text-align:center;margin-bottom:20px">
+              <div style="font-size:40px;margin-bottom:10px">🚀</div>
+              <div style="font-size:20px;font-weight:800">Publish Your Agent</div>
+              <div style="margin:10px 0 20px;color:var(--text-2);font-size:13px;max-width:380px;margin-left:auto;margin-right:auto">
+                Your agent goes live at a dedicated subdomain: <code style="color:var(--accent)">{your-slug}.supportagent.aasaitech.in</code>
+              </div>
+              <button class="btn btn-primary" style="height:46px;padding:0 28px;font-size:14px" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
             </div>
-            <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px;">
+            <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">🔗 Live Links</div>
                 <span class="badge badge-green">● Live</span>
@@ -446,11 +465,11 @@
                   <div class="url-copy-row">
                     <a id="sub-url" href="#" target="_blank" class="url-copy-link green-link">—</a>
                     <button class="url-copy-btn" onclick="copyText(document.getElementById('sub-url').href)">Copy</button>
-                    <a id="sub-url-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">Open ↗</a>
+                    <a id="sub-url-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none">Open ↗</a>
                   </div>
-                  <div style="font-size:11px;color:var(--green);margin-top:8px;opacity:0.85;">✓ Share this URL with your customers — it's your agent's permanent home.</div>
+                  <div style="font-size:11px;color:var(--green);margin-top:8px;opacity:.85">✓ Share this URL with your customers — it's your agent's permanent home.</div>
                 </div>
-                <div class="pub-url-label" style="margin-top:16px;">Fallback URL</div>
+                <div class="pub-url-label" style="margin-top:16px">Fallback URL</div>
                 <div class="pub-url-card">
                   <div class="url-copy-row">
                     <a id="pub-url" href="#" target="_blank" class="url-copy-link">—</a>
@@ -460,19 +479,19 @@
                 <div class="divider"></div>
                 <div class="pub-url-label">Embed Widget</div>
                 <div class="embed-box" id="embed-box">—</div>
-                <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Embed Code</button>
+                <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Embed Code</button>
               </div>
             </div>
-            <div class="card" style="margin-bottom:16px;">
+            <div class="card" style="margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">🌐 Custom Domain</div>
                 <span class="badge badge-accent">Grower+</span>
               </div>
               <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Point your own domain to this agent (e.g. <code>support.yourbrand.com</code>).</div>
-                <div id="domain-status-wrap" style="display:none;margin-bottom:12px;"></div>
-                <div style="display:flex;gap:8px;">
-                  <input class="inp" type="text" id="domain-inp" placeholder="support.yourdomain.com" style="flex:1;"/>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px">Point your own domain to this agent (e.g. <code>support.yourbrand.com</code>).</div>
+                <div id="domain-status-wrap" style="display:none;margin-bottom:12px"></div>
+                <div style="display:flex;gap:8px">
+                  <input class="inp" type="text" id="domain-inp" placeholder="support.yourdomain.com" style="flex:1"/>
                   <button class="btn btn-primary btn-sm" onclick="connectDomain()">Connect Domain</button>
                 </div>
                 <div class="dns-box">
@@ -485,11 +504,11 @@
                 </div>
               </div>
             </div>
-            <div class="card" style="border-color:var(--red-border);">
-              <div class="card-header"><div class="card-title" style="color:var(--red);">⚠️ Danger Zone</div></div>
+            <div class="card" style="border-color:var(--red-border)">
+              <div class="card-header"><div class="card-title" style="color:var(--red)">⚠️ Danger Zone</div></div>
               <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px;">These actions are permanent and cannot be undone.</div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:14px">These actions are permanent and cannot be undone.</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
                   <button class="btn btn-danger btn-sm" onclick="clearConvs()">Clear All Conversations</button>
                   <button class="btn btn-danger btn-sm" onclick="deleteAgent()">Delete Agent Permanently</button>
                 </div>
@@ -497,44 +516,43 @@
             </div>
           </div>
 
-          <!-- ══ CONVERSATIONS TAB ════════════════════════════════════
-               FIX 3: This panel was previously placed OUTSIDE .main-wrap
-               entirely, so clicking the tab rendered nothing. It now lives
-               correctly inside the card alongside the other tab panels.
-          ══════════════════════════════════════════════════════════════ -->
-          <div id="tab-conversations" class="tab-panel" style="padding:18px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <!-- ══ CONVERSATIONS TAB ════════════════════════════════════ -->
+          <div id="tab-conversations" class="tab-panel" style="padding:18px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
               <div>
-                <div style="font-size:14px;font-weight:700;">Conversation Sessions</div>
-                <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="convs-sub-tab">All sessions for this agent</div>
+                <div style="font-size:14px;font-weight:700">Conversation Sessions</div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px" id="convs-sub-tab">All sessions for this agent</div>
               </div>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input type="text" class="inp" id="conv-search" placeholder="Search sessions…" style="width:180px;height:34px;" oninput="filterConvSessions()"/>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="text" class="inp" id="conv-search" placeholder="Search sessions…"
+                  style="width:180px;height:34px" oninput="filterConvSessions()"/>
                 <button class="btn btn-danger btn-sm" onclick="clearConvs()">🗑 Clear All</button>
               </div>
             </div>
-            <div class="convs-tab-inner" id="convs-layout-inner">
-              <div style="border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;">
-                <div style="padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);flex-shrink:0;">
-                  <div style="font-size:13px;font-weight:700;">Sessions</div>
+            <div class="convs-tab-inner">
+              <!-- Left: session list -->
+              <div class="conv-left-col">
+                <div class="conv-left-hdr">
+                  <div style="font-size:13px;font-weight:700">Sessions</div>
                   <span class="badge badge-gray" id="conv-sess-count">0</span>
                 </div>
-                <div style="flex:1;overflow-y:auto;scrollbar-width:thin;" id="conv-session-list">
-                  <div style="padding:32px 20px;text-align:center;color:var(--text-3);font-size:13px;">Loading…</div>
+                <div class="conv-session-list" id="conv-session-list">
+                  <div style="padding:32px 20px;text-align:center;color:var(--text-3);font-size:13px">Loading…</div>
                 </div>
               </div>
-              <div style="display:flex;flex-direction:column;background:var(--bg);overflow:hidden;">
-                <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3);" id="conv-empty-right">
-                  <div style="font-size:36px;opacity:.25;">💬</div>
-                  <div style="font-size:14px;font-weight:700;color:var(--text-2);">Select a session</div>
-                  <div style="font-size:12px;">Click any session on the left to view the conversation</div>
+              <!-- Right: messages -->
+              <div class="conv-right-col">
+                <div class="conv-empty" id="conv-empty">
+                  <div style="font-size:36px;opacity:.25">💬</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--text-2)">Select a session</div>
+                  <div style="font-size:12px">Click any session on the left to view</div>
                 </div>
-                <div id="conv-msg-area" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
-                  <div style="padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;">
-                    <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="conv-msg-title">Session</div>
-                    <div style="font-size:11px;color:var(--text-3);margin-top:2px;" id="conv-msg-meta"></div>
+                <div class="conv-thread" id="conv-thread">
+                  <div class="conv-thread-hdr">
+                    <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="conv-msg-title">Session</div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:2px" id="conv-msg-meta"></div>
                   </div>
-                  <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;" id="conv-msg-scroll"></div>
+                  <div class="conv-msgs" id="conv-msgs"></div>
                 </div>
               </div>
             </div>
@@ -543,36 +561,39 @@
         </div><!-- /.card -->
       </div><!-- /left column -->
 
-      <!-- RIGHT: Preview & stats (sticky sidebar) -->
-      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px;">
+      <!-- RIGHT: Preview & stats -->
+      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:20px">
         <div class="card">
-          <div class="card-header"><div class="card-title">Chat Preview</div><span id="prev-theme-badge" class="badge badge-gray">dark</span></div>
+          <div class="card-header">
+            <div class="card-title">Chat Preview</div>
+            <span id="prev-theme-badge" class="badge badge-gray">dark</span>
+          </div>
           <div class="card-body">
-            <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
-              <div id="prev-logo" style="width:32px;height:32px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0;">🤖</div>
-              <div style="font-weight:700;" id="prev-name">Agent</div>
-              <div style="margin-left:auto;font-size:10px;color:var(--green);">● Online</div>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+              <div id="prev-logo" style="width:32px;height:32px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0">🤖</div>
+              <div style="font-weight:700" id="prev-name">Agent</div>
+              <div style="margin-left:auto;font-size:10px;color:var(--green)">● Online</div>
             </div>
-            <div id="prev-welcome" style="background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;padding:9px 13px;margin-bottom:8px;font-size:13px;">Hi!</div>
-            <div style="background:var(--surface-2);border-radius:4px 18px 18px 18px;padding:9px 13px;font-size:13px;color:var(--text-2);">I'm here to help!</div>
+            <div id="prev-welcome" style="background:var(--accent);color:#fff;border-radius:18px 18px 4px 18px;padding:9px 13px;margin-bottom:8px;font-size:13px">Hi!</div>
+            <div style="background:var(--surface-2);border-radius:4px 18px 18px 18px;padding:9px 13px;font-size:13px;color:var(--text-2)">I'm here to help!</div>
           </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">Agent Stats</div></div>
-          <div class="card-body" style="padding:14px 18px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Conversations</span><span id="st-convs" style="font-weight:700;">—</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Knowledge Sources</span><span id="st-srcs" style="font-weight:700;">—</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);"><span style="color:var(--text-3);font-size:13px;">Products</span><span id="st-prods" style="font-weight:700;">—</span></div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;"><span style="color:var(--text-3);font-size:13px;">Status</span><span id="st-status">—</span></div>
+          <div class="card-body" style="padding:14px 18px">
+            <div class="info-row"><span class="info-row-label">Conversations</span><span id="st-convs" class="info-row-val">—</span></div>
+            <div class="info-row"><span class="info-row-label">Knowledge Sources</span><span id="st-srcs" class="info-row-val">—</span></div>
+            <div class="info-row"><span class="info-row-label">Products</span><span id="st-prods" class="info-row-val">—</span></div>
+            <div class="info-row" style="border-bottom:none"><span class="info-row-label">Status</span><span id="st-status">—</span></div>
           </div>
         </div>
-        <div class="card" id="agent-url-side-card" style="display:none;">
+        <div class="card" id="agent-url-side-card" style="display:none">
           <div class="card-header"><div class="card-title">🔗 Your Agent URL</div></div>
           <div class="card-body">
-            <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;">Share this URL with your customers:</div>
-            <a id="side-agent-url" href="#" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--green);word-break:break-all;text-decoration:none;display:block;margin-bottom:10px;">—</a>
-            <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="copyText(document.getElementById('side-agent-url').href)">📋 Copy Link</button>
-            <a id="side-agent-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="width:100%;margin-top:8px;text-decoration:none;display:flex;justify-content:center;">👁 Open Chat</a>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Share this URL with your customers:</div>
+            <a id="side-agent-url" href="#" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--green);word-break:break-all;text-decoration:none;display:block;margin-bottom:10px">—</a>
+            <button class="btn btn-secondary btn-sm" style="width:100%" onclick="copyText(document.getElementById('side-agent-url').href)">📋 Copy Link</button>
+            <a id="side-agent-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="width:100%;margin-top:8px;text-decoration:none;display:flex;justify-content:center">👁 Open Chat</a>
           </div>
         </div>
       </div><!-- /right column -->
@@ -581,22 +602,22 @@
   </div><!-- /.content -->
 </div><!-- /.main-wrap -->
 
-<!-- ── Product Modal ──────────────────────────────────────────────── -->
+<!-- ── Product Modal ───────────────────────────────────────────── -->
 <div class="modal-overlay" id="product-modal">
-  <div class="modal" style="max-width:640px;">
+  <div class="modal" style="max-width:640px">
     <div class="modal-header">
       <div><div class="modal-title" id="pm-title">Add Product</div><div class="modal-sub">Fill in product details for the chat store</div></div>
       <button class="modal-close" onclick="closeProductModal()">✕</button>
     </div>
     <input type="hidden" id="pm-id"/>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 4px;">
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Product Name *</label><input class="inp" type="text" id="pm-name" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Price *</label><input class="inp" type="number" id="pm-price" min="0" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Category</label><input class="inp" type="text" id="pm-category" style="width:100%;"/></div>
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Description</label><textarea class="ta" id="pm-desc" rows="2" style="width:100%;"></textarea></div>
-      <div style="grid-column:span 2;"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Image URL</label><input class="inp" type="url" id="pm-image" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">SKU</label><input class="inp" type="text" id="pm-sku" style="width:100%;"/></div>
-      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">Stock Qty</label><input class="inp" type="number" id="pm-stock" min="0" style="width:100%;"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 0 4px">
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Product Name *</label><input class="inp" type="text" id="pm-name" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Price *</label><input class="inp" type="number" id="pm-price" min="0" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Category</label><input class="inp" type="text" id="pm-category" style="width:100%"/></div>
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Description</label><textarea class="ta" id="pm-desc" rows="2" style="width:100%"></textarea></div>
+      <div style="grid-column:span 2"><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Image URL</label><input class="inp" type="url" id="pm-image" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">SKU</label><input class="inp" type="text" id="pm-sku" style="width:100%"/></div>
+      <div><label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px">Stock Qty</label><input class="inp" type="number" id="pm-stock" min="0" style="width:100%"/></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
@@ -605,160 +626,192 @@
   </div>
 </div>
 
-<!-- ── CSV Preview Modal ──────────────────────────────────────────── -->
+<!-- ── CSV Preview Modal ───────────────────────────────────────── -->
 <div class="modal-overlay" id="csv-modal">
-  <div class="modal" style="max-width:700px;">
+  <div class="modal" style="max-width:700px">
     <div class="modal-header">
       <div><div class="modal-title" id="csv-modal-title">Import CSV</div><div class="modal-sub" id="csv-modal-sub">Preview before importing</div></div>
       <button class="modal-close" onclick="closeCSVModal()">✕</button>
     </div>
     <div class="import-prog-wrap" id="import-prog-wrap">
-      <div style="font-size:13px;font-weight:600;" id="import-prog-label">Importing...</div>
-      <div class="prog-track"><div class="prog-fill" id="import-prog-bar" style="width:0%;"></div></div>
-      <div style="font-size:11px;color:var(--text-3);" id="import-prog-sub"></div>
+      <div style="font-size:13px;font-weight:600" id="import-prog-label">Importing...</div>
+      <div class="prog-track"><div class="prog-fill" id="import-prog-bar" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--text-3)" id="import-prog-sub"></div>
     </div>
-    <div id="csv-preview-wrap" style="overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:12px;margin-top:4px;">
+    <div id="csv-preview-wrap" style="overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:12px;margin-top:4px">
       <table class="csv-tbl" id="csv-preview-tbl"></table>
     </div>
-    <div style="margin-top:10px;font-size:12px;color:var(--text-3);" id="csv-preview-note"></div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-3)" id="csv-preview-note"></div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeCSVModal()">Cancel</button>
-      <button class="btn btn-secondary" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green);" id="csv-do-import" onclick="executeImport()">⬆ Import All Rows</button>
+      <button class="btn btn-secondary" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green)" id="csv-do-import" onclick="executeImport()">⬆ Import All Rows</button>
     </div>
   </div>
 </div>
 
 <script>
-// FIX 4: SUBDOMAIN_BASE was used in fillForm() but never defined,
-// causing a ReferenceError on every agent load.
-const SUBDOMAIN_BASE = 'supportagent.aasaitech.in';
+/* ══════════════════════════════════════════════════════════════════
+   Constants & State
+══════════════════════════════════════════════════════════════════ */
+const SUBDOMAIN_BASE = 'supportagent.aasaitech.in'
+const AGENT_ID       = new URLSearchParams(location.search).get('id') || ''
 
-const AGENT_ID = new URLSearchParams(location.search).get('id') || '';
-let agent = null, selectedColor = '#6C5FF5', logoBase64 = null;
-let _csvMode = null, _csvHeader = [], _csvRows = [];
+let agent = null, selectedColor = '#6C5FF5', logoBase64 = null
+let _csvMode = null, _csvHeader = [], _csvRows = []
 
-// ══════════════════════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════════════════════
+// Products lookup map — avoids JSON.stringify in onclick
+let _productsMap = {}
+
+// Conversation sessions map — avoids JSON.stringify in onclick
+let _allConvSessions = [], _convSessionsMap = {}, _activeConvKey = null
+
+/* ══════════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════════ */
+;(async () => {
+  const nav = await renderNav('agents')
+  if (!nav) return
+  await loadAgent()
+})()
+
+/* ══════════════════════════════════════════════════════════════════
+   LOAD AGENT
+   Products are NOT fetched here — lazy-loaded when Shopping tab opens.
+   This eliminates the CORS preflight error that appeared on every page load.
+══════════════════════════════════════════════════════════════════ */
 async function loadAgent() {
-  if (!AGENT_ID) { toast('No agent ID in URL', 'error'); dismissSkeleton(); return; }
+  if (!AGENT_ID) { toast('No agent ID in URL', 'error'); dismissSkeleton(); return }
   try {
-    const [agentData, sources, products] = await Promise.all([
+    const [agentData, sources] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
-      apiFetch(`/agents/${AGENT_ID}/products`)
-    ]);
-    agent = agentData;
-    agent.sources_count  = sources.length;
-    agent.products_count = products.length;
-    fillForm(agent);
-    livePreview();
-    updateStats(agent);
-    if (agent.published) updatePublishUI(agent);
-    document.getElementById('main-content').style.display = 'grid';
-    dismissSkeleton();
+    ])
+    agent = agentData
+    agent.sources_count = sources.length
+    fillForm(agent)
+    livePreview()
+    updateStats(agent)
+    if (agent.published) updatePublishUI(agent)
+    document.getElementById('main-content').style.display = 'grid'
+    dismissSkeleton()
   } catch(e) {
-    toast('Failed to load agent: ' + e.message, 'error');
-    dismissSkeleton();
+    toast('Failed to load agent: ' + e.message, 'error')
+    dismissSkeleton()
   }
 }
 
+/* ── Form fill ──────────────────────────────────────────────────── */
 function fillForm(a) {
-  document.getElementById('page-agent-name').textContent = a.name;
-  const slugURL = a.slug ? `${a.slug}.${SUBDOMAIN_BASE}` : '';
-  document.getElementById('page-agent-slug').textContent = (a.slug ? '/' + a.slug : '') + (slugURL ? '  ·  ' + slugURL : '');
-  document.getElementById('f-name').value          = a.name || '';
-  document.getElementById('f-welcome').value       = a.welcome_message || '';
-  document.getElementById('f-system-prompt').value = a.system_prompt || '';
-  document.getElementById('f-theme').value         = a.theme || 'dark';
-  selectedColor = a.brand_color || '#6C5FF5';
-  document.getElementById('color-custom').value = selectedColor;
+  document.getElementById('page-agent-name').textContent = a.name
+  const slugURL = a.slug ? a.slug + '.' + SUBDOMAIN_BASE : ''
+  document.getElementById('page-agent-slug').textContent =
+    (a.slug ? '/' + a.slug : '') + (slugURL ? '  ·  ' + slugURL : '')
+  document.getElementById('f-name').value          = a.name || ''
+  document.getElementById('f-welcome').value        = a.welcome_message || ''
+  document.getElementById('f-system-prompt').value  = a.system_prompt || ''
+  document.getElementById('f-theme').value          = a.theme || 'dark'
+  selectedColor = a.brand_color || '#6C5FF5'
+  document.getElementById('color-custom').value = selectedColor
   if (a.logo_base64) {
-    logoBase64 = a.logo_base64;
-    document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
-    document.getElementById('logo-remove').style.display = 'inline-flex';
+    logoBase64 = a.logo_base64
+    document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover">`
+    document.getElementById('logo-remove').style.display = 'inline-flex'
   }
-  document.getElementById('shopping-toggle').checked = !!a.shopping_enabled;
-  const badge = document.getElementById('pub-badge');
-  badge.style.display = 'inline-flex';
+  document.getElementById('shopping-toggle').checked = !!a.shopping_enabled
+  const badge = document.getElementById('pub-badge')
+  badge.style.display = 'inline-flex'
   if (a.published) {
-    badge.className = 'status-badge badge-live'; badge.innerHTML = '● Live';
-    document.getElementById('preview-btn').style.display = 'flex';
+    badge.className = 'status-badge badge-live'; badge.innerHTML = '● Live'
+    document.getElementById('preview-btn').style.display = 'flex'
   } else {
-    badge.className = 'status-badge badge-draft'; badge.textContent = 'Draft';
+    badge.className = 'status-badge badge-draft'; badge.textContent = 'Draft'
   }
 }
 
 function updateStats(a) {
-  document.getElementById('st-convs').textContent  = a.query_count    || '—';
-  document.getElementById('st-srcs').textContent   = a.sources_count  || 0;
-  document.getElementById('st-prods').textContent  = a.products_count || 0;
-  document.getElementById('st-status').innerHTML   = a.published
-    ? '<span style="color:var(--green);font-weight:700;">● Live</span>'
-    : '<span style="color:var(--text-3);">Draft</span>';
-  document.getElementById('stat-products').textContent   = a.products_count || 0;
-  document.getElementById('stat-categories').textContent = a.sources_count  || 0;
-  document.getElementById('stat-sources').textContent    = a.sources_count  || 0;
-  document.getElementById('prod-badge').textContent      = (a.products_count || 0) + ' products';
-  document.getElementById('cat-badge').textContent       = '(imported as sources)';
-  if ((a.products_count || 0) > 0) markStep(1);
-  if ((a.sources_count  || 0) > 0) markStep(2);
-  if (a.published) markStep(3);
+  document.getElementById('st-convs').textContent = a.query_count    || '—'
+  document.getElementById('st-srcs').textContent  = a.sources_count  || 0
+  document.getElementById('st-prods').textContent = a.products_count || 0
+  document.getElementById('st-status').innerHTML  = a.published
+    ? '<span style="color:var(--green);font-weight:700">● Live</span>'
+    : '<span style="color:var(--text-3)">Draft</span>'
+  document.getElementById('stat-products').textContent   = a.products_count || 0
+  document.getElementById('stat-categories').textContent = a.sources_count  || 0
+  document.getElementById('stat-sources').textContent    = a.sources_count  || 0
+  document.getElementById('prod-badge').textContent      = (a.products_count || 0) + ' products'
+  document.getElementById('cat-badge').textContent       = '(imported as sources)'
+  if ((a.products_count || 0) > 0) markStep(1)
+  if ((a.sources_count  || 0) > 0) markStep(2)
+  if (a.published) markStep(3)
 }
 
 function markStep(n) {
-  const el = document.getElementById(`step${n}-num`);
-  if (el && !el.classList.contains('done')) { el.classList.add('done'); el.textContent = '✓'; }
+  const el = document.getElementById('step' + n + '-num')
+  if (el && !el.classList.contains('done')) { el.classList.add('done'); el.textContent = '✓' }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  GENERAL
-// ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
+   TABS
+══════════════════════════════════════════════════════════════════ */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById('tab-' + tab).classList.add('active')
+  btn.classList.add('active')
+  if (tab === 'knowledge')     loadSources()
+  if (tab === 'shopping')      { loadProducts(); loadPaymentSettings() }
+  if (tab === 'publish')       updatePublishUI(agent)
+  if (tab === 'conversations') loadConvSessions()
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   GENERAL TAB
+══════════════════════════════════════════════════════════════════ */
 function livePreview() {
-  const name    = document.getElementById('f-name').value    || 'Agent';
-  const welcome = document.getElementById('f-welcome').value || 'Hi!';
-  const div     = document.getElementById('prev-logo');
-  div.style.background = selectedColor;
+  const name    = document.getElementById('f-name').value    || 'Agent'
+  const welcome = document.getElementById('f-welcome').value || 'Hi!'
+  const div = document.getElementById('prev-logo')
+  div.style.background = selectedColor
   div.innerHTML = logoBase64
-    ? `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover;">`
-    : (name[0]?.toUpperCase() || 'A');
-  document.getElementById('prev-name').textContent    = name;
-  document.getElementById('prev-welcome').textContent = welcome;
-  document.getElementById('prev-welcome').style.background = selectedColor;
-  document.getElementById('prev-theme-badge').textContent  = document.getElementById('f-theme').value;
+    ? `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover">`
+    : (name[0]?.toUpperCase() || 'A')
+  document.getElementById('prev-name').textContent          = name
+  document.getElementById('prev-welcome').textContent       = welcome
+  document.getElementById('prev-welcome').style.background  = selectedColor
+  document.getElementById('prev-theme-badge').textContent   = document.getElementById('f-theme').value
 }
 
 function pickColor(c, el) {
-  selectedColor = c;
-  document.querySelectorAll('#color-palette .color-swatch').forEach(s => s.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('color-custom').value = c;
-  livePreview();
+  selectedColor = c
+  document.querySelectorAll('#color-palette .color-swatch').forEach(s => s.classList.remove('active'))
+  if (el) el.classList.add('active')
+  document.getElementById('color-custom').value = c
+  livePreview()
 }
 
 function handleLogo(input) {
-  const file = input.files[0]; if (!file) return;
-  if (file.size > 2 * 1024 * 1024) return toast('Max 2MB', 'error');
-  const r = new FileReader();
+  const file = input.files[0]; if (!file) return
+  if (file.size > 2 * 1024 * 1024) return toast('Max 2MB', 'error')
+  const r = new FileReader()
   r.onload = e => {
-    logoBase64 = e.target.result;
-    document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
-    document.getElementById('logo-remove').style.display = 'inline-flex';
-    livePreview();
-  };
-  r.readAsDataURL(file);
+    logoBase64 = e.target.result
+    document.getElementById('logo-preview').innerHTML = `<img src="${logoBase64}" style="width:100%;height:100%;object-fit:cover">`
+    document.getElementById('logo-remove').style.display = 'inline-flex'
+    livePreview()
+  }
+  r.readAsDataURL(file)
 }
 
 function removeLogo() {
-  logoBase64 = null;
-  document.getElementById('logo-preview').innerHTML = '🤖';
-  document.getElementById('logo-remove').style.display = 'none';
-  livePreview();
+  logoBase64 = null
+  document.getElementById('logo-preview').innerHTML = '🤖'
+  document.getElementById('logo-remove').style.display = 'none'
+  livePreview()
 }
 
 async function saveGeneral() {
-  const btn = document.getElementById('save-btn');
-  btn.disabled = true; btn.textContent = 'Saving...';
+  const btn = document.getElementById('save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
   try {
     await apiFetch(`/agents/${AGENT_ID}`, { method: 'PUT', body: JSON.stringify({
       name:             document.getElementById('f-name').value,
@@ -768,292 +821,181 @@ async function saveGeneral() {
       system_prompt:    document.getElementById('f-system-prompt').value,
       theme:            document.getElementById('f-theme').value,
       shopping_enabled: document.getElementById('shopping-toggle').checked
-    })});
-    toast('Changes saved!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
-  finally { btn.disabled = false; btn.textContent = 'Save Changes'; }
+    })})
+    toast('Changes saved!', 'success')
+    document.getElementById('page-agent-name').textContent = document.getElementById('f-name').value
+  } catch(e) { toast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = 'Save Changes' }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  TABS
-// ══════════════════════════════════════════════════════════════════
-function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  btn.classList.add('active');
-  if (tab === 'knowledge')     loadSources();
-  if (tab === 'shopping')      { loadProducts(); loadPaymentSettings(); }
-  if (tab === 'publish')       updatePublishUI(agent);
-  if (tab === 'conversations') loadConvSessions();
-}
-
-// ══════════════════════════════════════════════════════════════════
-//  CONVERSATIONS TAB
-// ══════════════════════════════════════════════════════════════════
-let _allConvSessions = [];
-
-function esc(s) {
-  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br/>');
-}
-
-async function loadConvSessions() {
-  const list = document.getElementById('conv-session-list');
-  list.innerHTML = '<div style="padding:14px;display:flex;flex-direction:column;gap:7px;">'
-    + '<div class="skel" style="height:50px;border-radius:8px;"></div>'
-    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.7;"></div>'
-    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.45;"></div>'
-    + '</div>';
-  try {
-    const d = await apiFetch(`/agents/${AGENT_ID}/conversations`);
-    _allConvSessions = d.sessions || [];
-    document.getElementById('conv-sess-count').textContent = _allConvSessions.length;
-    const sub = document.getElementById('convs-sub-tab');
-    if (sub) sub.textContent = _allConvSessions.length + ' sessions';
-    renderConvSessions(_allConvSessions);
-  } catch(e) {
-    list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--red);font-size:13px;">Failed to load: ${esc(e.message)}</div>`;
-  }
-}
-
-function renderConvSessions(sessions) {
-  const list = document.getElementById('conv-session-list');
-  if (!sessions.length) {
-    list.innerHTML = '<div style="padding:36px 20px;text-align:center;">'
-      + '<div style="font-size:28px;opacity:.3;margin-bottom:10px;">💬</div>'
-      + '<div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px;">No conversations yet</div>'
-      + '<div style="font-size:12px;color:var(--text-3);">Sessions appear once users chat with your agent.</div>'
-      + '</div>';
-    return;
-  }
-  list.innerHTML = sessions.map(s => {
-    const key    = s._id || s.session_id || s.visitor_ip || '';
-    const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g, '_');
-    return `<div class="session-item" id="${safeId}" onclick="openConvSession(${JSON.stringify(key)},${JSON.stringify(s)})">
-      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;">${esc(s.first_question || '(No message)')}</div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);">
-        <span>${s.message_count || 1} msgs · ${fmtTokens(s.tokens_used || 0)} tokens</span>
-        <span>${timeAgo(s.last_active)}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function filterConvSessions() {
-  const q = document.getElementById('conv-search').value.toLowerCase();
-  renderConvSessions(_allConvSessions.filter(s =>
-    (s.first_question || '').toLowerCase().includes(q) || (s.visitor_ip || '').includes(q)
-  ));
-}
-
-async function openConvSession(key, meta) {
-  document.querySelectorAll('#conv-session-list .session-item').forEach(el => el.classList.remove('csi-active'));
-  const safeId = 'csi_' + key.toString().replace(/[^a-zA-Z0-9]/g, '_');
-  document.getElementById(safeId)?.classList.add('csi-active');
-
-  document.getElementById('conv-empty-right').style.display = 'none';
-  const msgArea = document.getElementById('conv-msg-area');
-  msgArea.style.display = 'flex';
-  document.getElementById('conv-msg-title').textContent = (meta.first_question || 'Session').slice(0, 70);
-  document.getElementById('conv-msg-meta').textContent  = `${meta.message_count || 1} messages · ${timeAgo(meta.started_at)}${meta.visitor_ip ? ' · ' + meta.visitor_ip : ''}`;
-
-  const scroll = document.getElementById('conv-msg-scroll');
-  scroll.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px;">'
-    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:50%"></div>'
-    + '<div class="skel" style="height:72px;border-radius:10px;width:68%"></div>'
-    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:42%"></div>'
-    + '</div>';
-  try {
-    const d    = await apiFetch(`/agents/${AGENT_ID}/conversations/${encodeURIComponent(key)}`);
-    const msgs = d.messages || [];
-    if (!msgs.length) { scroll.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-3);">No messages in this session.</div>'; return; }
-    scroll.innerHTML = msgs.map(m => `
-      <div>
-        <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:78%;align-self:flex-end;word-break:break-word;margin-left:auto;">${esc(m.question)}</div>
-        <div style="background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;margin-top:6px;">${m.answer || ''}</div>
-        <div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:3px;">🪙 ${fmtTokens(m.tokens_used || 0)} tokens · ${timeAgo(m.created_at)}</div>
-      </div>`).join('');
-    scroll.scrollTop = scroll.scrollHeight;
-  } catch(e) {
-    scroll.innerHTML = `<div style="padding:24px;color:var(--red);">Failed to load: ${esc(e.message)}</div>`;
-  }
-}
-
+/* ══════════════════════════════════════════════════════════════════
+   KNOWLEDGE — Sources
+══════════════════════════════════════════════════════════════════ */
 function switchSrcTab(t, btn) {
-  document.querySelectorAll('.src-tab').forEach(b  => b.classList.remove('active'));
-  document.querySelectorAll('.src-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('src-' + t).classList.add('active');
+  document.querySelectorAll('.src-tab').forEach(b  => b.classList.remove('active'))
+  document.querySelectorAll('.src-panel').forEach(p => p.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('src-' + t).classList.add('active')
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  KNOWLEDGE — TEXT / URL / FILE
-// ══════════════════════════════════════════════════════════════════
 async function loadSources() {
   try {
-    const sources = await apiFetch(`/agents/${AGENT_ID}/sources`);
-    const total   = sources.reduce((a, s) => a + Math.ceil((s.extracted_text || s.content || '').length / 4), 0);
-    const pct     = Math.min(100, Math.round(total / 18000 * 100));
-    document.getElementById('kb-fill').style.width     = pct + '%';
-    document.getElementById('kb-text').textContent     = '~' + total.toLocaleString() + ' / 18,000 tokens used';
-    document.getElementById('src-count-badge').textContent = sources.length + ' sources';
-    document.getElementById('stat-sources').textContent    = sources.length;
-    const list = document.getElementById('sources-list');
-    if (!sources.length) { list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px;">No extra sources yet. Add text, URLs, or files above.</div>'; return; }
+    const sources = await apiFetch(`/agents/${AGENT_ID}/sources`)
+    const total   = sources.reduce((a, s) => a + Math.ceil((s.extracted_text || s.content || '').length / 4), 0)
+    const pct     = Math.min(100, Math.round(total / 18000 * 100))
+    document.getElementById('kb-fill').style.width       = pct + '%'
+    document.getElementById('kb-text').textContent       = '~' + total.toLocaleString() + ' / 18,000 tokens used'
+    document.getElementById('src-count-badge').textContent = sources.length + ' sources'
+    document.getElementById('stat-sources').textContent  = sources.length
+    const list = document.getElementById('sources-list')
+    if (!sources.length) {
+      list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px">No extra sources yet. Add text, URLs, or files above.</div>'
+      return
+    }
     list.innerHTML = sources.map(s => `
       <div class="source-item">
-        <span class="source-badge">${s.type}</span>
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.title || s.content?.slice(0, 60) || 'Untitled'}</div>
+        <span class="source-badge">${esc(s.type)}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title || s.content?.slice(0,60) || 'Untitled')}</div>
           <div class="source-meta">${Math.ceil((s.extracted_text || s.content || '').length / 4)} tokens</div>
         </div>
-        <button class="btn-icon" onclick="delSrc('${s._id}')">🗑️</button>
-      </div>`).join('');
-  } catch(e) { toast(e.message, 'error'); }
+        <button class="btn-icon" data-src-id="${escAttr(s._id)}">🗑️</button>
+      </div>`).join('')
+    list.querySelectorAll('[data-src-id]').forEach(btn => {
+      btn.addEventListener('click', () => delSrc(btn.dataset.srcId))
+    })
+  } catch(e) { toast(e.message, 'error') }
 }
 
 async function addTextSrc() {
-  const content = document.getElementById('src-text-inp').value.trim();
-  if (!content) return toast('Enter some text first', 'warning');
+  const content = document.getElementById('src-text-inp').value.trim()
+  if (!content) return toast('Enter some text first', 'warning')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', content, title: document.getElementById('src-text-title').value }) });
-    document.getElementById('src-text-inp').value = '';
-    document.getElementById('src-text-title').value = '';
-    toast('Source added!', 'success'); loadSources();
-  } catch(e) { toast(e.message, 'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({
+      type: 'text', content, title: document.getElementById('src-text-title').value
+    })})
+    document.getElementById('src-text-inp').value   = ''
+    document.getElementById('src-text-title').value = ''
+    toast('Source added!', 'success'); loadSources()
+  } catch(e) { toast(e.message, 'error') }
 }
 
 async function addUrlSrc() {
-  const url = document.getElementById('src-url-inp').value.trim();
-  if (!url) return toast('Enter a URL', 'warning');
-  toast('Fetching URL...', 'info');
+  const url = document.getElementById('src-url-inp').value.trim()
+  if (!url) return toast('Enter a URL', 'warning')
+  toast('Fetching URL...', 'info')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'url', content: url }) });
-    document.getElementById('src-url-inp').value = '';
-    toast('URL added!', 'success'); loadSources();
-  } catch(e) { toast(e.message, 'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'url', content: url }) })
+    document.getElementById('src-url-inp').value = ''
+    toast('URL added!', 'success'); loadSources()
+  } catch(e) { toast(e.message, 'error') }
 }
 
-function handleKBFileDrop(e) { e.preventDefault(); document.getElementById('file-drop').classList.remove('drag'); handleKBFiles(e.dataTransfer.files); }
-
+function handleKBFileDrop(e) {
+  e.preventDefault(); document.getElementById('file-drop').classList.remove('drag')
+  handleKBFiles(e.dataTransfer.files)
+}
 async function handleKBFiles(files) {
   for (const file of files) {
-    const fd = new FormData(); fd.append('file', file);
-    toast(`Uploading ${file.name}...`, 'info');
-    try {
-      await apiFetch(`/agents/${AGENT_ID}/sources/file`, { method: 'POST', body: fd });
-      toast(`${file.name} added!`, 'success'); loadSources();
-    } catch(e) { toast(e.message, 'error'); }
+    const fd = new FormData(); fd.append('file', file)
+    toast(`Uploading ${file.name}...`, 'info')
+    try { await apiFetch(`/agents/${AGENT_ID}/sources/file`, { method: 'POST', body: fd }); toast(file.name + ' added!', 'success'); loadSources() }
+    catch(e) { toast(e.message, 'error') }
   }
 }
 
 async function delSrc(id) {
-  if (!confirm('Delete this source?')) return;
-  try { await apiFetch(`/agents/${AGENT_ID}/sources/${id}`, { method: 'DELETE' }); toast('Deleted', 'success'); loadSources(); }
-  catch(e) { toast(e.message, 'error'); }
+  const ok = await confirmModal({ title: 'Delete source?', message: 'This source will be removed from the knowledge base.', confirmText: 'Delete', danger: true })
+  if (!ok) return
+  try { await apiFetch(`/agents/${AGENT_ID}/sources/${id}`, { method: 'DELETE' }); toast('Deleted', 'success'); loadSources() }
+  catch(e) { toast(e.message, 'error') }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  CSV UTILITIES
-// ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
+   CSV UTILITIES
+══════════════════════════════════════════════════════════════════ */
 function parseCSV(text) {
-  const lines  = text.trim().split(/\r?\n/);
-  const header = splitCSVLine(lines[0]);
+  const lines  = text.trim().split(/\r?\n/)
+  const header = splitCSVLine(lines[0])
   const rows   = lines.slice(1).map(l => {
-    const cols = splitCSVLine(l);
-    const obj  = {};
-    header.forEach((h, i) => obj[h] = (cols[i] || '').trim());
-    return obj;
-  }).filter(r => Object.values(r).some(v => v));
-  return { header, rows };
+    const cols = splitCSVLine(l), obj = {}
+    header.forEach((h, i) => obj[h] = (cols[i] || '').trim())
+    return obj
+  }).filter(r => Object.values(r).some(v => v))
+  return { header, rows }
 }
-
 function splitCSVLine(line) {
-  const cols = []; let cur = '', inQ = false;
+  const cols = []; let cur = '', inQ = false
   for (const ch of line) {
-    if (ch === '"') { inQ = !inQ; }
-    else if (ch === ',' && !inQ) { cols.push(cur.trim().replace(/^"|"$/g, '')); cur = ''; }
-    else cur += ch;
+    if (ch === '"') inQ = !inQ
+    else if (ch === ',' && !inQ) { cols.push(cur.trim().replace(/^"|"$/g, '')); cur = '' }
+    else cur += ch
   }
-  cols.push(cur.trim().replace(/^"|"$/g, ''));
-  return cols;
+  cols.push(cur.trim().replace(/^"|"$/g, ''))
+  return cols
 }
-
 function downloadBlob(content, filename, type = 'text/csv') {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([content], { type }));
-  a.download = filename; a.click();
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([content], { type }))
+  a.download = filename; a.click()
 }
-
 function downloadSampleProductCSV() {
-  downloadBlob(
-`name,price,category,description,sku,stock_qty,image_url
+  downloadBlob(`name,price,category,description,sku,stock_qty,image_url
 "Blue Denim Jacket",1299,Jackets,"Classic slim-fit denim jacket",BJK-001,50,https://example.com/jacket.jpg
-"White Sneakers",899,Footwear,"Lightweight canvas sneakers",SNK-W01,120,https://example.com/sneaker.jpg`,
-  'sample-products.csv');
-  toast('Sample products.csv downloaded', 'success');
+"White Sneakers",899,Footwear,"Lightweight canvas sneakers",SNK-W01,120,https://example.com/sneaker.jpg`, 'sample-products.csv')
+  toast('Sample products.csv downloaded', 'success')
 }
-
 function downloadSampleCategoryCSV() {
-  downloadBlob(
-`name,description,slug
+  downloadBlob(`name,description,slug
 Jackets,"Denim, leather, and bomber jackets",jackets
-Footwear,"Shoes, sneakers, and sandals",footwear`,
-  'sample-categories.csv');
-  toast('Sample categories.csv downloaded', 'success');
+Footwear,"Shoes, sneakers, and sandals",footwear`, 'sample-categories.csv')
+  toast('Sample categories.csv downloaded', 'success')
 }
-
-function handleProdCSVDrop(e) { e.preventDefault(); document.getElementById('prod-drop').classList.remove('drag'); handleProdCSVFile(e.dataTransfer.files[0]); }
+function handleProdCSVDrop(e) { e.preventDefault(); document.getElementById('prod-drop').classList.remove('drag'); handleProdCSVFile(e.dataTransfer.files[0]) }
 function handleProdCSVFile(file) {
-  if (!file) return;
-  const r = new FileReader();
+  if (!file) return
+  const r = new FileReader()
   r.onload = e => {
-    const { header, rows } = parseCSV(e.target.result);
-    _csvMode = 'products'; _csvHeader = header; _csvRows = rows;
-    openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0, 5));
-  };
-  r.readAsText(file);
+    const { header, rows } = parseCSV(e.target.result)
+    _csvMode = 'products'; _csvHeader = header; _csvRows = rows
+    openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
+  }
+  r.readAsText(file)
 }
-
-function handleCatCSVDrop(e) { e.preventDefault(); document.getElementById('cat-drop').classList.remove('drag'); handleCatCSVFile(e.dataTransfer.files[0]); }
+function handleCatCSVDrop(e) { e.preventDefault(); document.getElementById('cat-drop').classList.remove('drag'); handleCatCSVFile(e.dataTransfer.files[0]) }
 function handleCatCSVFile(file) {
-  if (!file) return;
-  const r = new FileReader();
+  if (!file) return
+  const r = new FileReader()
   r.onload = e => {
-    const { header, rows } = parseCSV(e.target.result);
-    _csvMode = 'categories'; _csvHeader = header; _csvRows = rows;
-    openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown below — ${rows.length} total`, header, rows.slice(0, 5));
-  };
-  r.readAsText(file);
+    const { header, rows } = parseCSV(e.target.result)
+    _csvMode = 'categories'; _csvHeader = header; _csvRows = rows
+    openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
+  }
+  r.readAsText(file)
 }
-
 function openCSVModal(title, sub, header, preview) {
-  document.getElementById('csv-modal-title').textContent = title;
-  document.getElementById('csv-modal-sub').textContent   = sub;
-  document.getElementById('import-prog-wrap').classList.remove('show');
-  document.getElementById('csv-preview-wrap').style.display = 'block';
-  document.getElementById('csv-do-import').style.display    = 'flex';
-  document.getElementById('csv-preview-note').textContent   = `${_csvRows.length} rows will be imported.`;
-  const thead = `<thead><tr>${header.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
-  const tbody = `<tbody>${preview.map(row => `<tr>${header.map(h => `<td>${esc(row[h] || '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
-  document.getElementById('csv-preview-tbl').innerHTML = thead + tbody;
-  document.getElementById('csv-modal').classList.add('open');
+  document.getElementById('csv-modal-title').textContent = title
+  document.getElementById('csv-modal-sub').textContent   = sub
+  document.getElementById('import-prog-wrap').classList.remove('show')
+  document.getElementById('csv-preview-wrap').style.display = 'block'
+  document.getElementById('csv-do-import').style.display    = 'flex'
+  document.getElementById('csv-preview-note').textContent   = _csvRows.length + ' rows will be imported.'
+  const thead = '<thead><tr>' + header.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead>'
+  const tbody = '<tbody>' + preview.map(row => '<tr>' + header.map(h => '<td>' + esc(row[h] || '') + '</td>').join('') + '</tr>').join('') + '</tbody>'
+  document.getElementById('csv-preview-tbl').innerHTML = thead + tbody
+  document.getElementById('csv-modal').classList.add('open')
 }
-
-function closeCSVModal() { document.getElementById('csv-modal').classList.remove('open'); _csvMode = null; _csvRows = []; }
-
+function closeCSVModal() { document.getElementById('csv-modal').classList.remove('open'); _csvMode = null; _csvRows = [] }
 async function executeImport() {
-  if (!_csvRows.length) return;
-  document.getElementById('csv-do-import').style.display    = 'none';
-  document.getElementById('csv-preview-wrap').style.display = 'none';
-  const prog  = document.getElementById('import-prog-wrap');
-  const bar   = document.getElementById('import-prog-bar');
-  const label = document.getElementById('import-prog-label');
-  prog.classList.add('show');
-  const isProds = _csvMode === 'products';
-  const total   = _csvRows.length;
-  let done = 0, errs = 0;
-
+  if (!_csvRows.length) return
+  document.getElementById('csv-do-import').style.display    = 'none'
+  document.getElementById('csv-preview-wrap').style.display = 'none'
+  const prog  = document.getElementById('import-prog-wrap')
+  const bar   = document.getElementById('import-prog-bar')
+  const label = document.getElementById('import-prog-label')
+  prog.classList.add('show')
+  const isProds = _csvMode === 'products', total = _csvRows.length
+  let done = 0, errs = 0
   if (isProds) {
     for (const row of _csvRows) {
       try {
@@ -1062,54 +1004,51 @@ async function executeImport() {
           category: row.category || 'General', description: row.description || '',
           sku: row.sku || '', stock_qty: row.stock_qty ? parseInt(row.stock_qty) : null,
           image_url: row.image_url || ''
-        })});
-        done++;
-      } catch(e) { errs++; }
-      bar.style.width  = Math.round((done + errs) / total * 100) + '%';
-      label.textContent = `Importing ${done + errs} of ${total}...`;
+        })})
+        done++
+      } catch(e) { errs++ }
+      bar.style.width   = Math.round((done + errs) / total * 100) + '%'
+      label.textContent = 'Importing ' + (done + errs) + ' of ' + total + '...'
     }
-    bar.style.background = errs ? 'var(--amber)' : 'var(--green)';
-    label.textContent = `✓ Done — ${done} products imported${errs ? ', ' + errs + ' failed' : ''}`;
-    toast(`Imported ${done} products!`, done ? 'success' : 'error');
-    document.getElementById('stat-products').textContent = done;
-    document.getElementById('prod-badge').textContent    = done + ' products';
-    markStep(1);
-    setTimeout(() => { closeCSVModal(); loadProducts(); }, 1800);
+    bar.style.background = errs ? 'var(--amber)' : 'var(--green)'
+    label.textContent = '✓ Done — ' + done + ' products imported' + (errs ? ', ' + errs + ' failed' : '')
+    toast('Imported ' + done + ' products!', done ? 'success' : 'error')
+    document.getElementById('stat-products').textContent = done
+    document.getElementById('prod-badge').textContent    = done + ' products'
+    markStep(1)
+    setTimeout(() => { closeCSVModal(); loadProducts() }, 1800)
   } else {
-    label.textContent = 'Processing categories…';
-    bar.style.width   = '50%';
+    label.textContent = 'Processing categories…'; bar.style.width = '50%'
     try {
       const text = _csvRows.filter(r => r.name)
-        .map(r => `Category: ${r.name}${r.description ? '\nDescription: ' + r.description : ''}${r.slug ? '\nSlug: ' + r.slug : ''}`)
-        .join('\n\n');
-      await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', title: 'Product Categories', content: text }) });
-      done = _csvRows.filter(r => r.name).length;
-      bar.style.width = '100%'; bar.style.background = 'var(--green)';
-      label.textContent = `✓ ${done} categories saved as knowledge source`;
-      toast(`${done} categories added to knowledge base!`, 'success');
-      document.getElementById('stat-categories').textContent = done;
-      markStep(2);
-      setTimeout(() => { closeCSVModal(); loadSources(); }, 1800);
+        .map(r => 'Category: ' + r.name + (r.description ? '\nDescription: ' + r.description : '') + (r.slug ? '\nSlug: ' + r.slug : ''))
+        .join('\n\n')
+      await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', title: 'Product Categories', content: text }) })
+      done = _csvRows.filter(r => r.name).length
+      bar.style.width = '100%'; bar.style.background = 'var(--green)'
+      label.textContent = '✓ ' + done + ' categories saved as knowledge source'
+      toast(done + ' categories added to knowledge base!', 'success')
+      document.getElementById('stat-categories').textContent = done
+      markStep(2)
+      setTimeout(() => { closeCSVModal(); loadSources() }, 1800)
     } catch(e) {
-      bar.style.background = 'var(--red)';
-      label.textContent = 'Import failed: ' + e.message;
-      toast(e.message, 'error');
+      bar.style.background = 'var(--red)'; label.textContent = 'Import failed: ' + e.message
+      toast(e.message, 'error')
     }
   }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  PAYMENT
-// ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
+   PAYMENT SETTINGS
+══════════════════════════════════════════════════════════════════ */
 async function loadPaymentSettings() {
   try {
-    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings`);
-    document.getElementById('rz-key-id').value   = d.razorpay_key_id || '';
-    document.getElementById('rz-currency').value = d.currency || 'INR';
-    document.getElementById('rz-hint').textContent = d.has_secret ? '🔒 Secret key is stored (encrypted)' : '';
+    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings`)
+    document.getElementById('rz-key-id').value   = d.razorpay_key_id || ''
+    document.getElementById('rz-currency').value = d.currency || 'INR'
+    document.getElementById('rz-hint').textContent = d.has_secret ? '🔒 Secret key is stored (encrypted)' : ''
   } catch(e) {}
 }
-
 async function savePayment() {
   try {
     await apiFetch(`/agents/${AGENT_ID}/payment-settings`, { method: 'PUT', body: JSON.stringify({
@@ -1117,72 +1056,87 @@ async function savePayment() {
       razorpay_key_secret: document.getElementById('rz-key-secret').value.trim(),
       currency:            document.getElementById('rz-currency').value,
       enabled:             true
-    })});
-    document.getElementById('rz-key-secret').value = '';
-    document.getElementById('rz-hint').textContent = '🔒 Secret key stored (encrypted)';
-    toast('Payment settings saved!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
+    })})
+    document.getElementById('rz-key-secret').value = ''
+    document.getElementById('rz-hint').textContent = '🔒 Secret key stored (encrypted)'
+    toast('Payment settings saved!', 'success')
+  } catch(e) { toast(e.message, 'error') }
 }
-
 async function verifyPayment() {
   try {
-    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings/verify`, { method: 'POST' });
-    toast(d.message || 'Keys verified ✓', 'success');
-  } catch(e) { toast('Verification failed: ' + e.message, 'error'); }
+    const d = await apiFetch(`/agents/${AGENT_ID}/payment-settings/verify`, { method: 'POST' })
+    toast(d.message || 'Keys verified ✓', 'success')
+  } catch(e) { toast('Verification failed: ' + e.message, 'error') }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  PRODUCTS CRUD
-// ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
+   PRODUCTS CRUD
+   editProduct uses _productsMap[id] — no JSON serialised into onclick
+══════════════════════════════════════════════════════════════════ */
 async function loadProducts() {
   try {
-    const prods = await apiFetch(`/agents/${AGENT_ID}/products`);
-    document.getElementById('stat-products').textContent = prods.length;
-    document.getElementById('prod-badge').textContent    = prods.length + ' products';
-    const cur  = document.getElementById('rz-currency')?.value === 'USD' ? '$' : '₹';
-    const list = document.getElementById('products-list');
-    if (!prods.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px;">No products yet. Add one manually or import a CSV.</div>'; return; }
+    const prods = await apiFetch(`/agents/${AGENT_ID}/products`)
+    // Rebuild lookup map
+    _productsMap = {}
+    prods.forEach(p => { _productsMap[p._id] = p })
+
+    document.getElementById('stat-products').textContent = prods.length
+    document.getElementById('prod-badge').textContent    = prods.length + ' products'
+    const cur  = document.getElementById('rz-currency')?.value === 'USD' ? '$' : '₹'
+    const list = document.getElementById('products-list')
+    if (!prods.length) {
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">No products yet. Add one manually or import a CSV.</div>'
+      return
+    }
     list.innerHTML = prods.map(p => `
       <div class="product-item">
-        <div class="product-thumb">${p.image_url ? `<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent='📦'">` : '📦'}</div>
+        <div class="product-thumb">${p.image_url ? `<img src="${escAttr(p.image_url)}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='📦'">` : '📦'}</div>
         <div class="product-info">
           <div class="product-name">${esc(p.name)}</div>
-          <div class="product-cat">${esc(p.category || 'No category')}${p.sku ? ' · ' + p.sku : ''}</div>
+          <div class="product-cat">${esc(p.category || 'No category')}${p.sku ? ' · ' + esc(p.sku) : ''}</div>
         </div>
         <div class="product-price">${cur}${p.price}</div>
-        <div style="display:flex;gap:2px;">
-          <button class="btn-icon" onclick='editProduct(${JSON.stringify(p)})'>✏️</button>
-          <button class="btn-icon" onclick="delProduct('${p._id}')">🗑️</button>
+        <div style="display:flex;gap:2px">
+          <button class="btn-icon" data-edit-id="${escAttr(p._id)}" title="Edit">✏️</button>
+          <button class="btn-icon" data-del-id="${escAttr(p._id)}" title="Delete">🗑️</button>
         </div>
-      </div>`).join('');
-  } catch(e) { toast(e.message, 'error'); }
+      </div>`).join('')
+
+    // Attach handlers via addEventListener — safe, no JSON-in-onclick
+    list.querySelectorAll('[data-edit-id]').forEach(btn => {
+      btn.addEventListener('click', () => editProduct(_productsMap[btn.dataset.editId]))
+    })
+    list.querySelectorAll('[data-del-id]').forEach(btn => {
+      btn.addEventListener('click', () => delProduct(btn.dataset.delId))
+    })
+  } catch(e) { toast(e.message, 'error') }
 }
 
 function openProductModal() {
-  document.getElementById('pm-id').value = '';
-  ['pm-name','pm-price','pm-category','pm-desc','pm-image','pm-sku','pm-stock'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('pm-title').textContent = 'Add Product';
-  document.getElementById('product-modal').classList.add('open');
+  document.getElementById('pm-id').value = ''
+  ;['pm-name','pm-price','pm-category','pm-desc','pm-image','pm-sku','pm-stock'].forEach(id => document.getElementById(id).value = '')
+  document.getElementById('pm-title').textContent = 'Add Product'
+  document.getElementById('product-modal').classList.add('open')
 }
 function editProduct(p) {
-  document.getElementById('pm-id').value      = p._id;
-  document.getElementById('pm-name').value    = p.name || '';
-  document.getElementById('pm-price').value   = p.price || '';
-  document.getElementById('pm-category').value = p.category || '';
-  document.getElementById('pm-desc').value    = p.description || '';
-  document.getElementById('pm-image').value   = p.image_url || '';
-  document.getElementById('pm-sku').value     = p.sku || '';
-  document.getElementById('pm-stock').value   = p.stock_qty != null ? p.stock_qty : '';
-  document.getElementById('pm-title').textContent = 'Edit Product';
-  document.getElementById('product-modal').classList.add('open');
+  if (!p) return
+  document.getElementById('pm-id').value       = p._id
+  document.getElementById('pm-name').value     = p.name || ''
+  document.getElementById('pm-price').value    = p.price || ''
+  document.getElementById('pm-category').value = p.category || ''
+  document.getElementById('pm-desc').value     = p.description || ''
+  document.getElementById('pm-image').value    = p.image_url || ''
+  document.getElementById('pm-sku').value      = p.sku || ''
+  document.getElementById('pm-stock').value    = p.stock_qty != null ? p.stock_qty : ''
+  document.getElementById('pm-title').textContent = 'Edit Product'
+  document.getElementById('product-modal').classList.add('open')
 }
-function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); }
-
+function closeProductModal() { document.getElementById('product-modal').classList.remove('open') }
 async function saveProduct() {
-  const id    = document.getElementById('pm-id').value;
-  const name  = document.getElementById('pm-name').value.trim();
-  const price = document.getElementById('pm-price').value;
-  if (!name || !price) return toast('Name & price required', 'warning');
+  const id    = document.getElementById('pm-id').value
+  const name  = document.getElementById('pm-name').value.trim()
+  const price = document.getElementById('pm-price').value
+  if (!name || !price) return toast('Name & price required', 'warning')
   const body = {
     name, price: parseFloat(price),
     category:    document.getElementById('pm-category').value,
@@ -1190,125 +1144,228 @@ async function saveProduct() {
     image_url:   document.getElementById('pm-image').value,
     sku:         document.getElementById('pm-sku').value,
     stock_qty:   document.getElementById('pm-stock').value ? parseInt(document.getElementById('pm-stock').value) : null
-  };
+  }
   try {
-    if (id) await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'PUT', body: JSON.stringify(body) });
-    else     await apiFetch(`/agents/${AGENT_ID}/products`,       { method: 'POST', body: JSON.stringify(body) });
-    closeProductModal(); loadProducts(); toast('Product saved!', 'success');
-  } catch(e) { toast(e.message, 'error'); }
+    if (id) await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'PUT',  body: JSON.stringify(body) })
+    else     await apiFetch(`/agents/${AGENT_ID}/products`,       { method: 'POST', body: JSON.stringify(body) })
+    closeProductModal(); loadProducts(); toast('Product saved!', 'success')
+  } catch(e) { toast(e.message, 'error') }
 }
-
 async function delProduct(id) {
-  if (!confirm('Delete this product?')) return;
-  try { await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'DELETE' }); loadProducts(); toast('Deleted', 'success'); }
-  catch(e) { toast(e.message, 'error'); }
+  const ok = await confirmModal({ title: 'Delete product?', message: 'This product will be permanently removed.', confirmText: 'Delete', danger: true })
+  if (!ok) return
+  try { await apiFetch(`/agents/${AGENT_ID}/products/${id}`, { method: 'DELETE' }); loadProducts(); toast('Deleted', 'success') }
+  catch(e) { toast(e.message, 'error') }
 }
 
-// ══════════════════════════════════════════════════════════════════
-//  PUBLISH
-// ══════════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
+   PUBLISH
+══════════════════════════════════════════════════════════════════ */
 async function publishAgent() {
-  const btn = document.getElementById('publish-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spin-anim">⟳</span> Publishing...';
+  const btn = document.getElementById('publish-btn')
+  btn.disabled = true; btn.innerHTML = '<span class="spin-anim">⟳</span> Publishing...'
   try {
-    await apiFetch(`/agents/${AGENT_ID}/publish`, { method: 'POST' });
-    const [updatedAgent, sources, products] = await Promise.all([
+    await apiFetch(`/agents/${AGENT_ID}/publish`, { method: 'POST' })
+    const [updatedAgent, sources] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
-      apiFetch(`/agents/${AGENT_ID}/products`)
-    ]);
-    agent = updatedAgent;
-    agent.sources_count  = sources.length;
-    agent.products_count = products.length;
-    agent.published = true;
-    updatePublishUI(agent);
-    document.getElementById('pub-badge').className = 'status-badge badge-live';
-    document.getElementById('pub-badge').innerHTML = '● Live';
-    document.getElementById('preview-btn').style.display = 'flex';
-    markStep(3);
-    toast('Agent published! 🎉', 'success');
-  } catch(e) { toast(e.message, 'error'); }
-  finally { btn.disabled = false; btn.innerHTML = 'Publish Agent'; }
+    ])
+    agent = updatedAgent; agent.sources_count = sources.length; agent.published = true
+    updatePublishUI(agent)
+    document.getElementById('pub-badge').className = 'status-badge badge-live'
+    document.getElementById('pub-badge').innerHTML = '● Live'
+    document.getElementById('preview-btn').style.display = 'flex'
+    markStep(3)
+    toast('Agent published! 🎉', 'success')
+  } catch(e) { toast(e.message, 'error') }
+  finally { btn.disabled = false; btn.innerHTML = 'Publish Agent' }
 }
 
 function updatePublishUI(a) {
-  if (!a?.published) return;
-  const card = document.getElementById('publish-links-card');
-  if (card) card.style.display = 'block';
-  const subURL = a.subdomain_url || '#';
-  const fbURL  = a.published_url || '#';
-  setLink('sub-url', subURL, subURL);
-  setLink('sub-url-open', subURL);
-  setLink('pub-url', fbURL, fbURL);
-  const embed = document.getElementById('embed-box');
-  if (embed) embed.textContent = `<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`;
-  const sideCard = document.getElementById('agent-url-side-card');
-  const sideUrl  = document.getElementById('side-agent-url');
-  const sideOpen = document.getElementById('side-agent-open');
-  if (sideCard) sideCard.style.display = 'block';
-  if (sideUrl)  { sideUrl.href = subURL; sideUrl.textContent = subURL; }
-  if (sideOpen) sideOpen.href = subURL;
+  if (!a?.published) return
+  const card = document.getElementById('publish-links-card')
+  if (card) card.style.display = 'block'
+  const subURL = a.subdomain_url || '#'
+  const fbURL  = a.published_url || '#'
+  setLink('sub-url', subURL, subURL)
+  setLink('sub-url-open', subURL)
+  setLink('pub-url', fbURL, fbURL)
+  const embed = document.getElementById('embed-box')
+  if (embed) embed.textContent = `<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`
+  const sideCard = document.getElementById('agent-url-side-card')
+  const sideUrl  = document.getElementById('side-agent-url')
+  const sideOpen = document.getElementById('side-agent-open')
+  if (sideCard) sideCard.style.display = 'block'
+  if (sideUrl)  { sideUrl.href = subURL; sideUrl.textContent = subURL }
+  if (sideOpen) sideOpen.href = subURL
   if (a.slug) {
-    const sub = subURL.replace('https://', '').replace(/\/$/, '');
-    document.getElementById('page-agent-slug').textContent = `/${a.slug}  ·  ${sub}`;
+    const sub = subURL.replace('https://', '').replace(/\/$/, '')
+    document.getElementById('page-agent-slug').textContent = '/' + a.slug + '  ·  ' + sub
   }
 }
 
 function setLink(id, href, text) {
-  const el = document.getElementById(id); if (!el) return;
-  el.href = href || '#';
-  if (text !== undefined) el.textContent = text;
-  else if (!el.textContent.trim() || el.textContent === '—') el.textContent = href || '—';
+  const el = document.getElementById(id); if (!el) return
+  el.href = href || '#'
+  if (text !== undefined) el.textContent = text
+  else if (!el.textContent.trim() || el.textContent === '—') el.textContent = href || '—'
 }
 
 async function connectDomain() {
-  const domain = document.getElementById('domain-inp').value.trim();
-  if (!domain) return toast('Enter a domain first', 'warning');
+  const domain = document.getElementById('domain-inp').value.trim()
+  if (!domain) return toast('Enter a domain first', 'warning')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/custom-domain`, { method: 'POST', body: JSON.stringify({ domain }) });
-    toast('Domain connected! DNS may take up to 24h to propagate.', 'success');
-    const wrap = document.getElementById('domain-status-wrap');
-    wrap.style.display = 'block';
-    wrap.innerHTML = `<div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green);">✓ ${domain} connected — waiting for DNS propagation</div>`;
-  } catch(e) { toast(e.message, 'error'); }
+    await apiFetch(`/agents/${AGENT_ID}/custom-domain`, { method: 'POST', body: JSON.stringify({ domain }) })
+    toast('Domain connected! DNS may take up to 24h to propagate.', 'success')
+    const wrap = document.getElementById('domain-status-wrap')
+    wrap.style.display = 'block'
+    wrap.innerHTML = `<div style="background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--green)">✓ ${esc(domain)} connected — waiting for DNS propagation</div>`
+  } catch(e) { toast(e.message, 'error') }
 }
 
 async function clearConvs() {
-  const ok = await confirmModal({ title: 'Clear all conversations?', message: 'This will permanently delete all conversations for this agent.', confirmText: 'Clear All', danger: true });
-  if (!ok) return;
-  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`, { method: 'POST' }); toast('Conversations cleared', 'success'); }
-  catch(e) { toast(e.message, 'error'); }
+  const ok = await confirmModal({ title: 'Clear all conversations?', message: 'This will permanently delete all conversations for this agent.', confirmText: 'Clear All', danger: true })
+  if (!ok) return
+  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`, { method: 'POST' }); toast('Conversations cleared', 'success'); loadConvSessions() }
+  catch(e) { toast(e.message, 'error') }
 }
 
 async function deleteAgent() {
-  const ok = await confirmModal({ title: 'Delete agent permanently?', message: 'All sources, products, and conversations will be lost forever.', confirmText: 'Delete Agent', danger: true });
-  if (!ok) return;
+  const ok = await confirmModal({ title: 'Delete agent permanently?', message: 'All sources, products, and conversations will be lost forever.', confirmText: 'Delete Agent', danger: true })
+  if (!ok) return
   try {
-    await apiFetch(`/agents/${AGENT_ID}`, { method: 'DELETE' });
-    toast('Agent deleted', 'success');
-    setTimeout(() => location.href = 'agents.html', 1200);
-  } catch(e) { toast(e.message, 'error'); }
+    await apiFetch(`/agents/${AGENT_ID}`, { method: 'DELETE' })
+    toast('Agent deleted', 'success')
+    setTimeout(() => location.href = 'agents.html', 1200)
+  } catch(e) { toast(e.message, 'error') }
 }
 
 function previewAgent() {
-  const url = agent?.subdomain_url || agent?.published_url;
-  if (url && url !== '#') window.open(url, '_blank');
-  else toast('Publish the agent first', 'warning');
+  const url = agent?.subdomain_url || agent?.published_url
+  if (url && url !== '#') window.open(url, '_blank')
+  else toast('Publish the agent first', 'warning')
 }
 
-// Close modals on backdrop click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-});
+/* ══════════════════════════════════════════════════════════════════
+   CONVERSATIONS TAB
+   Uses _convSessionsMap to avoid JSON.stringify in onclick.
+   Panel toggling uses CSS classes not style.display to avoid
+   the display:none / flex conflict that broke scroll.
+══════════════════════════════════════════════════════════════════ */
+function convSessionKey(s) {
+  return String(s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || ''))))
+}
 
-// ══════════════════════════════════════════════════════════════════
-//  BOOT
-// ══════════════════════════════════════════════════════════════════
-(async () => {
-  const nav = await renderNav('agents');
-  if (!nav) return;
-  await loadAgent();
-})();
+async function loadConvSessions() {
+  const list = document.getElementById('conv-session-list')
+  list.innerHTML = '<div style="padding:14px;display:flex;flex-direction:column;gap:7px">'
+    + '<div class="skel" style="height:50px;border-radius:8px"></div>'
+    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.7"></div>'
+    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.45"></div>'
+    + '</div>'
+  try {
+    const d = await apiFetch(`/agents/${AGENT_ID}/conversations`)
+    _allConvSessions = d.sessions || []
+    _convSessionsMap = {}
+    _allConvSessions.forEach(s => { _convSessionsMap[convSessionKey(s)] = s })
+    document.getElementById('conv-sess-count').textContent = _allConvSessions.length
+    const sub = document.getElementById('convs-sub-tab')
+    if (sub) sub.textContent = _allConvSessions.length + ' sessions'
+    renderConvSessions(_allConvSessions)
+  } catch(e) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--red);font-size:13px">Failed to load: ' + esc(e.message) + '</div>'
+  }
+}
+
+function renderConvSessions(sessions) {
+  const list = document.getElementById('conv-session-list')
+  if (!sessions.length) {
+    list.innerHTML = '<div style="padding:36px 20px;text-align:center">'
+      + '<div style="font-size:28px;opacity:.3;margin-bottom:10px">💬</div>'
+      + '<div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>'
+      + '<div style="font-size:12px;color:var(--text-3)">Sessions appear once users chat with your agent.</div>'
+      + '</div>'
+    return
+  }
+  list.innerHTML = sessions.map(s => {
+    const key     = convSessionKey(s)
+    const active  = key === _activeConvKey ? ' csi-active' : ''
+    const msgs    = s.message_count || 1
+    return '<div class="session-item' + active + '" id="csi_' + safeId(key) + '" data-conv-key="' + escAttr(key) + '">'
+      + '<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">' + esc(s.first_question || '(No message)') + '</div>'
+      + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)">'
+      + '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tokens</span>'
+      + '<span>' + timeAgo(s.last_active) + '</span>'
+      + '</div></div>'
+  }).join('')
+  list.querySelectorAll('[data-conv-key]').forEach(el => {
+    el.addEventListener('click', () => openConvSession(el.dataset.convKey))
+  })
+}
+
+function filterConvSessions() {
+  const q = document.getElementById('conv-search').value.toLowerCase()
+  renderConvSessions(_allConvSessions.filter(s =>
+    (s.first_question || '').toLowerCase().includes(q) || (s.visitor_ip || '').includes(q)
+  ))
+}
+
+async function openConvSession(key) {
+  const meta = _convSessionsMap[key]; if (!meta) return
+  _activeConvKey = key
+
+  document.querySelectorAll('#conv-session-list .session-item').forEach(el => el.classList.remove('csi-active'))
+  document.getElementById('csi_' + safeId(key))?.classList.add('csi-active')
+
+  // Show thread panel via CSS class — avoids display:none/flex conflict
+  document.getElementById('conv-empty').classList.add('hidden')
+  document.getElementById('conv-thread').classList.add('visible')
+
+  document.getElementById('conv-msg-title').textContent = (meta.first_question || 'Session').slice(0, 70)
+  const mc = meta.message_count || 1
+  document.getElementById('conv-msg-meta').textContent =
+    mc + ' message' + (mc !== 1 ? 's' : '') + ' · ' + timeAgo(meta.started_at) + (meta.visitor_ip ? ' · ' + meta.visitor_ip : '')
+
+  const msgs = document.getElementById('conv-msgs')
+  msgs.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px">'
+    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:50%"></div>'
+    + '<div class="skel" style="height:72px;border-radius:10px;width:68%"></div>'
+    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:42%"></div>'
+    + '</div>'
+  try {
+    const d    = await apiFetch(`/agents/${AGENT_ID}/conversations/${encodeURIComponent(key)}`)
+    const list = d.messages || []
+    if (!list.length) { msgs.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-3)">No messages in this session.</div>'; return }
+    msgs.innerHTML = list.map(m => `
+      <div>
+        <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:78%;margin-left:auto;word-break:break-word">${esc(m.question)}</div>
+        <div style="background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;margin-top:6px">${m.answer || ''}</div>
+        <div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:3px">🪙 ${fmtTokens(m.tokens_used || 0)} tokens · ${timeAgo(m.created_at)}</div>
+      </div>`).join('')
+    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight })
+  } catch(e) {
+    msgs.innerHTML = '<div style="padding:24px;color:var(--red)">Failed to load: ' + esc(e.message) + '</div>'
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ESCAPE HELPERS
+══════════════════════════════════════════════════════════════════ */
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+}
+function escAttr(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
+
+/* ── Modal backdrop close ───────────────────────────────────────── */
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open') })
+})
 </script>
 </body>
 </html>
