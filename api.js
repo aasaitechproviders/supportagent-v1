@@ -16,11 +16,9 @@ function applyTheme(t) {
   _theme.cur = t
   document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : '')
   localStorage.setItem('sg_theme', t)
+  // Update emoji in all theme-toggle buttons
   document.querySelectorAll('.theme-toggle').forEach(b => {
-    const moon = b.querySelector('.icon-moon')
-    const sun  = b.querySelector('.icon-sun')
-    if (moon) moon.style.display = t === 'dark' ? 'none' : 'block'
-    if (sun)  sun.style.display  = t === 'dark' ? 'block' : 'none'
+    b.textContent = t === 'dark' ? '☀️' : '🌙'
   })
 }
 function toggleTheme() { applyTheme(_theme.cur === 'dark' ? 'light' : 'dark') }
@@ -91,13 +89,11 @@ function toast(msg, type = 'success', duration = 3200) {
   const icons = { success:'✓', error:'✕', info:'ℹ', warning:'⚠' }
   const el = document.createElement('div')
   el.className = 'toast ' + type
-  el.innerHTML = `<div class="toast-icon">${icons[type] || 'ℹ'}</div><span style="flex:1">${msg}</span>`
+  el.innerHTML = `<span style="flex-shrink:0;font-size:12px;opacity:.7">${icons[type] || 'ℹ'}</span><span style="flex:1">${msg}</span>`
   c.appendChild(el)
   setTimeout(() => {
-    el.style.opacity = '0'
-    el.style.transform = 'translateY(6px)'
-    el.style.transition = 'opacity .3s, transform .3s'
-    setTimeout(() => el.remove(), 320)
+    el.classList.add('fade-out')
+    el.addEventListener('animationend', () => el.remove(), { once: true })
   }, duration)
 }
 
