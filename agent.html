@@ -129,6 +129,10 @@
   .spin-anim{display:inline-block;animation:spin .6s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
+  /* FIX F1: Text source input layout — clear separation of content and title */
+  .src-field-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+  .src-add-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+
   /* Skeleton override */
   #page-skeleton{padding:24px 24px 24px 312px}
   .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px}
@@ -282,8 +286,9 @@
             </div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
               <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px">📦</span></div>
+              <!-- FIX F3: categories counter now tracked separately -->
               <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px">🏷️</span></div>
-              <div class="kb-stat"><div><div class="kb-stat-label">Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px">📄</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">KB Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px">📄</span></div>
             </div>
             <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px">
               <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -350,21 +355,35 @@
                   <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 URL</button>
                   <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
                 </div>
+
+                <!-- FIX F1: Redesigned text source panel — title first, then content, then button on its own row -->
                 <div id="src-text" class="src-panel active">
-                  <div class="field-hint" style="margin-bottom:10px">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
-                  <textarea class="ta" id="src-text-inp" rows="4" placeholder="Q: What is your return policy?&#10;A: We offer 30-day hassle-free returns on all products..."></textarea>
-                  <div style="display:flex;gap:8px;margin-top:8px">
-                    <input class="inp" type="text" id="src-text-title" placeholder="Title (e.g. Return Policy)" style="flex:1"/>
-                    <button class="btn btn-primary btn-sm" onclick="addTextSrc()">Add Source</button>
+                  <div class="field-hint" style="margin-bottom:12px">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
+                  <div class="src-add-row">
+                    <div>
+                      <div class="src-field-label">Title (optional)</div>
+                      <input class="inp" type="text" id="src-text-title" placeholder="e.g. Return Policy, About Us, FAQ"/>
+                    </div>
+                    <div>
+                      <div class="src-field-label">Content *</div>
+                      <textarea class="ta" id="src-text-inp" rows="5"
+                        placeholder="Q: What is your return policy?&#10;A: We offer 30-day hassle-free returns on all products...&#10;&#10;Paste any text, FAQs, or information here."></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addTextSrc()">➕ Add Source</button>
                   </div>
                 </div>
+
+                <!-- FIX F2: URL input with auto-title -->
                 <div id="src-url" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:10px">Enter a public webpage URL — its content will be fetched and indexed.</div>
-                  <div style="display:flex;gap:8px">
-                    <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1"/>
-                    <button class="btn btn-primary" onclick="addUrlSrc()">Fetch &amp; Add</button>
+                  <div class="field-hint" style="margin-bottom:12px">Enter a public webpage URL — its content will be fetched and indexed.</div>
+                  <div class="src-add-row">
+                    <div style="display:flex;gap:8px">
+                      <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1"/>
+                      <button class="btn btn-primary" onclick="addUrlSrc()">Fetch &amp; Add</button>
+                    </div>
                   </div>
                 </div>
+
                 <div id="src-file" class="src-panel">
                   <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
                   <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
@@ -665,6 +684,9 @@ let _productsMap = {}
 // Conversation sessions map — avoids JSON.stringify in onclick
 let _allConvSessions = [], _convSessionsMap = {}, _activeConvKey = null
 
+// FIX F3: Track categories count separately (persisted across tab switches)
+let _categoriesCount = 0
+
 /* ══════════════════════════════════════════════════════════════════
    BOOT
 ══════════════════════════════════════════════════════════════════ */
@@ -676,18 +698,20 @@ let _allConvSessions = [], _convSessionsMap = {}, _activeConvKey = null
 
 /* ══════════════════════════════════════════════════════════════════
    LOAD AGENT
-   Products are NOT fetched here — lazy-loaded when Shopping tab opens.
-   This eliminates the CORS preflight error that appeared on every page load.
+   FIX F8: Fetch products count separately so stats are accurate.
 ══════════════════════════════════════════════════════════════════ */
 async function loadAgent() {
   if (!AGENT_ID) { toast('No agent ID in URL', 'error'); dismissSkeleton(); return }
   try {
-    const [agentData, sources] = await Promise.all([
+    // FIX F8: Fetch agent (which now includes live counts from backend), sources, and products in parallel
+    const [agentData, sources, products] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
+      apiFetch(`/agents/${AGENT_ID}/products`).catch(() => []),
     ])
     agent = agentData
-    agent.sources_count = sources.length
+    agent.sources_count  = sources.length
+    agent.products_count = products.length
     fillForm(agent)
     livePreview()
     updateStats(agent)
@@ -728,6 +752,7 @@ function fillForm(a) {
   }
 }
 
+/* FIX F3 & F8: updateStats now correctly maps each counter */
 function updateStats(a) {
   document.getElementById('st-convs').textContent = a.query_count    || '—'
   document.getElementById('st-srcs').textContent  = a.sources_count  || 0
@@ -735,13 +760,16 @@ function updateStats(a) {
   document.getElementById('st-status').innerHTML  = a.published
     ? '<span style="color:var(--green);font-weight:700">● Live</span>'
     : '<span style="color:var(--text-3)">Draft</span>'
+
+  // KB stats panel — products and sources mapped correctly
   document.getElementById('stat-products').textContent   = a.products_count || 0
-  document.getElementById('stat-categories').textContent = a.sources_count  || 0
+  // FIX F3: categories use dedicated _categoriesCount, not sources_count
+  document.getElementById('stat-categories').textContent = _categoriesCount || 0
   document.getElementById('stat-sources').textContent    = a.sources_count  || 0
   document.getElementById('prod-badge').textContent      = (a.products_count || 0) + ' products'
-  document.getElementById('cat-badge').textContent       = '(imported as sources)'
+  // cat-badge uses separate counter; we don't overwrite it with sources_count
   if ((a.products_count || 0) > 0) markStep(1)
-  if ((a.sources_count  || 0) > 0) markStep(2)
+  if (_categoriesCount > 0) markStep(2)
   if (a.published) markStep(3)
 }
 
@@ -847,6 +875,17 @@ async function loadSources() {
     document.getElementById('kb-text').textContent       = '~' + total.toLocaleString() + ' / 18,000 tokens used'
     document.getElementById('src-count-badge').textContent = sources.length + ' sources'
     document.getElementById('stat-sources').textContent  = sources.length
+    document.getElementById('st-srcs').textContent       = sources.length
+
+    // FIX F7: Also refresh products count when loading sources
+    try {
+      const prods = await apiFetch(`/agents/${AGENT_ID}/products`)
+      document.getElementById('stat-products').textContent = prods.length
+      document.getElementById('prod-badge').textContent    = prods.length + ' products'
+      document.getElementById('st-prods').textContent      = prods.length
+      if (prods.length > 0) markStep(1)
+    } catch(_) {}
+
     const list = document.getElementById('sources-list')
     if (!sources.length) {
       list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px">No extra sources yet. Add text, URLs, or files above.</div>'
@@ -867,27 +906,42 @@ async function loadSources() {
   } catch(e) { toast(e.message, 'error') }
 }
 
+/* FIX F1: addTextSrc now reads src-text-inp correctly and shows clear error */
 async function addTextSrc() {
   const content = document.getElementById('src-text-inp').value.trim()
-  if (!content) return toast('Enter some text first', 'warning')
+  const title   = document.getElementById('src-text-title').value.trim()
+  if (!content) {
+    toast('Please enter some content in the Content field above', 'warning')
+    document.getElementById('src-text-inp').focus()
+    return
+  }
+  if (content.length < 10) {
+    toast('Content is too short — please add more detail', 'warning')
+    return
+  }
   try {
     await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({
-      type: 'text', content, title: document.getElementById('src-text-title').value
+      type: 'text', content, title: title || ''
     })})
     document.getElementById('src-text-inp').value   = ''
     document.getElementById('src-text-title').value = ''
-    toast('Source added!', 'success'); loadSources()
+    toast('Source added!', 'success')
+    loadSources()
   } catch(e) { toast(e.message, 'error') }
 }
 
+/* FIX F2: addUrlSrc uses URL as title automatically */
 async function addUrlSrc() {
   const url = document.getElementById('src-url-inp').value.trim()
   if (!url) return toast('Enter a URL', 'warning')
-  toast('Fetching URL...', 'info')
+  const loadingToast = toast('Fetching URL...', 'info')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'url', content: url }) })
+    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({
+      type: 'url', content: url, title: url  // FIX F2: use URL as title
+    })})
     document.getElementById('src-url-inp').value = ''
-    toast('URL added!', 'success'); loadSources()
+    toast('URL added!', 'success')
+    loadSources()
   } catch(e) { toast(e.message, 'error') }
 }
 
@@ -899,8 +953,11 @@ async function handleKBFiles(files) {
   for (const file of files) {
     const fd = new FormData(); fd.append('file', file)
     toast(`Uploading ${file.name}...`, 'info')
-    try { await apiFetch(`/agents/${AGENT_ID}/sources/file`, { method: 'POST', body: fd }); toast(file.name + ' added!', 'success'); loadSources() }
-    catch(e) { toast(e.message, 'error') }
+    try {
+      await apiFetch(`/agents/${AGENT_ID}/sources/file`, { method: 'POST', body: fd })
+      toast(file.name + ' added!', 'success')
+      loadSources()
+    } catch(e) { toast(e.message, 'error') }
   }
 }
 
@@ -957,6 +1014,7 @@ function handleProdCSVFile(file) {
   const r = new FileReader()
   r.onload = e => {
     const { header, rows } = parseCSV(e.target.result)
+    if (!rows.length) return toast('CSV has no data rows', 'error')
     _csvMode = 'products'; _csvHeader = header; _csvRows = rows
     openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
   }
@@ -968,6 +1026,7 @@ function handleCatCSVFile(file) {
   const r = new FileReader()
   r.onload = e => {
     const { header, rows } = parseCSV(e.target.result)
+    if (!rows.length) return toast('CSV has no data rows', 'error')
     _csvMode = 'categories'; _csvHeader = header; _csvRows = rows
     openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
   }
@@ -986,6 +1045,7 @@ function openCSVModal(title, sub, header, preview) {
   document.getElementById('csv-modal').classList.add('open')
 }
 function closeCSVModal() { document.getElementById('csv-modal').classList.remove('open'); _csvMode = null; _csvRows = [] }
+
 async function executeImport() {
   if (!_csvRows.length) return
   document.getElementById('csv-do-import').style.display    = 'none'
@@ -996,8 +1056,33 @@ async function executeImport() {
   prog.classList.add('show')
   const isProds = _csvMode === 'products', total = _csvRows.length
   let done = 0, errs = 0
+
   if (isProds) {
-    for (const row of _csvRows) {
+    // FIX F6: Check for plan gate error on first row before bulk import
+    const firstRow = _csvRows[0]
+    let planBlocked = false
+    try {
+      await apiFetch(`/agents/${AGENT_ID}/products`, { method: 'POST', body: JSON.stringify({
+        name: firstRow.name, price: parseFloat(firstRow.price) || 0,
+        category: firstRow.category || 'General', description: firstRow.description || '',
+        sku: firstRow.sku || '', stock_qty: firstRow.stock_qty ? parseInt(firstRow.stock_qty) : null,
+        image_url: firstRow.image_url || ''
+      })})
+      done = 1
+    } catch(e) {
+      if (e.message?.includes('plan') || e.message?.includes('upgrade') || e.message?.includes('403')) {
+        planBlocked = true
+        bar.style.background = 'var(--red)'; bar.style.width = '100%'
+        label.textContent = '❌ Plan upgrade required to add products.'
+        toast('Upgrade your plan to import products', 'error')
+        return
+      }
+      errs = 1
+    }
+
+    // Import remaining rows
+    for (let i = 1; i < _csvRows.length; i++) {
+      const row = _csvRows[i]
       try {
         await apiFetch(`/agents/${AGENT_ID}/products`, { method: 'POST', body: JSON.stringify({
           name: row.name, price: parseFloat(row.price) || 0,
@@ -1010,30 +1095,60 @@ async function executeImport() {
       bar.style.width   = Math.round((done + errs) / total * 100) + '%'
       label.textContent = 'Importing ' + (done + errs) + ' of ' + total + '...'
     }
-    bar.style.background = errs ? 'var(--amber)' : 'var(--green)'
-    label.textContent = '✓ Done — ' + done + ' products imported' + (errs ? ', ' + errs + ' failed' : '')
-    toast('Imported ' + done + ' products!', done ? 'success' : 'error')
+
+    bar.style.background = errs && !done ? 'var(--red)' : errs ? 'var(--amber)' : 'var(--green)'
+    label.textContent = done > 0
+      ? '✓ Done — ' + done + ' products imported' + (errs ? ', ' + errs + ' failed' : '')
+      : '❌ Import failed — ' + errs + ' errors'
+    toast(done ? 'Imported ' + done + ' products!' : 'Import failed', done ? 'success' : 'error')
+
+    // FIX F4 & F7: Update all product counters after import
     document.getElementById('stat-products').textContent = done
     document.getElementById('prod-badge').textContent    = done + ' products'
-    markStep(1)
-    setTimeout(() => { closeCSVModal(); loadProducts() }, 1800)
+    document.getElementById('st-prods').textContent      = done
+    if (agent) agent.products_count = done
+    if (done > 0) markStep(1)
+
+    // FIX F5: Only auto-close on success, keep modal open on failure
+    if (done > 0) {
+      setTimeout(() => {
+        closeCSVModal()
+        // FIX F4: Refresh shopping tab products list if it's visible
+        if (document.getElementById('tab-shopping').classList.contains('active')) {
+          loadProducts()
+        }
+      }, 1800)
+    }
   } else {
+    // Categories import
     label.textContent = 'Processing categories…'; bar.style.width = '50%'
     try {
-      const text = _csvRows.filter(r => r.name)
+      const validRows = _csvRows.filter(r => r.name)
+      if (!validRows.length) throw new Error('No valid category rows found')
+      const text = validRows
         .map(r => 'Category: ' + r.name + (r.description ? '\nDescription: ' + r.description : '') + (r.slug ? '\nSlug: ' + r.slug : ''))
         .join('\n\n')
-      await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({ type: 'text', title: 'Product Categories', content: text }) })
-      done = _csvRows.filter(r => r.name).length
+      await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({
+        type: 'text', title: 'Product Categories', content: text
+      })})
+      done = validRows.length
       bar.style.width = '100%'; bar.style.background = 'var(--green)'
       label.textContent = '✓ ' + done + ' categories saved as knowledge source'
       toast(done + ' categories added to knowledge base!', 'success')
+
+      // FIX F3: Update the dedicated categories counter
+      _categoriesCount = done
       document.getElementById('stat-categories').textContent = done
+      document.getElementById('cat-badge').textContent       = done + ' categories'
       markStep(2)
+
+      // FIX F5: Only auto-close on success
       setTimeout(() => { closeCSVModal(); loadSources() }, 1800)
     } catch(e) {
-      bar.style.background = 'var(--red)'; label.textContent = 'Import failed: ' + e.message
+      bar.style.background = 'var(--red)'; bar.style.width = '100%'
+      label.textContent = 'Import failed: ' + e.message
       toast(e.message, 'error')
+      // Don't auto-close on failure
     }
   }
 }
@@ -1047,7 +1162,9 @@ async function loadPaymentSettings() {
     document.getElementById('rz-key-id').value   = d.razorpay_key_id || ''
     document.getElementById('rz-currency').value = d.currency || 'INR'
     document.getElementById('rz-hint').textContent = d.has_secret ? '🔒 Secret key is stored (encrypted)' : ''
-  } catch(e) {}
+  } catch(e) {
+    // Silently fail if user doesn't have grower plan — payment section shows upgrade badge
+  }
 }
 async function savePayment() {
   try {
@@ -1080,8 +1197,13 @@ async function loadProducts() {
     _productsMap = {}
     prods.forEach(p => { _productsMap[p._id] = p })
 
+    // FIX F4: Update ALL product counters (both tabs)
     document.getElementById('stat-products').textContent = prods.length
     document.getElementById('prod-badge').textContent    = prods.length + ' products'
+    document.getElementById('st-prods').textContent      = prods.length
+    if (agent) agent.products_count = prods.length
+    if (prods.length > 0) markStep(1)
+
     const cur  = document.getElementById('rz-currency')?.value === 'USD' ? '$' : '₹'
     const list = document.getElementById('products-list')
     if (!prods.length) {
@@ -1102,7 +1224,6 @@ async function loadProducts() {
         </div>
       </div>`).join('')
 
-    // Attach handlers via addEventListener — safe, no JSON-in-onclick
     list.querySelectorAll('[data-edit-id]').forEach(btn => {
       btn.addEventListener('click', () => editProduct(_productsMap[btn.dataset.editId]))
     })
@@ -1136,7 +1257,7 @@ async function saveProduct() {
   const id    = document.getElementById('pm-id').value
   const name  = document.getElementById('pm-name').value.trim()
   const price = document.getElementById('pm-price').value
-  if (!name || !price) return toast('Name & price required', 'warning')
+  if (!name || price === '') return toast('Name & price required', 'warning')
   const body = {
     name, price: parseFloat(price),
     category:    document.getElementById('pm-category').value,
@@ -1249,9 +1370,6 @@ function previewAgent() {
 
 /* ══════════════════════════════════════════════════════════════════
    CONVERSATIONS TAB
-   Uses _convSessionsMap to avoid JSON.stringify in onclick.
-   Panel toggling uses CSS classes not style.display to avoid
-   the display:none / flex conflict that broke scroll.
 ══════════════════════════════════════════════════════════════════ */
 function convSessionKey(s) {
   return String(s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || ''))))
@@ -1318,7 +1436,6 @@ async function openConvSession(key) {
   document.querySelectorAll('#conv-session-list .session-item').forEach(el => el.classList.remove('csi-active'))
   document.getElementById('csi_' + safeId(key))?.classList.add('csi-active')
 
-  // Show thread panel via CSS class — avoids display:none/flex conflict
   document.getElementById('conv-empty').classList.add('hidden')
   document.getElementById('conv-thread').classList.add('visible')
 
@@ -1362,6 +1479,18 @@ function escAttr(s) {
     .replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
+
+// Helpers expected by conversations tab (may be in shared utils — add fallbacks)
+function fmtTokens(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n) }
+function timeAgo(d) {
+  if (!d) return ''
+  const diff = Date.now() - new Date(d).getTime()
+  const m = Math.floor(diff / 60000), h = Math.floor(m / 60), days = Math.floor(h / 24)
+  if (days > 0) return days + 'd ago'
+  if (h > 0)    return h + 'h ago'
+  if (m > 0)    return m + 'm ago'
+  return 'just now'
+}
 
 /* ── Modal backdrop close ───────────────────────────────────────── */
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
