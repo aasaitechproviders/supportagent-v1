@@ -279,7 +279,7 @@
           </div>
           <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?t('labelLive'):t('labelDraft')}</span>
           ${agentUrl
-            ? `<button class="agent-share-btn" title="Copy agent URL" onclick="event.stopPropagation();navigator.clipboard.writeText('${agentUrl}').then(()=>toast('Link copied!','success'))">📋 Share</button>`
+            ? `<button class="agent-share-btn" title="Share agent link" onclick="event.stopPropagation();shareUrl('${agentUrl}','${(a.name||'').replace(/'/g,"\\'")}')">🔗 Share</button>`
             : ''
           }
           <svg width="12" height="12" fill="none" stroke="var(--text-3)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -292,5 +292,13 @@
   document.getElementById('btn-new-agent').textContent=t('navNewAgent')
   dismissSkeleton()
 })()
+
+function shareUrl(url, name) {
+  if (navigator.share) {
+    navigator.share({ title: name + ' — AI Agent', url: url }).catch(() => {})
+  } else {
+    navigator.clipboard.writeText(url).then(() => toast('Link copied!', 'success'))
+  }
+}
 </script>
 </body></html>
