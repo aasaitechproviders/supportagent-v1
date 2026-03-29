@@ -250,6 +250,13 @@ async function loadAgents(user) {
   }
 }
 
+const TYPE_META = {
+  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
+  support: { label: '🎧 Support', cls: 'badge-blue'   },
+  faq:     { label: '❓ FAQ',     cls: 'badge-gray'   },
+  general: { label: '🤖 General', cls: 'badge-gray'   },
+}
+
 function buildAgentCard(a, i, limit) {
   const card = document.createElement('div')
   card.className = 'agent-card'
@@ -285,12 +292,23 @@ function buildAgentCard(a, i, limit) {
   name.className = 'ac-name'
   name.textContent = a.name   // textContent — XSS safe
 
-  const slug = document.createElement('div')
+  // Agent type badge
+  const agentType = a.agent_type || a.type || 'general'
+  const typeMeta  = TYPE_META[agentType] || { label: agentType, cls: 'badge-gray' }
+  const typeRow   = document.createElement('div')
+  typeRow.style.cssText = 'display:flex;align-items:center;gap:5px;margin-top:3px'
+  const typeBadge = document.createElement('span')
+  typeBadge.className   = 'badge ' + typeMeta.cls
+  typeBadge.textContent = typeMeta.label
+  typeBadge.style.cssText = 'font-size:9.5px;padding:1px 7px'
+  const slug = document.createElement('span')
   slug.className = 'ac-slug'
-  slug.textContent = '/' + (a.slug || '—')
+  slug.textContent = a.slug ? '/' + a.slug : ''
+  typeRow.appendChild(typeBadge)
+  typeRow.appendChild(slug)
 
   info.appendChild(name)
-  info.appendChild(slug)
+  info.appendChild(typeRow)
 
   const badge = document.createElement('span')
   badge.className = 'badge ' + (a.published ? 'badge-green' : 'badge-gray')
