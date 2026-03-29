@@ -7,6 +7,24 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
+<style>
+.account-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+.account-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:68px}
+.profile-hero{display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:18px;flex-wrap:wrap}
+/* Tablet */
+@media(max-width:1024px) and (min-width:649px){
+  .account-layout{grid-template-columns:1fr}
+  .account-side{position:static;flex-direction:row;flex-wrap:wrap}
+  .account-side > *{flex:1;min-width:220px}
+}
+/* Mobile */
+@media(max-width:648px){
+  .account-layout{grid-template-columns:1fr;gap:14px}
+  .account-side{position:static;gap:12px}
+  .profile-hero{gap:12px;padding:14px}
+  .profile-hero > div:last-child label{width:100%;justify-content:center}
+}
+</style>
 <link rel="stylesheet" href="shared.css">
 <script>
 ;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
@@ -24,7 +42,7 @@
 
 <div id="page-skeleton">
   <div class="skel-topbar"><div class="skel" style="height:13px;width:100px;border-radius:4px"></div><div class="skel" style="height:34px;width:120px;border-radius:var(--r-sm)"></div></div>
-  <div class="skel-body" style="display:grid;grid-template-columns:1fr 280px;gap:20px">
+  <div class="skel-body account-layout">
     <div style="display:flex;flex-direction:column;gap:14px"><div class="skel" style="height:260px;border-radius:var(--r-lg)"></div><div class="skel" style="height:100px;border-radius:var(--r-lg)"></div><div class="skel" style="height:90px;border-radius:var(--r-lg)"></div></div>
     <div class="skel" style="height:280px;border-radius:var(--r-lg)"></div>
   </div>
@@ -38,14 +56,14 @@
     </div>
   </div>
   <div class="content" id="page-content" style="display:none">
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+    <div class="account-layout">
       <div style="display:flex;flex-direction:column;gap:16px">
         <!-- Profile card -->
         <div class="card">
           <div class="card-header"><div class="card-title"><span class="card-icon">👤</span data-i18n="profile">Profile</div></div>
           <div class="card-body">
             <!-- Avatar -->
-            <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:18px">
+            <div class="profile-hero">
               <div id="profile-avatar" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-3));display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;box-shadow:0 4px 16px var(--accent-glow)"></div>
               <div>
                 <label style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:var(--accent);color:#fff;border-radius:var(--r-sm);font-size:12.5px;font-weight:600;cursor:pointer">
@@ -93,7 +111,7 @@
         </div>
       </div>
       <!-- Side -->
-      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
+      <div class="account-side">
         <div class="card">
           <div class="card-header"><div class="card-title"><span class="card-icon">💳</span data-i18n="planSummary">Plan Summary</div></div>
           <div class="card-body">
