@@ -30,6 +30,7 @@
   document.documentElement.style.background=d?'#07080D':'#F2F3F9';
 })();
 </script>
+<script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
 </head>
@@ -79,7 +80,7 @@
     </div>
     <div class="topbar-right">
       <button class="theme-toggle" style="font-size:15px;"></button>
-      <a href="agents.html?create=1" class="btn btn-primary">+ New Agent</a>
+      <a href="agents.html?create=1" class="btn btn-primary" id="btn-new-agent">+ New Agent</a>
     </div>
   </div>
 
@@ -89,19 +90,19 @@
     <div class="quickstart-banner" id="quickstart-banner" style="display:none">
       <div class="qsb-icon">🚀</div>
       <div style="flex:1">
-        <div style="font-size:15px;font-weight:800;margin-bottom:3px">Welcome to SupportGent!</div>
-        <div style="font-size:13px;color:var(--text-2);margin-bottom:11px">Create your first AI agent in 3 steps: upload knowledge, configure, publish.</div>
-        <a href="agents.html?create=1" class="btn btn-primary btn-sm">Create Your First Agent →</a>
+        <div style="font-size:15px;font-weight:800;margin-bottom:3px" data-i18n="welcomeTitle">Welcome to SupportGent!</div>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:11px" data-i18n="welcomeDesc">Create your first AI agent in 3 steps: upload knowledge, configure, publish.</div>
+        <a href="agents.html?create=1" class="btn btn-primary btn-sm" data-i18n="createFirstAgentBtn">Create Your First Agent →</a>
       </div>
       <button onclick="this.closest('.quickstart-banner').style.display='none'" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:18px;padding:4px;flex-shrink:0">✕</button>
     </div>
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon-wrap">🤖</div><div class="stat-info"><div class="stat-label">Total Agents</div><div class="stat-value loading" id="s-agents">—</div></div></div>
-      <div class="stat-card"><div class="stat-icon-wrap">💬</div><div class="stat-info"><div class="stat-label">Conversations</div><div class="stat-value loading" id="s-queries">—</div></div></div>
-      <div class="stat-card"><div class="stat-icon-wrap">🪙</div><div class="stat-info"><div class="stat-label">Tokens Used</div><div class="stat-value loading" id="s-tokens">—</div></div></div>
-      <div class="stat-card"><div class="stat-icon-wrap">📅</div><div class="stat-info"><div class="stat-label">Today</div><div class="stat-value loading" id="s-today">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap">🤖</div><div class="stat-info"><div class="stat-label" data-i18n="totalAgents">Total Agents</div><div class="stat-value loading" id="s-agents">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap">💬</div><div class="stat-info"><div class="stat-label" data-i18n="conversations">Conversations</div><div class="stat-value loading" id="s-queries">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap">🪙</div><div class="stat-info"><div class="stat-label" data-i18n="tokensUsed">Tokens Used</div><div class="stat-value loading" id="s-tokens">—</div></div></div>
+      <div class="stat-card"><div class="stat-icon-wrap">📅</div><div class="stat-info"><div class="stat-label" data-i18n="today">Today</div><div class="stat-value loading" id="s-today">—</div></div></div>
     </div>
 
     <div class="dash-grid">
@@ -109,7 +110,7 @@
         <!-- Chart -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon">📈</span>Conversations (last 14 days)</div>
+            <div class="card-title"><span class="card-icon">📈</span><span data-i18n="chartTitle">Conversations (last 14 days)</span></div>
             <span class="badge badge-accent" id="chart-total">0 total</span>
           </div>
           <div style="padding:20px"><div class="chart-wrap"><canvas id="daily-chart"></canvas></div></div>
@@ -117,8 +118,8 @@
         <!-- Recent agents -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon">🤖</span>Your Agents</div>
-            <a href="agents.html" class="btn-ghost">View all →</a>
+            <div class="card-title"><span class="card-icon">🤖</span><span data-i18n="yourAgents">Your Agents</span></div>
+            <a href="agents.html" class="btn-ghost" data-i18n="viewAll">View all →</a>
           </div>
           <div id="recent-agents-wrap">
             <div style="padding:16px;display:flex;flex-direction:column;gap:8px">
@@ -133,13 +134,13 @@
         <!-- Token usage -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span class="card-icon">🪙</span>Token Usage</div>
-            <a href="payments.html" class="btn-ghost">Top up →</a>
+            <div class="card-title"><span class="card-icon">🪙</span><span data-i18n="tokenUsage">Token Usage</span></div>
+            <a href="payments.html" class="btn-ghost" data-i18n="topUp">Top up →</a>
           </div>
           <div class="card-body">
             <div style="text-align:center;margin-bottom:14px">
               <div style="font-size:26px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em" id="tu-used">—</div>
-              <div style="font-size:12px;color:var(--text-3)">of <span id="tu-cap">—</span> tokens this month</div>
+              <div style="font-size:12px;color:var(--text-3)"><span data-i18n="ofTokens">of</span> <span id="tu-cap">—</span> <span data-i18n="tokensThisMonth">tokens this month</span></div>
             </div>
             <div class="progress-bar" style="height:7px;margin-bottom:7px"><div class="progress-fill" id="tu-bar" style="width:0%"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:14px">
@@ -147,17 +148,17 @@
             </div>
             <div class="info-row"><span class="info-row-label">Plan</span><span class="info-row-val" id="tu-plan">—</span></div>
             <div class="info-row"><span class="info-row-label">Topup Balance</span><span class="info-row-val" id="tu-topup">—</span></div>
-            <a href="payments.html" class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:14px">Manage Billing</a>
+            <a href="payments.html" class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:14px" data-i18n="manageBilling">Manage Billing</a>
           </div>
         </div>
         <!-- Quick links -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">⚡</span>Quick Links</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">⚡</span><span data-i18n="quickLinks">Quick Links</span></div></div>
           <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">
-            <a href="agents.html"       class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>🤖</span>My Agents</a>
-            <a href="conversations.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>💬</span>Conversations</a>
+            <a href="agents.html"       class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>🤖</span><span data-i18n="navMyAgents">My Agents</span></a>
+            <a href="conversations.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>💬</span><span data-i18n="navConversations">Conversations</span></a>
             <a href="payments.html"     class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>⚡</span>Billing & Plans</a>
-            <a href="account.html"      class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>👤</span>Account Settings</a>
+            <a href="account.html"      class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:8px"><span>👤</span><span data-i18n="accountSettings">Account Settings</span></a>
           </div>
         </div>
       </div>
@@ -171,7 +172,7 @@
   if(!nav)return
   const{user}=nav
   const hr=new Date().getHours()
-  const greet=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening'
+  const greet=hr<12?t('goodMorning'):hr<17?t('goodAfternoon'):t('goodEvening')
   document.getElementById('greeting').textContent=greet+', '+(user.name?.split(' ')[0]||'there')+' 👋'
   try{
     const d=await apiFetch('/dashboard')
@@ -184,11 +185,11 @@
     document.getElementById('tu-used').textContent=fmtTokens(t.monthly_used||0)
     document.getElementById('tu-cap').textContent=fmtTokens(t.monthly_cap||0)
     document.getElementById('tu-topup').textContent=fmtTokens(t.topup_balance||0)
-    document.getElementById('tu-plan').textContent=({starter:'Starter',grower:'Grower',enterprise:'Enterprise'}[t.plan]||t.plan||'—')
+    document.getElementById('tu-plan').textContent=({starter:t('planStarter'),grower:t('planGrower'),enterprise:t('planEnterprise')}[t.plan]||t.plan||'—')
     const pct=t.monthly_cap?Math.min(100,Math.round(t.monthly_used/t.monthly_cap*100)):0
     const bar=document.getElementById('tu-bar')
     bar.style.width=pct+'%';bar.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
-    document.getElementById('tu-pct').textContent=pct+'% used'
+    document.getElementById('tu-pct').textContent=pct+'% '+t('navUsed')
     document.getElementById('tu-reset').textContent=t.cap_reset_at?'Resets '+fmtDate(t.cap_reset_at):''
     if(!d.agents_count)document.getElementById('quickstart-banner').style.display='flex'
     // Chart
@@ -201,12 +202,12 @@
     new Chart(document.getElementById('daily-chart').getContext('2d'),{
       type:'bar',
       data:{labels,datasets:[{data:values,backgroundColor:'rgba(124,111,255,.2)',borderColor:'rgba(124,111,255,.7)',borderWidth:1.5,borderRadius:5,hoverBackgroundColor:'rgba(124,111,255,.35)'}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:isDark?'#0C0E16':'#fff',titleColor:isDark?'#878BAA':'#5A5E78',bodyColor:isDark?'#ECEDF4':'#0F1117',borderColor:isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)',borderWidth:1,padding:10,callbacks:{title:i=>i[0].label,body:i=>i[0].raw+' conversations'}}},scales:{x:{grid:{display:false},ticks:{color:isDark?'#474B65':'#9EA3BB',font:{size:10,family:'Plus Jakarta Sans'}}},y:{grid:{color:isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)'},ticks:{color:isDark?'#474B65':'#9EA3BB',font:{size:10,family:'Plus Jakarta Sans'},precision:0},beginAtZero:true}}}
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:isDark?'#0C0E16':'#fff',titleColor:isDark?'#878BAA':'#5A5E78',bodyColor:isDark?'#ECEDF4':'#0F1117',borderColor:isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)',borderWidth:1,padding:10,callbacks:{title:i=>i[0].label,body:i=>i[0].raw+' '+t('conversations')}}},scales:{x:{grid:{display:false},ticks:{color:isDark?'#474B65':'#9EA3BB',font:{size:10,family:'Plus Jakarta Sans'}}},y:{grid:{color:isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)'},ticks:{color:isDark?'#474B65':'#9EA3BB',font:{size:10,family:'Plus Jakarta Sans'},precision:0},beginAtZero:true}}}
     })
     // Recent agents
     const wrap=document.getElementById('recent-agents-wrap')
     if(!d.recent_agents?.length){
-      wrap.innerHTML='<div class="empty-state" style="padding:36px 20px"><div class="empty-icon">🤖</div><div class="empty-title">No agents yet</div><div class="empty-desc">Create your first AI agent to get started.</div><a href="agents.html?create=1" class="btn btn-primary">Create Agent →</a></div>'
+      wrap.innerHTML='<div class="empty-state" style="padding:36px 20px"><div class="empty-icon">🤖</div><div class="empty-title">'+t('noAgentsYet')+'</div><div class="empty-desc">'+t('createFirstAgent')+'</div><a href="agents.html?create=1" class="btn btn-primary">'+t('createAgent')+'</a></div>'
     }else{
       wrap.innerHTML=d.recent_agents.map(a=>`
         <div class="agent-row" onclick="location.href='agent.html?id=${a._id}'">
@@ -215,12 +216,14 @@
             <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.name}</div>
             <div style="font-size:11px;color:var(--text-3)">${fmtNum(a.query_count||0)} chats · ${fmtNum(a.sources_count||0)} sources</div>
           </div>
-          <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?'● Live':'Draft'}</span>
+          <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?t('labelLive'):t('labelDraft')}</span>
           <svg width="12" height="12" fill="none" stroke="var(--text-3)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
         </div>`).join('')
     }
   }catch(e){toast(e.message,'error')}
   document.getElementById('page-content').style.display='block'
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n))
+  document.getElementById('btn-new-agent').textContent=t('navNewAgent')
   dismissSkeleton()
 })()
 </script>
