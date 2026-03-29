@@ -21,6 +21,10 @@
   box-shadow: var(--sh-sm);
   overflow: hidden;
 }
+@media (max-width: 648px) {
+  /* On mobile topbar is gone; account for mobile topbar (56px) + content padding */
+  .convs-wrap { height: auto; min-height: 0; }
+}
 
 /* ── Left panel ──────────────────────────────────────────────────── */
 .cv-left {
@@ -405,16 +409,60 @@
 .thread-loading { display: flex; flex-direction: column; gap: 12px; }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
+
+/* Tablet: 649–860px — stack the two panels */
 @media (max-width: 860px) {
-  .convs-wrap { grid-template-columns: 1fr; height: auto; }
-  .cv-left  { height: 300px; }
-  .cv-right { height: calc(100vh - 420px); min-height: 260px; }
+  .convs-wrap {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+  .cv-left  {
+    height: 280px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .cv-right {
+    height: calc(100vh - 400px);
+    min-height: 300px;
+  }
 }
+
+/* Mobile: ≤ 648px */
 @media (max-width: 648px) {
+  /* Panel heights tighter on phone */
+  .cv-left  { height: 240px; }
+  .cv-right { height: calc(100vh - 380px); min-height: 280px; }
+
+  /* Topbar: agent dropdown full-width on mobile (topbar hidden anyway) */
+  .agent-sel { min-width: 0; width: 100%; font-size: 12px; }
+
+  /* Wrap area */
   .convs-wrap { border-radius: var(--r); }
-  .cv-msgs    { padding: 12px 12px; }
-  .products-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-  .chat-msg { max-width: 92%; }
+
+  /* Messages */
+  .cv-msgs    { padding: 10px; gap: 8px; }
+  .chat-msg   { max-width: 93%; }
+  .chat-bubble { font-size: 13px; padding: 9px 12px; }
+
+  /* Thread header tighter */
+  .cv-thread-hdr { padding: 9px 12px; }
+  .cv-thread-hdr-title { font-size: 12.5px; }
+  .cv-thread-hdr-meta  { font-size: 10px; }
+
+  /* Products grid smaller cards on phone */
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 6px;
+  }
+
+  /* Session items slightly larger tap target */
+  .session-item { padding: 11px 13px; }
+  .sess-preview { font-size: 12.5px; }
+
+  /* Pill tabs in thread header */
+  .cv-thread-tabs { overflow-x: auto; scrollbar-width: none; }
+  .cv-thread-tabs::-webkit-scrollbar { display: none; }
 }
 </style>
 <script>
@@ -453,7 +501,7 @@
     <div class="skel" style="height:32px;width:160px;border-radius:var(--r-sm)"></div>
   </div>
   <div class="skel-body">
-    <div class="skel" style="height:calc(100vh - 109px);border-radius:var(--r-lg)"></div>
+    <div class="skel" style="height:min(600px, calc(100vh - 109px));border-radius:var(--r-lg)"></div>
   </div>
 </div>
 
