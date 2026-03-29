@@ -100,30 +100,7 @@
   .color-swatch{width:32px;height:32px;border-radius:12px;cursor:pointer;transition:.1s;border:2px solid transparent}
   .color-swatch.active{border-color:#fff;box-shadow:0 0 0 1px var(--accent);transform:scale(1.05)}
 
-  /* Conversations tab */
-  .convs-tab-inner{
-    display:grid;grid-template-columns:280px 1fr;
-    border:1px solid var(--border);border-radius:var(--r-lg);
-    overflow:hidden;background:var(--surface);
-    height:calc(100vh - 260px);min-height:420px;
-  }
-  .conv-left-col{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
-  .conv-left-hdr{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2);flex-shrink:0}
-  .conv-session-list{flex:1;overflow-y:auto;min-height:0;scrollbar-width:thin}
-  .conv-right-col{display:flex;flex-direction:column;background:var(--bg);min-height:0;overflow:hidden}
-
-  /* Session item */
-  .session-item{padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;border-left:3px solid transparent;user-select:none}
-  .session-item:hover{background:var(--surface-2)}
-  .session-item.csi-active{background:var(--accent-dim);border-left-color:var(--accent)}
-
-  /* Conv right panels */
-  .conv-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-3)}
-  .conv-empty.hidden{display:none}
-  .conv-thread{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
-  .conv-thread.visible{display:flex}
-  .conv-thread-hdr{padding:11px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
-  .conv-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:0;scrollbar-width:thin}
+  /* Conversations tab removed — conversations are in the global Conversations page */
 
   /* Spin */
   .spin-anim{display:inline-block;animation:spin .6s linear infinite}
@@ -133,15 +110,13 @@
   .src-field-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
   .src-add-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 
-  /* Skeleton override */
-  #page-skeleton{padding:24px 24px 24px 312px}
+  /* Skeleton override — shared.css already positions it via left:var(--sidebar-w),
+     so we only need normal content padding here */
   .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px}
   .skel-body{max-width:1360px}
 
   @media(max-width:900px){
-    #page-skeleton{padding:16px}
     .editor-layout{grid-template-columns:1fr}
-    .convs-tab-inner{grid-template-columns:1fr;height:auto}
   }
 </style>
 <script>
@@ -156,6 +131,7 @@
 <script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
+<script src="onboarding.js"></script>
 </head>
 <body>
 
@@ -220,7 +196,6 @@
             <button class="tab-btn"         onclick="switchTab('knowledge',this)" data-i18n-tab="tabKnowledge">📚 Knowledge</button>
             <button class="tab-btn"         onclick="switchTab('shopping',this)" data-i18n-tab="tabShopping">🛒 Shopping</button>
             <button class="tab-btn"         onclick="switchTab('publish',this)" data-i18n-tab="tabPublish">🚀 Publish</button>
-            <button class="tab-btn"         onclick="switchTab('conversations',this)" data-i18n-tab="tabConversations">💬 Conversations</button>
           </div>
 
           <!-- ══ GENERAL TAB ═══════════════════════════════════════════ -->
@@ -548,48 +523,6 @@
             </div>
           </div>
 
-          <!-- ══ CONVERSATIONS TAB ════════════════════════════════════ -->
-          <div id="tab-conversations" class="tab-panel" style="padding:18px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-              <div>
-                <div style="font-size:14px;font-weight:700">Conversation Sessions</div>
-                <div style="font-size:12px;color:var(--text-3);margin-top:2px" id="convs-sub-tab">All sessions for this agent</div>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center">
-                <input type="text" class="inp" id="conv-search" placeholder="Search sessions…"
-                  style="width:180px;height:34px" oninput="filterConvSessions()"/>
-                <button class="btn btn-danger btn-sm" onclick="clearConvs()">🗑 Clear All</button>
-              </div>
-            </div>
-            <div class="convs-tab-inner">
-              <!-- Left: session list -->
-              <div class="conv-left-col">
-                <div class="conv-left-hdr">
-                  <div style="font-size:13px;font-weight:700">Sessions</div>
-                  <span class="badge badge-gray" id="conv-sess-count">0</span>
-                </div>
-                <div class="conv-session-list" id="conv-session-list">
-                  <div style="padding:32px 20px;text-align:center;color:var(--text-3);font-size:13px">Loading…</div>
-                </div>
-              </div>
-              <!-- Right: messages -->
-              <div class="conv-right-col">
-                <div class="conv-empty" id="conv-empty">
-                  <div style="font-size:36px;opacity:.25">💬</div>
-                  <div style="font-size:14px;font-weight:700;color:var(--text-2)">Select a session</div>
-                  <div style="font-size:12px">Click any session on the left to view</div>
-                </div>
-                <div class="conv-thread" id="conv-thread">
-                  <div class="conv-thread-hdr">
-                    <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="conv-msg-title">Session</div>
-                    <div style="font-size:11px;color:var(--text-3);margin-top:2px" id="conv-msg-meta"></div>
-                  </div>
-                  <div class="conv-msgs" id="conv-msgs"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div><!-- /.card -->
       </div><!-- /left column -->
 
@@ -694,9 +627,6 @@ let _csvMode = null, _csvHeader = [], _csvRows = []
 // Products lookup map — avoids JSON.stringify in onclick
 let _productsMap = {}
 
-// Conversation sessions map — avoids JSON.stringify in onclick
-let _allConvSessions = [], _convSessionsMap = {}, _activeConvKey = null
-
 // FIX F3: Track categories count separately (persisted across tab switches)
 let _categoriesCount = 0
 
@@ -708,7 +638,7 @@ let _categoriesCount = 0
   document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n))
   document.querySelectorAll('[data-i18n-tab]').forEach(el => {
     const key = el.dataset.i18nTab
-    const icons = {'tabGeneral':'⚙️ ','tabKnowledge':'📚 ','tabShopping':'🛒 ','tabPublish':'🚀 ','tabConversations':'💬 '}
+    const icons = {'tabGeneral':'⚙️ ','tabKnowledge':'📚 ','tabShopping':'🛒 ','tabPublish':'🚀 '}
     el.textContent = (icons[key]||'') + t(key)
   })
   if (!nav) return
@@ -810,7 +740,6 @@ function switchTab(tab, btn) {
   if (tab === 'knowledge')     loadSources()
   if (tab === 'shopping')      { loadProducts(); loadPaymentSettings() }
   if (tab === 'publish')       updatePublishUI(agent)
-  if (tab === 'conversations') loadConvSessions()
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1370,7 +1299,7 @@ async function connectDomain() {
 async function clearConvs() {
   const ok = await confirmModal({ title: t('confirmClearConvsTitle'), message: t('confirmClearConvsMsg'), confirmText: t('clearAll'), danger: true })
   if (!ok) return
-  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`, { method: 'POST' }); toast(t('toastConvsCleared'), 'success'); loadConvSessions() }
+  try { await apiFetch(`/agents/${AGENT_ID}/clear-conversations`, { method: 'POST' }); toast(t('toastConvsCleared'), 'success') }
   catch(e) { toast(e.message, 'error') }
 }
 
@@ -1391,104 +1320,6 @@ function previewAgent() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   CONVERSATIONS TAB
-══════════════════════════════════════════════════════════════════ */
-function convSessionKey(s) {
-  return String(s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || ''))))
-}
-
-async function loadConvSessions() {
-  const list = document.getElementById('conv-session-list')
-  list.innerHTML = '<div style="padding:14px;display:flex;flex-direction:column;gap:7px">'
-    + '<div class="skel" style="height:50px;border-radius:8px"></div>'
-    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.7"></div>'
-    + '<div class="skel" style="height:50px;border-radius:8px;opacity:.45"></div>'
-    + '</div>'
-  try {
-    const d = await apiFetch(`/agents/${AGENT_ID}/conversations`)
-    _allConvSessions = d.sessions || []
-    _convSessionsMap = {}
-    _allConvSessions.forEach(s => { _convSessionsMap[convSessionKey(s)] = s })
-    document.getElementById('conv-sess-count').textContent = _allConvSessions.length
-    const sub = document.getElementById('convs-sub-tab')
-    if (sub) sub.textContent = _allConvSessions.length + ' ' + t('labelSessions')
-    renderConvSessions(_allConvSessions)
-  } catch(e) {
-    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--red);font-size:13px">Failed to load: ' + esc(e.message) + '</div>'
-  }
-}
-
-function renderConvSessions(sessions) {
-  const list = document.getElementById('conv-session-list')
-  if (!sessions.length) {
-    list.innerHTML = '<div style="padding:36px 20px;text-align:center">'
-      + '<div style="font-size:28px;opacity:.3;margin-bottom:10px">💬</div>'
-      + '<div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>'
-      + '<div style="font-size:12px;color:var(--text-3)">Sessions appear once users chat with your agent.</div>'
-      + '</div>'
-    return
-  }
-  list.innerHTML = sessions.map(s => {
-    const key     = convSessionKey(s)
-    const active  = key === _activeConvKey ? ' csi-active' : ''
-    const msgs    = s.message_count || 1
-    return '<div class="session-item' + active + '" id="csi_' + safeId(key) + '" data-conv-key="' + escAttr(key) + '">'
-      + '<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px">' + esc(s.first_question || '(No message)') + '</div>'
-      + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3)">'
-      + '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tokens</span>'
-      + '<span>' + timeAgo(s.last_active) + '</span>'
-      + '</div></div>'
-  }).join('')
-  list.querySelectorAll('[data-conv-key]').forEach(el => {
-    el.addEventListener('click', () => openConvSession(el.dataset.convKey))
-  })
-}
-
-function filterConvSessions() {
-  const q = document.getElementById('conv-search').value.toLowerCase()
-  renderConvSessions(_allConvSessions.filter(s =>
-    (s.first_question || '').toLowerCase().includes(q) || (s.visitor_ip || '').includes(q)
-  ))
-}
-
-async function openConvSession(key) {
-  const meta = _convSessionsMap[key]; if (!meta) return
-  _activeConvKey = key
-
-  document.querySelectorAll('#conv-session-list .session-item').forEach(el => el.classList.remove('csi-active'))
-  document.getElementById('csi_' + safeId(key))?.classList.add('csi-active')
-
-  document.getElementById('conv-empty').classList.add('hidden')
-  document.getElementById('conv-thread').classList.add('visible')
-
-  document.getElementById('conv-msg-title').textContent = (meta.first_question || 'Session').slice(0, 70)
-  const mc = meta.message_count || 1
-  document.getElementById('conv-msg-meta').textContent =
-    mc + ' message' + (mc !== 1 ? 's' : '') + ' · ' + timeAgo(meta.started_at) + (meta.visitor_ip ? ' · ' + meta.visitor_ip : '')
-
-  const msgs = document.getElementById('conv-msgs')
-  msgs.innerHTML = '<div style="display:flex;flex-direction:column;gap:12px">'
-    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:50%"></div>'
-    + '<div class="skel" style="height:72px;border-radius:10px;width:68%"></div>'
-    + '<div class="skel" style="height:44px;border-radius:10px;align-self:flex-end;width:42%"></div>'
-    + '</div>'
-  try {
-    const d    = await apiFetch(`/agents/${AGENT_ID}/conversations/${encodeURIComponent(key)}`)
-    const list = d.messages || []
-    if (!list.length) { msgs.innerHTML = '<div style="text-align:center;padding:36px;color:var(--text-3)">No messages in this session.</div>'; return }
-    msgs.innerHTML = list.map(m => `
-      <div>
-        <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.15);border-radius:14px 14px 4px 14px;padding:9px 13px;font-size:13px;max-width:78%;margin-left:auto;word-break:break-word">${esc(m.question)}</div>
-        <div style="background:var(--surface);border:1px solid var(--border-md);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:13px;color:var(--text-2);max-width:85%;line-height:1.75;word-break:break-word;margin-top:6px">${m.answer || ''}</div>
-        <div style="font-size:10px;color:var(--text-3);text-align:right;margin-top:3px">🪙 ${fmtTokens(m.tokens_used || 0)} tokens · ${timeAgo(m.created_at)}</div>
-      </div>`).join('')
-    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight })
-  } catch(e) {
-    msgs.innerHTML = '<div style="padding:24px;color:var(--red)">Failed to load: ' + esc(e.message) + '</div>'
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════════
    ESCAPE HELPERS
 ══════════════════════════════════════════════════════════════════ */
 function esc(s) {
@@ -1502,7 +1333,6 @@ function escAttr(s) {
 }
 function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
 
-// Helpers expected by conversations tab (may be in shared utils — add fallbacks)
 function fmtTokens(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n) }
 function timeAgo(d) {
   if (!d) return ''
@@ -1518,6 +1348,171 @@ function timeAgo(d) {
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open') })
 })
+
+/* ══════════════════════════════════════════════════════════════════
+   INLINE ONBOARDING GUIDES
+   Injected after agent loads — contextual, dismissible, per-tab tips
+══════════════════════════════════════════════════════════════════ */
+function initGuides(agentData) {
+  const isDemo = new URLSearchParams(location.search).get('demo') === '1'
+
+  /* ── Demo mode banner (top of page) ─────────────────────────── */
+  if (isDemo) {
+    const topbar = document.querySelector('.topbar')
+    if (topbar) {
+      const demoBar = document.createElement('div')
+      demoBar.className = 'demo-mode-bar'
+      demoBar.style.cssText = 'margin:0 24px 0;'
+      demoBar.innerHTML = `
+        <span style="font-size:20px">🎉</span>
+        <div class="demo-mode-bar-text">
+          <strong>Welcome to your demo store!</strong> — Explore each tab below to see how SupportGent works. Your agent is pre-loaded with products, knowledge, and an AI system prompt. Hit <strong>Publish</strong> to make it live!
+        </div>
+        <button onclick="this.closest('.demo-mode-bar').remove()" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;flex-shrink:0;font-family:inherit">✕</button>
+      `
+      topbar.insertAdjacentElement('afterend', demoBar)
+    }
+    SG_OB.markDone('create_agent')
+  }
+
+  /* ── General tab guide ───────────────────────────────────────── */
+  const generalPanel = document.getElementById('tab-general')
+  if (generalPanel) {
+    const anchor = generalPanel.querySelector('.field')
+    if (anchor) {
+      SG_OB.showInlineTip(
+        anchor,
+        'guide-general',
+        '⚙️',
+        'Personalise your agent',
+        `Give it a <strong>name</strong> your customers will see, write a friendly <strong>welcome message</strong>, and add a <strong>system prompt</strong> to shape its personality — e.g. <em>"You are a helpful support agent for Acme Corp. Be concise and empathetic."</em><br><br>Pick your <strong>brand colour</strong> and upload your <strong>logo</strong> so the chat widget matches your brand perfectly. Hit <strong>Save Changes</strong> when done.`
+      )
+    }
+  }
+
+  /* ── Knowledge tab guide ─────────────────────────────────────── */
+  const knowledgePanel = document.getElementById('tab-knowledge')
+  if (knowledgePanel) {
+    // Insert after the existing info-banner
+    const infoBanner = knowledgePanel.querySelector('.info-banner')
+    const kbStats    = knowledgePanel.querySelector('[style*="grid-template-columns:repeat(3"]')
+    const anchor     = kbStats || infoBanner?.nextElementSibling || knowledgePanel.firstElementChild
+    if (anchor) {
+      SG_OB.showInlineTip(
+        anchor,
+        'guide-knowledge',
+        '📚',
+        'How to feed your AI — step by step',
+        `<strong>Step 1 — Products CSV:</strong> Download the sample CSV, fill it with your products (name, price, category, description, SKU), and upload. The AI learns every product instantly.<br><br>
+         <strong>Step 2 — Categories CSV:</strong> Upload a categories CSV so the AI can group and filter products correctly.<br><br>
+         <strong>Step 3 — Extra sources (optional):</strong> Paste your return policy, FAQs, or any text. Add your website URL to scrape it. Upload PDFs/docs. The more context, the smarter your agent gets.<br><br>
+         💡 <em>Tip: Click "⬇ Download Sample" to get perfectly formatted template CSVs.</em>`,
+        {
+          cta: {
+            label: '⬇ Download Sample Products CSV',
+            onclick: () => {
+              if (typeof downloadSampleProductCSV === 'function') downloadSampleProductCSV()
+            }
+          }
+        }
+      )
+    }
+  }
+
+  /* ── Shopping tab guide ──────────────────────────────────────── */
+  const shoppingPanel = document.getElementById('tab-shopping')
+  if (shoppingPanel) {
+    const infoBannerShopping = shoppingPanel.querySelector('.info-banner')
+    const anchor = infoBannerShopping?.nextElementSibling || shoppingPanel.firstElementChild
+    if (anchor) {
+      SG_OB.showInlineTip(
+        anchor,
+        'guide-shopping',
+        '🛒',
+        'Enable in-chat purchases with Razorpay',
+        `<strong>How it works:</strong> Toggle on "Shopping Mode", enter your Razorpay Key ID and Key Secret, then hit "Save Settings".<br><br>
+         <strong>Getting Razorpay keys:</strong> Log into <code>dashboard.razorpay.com</code> → Settings → API Keys → Generate Key. Use <code>rzp_test_...</code> keys while testing — switch to <code>rzp_live_...</code> when you go live.<br><br>
+         <strong>Products tab below:</strong> Import your products via CSV or add them one by one using "Add Product". Customers can then browse and checkout entirely inside the chat window — no redirect needed.`
+      )
+    }
+  }
+
+  /* ── Publish tab guide ───────────────────────────────────────── */
+  const publishPanel = document.getElementById('tab-publish')
+  if (publishPanel) {
+    const publishHero = publishPanel.querySelector('[style*="accent-dim"]')
+    const anchor = publishHero?.nextElementSibling || publishPanel.firstElementChild
+    if (anchor) {
+      SG_OB.showInlineTip(
+        anchor,
+        'guide-publish',
+        '🚀',
+        'Go live — 3 ways to share your agent',
+        `<strong>1. Subdomain link</strong> — After publishing, you get a permanent URL like <code>your-store.supportagent.aasaitech.in</code>. Share it on WhatsApp, Instagram bio, or Google Business.<br><br>
+         <strong>2. Embed widget</strong> — Copy the one-line embed code and paste it into your website's HTML. A chat bubble appears on every page.<br><br>
+         <strong>3. Custom domain (Grower+)</strong> — Point <code>support.yourbrand.com</code> to your agent by adding a CNAME DNS record. Takes ~10 minutes to propagate.<br><br>
+         💡 <em>Hit "Publish Agent" above to generate your live link right now!</em>`,
+        {
+          cta: {
+            label: '🚀 Publish Now',
+            onclick: () => {
+              if (typeof publishAgent === 'function') publishAgent()
+              SG_OB.markDone('publish')
+            }
+          }
+        }
+      )
+    }
+  }
+
+  /* ── Add pulsing badge to un-visited tabs ───────────────────── */
+  const tabBtns = document.querySelectorAll('.tab-btn')
+  const guideKeys = ['guide-general','guide-knowledge','guide-shopping','guide-publish']
+  tabBtns.forEach((btn, i) => {
+    const key = guideKeys[i]
+    if (key && !SG_OB.isTipDismissed(key)) {
+      const badge = document.createElement('span')
+      badge.className = 'tab-guide-badge'
+      badge.id = 'tab-badge-' + i
+      badge.textContent = '!'
+      btn.appendChild(badge)
+    }
+  })
+
+  /* ── Remove badge when a tab is clicked ────────────────────── */
+  const origSwitch = window.switchTab
+  window.switchTab = function(tab, btn) {
+    origSwitch(tab, btn)
+    const tabOrder = ['general','knowledge','shopping','publish']
+    const idx = tabOrder.indexOf(tab)
+    if (idx !== -1) {
+      const badge = document.getElementById('tab-badge-' + idx)
+      if (badge) badge.remove()
+    }
+  }
+
+  /* ── Update progress on save ─────────────────────────────────── */
+  const origSave = window.saveGeneral
+  if (origSave) {
+    window.saveGeneral = async function() {
+      await origSave()
+      SG_OB.markDone('create_agent')
+    }
+  }
+}
+
+/* ── Hook guides into loadAgent ──────────────────────────────────── */
+// Patch loadAgent to run guides after agent data is loaded
+/* ── Run guides after agent data is loaded ───────────────────────── */
+function _waitForAgentLoad() {
+  const mc = document.getElementById('main-content')
+  if (mc && mc.style.display !== 'none') {
+    initGuides(window.agent || {})
+  } else {
+    setTimeout(_waitForAgentLoad, 120)
+  }
+}
+setTimeout(_waitForAgentLoad, 300)
 </script>
 </body>
 </html>
