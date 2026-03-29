@@ -12,7 +12,7 @@
 /* ── Layout ──────────────────────────────────────────────────────── */
 .convs-wrap {
   display: grid;
-  grid-template-columns: 288px 1fr;
+  grid-template-columns: 300px 1fr;
   height: calc(100vh - 109px);
   min-height: 480px;
   border: 1px solid var(--border);
@@ -47,25 +47,19 @@
 }
 .cv-search-wrap { position: relative; }
 .cv-search-icon {
-  position: absolute;
-  left: 10px; top: 50%;
+  position: absolute; left: 10px; top: 50%;
   transform: translateY(-50%);
-  color: var(--text-3);
-  pointer-events: none;
+  color: var(--text-3); pointer-events: none;
 }
 .cv-search-inp {
-  width: 100%;
-  height: 34px;
+  width: 100%; height: 34px;
   padding: 0 10px 0 32px;
   border-radius: var(--r-sm);
   border: 1px solid var(--border-md);
   background: var(--surface-2);
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 12.5px;
-  outline: none;
-  transition: var(--t);
-  box-sizing: border-box;
+  color: var(--text); font-family: var(--font);
+  font-size: 12.5px; outline: none;
+  transition: var(--t); box-sizing: border-box;
 }
 .cv-search-inp:focus {
   border-color: var(--accent);
@@ -76,9 +70,7 @@
 
 /* Session list */
 .session-list {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+  flex: 1; overflow-y: auto; min-height: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--surface-4) transparent;
 }
@@ -86,177 +78,239 @@
   padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   border-left: 3px solid transparent;
-  cursor: pointer;
-  transition: background .12s;
-  user-select: none;
+  cursor: pointer; transition: background .12s; user-select: none;
 }
 .session-item:last-child { border-bottom: none; }
 .session-item:hover { background: var(--surface-2); }
-.session-item.active {
-  background: var(--accent-dim);
-  border-left-color: var(--accent);
-}
+.session-item.active { background: var(--accent-dim); border-left-color: var(--accent); }
 .session-q {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 12.5px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   margin-bottom: 4px;
 }
 .session-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 10.5px;
-  color: var(--text-3);
+  display: flex; justify-content: space-between;
+  gap: 8px; font-size: 10.5px; color: var(--text-3);
 }
-.session-item.active .session-q  { color: var(--accent); }
+.session-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.session-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 10px; font-weight: 600; letter-spacing: .02em;
+}
+.tag-sales    { background: rgba(16,185,129,.15); color: #10b981; }
+.tag-support  { background: rgba(99,102,241,.15);  color: var(--accent); }
+.tag-faq      { background: rgba(245,158,11,.15);  color: #f59e0b; }
+.tag-general  { background: rgba(100,116,139,.15); color: #64748b; }
+.tag-checkout { background: rgba(16,185,129,.2);   color: #10b981; border: 1px solid rgba(16,185,129,.3); }
+.tag-products { background: rgba(99,102,241,.15);  color: var(--accent); }
+.session-item.active .session-q   { color: var(--accent); }
 .session-item.active .session-meta { color: var(--accent); opacity: .7; }
 
 /* ── Right panel ─────────────────────────────────────────────────── */
 .cv-right {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg);
-  min-height: 0;
-  overflow: hidden;
+  display: flex; flex-direction: column;
+  background: var(--bg); min-height: 0; overflow: hidden;
 }
 
 /* Empty state */
 .cv-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
 }
 .cv-empty.hidden { display: none; }
 .cv-empty-icon  { font-size: 38px; opacity: .22; line-height: 1; }
 .cv-empty-title { font-size: 13.5px; font-weight: 700; color: var(--text-2); }
 .cv-empty-sub   { font-size: 12px; color: var(--text-3); }
 
-/* Message thread */
-.cv-thread {
-  display: none;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
+/* Thread */
+.cv-thread { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .cv-thread.visible { display: flex; }
 
-/* Thread header */
 .cv-thread-hdr {
   padding: 12px 18px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background: var(--surface); flex-shrink: 0;
+  display: flex; align-items: center; gap: 12px;
 }
 .cv-thread-hdr-info { flex: 1; min-width: 0; }
 .cv-thread-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 13px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .cv-thread-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
 /* Scroll area */
 .cv-msgs {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  flex: 1; overflow-y: auto;
+  padding: 20px 20px 24px;
+  display: flex; flex-direction: column; gap: 20px;
   min-height: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--surface-4) transparent;
 }
-.msg-pair { display: flex; flex-direction: column; gap: 6px; }
 
-/* User question bubble */
+/* ── Message pair ────────────────────────────────────────────────── */
+.msg-pair { display: flex; flex-direction: column; gap: 6px; }
+.msg-turn-num {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-3);
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 2px;
+}
+.msg-turn-num::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+
+/* User bubble */
 .msg-q {
-  align-self: flex-end;
-  max-width: 78%;
+  align-self: flex-end; max-width: 78%;
   background: var(--accent-dim);
   border: 1px solid var(--accent-glow);
   border-radius: 14px 14px 4px 14px;
-  padding: 9px 13px;
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.65;
-  word-break: break-word;
+  padding: 10px 14px; font-size: 13.5px;
+  color: var(--text); line-height: 1.65; word-break: break-word;
 }
 
-/* AI answer bubble */
+/* AI bubble */
 .msg-a {
-  max-width: 85%;
+  max-width: 88%;
   background: var(--surface);
   border: 1px solid var(--border-md);
   border-radius: 4px 14px 14px 14px;
-  padding: 12px 14px;
-  font-size: 13px;
-  color: var(--text-2);
-  line-height: 1.75;
-  word-break: break-word;
+  padding: 13px 15px; font-size: 13.5px;
+  color: var(--text-2); line-height: 1.8; word-break: break-word;
 }
-.msg-a p               { margin: 0 0 8px; }
+/* Rich HTML content inside AI bubble */
+.msg-a p               { margin: 0 0 9px; }
 .msg-a p:last-child    { margin-bottom: 0; }
-.msg-a ul, .msg-a ol   { padding-left: 18px; margin: 0 0 8px; }
-.msg-a h3              { font-size: 13px; font-weight: 700; margin: 10px 0 5px; color: var(--text); }
-.msg-a table           { font-size: 12px; border-collapse: collapse; width: 100%; }
-.msg-a td, .msg-a th   { padding: 5px 8px; border: 1px solid var(--border-md); }
+.msg-a ul, .msg-a ol   { padding-left: 18px; margin: 0 0 9px; }
+.msg-a li              { margin-bottom: 4px; }
+.msg-a h1,.msg-a h2,.msg-a h3 { font-size: 13.5px; font-weight: 700; margin: 12px 0 6px; color: var(--text); }
+.msg-a h1:first-child,.msg-a h2:first-child,.msg-a h3:first-child { margin-top: 0; }
+.msg-a table           { font-size: 12.5px; border-collapse: collapse; width: 100%; }
+.msg-a td, .msg-a th   { padding: 6px 10px; border: 1px solid var(--border-md); }
+.msg-a pre             { overflow-x: auto; font-size: 12.5px; }
+.msg-a code            { font-family: var(--mono, monospace); font-size: 12px; }
+.msg-a strong, .msg-a b { color: var(--text); }
+.msg-a a               { color: var(--accent); }
 
-/* Token + time footer */
-.msg-meta {
-  font-size: 10.5px;
-  color: var(--text-3);
-  text-align: right;
-  padding-right: 2px;
+/* Sales plain text bubble */
+.msg-a.msg-sales-plain { font-size: 14px; color: var(--text); line-height: 1.7; }
+
+/* ── Product cards grid ──────────────────────────────────────────── */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px; margin-top: 6px; max-width: 88%;
+}
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--border-md);
+  border-radius: 10px; overflow: hidden;
+  transition: border-color .15s, box-shadow .15s;
+}
+.product-card:hover {
+  border-color: var(--accent-glow);
+  box-shadow: 0 2px 12px var(--accent-dim);
+}
+.product-thumb {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover; display: block;
+  background: var(--surface-2);
+}
+.product-thumb-placeholder {
+  width: 100%; aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; background: var(--surface-2); color: var(--text-3);
+}
+.product-info { padding: 8px 9px; }
+.product-name {
+  font-size: 11.5px; font-weight: 600; color: var(--text);
+  overflow: hidden; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  line-height: 1.4; margin-bottom: 4px;
+}
+.product-price { font-size: 12px; font-weight: 700; color: var(--accent); }
+.product-category { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+
+/* ── Checkout banner ─────────────────────────────────────────────── */
+.checkout-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; margin-top: 6px;
+  background: rgba(16,185,129,.1);
+  border: 1px solid rgba(16,185,129,.3);
+  border-left: 3px solid #10b981;
+  border-radius: 10px; max-width: 88%;
+}
+.checkout-icon { font-size: 18px; flex-shrink: 0; }
+.checkout-body { flex: 1; }
+.checkout-title { font-size: 12.5px; font-weight: 700; color: #10b981; margin-bottom: 2px; }
+.checkout-sub   { font-size: 11.5px; color: var(--text-2); }
+.checkout-products-list {
+  font-size: 11px; color: var(--text-3); margin-top: 4px;
 }
 
-/* Agent dropdown in topbar */
+/* ── Deflect / no-KB bubble ──────────────────────────────────────── */
+.msg-deflect {
+  max-width: 88%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px 14px 14px 14px;
+  padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.msg-deflect-icon { font-size: 18px; flex-shrink: 0; }
+.msg-deflect-text { font-size: 13px; color: var(--text-2); line-height: 1.7; margin: 0; }
+
+/* ── Meta row ────────────────────────────────────────────────────── */
+.msg-meta {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10.5px; color: var(--text-3); padding-left: 2px;
+}
+.msg-meta-chip {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 10px; font-weight: 600;
+  background: var(--surface-2); color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+/* ── Agent type badge in header ──────────────────────────────────── */
+.agent-type-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: .03em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Agent dropdown */
 .agent-sel {
-  height: 34px;
-  padding: 0 10px;
+  height: 34px; padding: 0 10px;
   border-radius: var(--r-sm);
   border: 1px solid var(--border-md);
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 12.5px;
-  outline: none;
-  cursor: pointer;
-  transition: var(--t);
-  min-width: 148px;
+  background: var(--surface-2); color: var(--text);
+  font-family: var(--font); font-size: 12.5px;
+  outline: none; cursor: pointer; transition: var(--t); min-width: 148px;
 }
-.agent-sel:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim);
-}
+.agent-sel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 .agent-sel option { background: var(--surface); color: var(--text); }
+
+/* Thread loading skeletons */
+.thread-loading { display: flex; flex-direction: column; gap: 14px; }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 860px) {
-  .convs-wrap {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
+  .convs-wrap { grid-template-columns: 1fr; height: auto; }
   .cv-left  { height: 300px; }
   .cv-right { height: calc(100vh - 420px); min-height: 260px; }
 }
 @media (max-width: 648px) {
   .convs-wrap { border-radius: var(--r); }
   .cv-msgs    { padding: 12px 14px; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 }
 </style>
 <script>
@@ -276,7 +330,6 @@
 
 <div id="toast-container"></div>
 
-<!-- Mobile topbar -->
 <div class="mobile-topbar">
   <div class="mob-left">
     <button class="hamburger" onclick="openMobileSidebar()">
@@ -284,15 +337,12 @@
     </button>
     <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
   </div>
-  <div class="mob-right">
-    <button class="theme-toggle"></button>
-  </div>
+  <div class="mob-right"><button class="theme-toggle"></button></div>
 </div>
 
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
 <div class="sidebar" id="sidebar"></div>
 
-<!-- Page skeleton -->
 <div id="page-skeleton">
   <div class="skel-topbar">
     <div class="skel" style="height:12px;width:140px;border-radius:4px"></div>
@@ -303,7 +353,6 @@
   </div>
 </div>
 
-<!-- Main -->
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
@@ -314,10 +363,10 @@
     </div>
     <div class="topbar-right">
       <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
-        <option value="" id="sel-agent-opt">— Select agent —</option>
+        <option value="">— Select agent —</option>
       </select>
       <button class="theme-toggle"></button>
-      <button class="btn btn-danger btn-sm" onclick="clearAllModal()" data-i18n="clearAll">Clear All</button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllModal()">Clear All</button>
     </div>
   </div>
 
@@ -327,7 +376,7 @@
       <!-- LEFT -->
       <div class="cv-left">
         <div class="cv-left-hdr">
-          <span class="cv-left-hdr-title" data-i18n="sessions">Sessions</span>
+          <span class="cv-left-hdr-title">Sessions</span>
           <span class="badge badge-gray" id="sess-count">0</span>
         </div>
         <div class="cv-search">
@@ -336,7 +385,6 @@
               stroke-width="2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <!-- FIX Bug 1: removed duplicate id attribute -->
             <input class="cv-search-inp" type="text" id="search-inp"
               placeholder="Search sessions…" oninput="filterSessions()" autocomplete="off">
           </div>
@@ -350,7 +398,6 @@
 
       <!-- RIGHT -->
       <div class="cv-right">
-
         <div class="cv-empty" id="cv-empty">
           <div class="cv-empty-icon">💬</div>
           <div class="cv-empty-title">Select a session</div>
@@ -363,23 +410,20 @@
               <div class="cv-thread-title" id="thread-title"></div>
               <div class="cv-thread-meta" id="thread-meta"></div>
             </div>
+            <div id="thread-badge"></div>
             <button class="btn btn-secondary btn-sm" id="back-btn"
-              style="display:none" onclick="backToList()" data-i18n="back">← Back</button>
+              style="display:none" onclick="backToList()">← Back</button>
           </div>
           <div class="cv-msgs" id="cv-msgs"></div>
         </div>
-
       </div>
+
     </div>
   </div>
 </div>
 
 <script>
-/* ── Utility fallbacks (Bug 2 fix) ─────────────────────────────────
-   fmtTokens and timeAgo must be defined globally (ideally in api.js
-   or shared.js). These fallbacks prevent ReferenceErrors if the
-   shared file hasn't exported them yet.
-─────────────────────────────────────────────────────────────────── */
+/* ── Utility fallbacks ──────────────────────────────────────────── */
 if (typeof fmtTokens === 'undefined') {
   window.fmtTokens = function(n) {
     n = parseInt(n) || 0
@@ -388,7 +432,6 @@ if (typeof fmtTokens === 'undefined') {
     return n.toString()
   }
 }
-
 if (typeof timeAgo === 'undefined') {
   window.timeAgo = function(d) {
     if (!d) return '—'
@@ -404,8 +447,6 @@ if (typeof timeAgo === 'undefined') {
     return new Date(d).toLocaleDateString()
   }
 }
-
-/* Bug 3 fix: confirmModal fallback if not provided by nav.js/shared.js */
 if (typeof confirmModal === 'undefined') {
   window.confirmModal = function(opts) {
     return Promise.resolve(window.confirm(
@@ -413,8 +454,6 @@ if (typeof confirmModal === 'undefined') {
     ))
   }
 }
-
-/* Bug 4 fix: dismissSkeleton fallback if not provided by nav.js */
 if (typeof dismissSkeleton === 'undefined') {
   window.dismissSkeleton = function() {
     var sk = document.getElementById('page-skeleton')
@@ -422,28 +461,22 @@ if (typeof dismissSkeleton === 'undefined') {
   }
 }
 
-/* ── State ─────────────────────────────────────────────────────── */
-var allSessions = []
-var sessionsMap = {}   // key → session meta — never serialised into HTML
-var curAgentId  = ''
-var activeKey   = null
+/* ── State ──────────────────────────────────────────────────────── */
+var allSessions  = []
+var sessionsMap  = {}
+var curAgentId   = ''
+var curAgent     = null   // full agent object (agent_type, shopping_enabled, etc.)
+var productsMap  = {}     // product._id → product object
+var activeKey    = null
 
-/* ── Boot ──────────────────────────────────────────────────────── */
+/* ── Boot ───────────────────────────────────────────────────────── */
 ;(async function () {
   var nav = await renderNav('conversations')
-  document.querySelectorAll('[data-i18n]').forEach(function(el) {
-    el.textContent = (typeof t === 'function') ? t(el.dataset.i18n) : el.textContent
-  })
-  var si = document.getElementById('search-inp')
-  if (si && typeof t === 'function') si.placeholder = t('searchSessions') || 'Search sessions…'
-  var sao = document.getElementById('sel-agent-opt')
-  if (sao && typeof t === 'function') sao.textContent = t('selectAgent') || '— Select agent —'
   if (!nav) return
 
   try {
     var agents = await apiFetch('/agents')
     var sel    = document.getElementById('agent-sel')
-
     if (!agents.length) {
       document.getElementById('convs-sub').textContent = 'No agents yet'
     } else {
@@ -454,7 +487,7 @@ var activeKey   = null
       })
       sel.value  = agents[0]._id
       curAgentId = agents[0]._id
-      await loadSessions()
+      await loadAgentAndSessions()
     }
   } catch (e) {
     toast(e.message, 'error')
@@ -462,19 +495,20 @@ var activeKey   = null
   }
 
   document.getElementById('page-content').style.display = 'block'
-  /* Bug 4 fix: guard call in case nav.js provides it later */
   if (typeof dismissSkeleton === 'function') dismissSkeleton()
 }())
 
-/* ── Agent change ──────────────────────────────────────────────── */
+/* ── Agent change ───────────────────────────────────────────────── */
 function onAgentChange() {
-  activeKey = null
+  activeKey   = null
+  curAgent    = null
+  productsMap = {}
   showEmpty()
-  loadSessions()
+  loadAgentAndSessions()
 }
 
-/* ── Load sessions ─────────────────────────────────────────────── */
-async function loadSessions() {
+/* ── Load agent config + sessions + products ─────────────────────── */
+async function loadAgentAndSessions() {
   curAgentId = document.getElementById('agent-sel').value
   var list   = document.getElementById('session-list')
 
@@ -485,16 +519,33 @@ async function loadSessions() {
     return
   }
 
-  list.innerHTML = [
-    '<div style="padding:12px;display:flex;flex-direction:column;gap:7px">',
-    '  <div class="skel" style="height:50px;border-radius:var(--r-sm)"></div>',
-    '  <div class="skel" style="height:50px;border-radius:var(--r-sm);opacity:.7"></div>',
-    '  <div class="skel" style="height:50px;border-radius:var(--r-sm);opacity:.45"></div>',
-    '</div>'
-  ].join('')
+  list.innerHTML = skeletonListHtml()
 
   try {
-    var data  = await apiFetch('/agents/' + curAgentId + '/conversations')
+    /* Fetch agent details and conversations in parallel */
+    var results = await Promise.allSettled([
+      apiFetch('/agents/' + curAgentId),
+      apiFetch('/agents/' + curAgentId + '/conversations'),
+    ])
+
+    /* Agent details */
+    if (results[0].status === 'fulfilled') {
+      curAgent = results[0].value
+      /* Load products if this is a sales/shopping agent */
+      if (curAgent && (curAgent.shopping_enabled || curAgent.agent_type === 'sales')) {
+        try {
+          var products = await apiFetch('/agents/' + curAgentId + '/products')
+          productsMap = {}
+          ;(products || []).forEach(function (p) { productsMap[String(p._id)] = p })
+        } catch (pe) {
+          console.warn('[products] load failed:', pe.message)
+        }
+      }
+    }
+
+    /* Sessions */
+    if (results[1].status !== 'fulfilled') throw results[1].reason
+    var data    = results[1].value
     allSessions = data.sessions || []
     sessionsMap = {}
     allSessions.forEach(function (s) { sessionsMap[sessionKey(s)] = s })
@@ -502,7 +553,8 @@ async function loadSessions() {
     var count = allSessions.length
     document.getElementById('sess-count').textContent = count
     document.getElementById('convs-sub').textContent  =
-      count + ' session' + (count !== 1 ? 's' : '')
+      count + ' session' + (count !== 1 ? 's' : '') +
+      (curAgent ? '  ·  ' + agentTypeLabel(curAgent.agent_type) : '')
 
     renderSessions(allSessions)
   } catch (e) {
@@ -512,27 +564,42 @@ async function loadSessions() {
   }
 }
 
-/* ── Session key ───────────────────────────────────────────────── */
+/* ── Helpers ────────────────────────────────────────────────────── */
 function sessionKey(s) {
-  /* Bug 5 partial fix (frontend side): ensure we always get a non-empty string.
-     The real fix is on the backend — see index.js where $group _id falls back to $toString:$_id */
-  var v = s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || '')))
+  var v = s._id != null ? s._id
+        : s.session_id != null ? s.session_id
+        : s.visitor_id != null ? s.visitor_id
+        : s.visitor_ip != null ? s.visitor_ip
+        : ''
   return String(v)
 }
 
-/* ── Render list ───────────────────────────────────────────────── */
+function agentTypeLabel(type) {
+  var map = { sales: 'Sales', support: 'Support', faq: 'FAQ', general: 'General' }
+  return map[type] || 'General'
+}
+
+function agentTypeBadgeHtml(type) {
+  var map = {
+    sales:   { cls: 'tag-sales',   icon: '🛍️', label: 'Sales'   },
+    support: { cls: 'tag-support', icon: '🛎️', label: 'Support' },
+    faq:     { cls: 'tag-faq',     icon: '❓', label: 'FAQ'     },
+    general: { cls: 'tag-general', icon: '💬', label: 'General' },
+  }
+  var cfg = map[type] || map.general
+  return '<span class="agent-type-badge ' + cfg.cls + '">' + cfg.icon + ' ' + cfg.label + '</span>'
+}
+
+/* ── Render session list ─────────────────────────────────────────── */
 function renderSessions(sessions) {
   var list = document.getElementById('session-list')
-
   if (!sessions.length) {
-    var noConvsText = (typeof t === 'function') ? t('noConversations') : 'No conversations yet'
-    var noConvsDesc = (typeof t === 'function') ? t('noConvsDesc')     : 'Conversations will appear here once visitors start chatting'
     list.innerHTML = [
       '<div style="padding:40px 20px;text-align:center">',
       '  <div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
-      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">' + noConvsText + '</div>',
-      '  <div style="font-size:12px;color:var(--text-3)">' + noConvsDesc + '</div>',
-      '</div>'
+      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>',
+      '  <div style="font-size:12px;color:var(--text-3)">Conversations will appear here once visitors start chatting</div>',
+      '</div>',
     ].join('')
     return
   }
@@ -541,12 +608,23 @@ function renderSessions(sessions) {
     var key    = sessionKey(s)
     var active = key === activeKey ? ' active' : ''
     var msgs   = s.message_count || 1
+    var type   = (curAgent && curAgent.agent_type) || 'general'
+    var typeCls = 'tag-' + (type || 'general')
+
+    /* Tags row */
+    var tags = '<div class="session-tags">'
+    tags += '<span class="session-tag ' + typeCls + '">' + agentTypeLabel(type) + '</span>'
+    if (s.has_checkout) tags += '<span class="session-tag tag-checkout">🛒 Checkout</span>'
+    if (s.has_products) tags += '<span class="session-tag tag-products">🛍️ Products</span>'
+    tags += '</div>'
+
     return '<div class="session-item' + active + '" id="si-' + safeId(key) + '" data-key="' + escAttr(key) + '">' +
       '<div class="session-q">' + esc(s.first_question || '(No message)') + '</div>' +
       '<div class="session-meta">' +
-        '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tokens</span>' +
+        '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tok</span>' +
         '<span>' + timeAgo(s.last_active) + '</span>' +
       '</div>' +
+      tags +
     '</div>'
   }).join('')
 
@@ -555,7 +633,7 @@ function renderSessions(sessions) {
   })
 }
 
-/* ── Filter ────────────────────────────────────────────────────── */
+/* ── Filter sessions ────────────────────────────────────────────── */
 function filterSessions() {
   var inp = document.getElementById('search-inp')
   var q   = inp ? inp.value.toLowerCase().trim() : ''
@@ -567,38 +645,41 @@ function filterSessions() {
   }))
 }
 
-/* ── Open session ──────────────────────────────────────────────── */
+/* ── Open session / fetch messages ──────────────────────────────── */
 async function openSession(key) {
   var meta = sessionsMap[key]
   if (!meta) return
 
   activeKey = key
+
+  /* Highlight active item */
   document.querySelectorAll('.session-item').forEach(function (el) { el.classList.remove('active') })
   var item = document.getElementById('si-' + safeId(key))
   if (item) item.classList.add('active')
 
   showThread()
-
   document.getElementById('back-btn').style.display = window.innerWidth < 860 ? 'flex' : 'none'
 
-  document.getElementById('thread-title').textContent =
-    (meta.first_question || 'Session').slice(0, 72)
+  /* Header */
+  var agentType = (curAgent && curAgent.agent_type) || 'general'
+  document.getElementById('thread-title').textContent = (meta.first_question || 'Session').slice(0, 80)
+  document.getElementById('thread-badge').innerHTML   = agentTypeBadgeHtml(agentType)
   var msgCount = meta.message_count || 1
   document.getElementById('thread-meta').textContent = [
     msgCount + ' message' + (msgCount !== 1 ? 's' : ''),
     timeAgo(meta.started_at),
-    meta.visitor_ip || null
+    meta.visitor_ip || null,
+    meta.session_id ? 'sid:' + String(meta.session_id).slice(0, 8) + '…' : null,
   ].filter(Boolean).join(' · ')
 
+  /* Show skeleton */
   var msgs = document.getElementById('cv-msgs')
-  msgs.innerHTML = [
-    '<div style="display:flex;flex-direction:column;gap:12px">',
-    '  <div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:52%"></div>',
-    '  <div class="skel" style="height:68px;border-radius:12px;width:68%"></div>',
-    '  <div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:44%"></div>',
-    '  <div class="skel" style="height:80px;border-radius:12px;width:72%"></div>',
-    '</div>'
-  ].join('')
+  msgs.innerHTML = '<div class="thread-loading">' + [
+    '<div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:52%"></div>',
+    '<div class="skel" style="height:68px;border-radius:12px;width:68%"></div>',
+    '<div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:44%"></div>',
+    '<div class="skel" style="height:80px;border-radius:12px;width:72%"></div>',
+  ].join('') + '</div>'
 
   try {
     var data     = await apiFetch('/agents/' + curAgentId + '/conversations/' + encodeURIComponent(key))
@@ -609,16 +690,8 @@ async function openSession(key) {
       return
     }
 
-    /* Bug 7 fix: sanitize AI answer HTML to prevent XSS.
-       Uses DOMPurify if available, otherwise falls back to a basic strip. */
-    msgs.innerHTML = messages.map(function (m) {
-      var rawAnswer = m.answer || '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>'
-      var safeAnswer = sanitizeHtml(rawAnswer)
-      return '<div class="msg-pair">' +
-        '<div class="msg-q">' + esc(m.question || '') + '</div>' +
-        '<div class="msg-a">' + safeAnswer + '</div>' +
-        '<div class="msg-meta">🪙 ' + fmtTokens(m.tokens_used || 0) + ' tokens · ' + timeAgo(m.created_at) + '</div>' +
-      '</div>'
+    msgs.innerHTML = messages.map(function (m, idx) {
+      return renderMessagePair(m, idx + 1, messages.length)
     }).join('')
 
     requestAnimationFrame(function () { msgs.scrollTop = msgs.scrollHeight })
@@ -628,31 +701,152 @@ async function openSession(key) {
   }
 }
 
-/* ── HTML sanitizer (Bug 7 fix) ────────────────────────────────── */
+/* ── Render a single Q&A turn ────────────────────────────────────── */
+function renderMessagePair(m, turnNum, totalTurns) {
+  var agentType      = m.agent_type || (curAgent && curAgent.agent_type) || 'general'
+  var isSales        = agentType === 'sales'
+  var productsShown  = m.products_shown  || []
+  var productNames   = m.product_names   || []
+  var action         = m.action          || null
+  var isDeflected    = m.deflected       || false
+  var hasImage       = m.has_image       || false
+  var answer         = m.answer          || ''
+
+  var html = '<div class="msg-pair">'
+
+  /* Turn divider */
+  if (totalTurns > 1) {
+    html += '<div class="msg-turn-num">Turn ' + turnNum + '</div>'
+  }
+
+  /* ── User question bubble ── */
+  html += '<div class="msg-q">'
+  if (hasImage) html += '<span style="margin-right:6px;opacity:.7">📎</span>'
+  html += esc(m.question || '(image or empty)') + '</div>'
+
+  /* ── AI answer ── */
+  if (isDeflected) {
+    /* Hard-deflect: show styled notice */
+    var deflectIcon = agentType === 'support' ? '🛎️' : '🤷'
+    html += '<div class="msg-deflect">'
+    html += '<span class="msg-deflect-icon">' + deflectIcon + '</span>'
+    html += '<p class="msg-deflect-text">' + esc(answer || 'Outside my knowledge base.') + '</p>'
+    html += '</div>'
+  } else if (isSales) {
+    /* Sales: plain text answer */
+    html += '<div class="msg-a msg-sales-plain">' + esc(answer) + '</div>'
+  } else {
+    /* Support / FAQ / General: render stored HTML safely */
+    var safeAnswer = answer
+      ? sanitizeHtml(answer)
+      : '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>'
+    html += '<div class="msg-a">' + safeAnswer + '</div>'
+  }
+
+  /* ── Products shown (sales agent) ── */
+  if (productsShown.length > 0) {
+    html += '<div class="products-grid">'
+    productsShown.slice(0, 8).forEach(function (pid, i) {
+      var product  = productsMap[String(pid)]
+      var name     = product ? product.name     : (productNames[i] || 'Product #' + (i + 1))
+      var price    = product ? product.price    : null
+      var image    = product ? product.image_url : null
+      var category = product ? product.category : null
+      var currency = product ? (product.currency === 'USD' ? '$' : '₹') : '₹'
+
+      html += '<div class="product-card">'
+      if (image) {
+        html += '<img class="product-thumb" src="' + escAttr(image) + '" alt="' + escAttr(name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        html += '<div class="product-thumb-placeholder" style="display:none">🛍️</div>'
+      } else {
+        html += '<div class="product-thumb-placeholder">🛍️</div>'
+      }
+      html += '<div class="product-info">'
+      html += '<div class="product-name">' + esc(name) + '</div>'
+      if (price != null) html += '<div class="product-price">' + currency + price + '</div>'
+      if (category)      html += '<div class="product-category">' + esc(category) + '</div>'
+      html += '</div>'
+      html += '</div>'
+    })
+    html += '</div>'
+  }
+
+  /* ── Checkout initiated banner ── */
+  if (action === 'checkout') {
+    var checkedOutNames = []
+    productsShown.forEach(function (pid, i) {
+      var product = productsMap[String(pid)]
+      checkedOutNames.push(product ? product.name : (productNames[i] || 'Item'))
+    })
+
+    html += '<div class="checkout-banner">'
+    html += '<span class="checkout-icon">🛒</span>'
+    html += '<div class="checkout-body">'
+    html += '<div class="checkout-title">Checkout initiated</div>'
+    if (checkedOutNames.length) {
+      html += '<div class="checkout-sub">Items: ' + esc(checkedOutNames.join(', ')) + '</div>'
+    }
+    html += '</div>'
+    html += '</div>'
+  }
+
+  /* ── Metadata row ── */
+  html += '<div class="msg-meta">'
+
+  /* RAG indicator */
+  if (m.rag_mode) {
+    html += '<span class="msg-meta-chip">🔍 RAG</span>'
+  }
+  if (m.kb_confidence && m.kb_confidence !== 'none') {
+    html += '<span class="msg-meta-chip" style="color:' + (m.kb_confidence === 'strong' ? 'var(--green)' : '#f59e0b') + '">' +
+      (m.kb_confidence === 'strong' ? '✅' : '⚠️') + ' KB ' + m.kb_confidence +
+    '</span>'
+  }
+  if (productsShown.length > 0) {
+    html += '<span class="msg-meta-chip">🛍️ ' + productsShown.length + ' product' + (productsShown.length !== 1 ? 's' : '') + '</span>'
+  }
+
+  html += '<span>🪙 ' + fmtTokens(m.tokens_used || 0) + ' tokens</span>'
+  html += '<span>' + timeAgo(m.created_at) + '</span>'
+
+  /* First token / stream latency if present */
+  if (m.first_token_ms) {
+    html += '<span style="margin-left:auto">⚡ ' + m.first_token_ms + 'ms</span>'
+  }
+
+  html += '</div>'
+  html += '</div>'
+
+  return html
+}
+
+/* ── HTML sanitizer ─────────────────────────────────────────────── */
 function sanitizeHtml(html) {
-  /* Prefer DOMPurify if loaded (add <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"> to <head>) */
   if (typeof DOMPurify !== 'undefined') {
     return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['p','br','b','strong','em','i','u','s','ul','ol','li','h1','h2','h3','h4','code','pre','table','thead','tbody','tr','td','th','a','span','div'],
-      ALLOWED_ATTR: ['href','target','rel','class','style'],
+      ALLOWED_TAGS: ['p','br','b','strong','em','i','u','s','ul','ol','li','h1','h2','h3','h4','code','pre','table','thead','tbody','tr','td','th','a','span','div','button'],
+      ALLOWED_ATTR: ['href','target','rel','class','style','onclick'],
       ALLOW_DATA_ATTR: false,
     })
   }
-  /* Fallback: strip script/iframe/object/event handlers but allow basic formatting */
+  /* Fallback: strip dangerous elements and on* handlers */
   var tmp = document.createElement('div')
   tmp.innerHTML = html
-  tmp.querySelectorAll('script,iframe,object,embed,form,input,button,link,meta,base').forEach(function(el) { el.remove() })
+  tmp.querySelectorAll('script,iframe,object,embed,form,input,link,meta,base,style').forEach(function(el) { el.remove() })
   tmp.querySelectorAll('*').forEach(function(el) {
     Array.from(el.attributes).forEach(function(attr) {
-      if (/^on/i.test(attr.name) || (attr.name === 'href' && /^javascript:/i.test(attr.value))) {
-        el.removeAttribute(attr.name)
-      }
+      var name = attr.name.toLowerCase()
+      var val  = attr.value
+      if (/^on/i.test(name)) { el.removeAttribute(attr.name); return }
+      if (name === 'href'   && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
+      if (name === 'src'    && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
+      if (name === 'action' && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
     })
   })
   return tmp.innerHTML
 }
 
-/* ── Panel helpers ─────────────────────────────────────────────── */
+/* ── Panel toggle helpers ───────────────────────────────────────── */
 function showEmpty() {
   document.getElementById('cv-empty').classList.remove('hidden')
   document.getElementById('cv-thread').classList.remove('visible')
@@ -667,7 +861,7 @@ function backToList() {
   activeKey = null
 }
 
-/* ── Clear all ─────────────────────────────────────────────────── */
+/* ── Clear all conversations ─────────────────────────────────────── */
 async function clearAllModal() {
   var sel       = document.getElementById('agent-sel')
   var agentId   = sel.value
@@ -675,25 +869,25 @@ async function clearAllModal() {
   if (!agentId) { toast('Select an agent first', 'warning'); return }
 
   var ok = await confirmModal({
-    title:       (typeof t === 'function') ? t('confirmClearTitle') : 'Clear all conversations?',
-    message:     ((typeof t === 'function') ? t('confirmClearMsg') : 'This will permanently delete all conversations for {agent}.').replace('{agent}', agentName),
-    confirmText: (typeof t === 'function') ? t('clearAll') : 'Clear All',
-    danger:      true
+    title:       'Clear all conversations?',
+    message:     'This will permanently hide all conversations for "' + agentName + '".',
+    confirmText: 'Clear All',
+    danger:      true,
   })
   if (!ok) return
 
   try {
     await apiFetch('/agents/' + agentId + '/clear-conversations', { method: 'POST' })
-    toast((typeof t === 'function') ? t('toastConvsCleared') : 'Conversations cleared', 'success')
+    toast('Conversations cleared', 'success')
     activeKey = null
     showEmpty()
-    await loadSessions()
+    await loadAgentAndSessions()
   } catch (e) {
     toast(e.message, 'error')
   }
 }
 
-/* ── Escape helpers ────────────────────────────────────────────── */
+/* ── Escape / utility helpers ───────────────────────────────────── */
 function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -707,6 +901,13 @@ function escAttr(s) {
 function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
 function placeholderHtml(msg) {
   return '<div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">' + esc(msg) + '</div>'
+}
+function skeletonListHtml() {
+  return '<div style="padding:12px;display:flex;flex-direction:column;gap:7px">' +
+    '<div class="skel" style="height:68px;border-radius:var(--r-sm)"></div>' +
+    '<div class="skel" style="height:68px;border-radius:var(--r-sm);opacity:.7"></div>' +
+    '<div class="skel" style="height:68px;border-radius:var(--r-sm);opacity:.45"></div>' +
+    '</div>'
 }
 </script>
 </body>
