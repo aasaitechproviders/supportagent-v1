@@ -223,10 +223,10 @@
         <div class="card" style="overflow:visible">
           <!-- Tab bar -->
           <div class="tab-bar">
-            <button class="tab-btn active"  onclick="switchTab('general',this)" data-i18n-tab="tabGeneral">⚙️ General</button>
-            <button class="tab-btn"         onclick="switchTab('knowledge',this)" data-i18n-tab="tabKnowledge">📚 Knowledge</button>
-            <button class="tab-btn"         onclick="switchTab('shopping',this)" data-i18n-tab="tabShopping">🛒 Shopping</button>
-            <button class="tab-btn"         onclick="switchTab('publish',this)" data-i18n-tab="tabPublish">🚀 Publish</button>
+            <button class="tab-btn active"  data-tab="general"   onclick="switchTab('general',this)"   data-i18n-tab="tabGeneral">⚙️ General</button>
+            <button class="tab-btn"         data-tab="knowledge" onclick="switchTab('knowledge',this)" data-i18n-tab="tabKnowledge">📚 Knowledge</button>
+            <button class="tab-btn"         data-tab="shopping"  onclick="switchTab('shopping',this)"  data-i18n-tab="tabShopping">🛒 Shopping</button>
+            <button class="tab-btn"         data-tab="publish"   onclick="switchTab('publish',this)"   data-i18n-tab="tabPublish">🚀 Publish</button>
           </div>
 
           <!-- ══ GENERAL TAB ═══════════════════════════════════════════ -->
@@ -299,73 +299,23 @@
             <div class="info-banner" style="margin-bottom:18px">
               <div style="font-size:20px;flex-shrink:0">💡</div>
               <div>
-                <div class="info-banner-title">How the Knowledge Base works</div>
-                <div class="info-banner-desc">Upload your <strong>Products CSV</strong> and <strong>Categories CSV</strong> — the AI will answer customer questions from that data automatically. You can also add FAQs, website URLs, and documents as extra knowledge sources below.</div>
+                <div class="info-banner-title">Knowledge Base</div>
+                <div class="info-banner-desc">Add FAQs, paste text, scrape URLs, or upload documents. The AI answers customer questions from this knowledge automatically.</div>
               </div>
             </div>
-            <div class="kb-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
-              <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px">📦</span></div>
-              <!-- FIX F3: categories counter now tracked separately -->
-              <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px">🏷️</span></div>
+            <div class="kb-stats-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px">
               <div class="kb-stat"><div><div class="kb-stat-label">KB Sources</div><div class="kb-stat-val" id="stat-sources">0</div></div><span style="font-size:24px">📄</span></div>
+              <div class="kb-stat"><div><div class="kb-stat-label">Tokens Used</div><div class="kb-stat-val" id="kb-tokens-val">0</div></div><span style="font-size:24px">🧠</span></div>
             </div>
             <div style="display:flex;gap:10px;align-items:center;margin-bottom:22px;padding:10px 14px;background:var(--surface-2);border-radius:12px">
               <svg width="14" height="14" fill="none" stroke="var(--text-3)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <div style="flex:1;height:5px;background:var(--surface-3);border-radius:100px"><div id="kb-fill" style="width:0%;height:100%;background:var(--accent);border-radius:100px;transition:width .4s"></div></div>
               <div style="font-size:11px;color:var(--text-3);white-space:nowrap" id="kb-text">0 / 18k tokens used</div>
             </div>
-            <!-- Step 1: Products CSV -->
-            <div class="card" style="margin-bottom:14px">
-              <div class="card-header">
-                <div class="card-title"><div class="step-num" id="step1-num" style="margin-right:4px">1</div>Upload Products CSV</div>
-                <span class="badge badge-gray" id="prod-badge">0 products</span>
-              </div>
-              <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">
-                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px">name, price, category, description, sku, stock_qty, image_url</code>
-                </div>
-                <div class="csv-drop" id="prod-drop" onclick="document.getElementById('prod-csv-inp').click()"
-                  ondragover="event.preventDefault();this.classList.add('drag')"
-                  ondragleave="this.classList.remove('drag')"
-                  ondrop="handleProdCSVDrop(event)">
-                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-                  <div style="font-size:13px;font-weight:600">Drop products.csv here or click to browse</div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:4px">CSV file — one product per row</div>
-                </div>
-                <input type="file" id="prod-csv-inp" accept=".csv" style="display:none" onchange="handleProdCSVFile(this.files[0])"/>
-                <div style="display:flex;justify-content:flex-end;margin-top:10px">
-                  <button class="btn btn-secondary btn-sm" onclick="downloadSampleProductCSV()">⬇ Download Sample</button>
-                </div>
-              </div>
-            </div>
-            <!-- Step 2: Categories CSV -->
-            <div class="card" style="margin-bottom:14px">
-              <div class="card-header">
-                <div class="card-title"><div class="step-num" id="step2-num" style="margin-right:4px">2</div>Upload Categories CSV</div>
-                <span class="badge badge-gray" id="cat-badge">0 categories</span>
-              </div>
-              <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:12px">
-                  Required columns: <code style="background:var(--surface-3);padding:2px 6px;border-radius:5px;font-size:10px">name, description, slug</code>
-                </div>
-                <div class="csv-drop" id="cat-drop" onclick="document.getElementById('cat-csv-inp').click()"
-                  ondragover="event.preventDefault();this.classList.add('drag')"
-                  ondragleave="this.classList.remove('drag')"
-                  ondrop="handleCatCSVDrop(event)">
-                  <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                  <div style="font-size:13px;font-weight:600">Drop categories.csv here or click to browse</div>
-                  <div style="font-size:11px;color:var(--text-3);margin-top:4px">CSV file — one category per row</div>
-                </div>
-                <input type="file" id="cat-csv-inp" accept=".csv" style="display:none" onchange="handleCatCSVFile(this.files[0])"/>
-                <div style="display:flex;justify-content:flex-end;margin-top:10px">
-                  <button class="btn btn-secondary btn-sm" onclick="downloadSampleCategoryCSV()">⬇ Download Sample</button>
-                </div>
-              </div>
-            </div>
-            <!-- Step 3: Extra sources -->
+            <!-- Knowledge Sources -->
             <div class="card">
               <div class="card-header">
-                <div class="card-title"><div class="step-num" style="margin-right:4px">3</div>Additional Knowledge Sources <span style="font-size:11px;font-weight:400;color:var(--text-3)">(optional)</span></div>
+                <div class="card-title">📚 Knowledge Sources</div>
                 <span class="badge badge-gray" id="src-count-badge">0 sources</span>
               </div>
               <div class="card-body">
@@ -374,8 +324,6 @@
                   <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 URL</button>
                   <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
                 </div>
-
-                <!-- FIX F1: Redesigned text source panel — title first, then content, then button on its own row -->
                 <div id="src-text" class="src-panel active">
                   <div class="field-hint" style="margin-bottom:12px">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
                   <div class="src-add-row">
@@ -391,8 +339,6 @@
                     <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addTextSrc()">➕ Add Source</button>
                   </div>
                 </div>
-
-                <!-- FIX F2: URL input with auto-title -->
                 <div id="src-url" class="src-panel">
                   <div class="field-hint" style="margin-bottom:12px">Enter a public webpage URL — its content will be fetched and indexed.</div>
                   <div class="src-add-row">
@@ -402,7 +348,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div id="src-file" class="src-panel">
                   <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
                   <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
@@ -473,9 +418,25 @@
               <div class="card-header">
                 <div class="card-title">📦 Products</div>
                 <div style="display:flex;gap:8px">
-                  <button class="btn btn-secondary btn-sm" onclick="document.getElementById('prod-csv-shop').click()">⬆ Import CSV</button>
+                  <span class="badge badge-gray" id="prod-badge">0 products</span>
                   <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Add Product</button>
-                  <input type="file" id="prod-csv-shop" accept=".csv" style="display:none" onchange="handleProdCSVFile(this.files[0])"/>
+                </div>
+              </div>
+              <div class="card-body">
+                <!-- CSV import drop zone -->
+                <div class="csv-drop" id="prod-drop"
+                  onclick="document.getElementById('prod-csv-inp').click()"
+                  ondragover="event.preventDefault();this.classList.add('drag')"
+                  ondragleave="this.classList.remove('drag')"
+                  ondrop="handleProdCSVDrop(event)"
+                  style="margin-bottom:14px">
+                  <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 8px;display:block"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                  <div style="font-size:13px;font-weight:600">Drop products.csv here or click to browse</div>
+                  <div style="font-size:11px;color:var(--text-3);margin-top:4px">Required columns: <code style="background:var(--surface-3);padding:1px 5px;border-radius:4px">name, price, category, description, sku, stock_qty, image_url</code></div>
+                </div>
+                <input type="file" id="prod-csv-inp" accept=".csv" style="display:none" onchange="handleProdCSVFile(this.files[0])"/>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px">
+                  <button class="btn btn-secondary btn-sm" onclick="downloadSampleProductCSV()">⬇ Download Sample CSV</button>
                 </div>
               </div>
               <div id="products-list" style="padding:4px 18px 12px"></div>
@@ -658,9 +619,6 @@ let _csvMode = null, _csvHeader = [], _csvRows = []
 // Products lookup map — avoids JSON.stringify in onclick
 let _productsMap = {}
 
-// FIX F3: Track categories count separately (persisted across tab switches)
-let _categoriesCount = 0
-
 /* ══════════════════════════════════════════════════════════════════
    BOOT
 ══════════════════════════════════════════════════════════════════ */
@@ -695,6 +653,7 @@ async function loadAgent() {
     fillForm(agent)
     livePreview()
     updateStats(agent)
+    applyAgentTypeTabs(agent.type || 'support')
     if (agent.published) updatePublishUI(agent)
     document.getElementById('main-content').style.display = 'grid'
     dismissSkeleton()
@@ -734,7 +693,7 @@ function fillForm(a) {
   }
 }
 
-/* FIX F3 & F8: updateStats now correctly maps each counter */
+/* FIX F8: updateStats — products/categories now only in Shopping tab */
 function updateStats(a) {
   document.getElementById('st-convs').textContent = a.query_count    || '—'
   document.getElementById('st-srcs').textContent  = a.sources_count  || 0
@@ -743,21 +702,45 @@ function updateStats(a) {
     ? '<span style="color:var(--green);font-weight:700">● Live</span>'
     : '<span style="color:var(--text-3)">Draft</span>'
 
-  // KB stats panel — products and sources mapped correctly
-  document.getElementById('stat-products').textContent   = a.products_count || 0
-  // FIX F3: categories use dedicated _categoriesCount, not sources_count
-  document.getElementById('stat-categories').textContent = _categoriesCount || 0
-  document.getElementById('stat-sources').textContent    = a.sources_count  || 0
-  document.getElementById('prod-badge').textContent      = (a.products_count || 0) + ' ' + t('labelProducts')
-  // cat-badge uses separate counter; we don't overwrite it with sources_count
-  if ((a.products_count || 0) > 0) markStep(1)
-  if (_categoriesCount > 0) markStep(2)
-  if (a.published) markStep(3)
+  // KB stats panel — sources only (products moved to Shopping tab)
+  document.getElementById('stat-sources').textContent = a.sources_count || 0
+  const prodBadge = document.getElementById('prod-badge')
+  if (prodBadge) prodBadge.textContent = (a.products_count || 0) + ' ' + t('labelProducts')
+}
+
+/* ── Apply tab visibility based on agent type ─────────────────── */
+function applyAgentTypeTabs(type) {
+  const isSales = type === 'sales'
+
+  const knowledgeBtn = document.querySelector('.tab-btn[data-tab="knowledge"]')
+  const shoppingBtn  = document.querySelector('.tab-btn[data-tab="shopping"]')
+  const knowledgePanel = document.getElementById('tab-knowledge')
+  const shoppingPanel  = document.getElementById('tab-shopping')
+
+  // Show/hide tab buttons
+  if (knowledgeBtn) knowledgeBtn.style.display = isSales ? 'none' : ''
+  if (shoppingBtn)  shoppingBtn.style.display  = isSales ? '' : 'none'
+
+  // If current active tab is now hidden, fall back to General
+  const activePanel = document.querySelector('.tab-panel.active')
+  if (activePanel) {
+    if (isSales && activePanel.id === 'tab-knowledge') {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+      document.getElementById('tab-general').classList.add('active')
+      document.querySelector('.tab-btn[data-tab="general"]').classList.add('active')
+    }
+    if (!isSales && activePanel.id === 'tab-shopping') {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+      document.getElementById('tab-general').classList.add('active')
+      document.querySelector('.tab-btn[data-tab="general"]').classList.add('active')
+    }
+  }
 }
 
 function markStep(n) {
-  const el = document.getElementById('step' + n + '-num')
-  if (el && !el.classList.contains('done')) { el.classList.add('done'); el.textContent = '✓' }
+  // Step number indicators removed — no-op kept for call-site compatibility
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -859,13 +842,12 @@ async function loadSources() {
     document.getElementById('stat-sources').textContent  = sources.length
     document.getElementById('st-srcs').textContent       = sources.length
 
-    // FIX F7: Also refresh products count when loading sources
+    // Refresh products count displayed in Shopping tab badge
     try {
       const prods = await apiFetch(`/agents/${AGENT_ID}/products`)
-      document.getElementById('stat-products').textContent = prods.length
-      document.getElementById('prod-badge').textContent    = prods.length + ' ' + t('labelProducts')
-      document.getElementById('st-prods').textContent      = prods.length
-      if (prods.length > 0) markStep(1)
+      const prodBadge = document.getElementById('prod-badge')
+      if (prodBadge) prodBadge.textContent = prods.length + ' ' + t('labelProducts')
+      document.getElementById('st-prods').textContent = prods.length
     } catch(_) {}
 
     const list = document.getElementById('sources-list')
@@ -1084,12 +1066,11 @@ async function executeImport() {
       : '❌ Import failed — ' + errs + ' errors'
     toast(done ? 'Imported ' + done + ' products!' : 'Import failed', done ? 'success' : 'error')
 
-    // FIX F4 & F7: Update all product counters after import
-    document.getElementById('stat-products').textContent = done
-    document.getElementById('prod-badge').textContent    = done + ' ' + t('labelProducts')
-    document.getElementById('st-prods').textContent      = done
+    // Update product counters after import
+    const prodBadge = document.getElementById('prod-badge')
+    if (prodBadge) prodBadge.textContent = done + ' ' + t('labelProducts')
+    document.getElementById('st-prods').textContent = done
     if (agent) agent.products_count = done
-    if (done > 0) markStep(1)
 
     // FIX F5: Only auto-close on success, keep modal open on failure
     if (done > 0) {
@@ -1117,12 +1098,6 @@ async function executeImport() {
       bar.style.width = '100%'; bar.style.background = 'var(--green)'
       label.textContent = '✓ ' + done + ' ' + t('labelCatsSaved')
       toast(done + ' categories added to knowledge base!', 'success')
-
-      // FIX F3: Update the dedicated categories counter
-      _categoriesCount = done
-      document.getElementById('stat-categories').textContent = done
-      document.getElementById('cat-badge').textContent       = done + ' categories'
-      markStep(2)
 
       // FIX F5: Only auto-close on success
       setTimeout(() => { closeCSVModal(); loadSources() }, 1800)
@@ -1179,12 +1154,11 @@ async function loadProducts() {
     _productsMap = {}
     prods.forEach(p => { _productsMap[p._id] = p })
 
-    // FIX F4: Update ALL product counters (both tabs)
-    document.getElementById('stat-products').textContent = prods.length
-    document.getElementById('prod-badge').textContent    = prods.length + ' ' + t('labelProducts')
-    document.getElementById('st-prods').textContent      = prods.length
+    // Update product counters
+    const prodBadge2 = document.getElementById('prod-badge')
+    if (prodBadge2) prodBadge2.textContent = prods.length + ' ' + t('labelProducts')
+    document.getElementById('st-prods').textContent = prods.length
     if (agent) agent.products_count = prods.length
-    if (prods.length > 0) markStep(1)
 
     const cur  = document.getElementById('rz-currency')?.value === 'USD' ? '$' : '₹'
     const list = document.getElementById('products-list')
