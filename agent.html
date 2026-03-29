@@ -370,8 +370,8 @@
             <div class="info-banner" style="margin-bottom:18px">
               <div style="font-size:20px;flex-shrink:0">🛒</div>
               <div>
-                <div class="info-banner-title">Shopping Mode</div>
-                <div class="info-banner-desc">Enable to let customers browse products and checkout directly inside the chat. Requires Razorpay credentials.</div>
+                <div class="info-banner-title">Shopping &amp; Products</div>
+                <div class="info-banner-desc">Manage your product catalog and enable in-chat checkout. Upload products via CSV, connect Razorpay for payments, and customers can browse and buy entirely inside the chat — no redirect needed.</div>
               </div>
             </div>
             <div class="card" style="margin-bottom:16px">
@@ -836,11 +836,13 @@ async function loadSources() {
     const sources = await apiFetch(`/agents/${AGENT_ID}/sources`)
     const total   = sources.reduce((a, s) => a + Math.ceil((s.extracted_text || s.content || '').length / 4), 0)
     const pct     = Math.min(100, Math.round(total / 18000 * 100))
-    document.getElementById('kb-fill').style.width       = pct + '%'
-    document.getElementById('kb-text').textContent       = '~' + total.toLocaleString() + ' / 18,000 ' + t('labelTokensUsed')
-    document.getElementById('src-count-badge').textContent = sources.length + ' ' + t('labelSources')
-    document.getElementById('stat-sources').textContent  = sources.length
-    document.getElementById('st-srcs').textContent       = sources.length
+    document.getElementById('kb-fill').style.width          = pct + '%'
+    document.getElementById('kb-text').textContent          = '~' + total.toLocaleString() + ' / 18,000 ' + t('labelTokensUsed')
+    document.getElementById('src-count-badge').textContent  = sources.length + ' ' + t('labelSources')
+    document.getElementById('stat-sources').textContent     = sources.length
+    document.getElementById('st-srcs').textContent          = sources.length
+    const tokVal = document.getElementById('kb-tokens-val')
+    if (tokVal) tokVal.textContent = total >= 1000 ? (total/1000).toFixed(1) + 'K' : total
 
     // Refresh products count displayed in Shopping tab badge
     try {
@@ -966,12 +968,6 @@ function downloadSampleProductCSV() {
 "White Sneakers",899,Footwear,"Lightweight canvas sneakers",SNK-W01,120,https://example.com/sneaker.jpg`, 'sample-products.csv')
   toast('Sample products.csv downloaded', 'success')
 }
-function downloadSampleCategoryCSV() {
-  downloadBlob(`name,description,slug
-Jackets,"Denim, leather, and bomber jackets",jackets
-Footwear,"Shoes, sneakers, and sandals",footwear`, 'sample-categories.csv')
-  toast('Sample categories.csv downloaded', 'success')
-}
 function handleProdCSVDrop(e) { e.preventDefault(); document.getElementById('prod-drop').classList.remove('drag'); handleProdCSVFile(e.dataTransfer.files[0]) }
 function handleProdCSVFile(file) {
   if (!file) return
@@ -981,18 +977,6 @@ function handleProdCSVFile(file) {
     if (!rows.length) return toast('CSV has no data rows', 'error')
     _csvMode = 'products'; _csvHeader = header; _csvRows = rows
     openCSVModal(`Import Products (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
-  }
-  r.readAsText(file)
-}
-function handleCatCSVDrop(e) { e.preventDefault(); document.getElementById('cat-drop').classList.remove('drag'); handleCatCSVFile(e.dataTransfer.files[0]) }
-function handleCatCSVFile(file) {
-  if (!file) return
-  const r = new FileReader()
-  r.onload = e => {
-    const { header, rows } = parseCSV(e.target.result)
-    if (!rows.length) return toast('CSV has no data rows', 'error')
-    _csvMode = 'categories'; _csvHeader = header; _csvRows = rows
-    openCSVModal(`Import Categories (${rows.length} rows)`, `First 5 rows shown — ${rows.length} total`, header, rows.slice(0, 5))
   }
   r.readAsText(file)
 }
@@ -1398,28 +1382,20 @@ function initGuides(agentData) {
   /* ── Knowledge tab guide ─────────────────────────────────────── */
   const knowledgePanel = document.getElementById('tab-knowledge')
   if (knowledgePanel) {
-    // Insert after the existing info-banner
     const infoBanner = knowledgePanel.querySelector('.info-banner')
-    const kbStats    = knowledgePanel.querySelector('[style*="grid-template-columns:repeat(3"]')
+    const kbStats    = knowledgePanel.querySelector('.kb-stats-grid')
     const anchor     = kbStats || infoBanner?.nextElementSibling || knowledgePanel.firstElementChild
     if (anchor) {
       SG_OB.showInlineTip(
         anchor,
         'guide-knowledge',
         '📚',
-        'How to feed your AI — step by step',
-        `<strong>Step 1 — Products CSV:</strong> Download the sample CSV, fill it with your products (name, price, category, description, SKU), and upload. The AI learns every product instantly.<br><br>
-         <strong>Step 2 — Categories CSV:</strong> Upload a categories CSV so the AI can group and filter products correctly.<br><br>
-         <strong>Step 3 — Extra sources (optional):</strong> Paste your return policy, FAQs, or any text. Add your website URL to scrape it. Upload PDFs/docs. The more context, the smarter your agent gets.<br><br>
-         💡 <em>Tip: Click "⬇ Download Sample" to get perfectly formatted template CSVs.</em>`,
-        {
-          cta: {
-            label: '⬇ Download Sample Products CSV',
-            onclick: () => {
-              if (typeof downloadSampleProductCSV === 'function') downloadSampleProductCSV()
-            }
-          }
-        }
+        'Build your AI\'s knowledge base',
+        `Your agent answers customer questions from the sources you add here. Three ways to add knowledge:<br><br>
+         <strong>✍️ Text / FAQ:</strong> Paste your return policy, FAQs, pricing, company info — anything written. The more you add, the smarter your agent gets.<br><br>
+         <strong>🌐 URL:</strong> Enter any public webpage and its content gets fetched and indexed automatically.<br><br>
+         <strong>📄 File:</strong> Upload PDFs, Word docs, or plain text files.<br><br>
+         💡 <em>Sales agents manage products in the Shopping tab — this Knowledge Base is for support context, FAQs, and policies.</em>`
       )
     }
   }
@@ -1434,10 +1410,17 @@ function initGuides(agentData) {
         anchor,
         'guide-shopping',
         '🛒',
-        'Enable in-chat purchases with Razorpay',
-        `<strong>How it works:</strong> Toggle on "Shopping Mode", enter your Razorpay Key ID and Key Secret, then hit "Save Settings".<br><br>
-         <strong>Getting Razorpay keys:</strong> Log into <code>dashboard.razorpay.com</code> → Settings → API Keys → Generate Key. Use <code>rzp_test_...</code> keys while testing — switch to <code>rzp_live_...</code> when you go live.<br><br>
-         <strong>Products tab below:</strong> Import your products via CSV or add them one by one using "Add Product". Customers can then browse and checkout entirely inside the chat window — no redirect needed.`
+        'Set up products and in-chat checkout',
+        `<strong>Step 1 — Add products:</strong> Drag-and-drop your <code>products.csv</code> into the drop zone below, or click to browse. Download the sample CSV to get the correct column format.<br><br>
+         <strong>Step 2 — Enable Shopping Mode:</strong> Toggle it on so customers can browse and add items to cart inside the chat.<br><br>
+         <strong>Step 3 — Connect Razorpay (Grower+):</strong> Add your Razorpay Key ID and Secret from <code>dashboard.razorpay.com → Settings → API Keys</code>. Use <code>rzp_test_</code> while testing, <code>rzp_live_</code> for production.<br><br>
+         💡 <em>Customers can browse, ask questions about products, and pay — all without leaving the chat window.</em>`,
+        {
+          cta: {
+            label: '⬇ Download Sample Products CSV',
+            onclick: () => { if (typeof downloadSampleProductCSV === 'function') downloadSampleProductCSV() }
+          }
+        }
       )
     }
   }
