@@ -89,14 +89,11 @@ function _buildSidebar(activePage) {
       <a href="agents.html" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;">${t('navViewAllAgents')}</a>
     </div>
 
-    <!-- Language switcher -->
-    <div style="padding:0 12px 8px;">
-      <select onchange="setLang(this.value)" style="width:100%;height:30px;padding:0 8px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12px;cursor:pointer;outline:none;">
+    <!-- Language switcher + Sign Out always anchored at bottom -->
+    <div class="sidebar-bottom">
+      <select onchange="setLang(this.value)" style="width:100%;height:30px;padding:0 8px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12px;cursor:pointer;outline:none;margin-bottom:8px;display:block;">
         ${langOptions}
       </select>
-    </div>
-
-    <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">
         <span style="font-size:14px;">↩</span> ${t('navSignOut')}
       </button>
