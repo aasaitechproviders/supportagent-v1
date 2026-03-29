@@ -329,14 +329,41 @@ function buildAgentCard(a, i, limit) {
   footer.appendChild(editBtn)
 
   if (a.published) {
-    const openBtn = document.createElement('a')
-    openBtn.className = 'btn btn-accent-ghost btn-sm'
-    openBtn.style.cssText = 'flex:1;justify-content:center'
-    openBtn.href = a.subdomain_url || a.published_url || '#'
-    openBtn.target = '_blank'
-    openBtn.textContent = 'Open ↗'
-    openBtn.onclick = e => e.stopPropagation()
-    footer.appendChild(openBtn)
+    const agentUrl = a.custom_domain
+      ? 'https://' + a.custom_domain
+      : a.subdomain_url || a.published_url || (a.slug ? 'https://' + a.slug + '.supportagent.aasaitech.in' : null)
+
+    if (agentUrl) {
+      const openBtn = document.createElement('a')
+      openBtn.className = 'btn btn-secondary btn-sm'
+      openBtn.style.cssText = 'justify-content:center;flex-shrink:0'
+      openBtn.href = agentUrl
+      openBtn.target = '_blank'
+      openBtn.title = 'Open live agent'
+      openBtn.textContent = 'Open ↗'
+      openBtn.onclick = e => e.stopPropagation()
+      footer.appendChild(openBtn)
+
+      const shareBtn = document.createElement('button')
+      shareBtn.className = 'btn btn-accent-ghost btn-sm'
+      shareBtn.style.cssText = 'flex:1;justify-content:center'
+      shareBtn.innerHTML = '🔗 Share'
+      shareBtn.title = 'Share agent link'
+      shareBtn.onclick = e => {
+        e.stopPropagation()
+        shareUrl(agentUrl, a.name || 'Agent')
+      }
+      footer.appendChild(shareBtn)
+    } else {
+      const openBtn = document.createElement('a')
+      openBtn.className = 'btn btn-accent-ghost btn-sm'
+      openBtn.style.cssText = 'flex:1;justify-content:center'
+      openBtn.href = a.subdomain_url || a.published_url || '#'
+      openBtn.target = '_blank'
+      openBtn.textContent = 'Open ↗'
+      openBtn.onclick = e => e.stopPropagation()
+      footer.appendChild(openBtn)
+    }
   } else {
     const pubBtn = document.createElement('button')
     pubBtn.className = 'btn btn-primary btn-sm'
@@ -408,6 +435,15 @@ async function quickPublish(id, btn) {
     toast(e.message, 'error')
     btn.disabled = false
     btn.textContent = '🚀 Publish'
+  }
+}
+
+/* ── Share agent URL (Web Share API with clipboard fallback) ─────── */
+function shareUrl(url, name) {
+  if (navigator.share) {
+    navigator.share({ title: name + ' — AI Agent', url }).catch(() => {})
+  } else {
+    navigator.clipboard.writeText(url).then(() => toast('Link copied!', 'success'))
   }
 }
 
