@@ -140,14 +140,14 @@ function populateForm(u){
   const av=document.getElementById('profile-avatar')
   if(u.avatar)av.innerHTML=`<img src="${u.avatar}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
   else av.textContent=u.name?.[0]?.toUpperCase()||'?'
-  const t=u.tokens||{}
-  const planMap={starter:'Starter',grower:'Grower',enterprise:'Enterprise'}
-  document.getElementById('s-plan').textContent=planMap[t.plan||u.plan]||(t.plan||'—')
-  document.getElementById('s-status').textContent=t.trial_active?'Free Trial Active':(t.subscription_status||'Active')
-  document.getElementById('s-mcap').textContent=fmtTokens(t.monthly_cap||0)
-  document.getElementById('s-used').textContent=fmtTokens(t.monthly_used||0)
-  document.getElementById('s-topup').textContent=fmtTokens(t.topup_balance||0)
-  document.getElementById('s-reset').textContent=t.cap_reset_at?fmtDate(t.cap_reset_at):'—'
+  const tok=u.tokens||{}
+  const planMap={starter:t('planStarter'),grower:t('planGrower'),enterprise:t('planEnterprise')}
+  document.getElementById('s-plan').textContent=planMap[tok.plan||u.plan]||(tok.plan||'—')
+  document.getElementById('s-status').textContent=tok.trial_active?'Free Trial Active':(tok.subscription_status||'Active')
+  document.getElementById('s-mcap').textContent=fmtTokens(tok.monthly_cap||0)
+  document.getElementById('s-used').textContent=fmtTokens(tok.monthly_used||0)
+  document.getElementById('s-topup').textContent=fmtTokens(tok.topup_balance||0)
+  document.getElementById('s-reset').textContent=tok.cap_reset_at?fmtDate(tok.cap_reset_at):'—'
   document.getElementById('s-joined').textContent=fmtDate(u.created_at)
   document.getElementById('s-login').textContent=timeAgo(u.last_login)
 }
