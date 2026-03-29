@@ -14,6 +14,10 @@
 .agent-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:var(--t)}
 .agent-row:last-child{border-bottom:none}
 .agent-row:hover{background:var(--surface-2)}
+.agent-url-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono,monospace);color:var(--accent);background:var(--accent-dim,rgba(108,95,245,.08));border:1px solid rgba(108,95,245,.15);border-radius:6px;padding:2px 7px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;margin-top:3px;flex-shrink:0}
+.agent-url-chip.draft{color:var(--text-3);background:var(--surface-3);border-color:var(--border);font-style:italic}
+.agent-share-btn{flex-shrink:0;background:var(--surface-2);border:1px solid var(--border-md);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:var(--t);line-height:1}
+.agent-share-btn:hover{background:var(--accent-dim);border-color:rgba(108,95,245,.3);color:var(--accent)}
 .agent-logo{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0;overflow:hidden;border:1px solid var(--border-md)}
 .agent-logo img{width:100%;height:100%;object-fit:cover}
 .quickstart-banner{background:linear-gradient(135deg,var(--accent-soft),var(--accent-dim));border:1px solid rgba(124,111,255,.15);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:22px;display:flex;align-items:center;gap:18px}
@@ -33,6 +37,7 @@
 <script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
+<script src="onboarding.js"></script>
 </head>
 <body>
 <div id="toast-container"></div>
@@ -86,7 +91,24 @@
 
   <div class="content" id="page-content" style="display:none">
 
-    <!-- Quickstart (shown only when no agents) -->
+    <!-- Demo Store Banner (shown to new users) -->
+    <div class="demo-banner" id="demo-banner" style="display:none">
+      <div class="demo-banner-icon">⚡</div>
+      <div class="demo-banner-body">
+        <div class="demo-banner-title">See SupportGent in action — instantly</div>
+        <div class="demo-banner-sub">Load a fully-configured demo boutique store with 11 products, a knowledge base, and an AI shopping assistant — ready in under 30 seconds. No setup required.</div>
+        <div class="demo-banner-actions">
+          <button class="btn-demo" onclick="SG_OB.loadDemoStore()">⚡ Load Demo Store in 1 Click</button>
+          <a href="agents.html?create=1" class="btn-demo secondary">+ Create My Own Agent</a>
+        </div>
+      </div>
+      <button onclick="document.getElementById('demo-banner').style.display='none'" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;opacity:.5;line-height:1">✕</button>
+    </div>
+
+    <!-- Onboarding checklist (shown until all steps done) -->
+    <div class="ob-checklist" id="ob-checklist" style="display:none"></div>
+
+    <!-- Quickstart (shown only when no agents, legacy fallback) -->
     <div class="quickstart-banner" id="quickstart-banner" style="display:none">
       <div class="qsb-icon">🚀</div>
       <div style="flex:1">
@@ -191,7 +213,16 @@
     bar.style.width=pct+'%';bar.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
     document.getElementById('tu-pct').textContent=pct+'% '+t('navUsed')
     document.getElementById('tu-reset').textContent=tok.cap_reset_at?'Resets '+fmtDate(tok.cap_reset_at):''
-    if(!d.agents_count)document.getElementById('quickstart-banner').style.display='flex'
+    if(!d.agents_count){
+      document.getElementById('quickstart-banner').style.display='flex'
+      // Show demo banner and checklist for new users
+      document.getElementById('demo-banner').style.display='flex'
+      SG_OB.renderChecklist(document.getElementById('ob-checklist'))
+    } else {
+      // Show checklist if not all steps done
+      SG_OB.markDone('create_agent')
+      if (!SG_OB.allDone()) SG_OB.renderChecklist(document.getElementById('ob-checklist'))
+    }
     // Chart
     const last14=Array.from({length:14},(_,i)=>{const dt=new Date();dt.setDate(dt.getDate()-(13-i));return dt.toISOString().slice(0,10)})
     const statMap={};(d.daily_stats||[]).forEach(s=>statMap[s._id]=s.queries||0)
@@ -209,16 +240,35 @@
     if(!d.recent_agents?.length){
       wrap.innerHTML='<div class="empty-state" style="padding:36px 20px"><div class="empty-icon">🤖</div><div class="empty-title">'+t('noAgentsYet')+'</div><div class="empty-desc">'+t('createFirstAgent')+'</div><a href="agents.html?create=1" class="btn btn-primary">'+t('createAgent')+'</a></div>'
     }else{
-      wrap.innerHTML=d.recent_agents.map(a=>`
+      const SUBDOMAIN = 'supportagent.aasaitech.in'
+      wrap.innerHTML=d.recent_agents.map(a=>{
+        const agentUrl = a.published && a.slug
+          ? (a.custom_domain ? 'https://'+a.custom_domain : 'https://'+a.slug+'.'+SUBDOMAIN)
+          : null
+        const urlDisplay = a.published && a.slug
+          ? (a.custom_domain ? a.custom_domain : a.slug+'.'+SUBDOMAIN)
+          : 'Not published yet'
+        return `
         <div class="agent-row" onclick="location.href='agent.html?id=${a._id}'">
           <div class="agent-logo" style="background:${a.brand_color||'#7C6FFF'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.name}</div>
-            <div style="font-size:11px;color:var(--text-3)">${fmtNum(a.query_count||0)} chats · ${fmtNum(a.sources_count||0)} sources</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">
+              ${agentUrl
+                ? `<a class="agent-url-chip" href="${agentUrl}" target="_blank" onclick="event.stopPropagation()" title="${agentUrl}">🔗 ${urlDisplay}</a>`
+                : `<span class="agent-url-chip draft">⏸ ${urlDisplay}</span>`
+              }
+              <span style="font-size:10px;color:var(--text-3)">${fmtNum(a.query_count||0)} chats</span>
+            </div>
           </div>
           <span class="badge ${a.published?'badge-green':'badge-gray'}">${a.published?t('labelLive'):t('labelDraft')}</span>
+          ${agentUrl
+            ? `<button class="agent-share-btn" title="Copy agent URL" onclick="event.stopPropagation();navigator.clipboard.writeText('${agentUrl}').then(()=>toast('Link copied!','success'))">📋 Share</button>`
+            : ''
+          }
           <svg width="12" height="12" fill="none" stroke="var(--text-3)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>`).join('')
+        </div>`
+      }).join('')
     }
   }catch(e){toast(e.message,'error')}
   document.getElementById('page-content').style.display='block'
