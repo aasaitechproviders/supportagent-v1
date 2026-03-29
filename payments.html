@@ -11,7 +11,7 @@
 <script>
 ;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
 </script>
-<script src="api.js"></script><script src="nav.js"></script>
+<script src="i18n.js"></script><script src="api.js"></script><script src="nav.js"></script>
 </head>
 <body>
 <div id="toast-container"></div>
@@ -38,7 +38,7 @@
 </div>
 <div class="main-wrap">
   <div class="topbar">
-    <div class="topbar-left"><div><div class="topbar-title">Billing</div><div class="topbar-subtitle">Manage your plan and token balance</div></div></div>
+    <div class="topbar-left"><div><div class="topbar-title" data-i18n="billing">Billing</div><div class="topbar-subtitle" data-i18n="billingSubtitle">Manage your plan and token balance</div></div></div>
     <div class="topbar-right"><button class="theme-toggle" style="font-size:15px"></button></div>
   </div>
   <div class="content" id="page-content" style="display:none">
@@ -47,7 +47,7 @@
 
         <!-- Current plan -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🎯</span>Current Plan</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🎯</span data-i18n="currentPlan">Current Plan</div></div>
           <div class="card-body">
             <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:16px">
               <div style="width:48px;height:48px;border-radius:13px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow)">⚡</div>
@@ -57,23 +57,23 @@
               </div>
               <span class="badge" id="cur-badge" style="margin-left:auto">—</span>
             </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">Monthly Token Usage</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px" data-i18n="monthlyTokenUsage">Monthly Token Usage</div>
             <div class="progress-bar" style="height:8px;margin-bottom:7px"><div class="progress-fill" id="usage-fill" style="width:0%"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-bottom:14px"><span id="usage-used">0 used</span><span id="usage-cap">—</span></div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid var(--border)">
-              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Monthly Cap</div></div>
-              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Topup Balance</div></div>
-              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-reset">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px">Resets On</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="monthlyCap">Monthly Cap</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="topupBalance">Topup Balance</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-reset">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="resetsOn">Resets On</div></div>
             </div>
           </div>
         </div>
 
         <!-- Upgrade plan -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🚀</span>Upgrade Plan</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🚀</span data-i18n="upgradePlan">Upgrade Plan</div></div>
           <div class="card-body">
             <div style="display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);width:fit-content;margin-bottom:18px">
-              <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px">Save 20%</span></button>
+              <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px" data-i18n="save20">Save 20%</span></button>
               <button class="btn btn-ghost btn-sm" id="cycle-monthly" onclick="setCycle('monthly',this)">Monthly</button>
             </div>
             <div class="plans-grid" id="plans-grid">
@@ -86,20 +86,20 @@
 
         <!-- Token topup -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span>Buy Token Credits</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span data-i18n="buyTokenCredits">Buy Token Credits</div></div>
           <div class="card-body">
-            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7">Top up instantly. Credits never expire and are used after your monthly cap is reached.</p>
+            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7" data-i18n="buyTokenDesc">Top up instantly. Credits never expire and are used after your monthly cap is reached.</p>
             <div class="topup-grid" id="topup-grid"></div>
-            <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center;height:40px" onclick="buyTopup()" id="topup-btn">Buy Token Credits</button>
+            <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center;height:40px" onclick="buyTopup()" id="topup-btn" data-i18n="buyTokenCredits">Buy Token Credits</button>
           </div>
         </div>
 
         <!-- History -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">📋</span>Billing History</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">📋</span data-i18n="billingHistory">Billing History</div></div>
           <div class="table-wrap" style="border:none;border-radius:0;box-shadow:none">
-            <table><thead><tr><th>Type</th><th>Details</th><th>Date</th><th>Status</th></tr></thead>
-            <tbody id="billing-tbody"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px">No billing history yet.</td></tr></tbody></table>
+            <table><thead><tr><th data-i18n="thType">Type</th><th data-i18n="thDetails">Details</th><th data-i18n="thDate">Date</th><th data-i18n="thStatus">Status</th></tr></thead>
+            <tbody id="billing-tbody"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px" data-i18n="noBillingHistory">No billing history yet.</td></tr></tbody></table>
           </div>
         </div>
       </div>
@@ -107,29 +107,29 @@
       <!-- Side -->
       <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span>Topup Balance</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span data-i18n="topupBalance">Topup Balance</div></div>
           <div class="card-body">
             <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:13px">
               <div style="font-size:28px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em" id="side-topup">—</div>
-              <div style="font-size:12px;color:var(--text-3)">extra tokens</div>
+              <div style="font-size:12px;color:var(--text-3)" data-i18n="extraTokens">extra tokens</div>
             </div>
             <p style="font-size:12.5px;color:var(--text-2);line-height:1.7">Topup tokens are used after your monthly cap. They never expire.</p>
           </div>
         </div>
         <div id="trial-card" style="display:none">
           <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.18);border-radius:var(--r-lg);padding:18px">
-            <div style="font-size:14px;font-weight:800;margin-bottom:5px">🎁 Free Trial Active</div>
-            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6">You started on Grower with 500K tokens. Upgrade to keep all features after your trial ends.</div>
+            <div style="font-size:14px;font-weight:800;margin-bottom:5px" data-i18n="freeTrialTitle">🎁 Free Trial Active</div>
+            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6" data-i18n="freeTrialDesc">You started on Grower with 500K tokens. Upgrade to keep all features after your trial ends.</div>
             <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px" id="trial-ends"></div>
-            <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center">Upgrade Now →</a>
+            <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center" data-i18n="upgradeNow">Upgrade Now →</a>
           </div>
         </div>
         <div class="card">
           <div class="card-body" style="padding:14px">
             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:10px">Quick Links</div>
             <div style="display:flex;flex-direction:column;gap:7px">
-              <a href="agents.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>🤖</span>Manage Agents</a>
-              <a href="account.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>👤</span>Account Settings</a>
+              <a href="agents.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>🤖</span data-i18n="manageAgents">Manage Agents</a>
+              <a href="account.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;gap:7px"><span>👤</span data-i18n="accountSettings">Account Settings</a>
             </div>
           </div>
         </div>
@@ -141,6 +141,7 @@
 let billingData=null,billingCycle='yearly',selectedTopup=null
 ;(async()=>{
   const nav=await renderNav('payments')
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n))
   if(!nav)return
   try{
     billingData=await apiFetch('/billing/summary')
@@ -154,7 +155,7 @@ let billingData=null,billingCycle='yearly',selectedTopup=null
 })()
 function renderCurrentPlan(t){
   if(!t)return
-  const planLabels={starter:'Starter',grower:'Grower',enterprise:'Enterprise'}
+  const planLabels={starter:window.t('planStarter'),grower:window.t('planGrower'),enterprise:window.t('planEnterprise')}
   document.getElementById('cur-plan').textContent=planLabels[t.plan]||t.plan||'—'
   document.getElementById('cur-status').textContent=t.trial_active?`Free trial · Ends ${fmtDate(t.trial_ends_at)}`:t.subscription_end?`Renews ${fmtDate(t.subscription_end)}`:'Active'
   const badge=document.getElementById('cur-badge')
@@ -196,13 +197,13 @@ function renderPlans(plans){
     const price=billingCycle==='yearly'?p.price_monthly:p.price_monthly_mo
     const isCur=key===cur
     return`<div class="plan-card ${recommended?'recommended':''} ${isCur?'current':''}">
-      ${recommended?'<div class="plan-recommend-badge">Most Popular</div>':''}
-      ${isCur?'<div class="plan-recommend-badge" style="background:var(--green)">Current Plan</div>':''}
+      ${recommended?'<div class="plan-recommend-badge" data-i18n="mostPopular">Most Popular</div>':''}
+      ${isCur?'<div class="plan-recommend-badge" style="background:var(--green)" data-i18n="currentPlan">Current Plan</div>':''}
       <div class="plan-name">${p.label}</div>
       <div class="plan-price"><sup style="font-size:15px;vertical-align:top;margin-top:6px">₹</sup>${price}<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo</span></div>
       <div class="plan-price-note">${billingCycle==='yearly'?`<span style="color:var(--green)">Billed ₹${(price*12).toLocaleString()}/yr — 20% off</span>`:'Billed monthly'}</div>
       <div class="plan-features">${features.map(f=>featHtml(f,true)).join('')}${no.map(f=>featHtml(f,false)).join('')}</div>
-      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled>Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Upgrade to ${p.label} →</button>`}
+      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled data-i18n="currentPlan">Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Upgrade to ${p.label} →</button>`}
     </div>`}).join('')
 }
 function renderTopupPacks(packs){
@@ -214,7 +215,7 @@ function selectTopup(id,el){selectedTopup=id;document.querySelectorAll('.topup-c
 function renderHistory(events,topups){
   const tbody=document.getElementById('billing-tbody')
   const all=[...(events||[]).map(e=>({...e,kind:'sub'})),...(topups||[]).filter(t=>t.status==='completed').map(t=>({...t,kind:'topup'}))].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
-  if(!all.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px">No billing history yet.</td></tr>';return}
+  if(!all.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:32px" data-i18n="noBillingHistory">No billing history yet.</td></tr>';return}
   tbody.innerHTML=all.slice(0,20).map(item=>`<tr><td>${item.kind==='topup'?'🪙 Token Topup':'⚡ Subscription'}</td><td>${item.kind==='topup'?fmtTokens(item.tokens)+' tokens':(item.plan||'—')+' · '+(item.billing_cycle||'')+(item.amount?' · ₹'+item.amount:'')}</td><td>${fmtDate(item.created_at||item.completed_at)}</td><td><span class="badge ${item.status==='paid'||item.status==='completed'?'badge-green':'badge-amber'}">${item.status}</span></td></tr>`).join('')
 }
 async function subscribePlan(plan){
