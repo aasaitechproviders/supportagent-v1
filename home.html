@@ -257,6 +257,12 @@
       wrap.innerHTML='<div class="empty-state" style="padding:36px 20px"><div class="empty-icon">🤖</div><div class="empty-title">'+t('noAgentsYet')+'</div><div class="empty-desc">'+t('createFirstAgent')+'</div><a href="agents.html?create=1" class="btn btn-primary">'+t('createAgent')+'</a></div>'
     }else{
       const SUBDOMAIN = 'supportagent.aasaitech.in'
+      const HOME_TYPE_META = {
+        sales: { label: '🛒 Sales', cls: 'badge-accent' },
+        support: { label: '🎧 Support', cls: 'badge-blue' },
+        faq: { label: '❓ FAQ', cls: 'badge-gray' },
+        general: { label: '🤖 General', cls: 'badge-gray' },
+      }
       wrap.innerHTML=d.recent_agents.map(a=>{
         const agentUrl = a.published && a.slug
           ? (a.custom_domain ? 'https://'+a.custom_domain : 'https://'+a.slug+'.'+SUBDOMAIN)
@@ -264,12 +270,15 @@
         const urlDisplay = a.published && a.slug
           ? (a.custom_domain ? a.custom_domain : a.slug+'.'+SUBDOMAIN)
           : 'Not published yet'
+        const agentType = a.agent_type || a.type || 'general'
+        const typeMeta  = HOME_TYPE_META[agentType] || { label: agentType, cls: 'badge-gray' }
         return `
         <div class="agent-row" onclick="location.href='agent.html?id=${a._id}'">
           <div class="agent-logo" style="background:${a.brand_color||'#7C6FFF'}">${a.logo_base64?`<img src="${a.logo_base64}" alt=""/>`:(a.name?.[0]?.toUpperCase()||'A')}</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.name}</div>
-            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px">
+              <span class="badge ${typeMeta.cls}" style="font-size:9.5px;padding:1px 7px">${typeMeta.label}</span>
               ${agentUrl
                 ? `<a class="agent-url-chip" href="${agentUrl}" target="_blank" onclick="event.stopPropagation()" title="${agentUrl}">🔗 ${urlDisplay}</a>`
                 : `<span class="agent-url-chip draft">⏸ ${urlDisplay}</span>`
