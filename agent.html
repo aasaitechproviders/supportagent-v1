@@ -209,6 +209,7 @@
       </div>
     </div>
     <div class="topbar-right">
+      <span class="status-badge" id="agent-type-badge" style="display:none"></span>
       <span class="status-badge" id="pub-badge" style="display:none"></span>
       <button class="btn btn-secondary btn-sm" id="preview-btn" onclick="previewAgent()" style="display:none">👁 Open Chat</button>
       <button class="btn btn-primary btn-sm" id="save-btn" onclick="saveGeneral()" data-i18n="save">Save Changes</button>
@@ -653,7 +654,7 @@ async function loadAgent() {
     fillForm(agent)
     livePreview()
     updateStats(agent)
-    applyAgentTypeTabs(agent.type || 'support')
+    applyAgentTypeTabs(agent.agent_type || agent.type || 'support')
     if (agent.published) updatePublishUI(agent)
     document.getElementById('main-content').style.display = 'grid'
     dismissSkeleton()
@@ -664,6 +665,13 @@ async function loadAgent() {
 }
 
 /* ── Form fill ──────────────────────────────────────────────────── */
+const TYPE_META = {
+  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
+  support: { label: '🎧 Support', cls: 'badge-blue'   },
+  faq:     { label: '❓ FAQ',     cls: 'badge-gray'   },
+  general: { label: '🤖 General', cls: 'badge-gray'   },
+}
+
 function fillForm(a) {
   document.getElementById('page-agent-name').textContent = a.name
   const slugURL = a.slug ? a.slug + '.' + SUBDOMAIN_BASE : ''
@@ -683,6 +691,18 @@ function fillForm(a) {
     document.getElementById('logo-remove').style.display = 'inline-flex'
   }
   document.getElementById('shopping-toggle').checked = !!a.shopping_enabled
+
+  // Agent type badge in topbar
+  const agentType = a.agent_type || a.type || 'general'
+  const typeBadge = document.getElementById('agent-type-badge')
+  if (typeBadge) {
+    const meta = TYPE_META[agentType] || { label: agentType, cls: 'badge-gray' }
+    typeBadge.className  = 'badge ' + meta.cls
+    typeBadge.textContent = meta.label
+    typeBadge.style.display = 'inline-flex'
+  }
+
+  // Published badge
   const badge = document.getElementById('pub-badge')
   badge.style.display = 'inline-flex'
   if (a.published) {
