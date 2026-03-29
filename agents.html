@@ -41,6 +41,7 @@
 <script>
 ;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
 </script>
+<script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
 </head>
@@ -74,13 +75,13 @@
   <div class="topbar">
     <div class="topbar-left">
       <div>
-        <div class="topbar-title">My Agents</div>
+        <div class="topbar-title" data-i18n="myAgents">My Agents</div>
         <div class="topbar-subtitle" id="agents-sub">Loading…</div>
       </div>
     </div>
     <div class="topbar-right">
       <button class="theme-toggle" style="font-size:15px"></button>
-      <button class="btn btn-primary" onclick="openCreate()">+ New Agent</button>
+      <button class="btn btn-primary" onclick="openCreate()" id="btn-new-agent">+ New Agent</button>
     </div>
   </div>
   <div class="content" id="page-content" style="display:none">
@@ -93,26 +94,26 @@
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
       <div>
-        <div class="modal-title">Create New Agent</div>
-        <div class="modal-sub">Takes less than a minute to set up</div>
+        <div class="modal-title" data-i18n="createNewAgent">Create New Agent</div>
+        <div class="modal-sub" data-i18n="createModalSub">Takes less than a minute to set up</div>
       </div>
       <button class="modal-close" onclick="closeCreate()">✕</button>
     </div>
     <div class="field">
-      <label>Agent Name *</label>
-      <input type="text" id="cm-name" placeholder="e.g. Support Bot, Sales Agent, FAQ Bot" autofocus>
+      <label data-i18n="agentNameLabel">Agent Name *</label>
+      <input type="text" id="cm-name" placeholder="e.g. Support Bot, Sales Agent, FAQ Bot" id="cm-name-inp" autofocus>
     </div>
     <div class="field">
-      <label>Agent Type</label>
+      <label data-i18n="agentType">Agent Type</label>
       <div class="type-grid" id="type-grid">
-        <div class="type-opt active" onclick="selectType('support',this)"><div class="type-opt-icon">🎧</div><div><div class="type-opt-name">Support</div><div class="type-opt-sub">Handle customer queries</div></div></div>
-        <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name">Sales</div><div class="type-opt-sub">Sell products via chat</div></div></div>
-        <div class="type-opt" onclick="selectType('faq',this)"><div class="type-opt-icon">❓</div><div><div class="type-opt-name">FAQ Bot</div><div class="type-opt-sub">Answer common questions</div></div></div>
-        <div class="type-opt" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name">General</div><div class="type-opt-sub">Flexible assistant</div></div></div>
+        <div class="type-opt active" onclick="selectType('support',this)"><div class="type-opt-icon">🎧</div><div><div class="type-opt-name" data-i18n="typeSupport">Support</div><div class="type-opt-sub" data-i18n="typeSupportSub">Handle customer queries</div></div></div>
+        <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name" data-i18n="typeSales">Sales</div><div class="type-opt-sub" data-i18n="typeSalesSub">Sell products via chat</div></div></div>
+        <div class="type-opt" onclick="selectType('faq',this)"><div class="type-opt-icon">❓</div><div><div class="type-opt-name" data-i18n="typeFaq">FAQ Bot</div><div class="type-opt-sub" data-i18n="typeFaqSub">Answer common questions</div></div></div>
+        <div class="type-opt" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name" data-i18n="typeGeneral">General</div><div class="type-opt-sub" data-i18n="typeGeneralSub">Flexible assistant</div></div></div>
       </div>
     </div>
     <div class="field" style="margin-bottom:0">
-      <label>Brand Colour</label>
+      <label data-i18n="brandColour">Brand Colour</label>
       <div class="color-palette" id="cm-palette">
         <div class="color-swatch active" style="background:#7C6FFF" onclick="cmColor('#7C6FFF',this)"></div>
         <div class="color-swatch" style="background:#F26B6B" onclick="cmColor('#F26B6B',this)"></div>
@@ -125,7 +126,7 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeCreate()">Cancel</button>
+      <button class="btn btn-secondary" onclick="closeCreate()" id="btn-cancel-create">Cancel</button>
       <button class="btn btn-primary" onclick="createAgent()" id="cm-btn">Create Agent →</button>
     </div>
   </div>
@@ -149,6 +150,10 @@ const PROMPTS = {
   const { user } = nav
   if (new URLSearchParams(location.search).get('create') === '1') setTimeout(openCreate, 400)
   try { await loadAgents(user) } catch(e) { toast(e.message, 'error') }
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n))
+  document.getElementById('btn-new-agent').textContent=t('newAgent')
+  document.getElementById('btn-cancel-create').textContent=t('cancel')
+  document.getElementById('cm-btn').textContent=t('createAgentBtn')
   dismissSkeleton()
 })()
 
@@ -167,9 +172,9 @@ async function loadAgents(user) {
       <div style="grid-column:1/-1">
         <div class="empty-state">
           <div class="empty-icon">🤖</div>
-          <div class="empty-title">No agents yet</div>
-          <div class="empty-desc">Create your first AI agent to start handling customer queries.</div>
-          <button class="btn btn-primary" style="margin:0 auto" onclick="openCreate()">Create Your First Agent →</button>
+          <div class="empty-title">${t('noAgentsYet')}</div>
+          <div class="empty-desc">${t('noAgentsDesc')}</div>
+          <button class="btn btn-primary" style="margin:0 auto" onclick="openCreate()">${t('createFirstAgentBtn')}</button>
         </div>
       </div>`
     return
@@ -189,8 +194,8 @@ async function loadAgents(user) {
     cc.onclick = openCreate
     cc.innerHTML = `
       <div style="font-size:36px;opacity:.35">+</div>
-      <div style="font-size:14px;font-weight:700">New Agent</div>
-      <div style="font-size:12px;color:var(--text-3)">Build another AI assistant</div>`
+      <div style="font-size:14px;font-weight:700" data-i18n="newAgentCard">New Agent</div>
+      <div style="font-size:12px;color:var(--text-3)" data-i18n="newAgentCardSub">Build another AI assistant</div>`
     grid.appendChild(cc)
   }
 }
@@ -239,7 +244,7 @@ function buildAgentCard(a, i, limit) {
 
   const badge = document.createElement('span')
   badge.className = 'badge ' + (a.published ? 'badge-green' : 'badge-gray')
-  badge.textContent = a.published ? '● Live' : 'Draft'
+  badge.textContent = a.published ? t('labelLive') : t('labelDraft')
 
   hdr.appendChild(logo)
   hdr.appendChild(info)
@@ -250,9 +255,9 @@ function buildAgentCard(a, i, limit) {
   const kpis = document.createElement('div')
   kpis.className = 'ac-kpis'
   ;[
-    [fmtNum(a.query_count || 0), 'Chats'],
-    [fmtNum(a.sources_count || 0), 'Sources'],
-    [a.products_count || 0, 'Products'],
+    [fmtNum(a.query_count || 0), t('chats')],
+    [fmtNum(a.sources_count || 0), t('sources')],
+    [a.products_count || 0, t('products')],
   ].forEach(([val, label]) => {
     const kpi = document.createElement('div')
     kpi.className = 'ac-kpi'
@@ -323,31 +328,31 @@ function closeCreate() {
 }
 async function createAgent() {
   const name = document.getElementById('cm-name').value.trim()
-  if (!name) { toast('Enter an agent name', 'error'); return }
+  if (!name) { toast(t('toastEnterName'), 'error'); return }
   const btn = document.getElementById('cm-btn')
-  btn.disabled = true; btn.textContent = 'Creating…'
+  btn.disabled = true; btn.textContent = t('creating')
   try {
     const a = await apiFetch('/agents', { method: 'POST', body: JSON.stringify({
       name, brand_color: _cmColor,
       system_prompt: PROMPTS[_cmType],
       welcome_message: `Hi! I'm ${name}. How can I help you today?`
     })})
-    toast('Agent created!', 'success')
+    toast(t('toastAgentCreated'), 'success')
     closeCreate()
     location.href = 'agent.html?id=' + a._id
   } catch(e) {
     toast(e.message, 'error')
     btn.disabled = false
-    btn.textContent = 'Create Agent →'
+    btn.textContent = t('createAgentBtn')
   }
 }
 
 /* ── Quick publish ─────────────────────────────────────────────── */
 async function quickPublish(id, btn) {
-  btn.disabled = true; btn.textContent = 'Publishing…'
+  btn.disabled = true; btn.textContent = t('saving')
   try {
     await apiFetch(`/agents/${id}/publish`, { method: 'POST' })
-    toast('Published! 🎉', 'success')
+    toast(t('toastPublished'), 'success')
     location.reload()
   } catch(e) {
     toast(e.message, 'error')
