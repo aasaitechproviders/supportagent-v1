@@ -1,24 +1,23 @@
 /* ══════════════════════════════════════════════════════════════════
-   nav.js — SupportGent Navigation v3
-   Exact same pattern as reference home.html nav system
-   Deps: api.js must load first
+   nav.js — SupportGent Navigation v3 (i18n)
+   Deps: i18n.js + api.js must load first
    Usage: const { user } = await renderNav('dashboard')
 ══════════════════════════════════════════════════════════════════ */
 
 const _NAV_SECTIONS = [
   {
-    label: 'Workspace',
+    labelKey: 'workspace',
     items: [
-      { page:'dashboard',     href:'home.html',          label:'Dashboard',     icon:'🏠' },
-      { page:'agents',        href:'agents.html',        label:'My Agents',     icon:'🤖' },
-      { page:'conversations', href:'conversations.html', label:'Conversations', icon:'💬' },
+      { page:'dashboard',     href:'home.html',          labelKey:'navDashboard',     icon:'🏠' },
+      { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
+      { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
     ]
   },
   {
-    label: 'Account',
+    labelKey: 'navAccount',
     items: [
-      { page:'payments', href:'payments.html', label:'Billing',  icon:'⚡' },
-      { page:'account',  href:'account.html',  label:'Account',  icon:'👤' },
+      { page:'payments', href:'payments.html', labelKey:'navBilling',     icon:'⚡' },
+      { page:'account',  href:'account.html',  labelKey:'navAccountPage', icon:'👤' },
     ]
   }
 ]
@@ -30,12 +29,17 @@ function _buildSidebar(activePage) {
 
   const navHtml = _NAV_SECTIONS.map(sec => `
     <div class="nav-section">
-      <div class="nav-section-label">${sec.label}</div>
+      <div class="nav-section-label">${t(sec.labelKey)}</div>
       ${sec.items.map(it => `
         <a class="nav-item ${it.page === activePage ? 'active' : ''}" href="${it.href}">
-          <span class="nav-icon">${it.icon}</span>${it.label}
+          <span class="nav-icon">${it.icon}</span>${t(it.labelKey)}
         </a>`).join('')}
     </div>`).join('')
+
+  // Language switcher options
+  const langOptions = Object.entries(LANG_META).map(([code, meta]) =>
+    `<option value="${code}" ${getLang() === code ? 'selected' : ''}>${meta.native}</option>`
+  ).join('')
 
   sidebar.innerHTML = `
     <a class="sidebar-logo" href="home.html">
@@ -64,12 +68,12 @@ function _buildSidebar(activePage) {
     <div id="token-sidebar-widget" style="display:none;">
       <div class="token-sidebar-widget" onclick="location.href='payments.html'" title="Manage billing">
         <div class="tsw-header">
-          <span class="tsw-label">Monthly Tokens</span>
+          <span class="tsw-label">${t('navMonthlyTokens')}</span>
           <span class="tsw-badge" id="tsw-pct">0%</span>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="tsw-fill" style="width:0%"></div></div>
         <div class="tsw-sub">
-          <span id="tsw-used">0 used</span>
+          <span id="tsw-used">0 ${t('navUsed')}</span>
           <span id="tsw-cap">0</span>
         </div>
       </div>
@@ -80,21 +84,27 @@ function _buildSidebar(activePage) {
 
     <!-- Quick actions -->
     <div class="sidebar-quick-actions">
-      <div class="sqa-label">Quick Actions</div>
-      <a href="agents.html?create=1" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:7px;">+ New Agent</a>
-      <a href="agents.html" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;">View All Agents</a>
+      <div class="sqa-label">${t('navQuickActions')}</div>
+      <a href="agents.html?create=1" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-bottom:7px;">${t('navNewAgent')}</a>
+      <a href="agents.html" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;">${t('navViewAllAgents')}</a>
+    </div>
+
+    <!-- Language switcher -->
+    <div style="padding:0 12px 8px;">
+      <select onchange="setLang(this.value)" style="width:100%;height:30px;padding:0 8px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12px;cursor:pointer;outline:none;">
+        ${langOptions}
+      </select>
     </div>
 
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">
-        <span style="font-size:14px;">↩</span> Sign Out
+        <span style="font-size:14px;">↩</span> ${t('navSignOut')}
       </button>
     </div>`
 }
 
 // Populate user chip after data loads
 function _populateUser(user) {
-  // Hide skeleton, show real chip
   const skel = document.getElementById('sidebar-user-skel')
   const real = document.getElementById('sidebar-user-real')
   if (skel) skel.classList.add('hidden')
@@ -102,7 +112,6 @@ function _populateUser(user) {
 
   const { name = '', email = '', avatar = '', plan = 'starter', tokens } = user
 
-  // Avatar
   const av = document.getElementById('nav-avatar')
   if (av) {
     if (avatar && (avatar.startsWith('data:') || avatar.startsWith('http')))
@@ -111,13 +120,16 @@ function _populateUser(user) {
       av.textContent = name?.[0]?.toUpperCase() || '?'
   }
 
-  const planLabel = { starter:'Starter Plan', grower:'Grower Plan', enterprise:'Enterprise' }
+  const planLabel = {
+    starter:    t('planStarter'),
+    grower:     t('planGrower'),
+    enterprise: t('planEnterprise'),
+  }
   const nameEl = document.getElementById('nav-user-name')
   const planEl = document.getElementById('nav-user-plan')
   if (nameEl) nameEl.textContent = name || 'User'
   if (planEl) planEl.textContent = planLabel[plan] || plan
 
-  // Token widget
   if (tokens) {
     const widget = document.getElementById('token-sidebar-widget')
     if (widget) widget.style.display = 'block'
@@ -133,7 +145,7 @@ function _populateUser(user) {
       fill.className   = 'progress-fill' + (pct >= 90 ? ' danger' : pct >= 70 ? ' warn' : '')
     }
     if (pctEl)  pctEl.textContent  = pct + '%'
-    if (usedEl) usedEl.textContent = fmtTokens(used) + ' used'
+    if (usedEl) usedEl.textContent = fmtTokens(used) + ' ' + t('navUsed')
     if (capEl)  capEl.textContent  = fmtTokens(cap)
   }
 }
@@ -150,7 +162,6 @@ function closeMobileSidebar() {
   document.body.style.overflow = ''
 }
 
-// For backward-compat: both 'sidebarBackdrop' (from home.html pattern) and 'sidebar-backdrop'
 function _initMobile() {
   const btn1 = document.getElementById('mob-menu-btn')
   const btn2 = document.getElementById('mobMenuBtn')
@@ -170,13 +181,11 @@ function _initMobile() {
   ;[bd1,bd2].forEach(bd => bd?.addEventListener('click', close))
 }
 
-// Topbar actions slot (set from page JS)
 function setTopbarActions(html) {
   const el = document.getElementById('topbar-actions')
   if (el) el.innerHTML = html
 }
 
-// dismissSkeleton - page-level skeleton
 function dismissSkeleton() {
   const el = document.getElementById('page-skeleton')
   if (!el || el._done) return
@@ -185,7 +194,6 @@ function dismissSkeleton() {
   setTimeout(() => el?.remove(), 350)
 }
 
-// revealSidebarUser — compat shim
 function revealSidebarUser() {
   document.getElementById('sidebar-user-skel')?.classList.add('hidden')
   document.getElementById('sidebar-user-real')?.classList.remove('loading')
@@ -193,7 +201,6 @@ function revealSidebarUser() {
 
 // ── MAIN ENTRY POINT ─────────────────────────────────────────────
 async function renderNav(activePage) {
-  // Handle ?token= from OAuth redirect
   const params = new URLSearchParams(location.search)
   if (params.get('token')) {
     setToken(params.get('token'))
@@ -202,16 +209,9 @@ async function renderNav(activePage) {
 
   if (!getToken()) { location.replace('/'); return null }
 
-  // Handle ?create=1 on agents page
-  if (location.pathname.endsWith('agents.html') && params.get('create')) {
-    // will be handled by page after renderNav resolves
-  }
-
-  // Build sidebar structure
   _buildSidebar(activePage)
   _initMobile()
 
-  // Init theme toggles (emoji style matching reference)
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
   document.querySelectorAll('.theme-toggle').forEach(b => {
     b.textContent = isDark ? '☀️' : '🌙'
@@ -222,7 +222,6 @@ async function renderNav(activePage) {
     })
   })
 
-  // Fetch user
   try {
     const user = await apiFetch('/auth/me')
     _populateUser(user)
@@ -234,7 +233,6 @@ async function renderNav(activePage) {
   }
 }
 
-// Backward compat: initNav is same as renderNav
 async function initNav(activePage) {
   return renderNav(activePage)
 }
