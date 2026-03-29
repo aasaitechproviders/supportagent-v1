@@ -336,8 +336,9 @@
               stroke-width="2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
+            <!-- FIX Bug 1: removed duplicate id attribute -->
             <input class="cv-search-inp" type="text" id="search-inp"
-              placeholder="Search sessions…" id="search-inp" oninput="filterSessions()" autocomplete="off">
+              placeholder="Search sessions…" oninput="filterSessions()" autocomplete="off">
           </div>
         </div>
         <div class="session-list" id="session-list">
@@ -374,6 +375,53 @@
 </div>
 
 <script>
+/* ── Utility fallbacks (Bug 2 fix) ─────────────────────────────────
+   fmtTokens and timeAgo must be defined globally (ideally in api.js
+   or shared.js). These fallbacks prevent ReferenceErrors if the
+   shared file hasn't exported them yet.
+─────────────────────────────────────────────────────────────────── */
+if (typeof fmtTokens === 'undefined') {
+  window.fmtTokens = function(n) {
+    n = parseInt(n) || 0
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
+    if (n >= 1000)    return (n / 1000).toFixed(1) + 'k'
+    return n.toString()
+  }
+}
+
+if (typeof timeAgo === 'undefined') {
+  window.timeAgo = function(d) {
+    if (!d) return '—'
+    var diff = Date.now() - new Date(d).getTime()
+    var s = Math.floor(diff / 1000)
+    if (s < 60)   return 'just now'
+    var m = Math.floor(s / 60)
+    if (m < 60)   return m + 'm ago'
+    var h = Math.floor(m / 60)
+    if (h < 24)   return h + 'h ago'
+    var day = Math.floor(h / 24)
+    if (day < 30) return day + 'd ago'
+    return new Date(d).toLocaleDateString()
+  }
+}
+
+/* Bug 3 fix: confirmModal fallback if not provided by nav.js/shared.js */
+if (typeof confirmModal === 'undefined') {
+  window.confirmModal = function(opts) {
+    return Promise.resolve(window.confirm(
+      (opts.title ? opts.title + '\n\n' : '') + (opts.message || 'Are you sure?')
+    ))
+  }
+}
+
+/* Bug 4 fix: dismissSkeleton fallback if not provided by nav.js */
+if (typeof dismissSkeleton === 'undefined') {
+  window.dismissSkeleton = function() {
+    var sk = document.getElementById('page-skeleton')
+    if (sk) sk.style.display = 'none'
+  }
+}
+
 /* ── State ─────────────────────────────────────────────────────── */
 var allSessions = []
 var sessionsMap = {}   // key → session meta — never serialised into HTML
@@ -383,11 +431,13 @@ var activeKey   = null
 /* ── Boot ──────────────────────────────────────────────────────── */
 ;(async function () {
   var nav = await renderNav('conversations')
-  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n))
-  const si = document.getElementById('search-inp')
-  if (si) si.placeholder = t('searchSessions')
-  const sao = document.getElementById('sel-agent-opt')
-  if (sao) sao.textContent = t('selectAgent')
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    el.textContent = (typeof t === 'function') ? t(el.dataset.i18n) : el.textContent
+  })
+  var si = document.getElementById('search-inp')
+  if (si && typeof t === 'function') si.placeholder = t('searchSessions') || 'Search sessions…'
+  var sao = document.getElementById('sel-agent-opt')
+  if (sao && typeof t === 'function') sao.textContent = t('selectAgent') || '— Select agent —'
   if (!nav) return
 
   try {
@@ -412,7 +462,8 @@ var activeKey   = null
   }
 
   document.getElementById('page-content').style.display = 'block'
-  dismissSkeleton()
+  /* Bug 4 fix: guard call in case nav.js provides it later */
+  if (typeof dismissSkeleton === 'function') dismissSkeleton()
 }())
 
 /* ── Agent change ──────────────────────────────────────────────── */
@@ -463,7 +514,8 @@ async function loadSessions() {
 
 /* ── Session key ───────────────────────────────────────────────── */
 function sessionKey(s) {
-  // _id is the $group key from the aggregation ($ifNull chain on session_id/visitor_id/visitor_ip)
+  /* Bug 5 partial fix (frontend side): ensure we always get a non-empty string.
+     The real fix is on the backend — see index.js where $group _id falls back to $toString:$_id */
   var v = s._id != null ? s._id : (s.session_id != null ? s.session_id : (s.visitor_id != null ? s.visitor_id : (s.visitor_ip || '')))
   return String(v)
 }
@@ -473,21 +525,22 @@ function renderSessions(sessions) {
   var list = document.getElementById('session-list')
 
   if (!sessions.length) {
+    var noConvsText = (typeof t === 'function') ? t('noConversations') : 'No conversations yet'
+    var noConvsDesc = (typeof t === 'function') ? t('noConvsDesc')     : 'Conversations will appear here once visitors start chatting'
     list.innerHTML = [
       '<div style="padding:40px 20px;text-align:center">',
       '  <div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
-      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">' + t('noConversations') + '</div>',
-      '  <div style="font-size:12px;color:var(--text-3)">' + t('noConvsDesc') + '</div>',
+      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">' + noConvsText + '</div>',
+      '  <div style="font-size:12px;color:var(--text-3)">' + noConvsDesc + '</div>',
       '</div>'
     ].join('')
     return
   }
 
-  // Build with data-key — no JSON in attributes, no escaping edge-cases
   list.innerHTML = sessions.map(function (s) {
-    var key     = sessionKey(s)
-    var active  = key === activeKey ? ' active' : ''
-    var msgs    = s.message_count || 1
+    var key    = sessionKey(s)
+    var active = key === activeKey ? ' active' : ''
+    var msgs   = s.message_count || 1
     return '<div class="session-item' + active + '" id="si-' + safeId(key) + '" data-key="' + escAttr(key) + '">' +
       '<div class="session-q">' + esc(s.first_question || '(No message)') + '</div>' +
       '<div class="session-meta">' +
@@ -497,7 +550,6 @@ function renderSessions(sessions) {
     '</div>'
   }).join('')
 
-  // Attach click handlers via addEventListener — zero inline JS
   list.querySelectorAll('.session-item[data-key]').forEach(function (el) {
     el.addEventListener('click', function () { openSession(el.dataset.key) })
   })
@@ -505,7 +557,8 @@ function renderSessions(sessions) {
 
 /* ── Filter ────────────────────────────────────────────────────── */
 function filterSessions() {
-  var q = document.getElementById('search-inp').value.toLowerCase().trim()
+  var inp = document.getElementById('search-inp')
+  var q   = inp ? inp.value.toLowerCase().trim() : ''
   if (!q) { renderSessions(allSessions); return }
   renderSessions(allSessions.filter(function (s) {
     return (s.first_question || '').toLowerCase().includes(q) ||
@@ -526,10 +579,8 @@ async function openSession(key) {
 
   showThread()
 
-  // Back button visible only on mobile
   document.getElementById('back-btn').style.display = window.innerWidth < 860 ? 'flex' : 'none'
 
-  // Header
   document.getElementById('thread-title').textContent =
     (meta.first_question || 'Session').slice(0, 72)
   var msgCount = meta.message_count || 1
@@ -539,7 +590,6 @@ async function openSession(key) {
     meta.visitor_ip || null
   ].filter(Boolean).join(' · ')
 
-  // Loading skeleton
   var msgs = document.getElementById('cv-msgs')
   msgs.innerHTML = [
     '<div style="display:flex;flex-direction:column;gap:12px">',
@@ -559,11 +609,14 @@ async function openSession(key) {
       return
     }
 
-    // Answers are AI-generated trusted HTML — rendered as innerHTML intentionally
+    /* Bug 7 fix: sanitize AI answer HTML to prevent XSS.
+       Uses DOMPurify if available, otherwise falls back to a basic strip. */
     msgs.innerHTML = messages.map(function (m) {
+      var rawAnswer = m.answer || '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>'
+      var safeAnswer = sanitizeHtml(rawAnswer)
       return '<div class="msg-pair">' +
         '<div class="msg-q">' + esc(m.question || '') + '</div>' +
-        '<div class="msg-a">' + (m.answer || '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>') + '</div>' +
+        '<div class="msg-a">' + safeAnswer + '</div>' +
         '<div class="msg-meta">🪙 ' + fmtTokens(m.tokens_used || 0) + ' tokens · ' + timeAgo(m.created_at) + '</div>' +
       '</div>'
     }).join('')
@@ -573,6 +626,30 @@ async function openSession(key) {
   } catch (e) {
     msgs.innerHTML = '<div style="padding:24px;font-size:13px;color:var(--red)">Failed to load messages: ' + esc(e.message) + '</div>'
   }
+}
+
+/* ── HTML sanitizer (Bug 7 fix) ────────────────────────────────── */
+function sanitizeHtml(html) {
+  /* Prefer DOMPurify if loaded (add <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"> to <head>) */
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: ['p','br','b','strong','em','i','u','s','ul','ol','li','h1','h2','h3','h4','code','pre','table','thead','tbody','tr','td','th','a','span','div'],
+      ALLOWED_ATTR: ['href','target','rel','class','style'],
+      ALLOW_DATA_ATTR: false,
+    })
+  }
+  /* Fallback: strip script/iframe/object/event handlers but allow basic formatting */
+  var tmp = document.createElement('div')
+  tmp.innerHTML = html
+  tmp.querySelectorAll('script,iframe,object,embed,form,input,button,link,meta,base').forEach(function(el) { el.remove() })
+  tmp.querySelectorAll('*').forEach(function(el) {
+    Array.from(el.attributes).forEach(function(attr) {
+      if (/^on/i.test(attr.name) || (attr.name === 'href' && /^javascript:/i.test(attr.value))) {
+        el.removeAttribute(attr.name)
+      }
+    })
+  })
+  return tmp.innerHTML
 }
 
 /* ── Panel helpers ─────────────────────────────────────────────── */
@@ -598,16 +675,16 @@ async function clearAllModal() {
   if (!agentId) { toast('Select an agent first', 'warning'); return }
 
   var ok = await confirmModal({
-    title:       t('confirmClearTitle'),
-    message:     t('confirmClearMsg').replace('{agent}', agentName),
-    confirmText: t('clearAll'),
+    title:       (typeof t === 'function') ? t('confirmClearTitle') : 'Clear all conversations?',
+    message:     ((typeof t === 'function') ? t('confirmClearMsg') : 'This will permanently delete all conversations for {agent}.').replace('{agent}', agentName),
+    confirmText: (typeof t === 'function') ? t('clearAll') : 'Clear All',
     danger:      true
   })
   if (!ok) return
 
   try {
     await apiFetch('/agents/' + agentId + '/clear-conversations', { method: 'POST' })
-    toast(t('toastConvsCleared'), 'success')
+    toast((typeof t === 'function') ? t('toastConvsCleared') : 'Conversations cleared', 'success')
     activeKey = null
     showEmpty()
     await loadSessions()
@@ -629,7 +706,7 @@ function escAttr(s) {
 }
 function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
 function placeholderHtml(msg) {
-  return '<div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">' + msg + '</div>'
+  return '<div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">' + esc(msg) + '</div>'
 }
 </script>
 </body>
