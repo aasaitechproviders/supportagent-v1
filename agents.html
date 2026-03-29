@@ -44,6 +44,7 @@
 <script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
+<script src="onboarding.js"></script>
 </head>
 <body>
 <div id="toast-container"></div>
@@ -81,6 +82,7 @@
     </div>
     <div class="topbar-right">
       <button class="theme-toggle" style="font-size:15px"></button>
+      <button class="btn btn-secondary btn-sm" onclick="SG_OB.loadDemoStore()" title="Load a fully pre-built demo store in under 30 seconds" style="gap:6px">⚡ Demo Store</button>
       <button class="btn btn-primary" onclick="openCreate()" id="btn-new-agent">+ New Agent</button>
     </div>
   </div>
@@ -170,6 +172,32 @@ async function loadAgents(user) {
   if (!agents.length) {
     grid.innerHTML = `
       <div style="grid-column:1/-1">
+        <!-- Demo store banner -->
+        <div class="demo-banner" style="margin-bottom:20px">
+          <div class="demo-banner-icon">⚡</div>
+          <div class="demo-banner-body">
+            <div class="demo-banner-title">Try a live demo in 30 seconds</div>
+            <div class="demo-banner-sub">Load "Priya's Boutique" — a fully working AI shopping assistant with 11 products, smart knowledge base, and live chat. See exactly what your customers will experience.</div>
+            <div class="demo-banner-actions">
+              <button class="btn-demo" onclick="SG_OB.loadDemoStore()">⚡ Load Demo Store</button>
+              <button class="btn-demo secondary" onclick="openCreate()">+ Create My Own Agent</button>
+            </div>
+          </div>
+        </div>
+        <!-- How it works inline guide -->
+        <div class="ob-tip" style="margin-bottom:20px">
+          <div class="ob-tip-icon">🗺️</div>
+          <div class="ob-tip-body">
+            <div class="ob-tip-title">How to set up your AI agent (3 steps)</div>
+            <div class="ob-tip-desc">
+              <strong>Step 1 — Create agent:</strong> Click "+ New Agent", give it a name, choose type (Support / Sales / FAQ), pick a brand colour.<br>
+              <strong>Step 2 — Add knowledge:</strong> Upload your Products CSV, paste your FAQ, or add your website URL. The AI learns from this data.<br>
+              <strong>Step 3 — Publish:</strong> Hit Publish. You get a live link (e.g. <code>your-store.supportagent.aasaitech.in</code>) to share anywhere.
+            </div>
+            <button class="ob-tip-cta" onclick="openCreate()">🤖 Create My First Agent →</button>
+          </div>
+          <button class="ob-tip-close" onclick="this.closest('.ob-tip').remove()">✕</button>
+        </div>
         <div class="empty-state">
           <div class="empty-icon">🤖</div>
           <div class="empty-title">${t('noAgentsYet')}</div>
