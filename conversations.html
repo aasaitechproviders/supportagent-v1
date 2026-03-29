@@ -12,7 +12,7 @@
 /* ── Layout ──────────────────────────────────────────────────────── */
 .convs-wrap {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 310px 1fr;
   height: calc(100vh - 109px);
   min-height: 480px;
   border: 1px solid var(--border);
@@ -34,31 +34,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
   flex-shrink: 0;
 }
-.cv-left-hdr-title { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.cv-left-hdr-title { font-size: 11.5px; font-weight: 700; color: var(--text); letter-spacing: .04em; text-transform: uppercase; }
 .cv-search {
-  padding: 10px 12px;
+  padding: 9px 11px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .cv-search-wrap { position: relative; }
 .cv-search-icon {
-  position: absolute; left: 10px; top: 50%;
+  position: absolute; left: 9px; top: 50%;
   transform: translateY(-50%);
   color: var(--text-3); pointer-events: none;
 }
 .cv-search-inp {
-  width: 100%; height: 34px;
-  padding: 0 10px 0 32px;
+  width: 100%; height: 32px;
+  padding: 0 9px 0 30px;
   border-radius: var(--r-sm);
   border: 1px solid var(--border-md);
   background: var(--surface-2);
   color: var(--text); font-family: var(--font);
-  font-size: 12.5px; outline: none;
+  font-size: 12px; outline: none;
   transition: var(--t); box-sizing: border-box;
 }
 .cv-search-inp:focus {
@@ -74,38 +74,96 @@
   scrollbar-width: thin;
   scrollbar-color: var(--surface-4) transparent;
 }
+
+/* ── Session item ─────────────────────────────────────────────────── */
 .session-item {
-  padding: 11px 14px;
+  padding: 10px 13px 9px;
   border-bottom: 1px solid var(--border);
   border-left: 3px solid transparent;
-  cursor: pointer; transition: background .12s; user-select: none;
+  cursor: pointer; transition: background .1s; user-select: none;
+  position: relative;
 }
 .session-item:last-child { border-bottom: none; }
 .session-item:hover { background: var(--surface-2); }
-.session-item.active { background: var(--accent-dim); border-left-color: var(--accent); }
-.session-q {
+.session-item.active {
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+}
+
+/* First message preview */
+.sess-preview {
   font-size: 12.5px; font-weight: 600; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 5px; line-height: 1.4;
+}
+.session-item.active .sess-preview { color: var(--accent); }
+
+/* IP badge row */
+.sess-ip-row {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 5px;
+}
+.sess-ip-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: 10.5px; font-weight: 600;
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  background: var(--surface-3);
+  color: var(--text-2);
+  border: 1px solid var(--border-md);
+  letter-spacing: .01em;
+  cursor: pointer; transition: border-color .12s, color .12s;
+  max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sess-ip-badge:hover {
+  border-color: var(--accent-glow);
+  color: var(--accent);
+}
+.sess-ip-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0; opacity: .7;
+}
+.session-item.active .sess-ip-badge {
+  background: rgba(99,102,241,.15);
+  border-color: var(--accent-glow);
+  color: var(--accent);
+}
+
+/* Stats row */
+.sess-stats {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; font-size: 10.5px; color: var(--text-3);
   margin-bottom: 4px;
 }
-.session-meta {
-  display: flex; justify-content: space-between;
-  gap: 8px; font-size: 10.5px; color: var(--text-3);
-}
-.session-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.sess-stats-left { display: flex; align-items: center; gap: 8px; }
+.sess-dot { opacity: .4; }
+
+/* Tags */
+.session-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
 .session-tag {
   display: inline-flex; align-items: center; gap: 3px;
-  padding: 2px 7px; border-radius: 20px;
-  font-size: 10px; font-weight: 600; letter-spacing: .02em;
+  padding: 1.5px 6px; border-radius: 20px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .03em;
+  text-transform: uppercase;
 }
 .tag-sales    { background: rgba(16,185,129,.15); color: #10b981; }
 .tag-support  { background: rgba(99,102,241,.15);  color: var(--accent); }
 .tag-faq      { background: rgba(245,158,11,.15);  color: #f59e0b; }
 .tag-general  { background: rgba(100,116,139,.15); color: #64748b; }
-.tag-checkout { background: rgba(16,185,129,.2);   color: #10b981; border: 1px solid rgba(16,185,129,.3); }
+.tag-checkout { background: rgba(16,185,129,.2);   color: #10b981; border: 1px solid rgba(16,185,129,.25); }
 .tag-products { background: rgba(99,102,241,.15);  color: var(--accent); }
-.session-item.active .session-q   { color: var(--accent); }
-.session-item.active .session-meta { color: var(--accent); opacity: .7; }
+
+/* Agent dropdown */
+.agent-sel {
+  height: 34px; padding: 0 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-md);
+  background: var(--surface-2); color: var(--text);
+  font-family: var(--font); font-size: 12.5px;
+  outline: none; cursor: pointer; transition: var(--t); min-width: 148px;
+}
+.agent-sel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.agent-sel option { background: var(--surface); color: var(--text); }
 
 /* ── Right panel ─────────────────────────────────────────────────── */
 .cv-right {
@@ -127,93 +185,179 @@
 .cv-thread { display: none; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .cv-thread.visible { display: flex; }
 
+/* ── Thread header ─────────────────────────────────────────────────── */
 .cv-thread-hdr {
-  padding: 12px 18px;
+  padding: 0;
   border-bottom: 1px solid var(--border);
   background: var(--surface); flex-shrink: 0;
-  display: flex; align-items: center; gap: 12px;
+}
+.cv-thread-hdr-top {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px 0;
 }
 .cv-thread-hdr-info { flex: 1; min-width: 0; }
 .cv-thread-title {
   font-size: 13px; font-weight: 700; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.cv-thread-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
-/* Scroll area */
+/* Session stats bar */
+.sess-stat-bar {
+  display: flex; align-items: center; gap: 0;
+  padding: 7px 16px 9px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sess-stat-bar::-webkit-scrollbar { display: none; }
+.sess-stat-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; font-size: 11px; font-weight: 500;
+  color: var(--text-2); white-space: nowrap; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+}
+.sess-stat-pill:last-child { border-right: none; }
+.sess-stat-pill strong {
+  font-weight: 700; color: var(--text);
+}
+.sess-ip-pill {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 10.5px; font-weight: 600;
+  background: var(--surface-2);
+  border-radius: 4px; padding: 2px 8px;
+  color: var(--text-2); border: 1px solid var(--border-md);
+  flex-shrink: 0; margin-right: 4px;
+  cursor: pointer; transition: border-color .12s, color .12s;
+}
+.sess-ip-pill:hover { border-color: var(--accent-glow); color: var(--accent); }
+
+/* ── Chat scroll area ────────────────────────────────────────────── */
 .cv-msgs {
   flex: 1; overflow-y: auto;
-  padding: 20px 20px 24px;
-  display: flex; flex-direction: column; gap: 20px;
+  padding: 18px 20px 24px;
+  display: flex; flex-direction: column; gap: 4px;
   min-height: 0;
   scrollbar-width: thin;
   scrollbar-color: var(--surface-4) transparent;
 }
 
-/* ── Message pair ────────────────────────────────────────────────── */
-.msg-pair { display: flex; flex-direction: column; gap: 6px; }
-.msg-turn-num {
-  font-size: 10px; font-weight: 700; letter-spacing: .08em;
-  text-transform: uppercase; color: var(--text-3);
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 2px;
+/* ── Date separator ──────────────────────────────────────────────── */
+.chat-date-sep {
+  display: flex; align-items: center; gap: 10px;
+  margin: 14px 0 10px;
 }
-.msg-turn-num::after {
-  content: ''; flex: 1;
-  height: 1px; background: var(--border);
+.chat-date-sep::before, .chat-date-sep::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.chat-date-sep span {
+  font-size: 10.5px; font-weight: 600; color: var(--text-3);
+  letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 8px; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 20px;
+  flex-shrink: 0;
 }
 
-/* User bubble */
-.msg-q {
-  align-self: flex-end; max-width: 78%;
+/* ── Message bubbles ─────────────────────────────────────────────── */
+.chat-msg {
+  display: flex; flex-direction: column;
+  max-width: 80%;
+  margin-bottom: 2px;
+}
+.chat-msg.from-user {
+  align-self: flex-end; align-items: flex-end;
+}
+.chat-msg.from-ai {
+  align-self: flex-start; align-items: flex-start;
+}
+
+/* Sender label (shown only on first of a group) */
+.chat-sender {
+  font-size: 10px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; margin-bottom: 3px; padding: 0 4px;
+}
+.from-user .chat-sender { color: var(--accent); opacity: .7; }
+.from-ai   .chat-sender { color: var(--text-3); }
+
+/* Bubble */
+.chat-bubble {
+  padding: 9px 13px;
+  font-size: 13.5px; line-height: 1.65;
+  word-break: break-word;
+  position: relative;
+}
+.from-user .chat-bubble {
   background: var(--accent-dim);
   border: 1px solid var(--accent-glow);
   border-radius: 14px 14px 4px 14px;
-  padding: 10px 14px; font-size: 13.5px;
-  color: var(--text); line-height: 1.65; word-break: break-word;
+  color: var(--text);
 }
-
-/* AI bubble */
-.msg-a {
-  max-width: 88%;
+.from-ai .chat-bubble {
   background: var(--surface);
   border: 1px solid var(--border-md);
   border-radius: 4px 14px 14px 14px;
-  padding: 13px 15px; font-size: 13.5px;
-  color: var(--text-2); line-height: 1.8; word-break: break-word;
+  color: var(--text-2);
 }
-/* Rich HTML content inside AI bubble */
-.msg-a p               { margin: 0 0 9px; }
-.msg-a p:last-child    { margin-bottom: 0; }
-.msg-a ul, .msg-a ol   { padding-left: 18px; margin: 0 0 9px; }
-.msg-a li              { margin-bottom: 4px; }
-.msg-a h1,.msg-a h2,.msg-a h3 { font-size: 13.5px; font-weight: 700; margin: 12px 0 6px; color: var(--text); }
-.msg-a h1:first-child,.msg-a h2:first-child,.msg-a h3:first-child { margin-top: 0; }
-.msg-a table           { font-size: 12.5px; border-collapse: collapse; width: 100%; }
-.msg-a td, .msg-a th   { padding: 6px 10px; border: 1px solid var(--border-md); }
-.msg-a pre             { overflow-x: auto; font-size: 12.5px; }
-.msg-a code            { font-family: var(--mono, monospace); font-size: 12px; }
-.msg-a strong, .msg-a b { color: var(--text); }
-.msg-a a               { color: var(--accent); }
 
-/* Sales plain text bubble */
-.msg-a.msg-sales-plain { font-size: 14px; color: var(--text); line-height: 1.7; }
+/* Rich HTML inside AI bubble */
+.chat-bubble p               { margin: 0 0 9px; }
+.chat-bubble p:last-child    { margin-bottom: 0; }
+.chat-bubble ul, .chat-bubble ol { padding-left: 18px; margin: 0 0 9px; }
+.chat-bubble li              { margin-bottom: 4px; }
+.chat-bubble h1,.chat-bubble h2,.chat-bubble h3 {
+  font-size: 13px; font-weight: 700; margin: 10px 0 5px; color: var(--text);
+}
+.chat-bubble h1:first-child,.chat-bubble h2:first-child,.chat-bubble h3:first-child { margin-top: 0; }
+.chat-bubble table           { font-size: 12px; border-collapse: collapse; width: 100%; }
+.chat-bubble td, .chat-bubble th { padding: 5px 9px; border: 1px solid var(--border-md); }
+.chat-bubble pre             { overflow-x: auto; font-size: 12px; }
+.chat-bubble code            { font-family: var(--mono, monospace); font-size: 11.5px; }
+.chat-bubble strong, .chat-bubble b { color: var(--text); }
+.chat-bubble a               { color: var(--accent); }
+
+/* Message timestamp + meta */
+.chat-meta {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 3px; padding: 0 4px;
+  font-size: 10px; color: var(--text-3);
+}
+.from-user .chat-meta { justify-content: flex-end; }
+.chat-meta-chip {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 1px 5px; border-radius: 10px;
+  font-size: 9.5px; font-weight: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+}
+
+/* Deflect bubble */
+.chat-bubble.deflect {
+  background: var(--surface-2);
+  border-color: var(--border);
+  display: flex; align-items: flex-start; gap: 9px;
+}
+.deflect-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+/* Sales plain text */
+.chat-bubble.sales-plain { font-size: 13.5px; color: var(--text); }
 
 /* ── Product cards grid ──────────────────────────────────────────── */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px; margin-top: 6px; max-width: 88%;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 7px; margin-top: 7px; width: 100%;
+  max-width: 460px;
 }
 .product-card {
   background: var(--surface);
   border: 1px solid var(--border-md);
-  border-radius: 10px; overflow: hidden;
+  border-radius: 9px; overflow: hidden;
   transition: border-color .15s, box-shadow .15s;
 }
 .product-card:hover {
   border-color: var(--accent-glow);
-  box-shadow: 0 2px 12px var(--accent-dim);
+  box-shadow: 0 2px 10px var(--accent-dim);
 }
 .product-thumb {
   width: 100%; aspect-ratio: 1;
@@ -223,83 +367,42 @@
 .product-thumb-placeholder {
   width: 100%; aspect-ratio: 1;
   display: flex; align-items: center; justify-content: center;
-  font-size: 28px; background: var(--surface-2); color: var(--text-3);
+  font-size: 26px; background: var(--surface-2); color: var(--text-3);
 }
-.product-info { padding: 8px 9px; }
+.product-info { padding: 7px 8px; }
 .product-name {
-  font-size: 11.5px; font-weight: 600; color: var(--text);
+  font-size: 11px; font-weight: 600; color: var(--text);
   overflow: hidden; display: -webkit-box;
   -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  line-height: 1.4; margin-bottom: 4px;
+  line-height: 1.4; margin-bottom: 3px;
 }
-.product-price { font-size: 12px; font-weight: 700; color: var(--accent); }
-.product-category { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+.product-price { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+.product-category { font-size: 10px; color: var(--text-3); margin-top: 2px; }
 
 /* ── Checkout banner ─────────────────────────────────────────────── */
 .checkout-banner {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px; margin-top: 6px;
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 13px; margin-top: 7px;
   background: rgba(16,185,129,.1);
   border: 1px solid rgba(16,185,129,.3);
   border-left: 3px solid #10b981;
-  border-radius: 10px; max-width: 88%;
+  border-radius: 9px;
+  max-width: 380px;
 }
-.checkout-icon { font-size: 18px; flex-shrink: 0; }
-.checkout-body { flex: 1; }
-.checkout-title { font-size: 12.5px; font-weight: 700; color: #10b981; margin-bottom: 2px; }
-.checkout-sub   { font-size: 11.5px; color: var(--text-2); }
-.checkout-products-list {
-  font-size: 11px; color: var(--text-3); margin-top: 4px;
-}
+.checkout-icon { font-size: 17px; flex-shrink: 0; }
+.checkout-title { font-size: 12px; font-weight: 700; color: #10b981; margin-bottom: 1px; }
+.checkout-sub   { font-size: 11px; color: var(--text-2); }
 
-/* ── Deflect / no-KB bubble ──────────────────────────────────────── */
-.msg-deflect {
-  max-width: 88%;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 4px 14px 14px 14px;
-  padding: 12px 14px;
-  display: flex; align-items: flex-start; gap: 10px;
-}
-.msg-deflect-icon { font-size: 18px; flex-shrink: 0; }
-.msg-deflect-text { font-size: 13px; color: var(--text-2); line-height: 1.7; margin: 0; }
-
-/* ── Meta row ────────────────────────────────────────────────────── */
-.msg-meta {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 10.5px; color: var(--text-3); padding-left: 2px;
-}
-.msg-meta-chip {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 2px 7px; border-radius: 20px;
-  font-size: 10px; font-weight: 600;
-  background: var(--surface-2); color: var(--text-3);
-  border: 1px solid var(--border);
-}
-
-/* ── Agent type badge in header ──────────────────────────────────── */
+/* ── Agent type badge ────────────────────────────────────────────── */
 .agent-type-badge {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 9px; border-radius: 20px;
-  font-size: 10.5px; font-weight: 700;
-  letter-spacing: .03em; text-transform: uppercase;
-  flex-shrink: 0;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase; flex-shrink: 0;
 }
 
-/* Agent dropdown */
-.agent-sel {
-  height: 34px; padding: 0 10px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border-md);
-  background: var(--surface-2); color: var(--text);
-  font-family: var(--font); font-size: 12.5px;
-  outline: none; cursor: pointer; transition: var(--t); min-width: 148px;
-}
-.agent-sel:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-.agent-sel option { background: var(--surface); color: var(--text); }
-
-/* Thread loading skeletons */
-.thread-loading { display: flex; flex-direction: column; gap: 14px; }
+/* ── Thread loading skeletons ────────────────────────────────────── */
+.thread-loading { display: flex; flex-direction: column; gap: 12px; }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 860px) {
@@ -309,8 +412,9 @@
 }
 @media (max-width: 648px) {
   .convs-wrap { border-radius: var(--r); }
-  .cv-msgs    { padding: 12px 14px; }
-  .products-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .cv-msgs    { padding: 12px 12px; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .chat-msg { max-width: 92%; }
 }
 </style>
 <script>
@@ -373,7 +477,7 @@
   <div class="content" id="page-content" style="display:none;padding-top:20px">
     <div class="convs-wrap">
 
-      <!-- LEFT -->
+      <!-- LEFT: session list -->
       <div class="cv-left">
         <div class="cv-left-hdr">
           <span class="cv-left-hdr-title">Sessions</span>
@@ -386,7 +490,7 @@
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
             <input class="cv-search-inp" type="text" id="search-inp"
-              placeholder="Search sessions…" oninput="filterSessions()" autocomplete="off">
+              placeholder="Search by IP, session, message…" oninput="filterSessions()" autocomplete="off">
           </div>
         </div>
         <div class="session-list" id="session-list">
@@ -396,24 +500,30 @@
         </div>
       </div>
 
-      <!-- RIGHT -->
+      <!-- RIGHT: chat thread -->
       <div class="cv-right">
         <div class="cv-empty" id="cv-empty">
           <div class="cv-empty-icon">💬</div>
           <div class="cv-empty-title">Select a session</div>
-          <div class="cv-empty-sub">Click any session on the left to read messages</div>
+          <div class="cv-empty-sub">Click any session on the left to view the full conversation</div>
         </div>
 
         <div class="cv-thread" id="cv-thread">
+          <!-- Thread header with session stats bar -->
           <div class="cv-thread-hdr">
-            <div class="cv-thread-hdr-info">
-              <div class="cv-thread-title" id="thread-title"></div>
-              <div class="cv-thread-meta" id="thread-meta"></div>
+            <div class="cv-thread-hdr-top">
+              <div class="cv-thread-hdr-info">
+                <div class="cv-thread-title" id="thread-title"></div>
+              </div>
+              <div id="thread-badge"></div>
+              <button class="btn btn-secondary btn-sm" id="back-btn"
+                style="display:none" onclick="backToList()">← Back</button>
             </div>
-            <div id="thread-badge"></div>
-            <button class="btn btn-secondary btn-sm" id="back-btn"
-              style="display:none" onclick="backToList()">← Back</button>
+            <!-- Session stats bar: IP · msgs · tokens · start time · duration -->
+            <div class="sess-stat-bar" id="sess-stat-bar"></div>
           </div>
+
+          <!-- Chat messages -->
           <div class="cv-msgs" id="cv-msgs"></div>
         </div>
       </div>
@@ -465,8 +575,8 @@ if (typeof dismissSkeleton === 'undefined') {
 var allSessions  = []
 var sessionsMap  = {}
 var curAgentId   = ''
-var curAgent     = null   // full agent object (agent_type, shopping_enabled, etc.)
-var productsMap  = {}     // product._id → product object
+var curAgent     = null
+var productsMap  = {}
 var activeKey    = null
 
 /* ── Boot ───────────────────────────────────────────────────────── */
@@ -507,7 +617,7 @@ function onAgentChange() {
   loadAgentAndSessions()
 }
 
-/* ── Load agent config + sessions + products ─────────────────────── */
+/* ── Load agent + sessions + products ───────────────────────────── */
 async function loadAgentAndSessions() {
   curAgentId = document.getElementById('agent-sel').value
   var list   = document.getElementById('session-list')
@@ -522,28 +632,22 @@ async function loadAgentAndSessions() {
   list.innerHTML = skeletonListHtml()
 
   try {
-    /* Fetch agent details and conversations in parallel */
     var results = await Promise.allSettled([
       apiFetch('/agents/' + curAgentId),
       apiFetch('/agents/' + curAgentId + '/conversations'),
     ])
 
-    /* Agent details */
     if (results[0].status === 'fulfilled') {
       curAgent = results[0].value
-      /* Load products if this is a sales/shopping agent */
       if (curAgent && (curAgent.shopping_enabled || curAgent.agent_type === 'sales')) {
         try {
           var products = await apiFetch('/agents/' + curAgentId + '/products')
           productsMap = {}
           ;(products || []).forEach(function (p) { productsMap[String(p._id)] = p })
-        } catch (pe) {
-          console.warn('[products] load failed:', pe.message)
-        }
+        } catch (pe) { console.warn('[products]', pe.message) }
       }
     }
 
-    /* Sessions */
     if (results[1].status !== 'fulfilled') throw results[1].reason
     var data    = results[1].value
     allSessions = data.sessions || []
@@ -559,14 +663,13 @@ async function loadAgentAndSessions() {
     renderSessions(allSessions)
   } catch (e) {
     toast(e.message, 'error')
-    list.innerHTML = '<div style="padding:24px;text-align:center;font-size:12.5px;color:var(--red)">' +
-      'Failed to load: ' + esc(e.message) + '</div>'
+    list.innerHTML = '<div style="padding:24px;text-align:center;font-size:12.5px;color:var(--red)">Failed to load: ' + esc(e.message) + '</div>'
   }
 }
 
-/* ── Helpers ────────────────────────────────────────────────────── */
+/* ── Session key ────────────────────────────────────────────────── */
 function sessionKey(s) {
-  var v = s._id != null ? s._id
+  var v = s._id != null       ? s._id
         : s.session_id != null ? s.session_id
         : s.visitor_id != null ? s.visitor_id
         : s.visitor_ip != null ? s.visitor_ip
@@ -574,11 +677,10 @@ function sessionKey(s) {
   return String(v)
 }
 
+/* ── Agent type helpers ─────────────────────────────────────────── */
 function agentTypeLabel(type) {
-  var map = { sales: 'Sales', support: 'Support', faq: 'FAQ', general: 'General' }
-  return map[type] || 'General'
+  return { sales: 'Sales', support: 'Support', faq: 'FAQ', general: 'General' }[type] || 'General'
 }
-
 function agentTypeBadgeHtml(type) {
   var map = {
     sales:   { cls: 'tag-sales',   icon: '🛍️', label: 'Sales'   },
@@ -596,9 +698,9 @@ function renderSessions(sessions) {
   if (!sessions.length) {
     list.innerHTML = [
       '<div style="padding:40px 20px;text-align:center">',
-      '  <div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
-      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>',
-      '  <div style="font-size:12px;color:var(--text-3)">Conversations will appear here once visitors start chatting</div>',
+      '<div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
+      '<div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>',
+      '<div style="font-size:12px;color:var(--text-3)">Conversations will appear once visitors start chatting</div>',
       '</div>',
     ].join('')
     return
@@ -611,7 +713,21 @@ function renderSessions(sessions) {
     var type   = (curAgent && curAgent.agent_type) || 'general'
     var typeCls = 'tag-' + (type || 'general')
 
-    /* Tags row */
+    /* IP / session identifier display */
+    var identLabel = s.visitor_ip || s.session_id || s.visitor_id || 'unknown'
+    /* Show only first 18 chars of session_id to save space */
+    if (!s.visitor_ip && (s.session_id || s.visitor_id)) {
+      identLabel = String(identLabel).slice(0, 18) + (String(identLabel).length > 18 ? '…' : '')
+    }
+
+    /* IP badge — clicking filters by this IP */
+    var ipHtml = '<div class="sess-ip-row">' +
+      '<span class="sess-ip-badge" onclick="filterByIdent(event,\'' + escAttr(String(s.visitor_ip || s.session_id || s.visitor_id || '')) + '\')" title="Click to filter by this identifier">' +
+        '<span class="sess-ip-dot"></span>' + esc(identLabel) +
+      '</span>' +
+    '</div>'
+
+    /* Tags */
     var tags = '<div class="session-tags">'
     tags += '<span class="session-tag ' + typeCls + '">' + agentTypeLabel(type) + '</span>'
     if (s.has_checkout) tags += '<span class="session-tag tag-checkout">🛒 Checkout</span>'
@@ -619,9 +735,14 @@ function renderSessions(sessions) {
     tags += '</div>'
 
     return '<div class="session-item' + active + '" id="si-' + safeId(key) + '" data-key="' + escAttr(key) + '">' +
-      '<div class="session-q">' + esc(s.first_question || '(No message)') + '</div>' +
-      '<div class="session-meta">' +
-        '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + ' · ' + fmtTokens(s.tokens_used || 0) + ' tok</span>' +
+      '<div class="sess-preview">' + esc(s.first_question || '(No message)') + '</div>' +
+      ipHtml +
+      '<div class="sess-stats">' +
+        '<div class="sess-stats-left">' +
+          '<span>' + msgs + ' msg' + (msgs !== 1 ? 's' : '') + '</span>' +
+          '<span class="sess-dot">·</span>' +
+          '<span>🪙 ' + fmtTokens(s.tokens_used || 0) + '</span>' +
+        '</div>' +
         '<span>' + timeAgo(s.last_active) + '</span>' +
       '</div>' +
       tags +
@@ -629,11 +750,29 @@ function renderSessions(sessions) {
   }).join('')
 
   list.querySelectorAll('.session-item[data-key]').forEach(function (el) {
-    el.addEventListener('click', function () { openSession(el.dataset.key) })
+    el.addEventListener('click', function (e) {
+      /* Don't trigger if clicking the IP badge (it has its own handler) */
+      if (e.target.closest('.sess-ip-badge')) return
+      openSession(el.dataset.key)
+    })
   })
 }
 
-/* ── Filter sessions ────────────────────────────────────────────── */
+/* ── Filter sessions by IP/identifier ──────────────────────────── */
+function filterByIdent(e, ident) {
+  e.stopPropagation()
+  if (!ident) return
+  var inp = document.getElementById('search-inp')
+  if (inp) {
+    inp.value = ident
+    filterSessions()
+    /* Still open the session that was clicked */
+    var item = e.target.closest('.session-item')
+    if (item && item.dataset.key) openSession(item.dataset.key)
+  }
+}
+
+/* ── Filter sessions (search box) ──────────────────────────────── */
 function filterSessions() {
   var inp = document.getElementById('search-inp')
   var q   = inp ? inp.value.toLowerCase().trim() : ''
@@ -641,45 +780,44 @@ function filterSessions() {
   renderSessions(allSessions.filter(function (s) {
     return (s.first_question || '').toLowerCase().includes(q) ||
            (s.visitor_ip     || '').includes(q) ||
-           (s.session_id     || '').toLowerCase().includes(q)
+           (s.session_id     || '').toLowerCase().includes(q) ||
+           (s.visitor_id     || '').toLowerCase().includes(q)
   }))
 }
 
-/* ── Open session / fetch messages ──────────────────────────────── */
+/* ── Open session ───────────────────────────────────────────────── */
 async function openSession(key) {
   var meta = sessionsMap[key]
   if (!meta) return
 
   activeKey = key
 
-  /* Highlight active item */
   document.querySelectorAll('.session-item').forEach(function (el) { el.classList.remove('active') })
   var item = document.getElementById('si-' + safeId(key))
-  if (item) item.classList.add('active')
+  if (item) {
+    item.classList.add('active')
+    item.scrollIntoView({ block: 'nearest' })
+  }
 
   showThread()
   document.getElementById('back-btn').style.display = window.innerWidth < 860 ? 'flex' : 'none'
 
-  /* Header */
+  /* Thread title */
   var agentType = (curAgent && curAgent.agent_type) || 'general'
   document.getElementById('thread-title').textContent = (meta.first_question || 'Session').slice(0, 80)
   document.getElementById('thread-badge').innerHTML   = agentTypeBadgeHtml(agentType)
-  var msgCount = meta.message_count || 1
-  document.getElementById('thread-meta').textContent = [
-    msgCount + ' message' + (msgCount !== 1 ? 's' : ''),
-    timeAgo(meta.started_at),
-    meta.visitor_ip || null,
-    meta.session_id ? 'sid:' + String(meta.session_id).slice(0, 8) + '…' : null,
-  ].filter(Boolean).join(' · ')
 
-  /* Show skeleton */
+  /* Stats bar */
+  renderStatsBar(meta)
+
+  /* Skeleton while loading */
   var msgs = document.getElementById('cv-msgs')
-  msgs.innerHTML = '<div class="thread-loading">' + [
-    '<div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:52%"></div>',
-    '<div class="skel" style="height:68px;border-radius:12px;width:68%"></div>',
-    '<div class="skel" style="height:42px;border-radius:12px;align-self:flex-end;width:44%"></div>',
-    '<div class="skel" style="height:80px;border-radius:12px;width:72%"></div>',
-  ].join('') + '</div>'
+  msgs.innerHTML = '<div class="thread-loading">' +
+    '<div class="skel" style="height:38px;border-radius:14px;align-self:flex-end;width:46%"></div>' +
+    '<div class="skel" style="height:60px;border-radius:14px;width:64%"></div>' +
+    '<div class="skel" style="height:38px;border-radius:14px;align-self:flex-end;width:38%"></div>' +
+    '<div class="skel" style="height:72px;border-radius:14px;width:70%"></div>' +
+    '</div>'
 
   try {
     var data     = await apiFetch('/agents/' + curAgentId + '/conversations/' + encodeURIComponent(key))
@@ -690,132 +828,191 @@ async function openSession(key) {
       return
     }
 
-    msgs.innerHTML = messages.map(function (m, idx) {
-      return renderMessagePair(m, idx + 1, messages.length)
-    }).join('')
+    /* Update stats bar with real message count */
+    renderStatsBar(meta, messages)
 
+    /* Render chat flow */
+    msgs.innerHTML = renderChatFlow(messages)
     requestAnimationFrame(function () { msgs.scrollTop = msgs.scrollHeight })
 
   } catch (e) {
-    msgs.innerHTML = '<div style="padding:24px;font-size:13px;color:var(--red)">Failed to load messages: ' + esc(e.message) + '</div>'
+    msgs.innerHTML = '<div style="padding:24px;font-size:13px;color:var(--red)">Failed to load: ' + esc(e.message) + '</div>'
   }
 }
 
-/* ── Render a single Q&A turn ────────────────────────────────────── */
-function renderMessagePair(m, turnNum, totalTurns) {
-  var agentType      = m.agent_type || (curAgent && curAgent.agent_type) || 'general'
-  var isSales        = agentType === 'sales'
-  var productsShown  = m.products_shown  || []
-  var productNames   = m.product_names   || []
-  var action         = m.action          || null
-  var isDeflected    = m.deflected       || false
-  var hasImage       = m.has_image       || false
-  var answer         = m.answer          || ''
+/* ── Stats bar ──────────────────────────────────────────────────── */
+function renderStatsBar(meta, messages) {
+  var bar    = document.getElementById('sess-stat-bar')
+  var ip     = meta.visitor_ip || null
+  var sid    = meta.session_id || meta.visitor_id || null
+  var msgs   = messages ? messages.length : (meta.message_count || 0)
+  /* Total tokens from messages if available */
+  var tokens = messages
+    ? messages.reduce(function (s, m) { return s + (m.tokens_used || 0) }, 0)
+    : (meta.tokens_used || 0)
+  var startTime = meta.started_at ? new Date(meta.started_at) : null
+  var endTime   = meta.last_active ? new Date(meta.last_active) : null
 
-  var html = '<div class="msg-pair">'
-
-  /* Turn divider */
-  if (totalTurns > 1) {
-    html += '<div class="msg-turn-num">Turn ' + turnNum + '</div>'
+  /* Duration */
+  var durationStr = ''
+  if (startTime && endTime) {
+    var diff = endTime - startTime
+    var dm   = Math.floor(diff / 60000)
+    durationStr = dm < 1 ? '< 1 min' : dm + ' min' + (dm !== 1 ? 's' : '')
   }
 
-  /* ── User question bubble ── */
-  html += '<div class="msg-q">'
-  if (hasImage) html += '<span style="margin-right:6px;opacity:.7">📎</span>'
-  html += esc(m.question || '(image or empty)') + '</div>'
+  var pills = []
 
-  /* ── AI answer ── */
-  if (isDeflected) {
-    /* Hard-deflect: show styled notice */
-    var deflectIcon = agentType === 'support' ? '🛎️' : '🤷'
-    html += '<div class="msg-deflect">'
-    html += '<span class="msg-deflect-icon">' + deflectIcon + '</span>'
-    html += '<p class="msg-deflect-text">' + esc(answer || 'Outside my knowledge base.') + '</p>'
-    html += '</div>'
-  } else if (isSales) {
-    /* Sales: plain text answer */
-    html += '<div class="msg-a msg-sales-plain">' + esc(answer) + '</div>'
-  } else {
-    /* Support / FAQ / General: render stored HTML safely */
-    var safeAnswer = answer
-      ? sanitizeHtml(answer)
-      : '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>'
-    html += '<div class="msg-a">' + safeAnswer + '</div>'
+  /* IP pill — clickable to filter */
+  if (ip) {
+    pills.push(
+      '<span class="sess-ip-pill" title="Click to filter sessions by this IP" onclick="filterByIpFromBar(\'' + escAttr(ip) + '\')">' +
+        '🌐 ' + esc(ip) +
+      '</span>'
+    )
   }
+  if (sid && sid !== ip) {
+    pills.push('<div class="sess-stat-pill">🔑 <strong>' + esc(String(sid).slice(0, 16) + (String(sid).length > 16 ? '…' : '')) + '</strong></div>')
+  }
+  pills.push('<div class="sess-stat-pill">💬 <strong>' + msgs + '</strong> message' + (msgs !== 1 ? 's' : '') + '</div>')
+  pills.push('<div class="sess-stat-pill">🪙 <strong>' + fmtTokens(tokens) + '</strong> tokens</div>')
+  if (startTime) pills.push('<div class="sess-stat-pill">🕐 <strong>' + fmtTime(startTime) + '</strong></div>')
+  if (durationStr) pills.push('<div class="sess-stat-pill">⏱ <strong>' + durationStr + '</strong></div>')
 
-  /* ── Products shown (sales agent) ── */
-  if (productsShown.length > 0) {
-    html += '<div class="products-grid">'
-    productsShown.slice(0, 8).forEach(function (pid, i) {
-      var product  = productsMap[String(pid)]
-      var name     = product ? product.name     : (productNames[i] || 'Product #' + (i + 1))
-      var price    = product ? product.price    : null
-      var image    = product ? product.image_url : null
-      var category = product ? product.category : null
-      var currency = product ? (product.currency === 'USD' ? '$' : '₹') : '₹'
+  bar.innerHTML = pills.join('')
+}
 
-      html += '<div class="product-card">'
-      if (image) {
-        html += '<img class="product-thumb" src="' + escAttr(image) + '" alt="' + escAttr(name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
-        html += '<div class="product-thumb-placeholder" style="display:none">🛍️</div>'
-      } else {
-        html += '<div class="product-thumb-placeholder">🛍️</div>'
+function filterByIpFromBar(ip) {
+  var inp = document.getElementById('search-inp')
+  if (inp) { inp.value = ip; filterSessions() }
+}
+
+function fmtTime(d) {
+  if (!d) return ''
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+    ' ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' })
+}
+
+/* ── Render chat flow (chronological messages) ──────────────────── */
+function renderChatFlow(messages) {
+  var html      = ''
+  var lastDate  = null
+  var prevSender = null
+
+  messages.forEach(function (m, idx) {
+    var agentType     = m.agent_type || (curAgent && curAgent.agent_type) || 'general'
+    var isSales       = agentType === 'sales'
+    var productsShown = m.products_shown || []
+    var productNames  = m.product_names  || []
+    var action        = m.action         || null
+    var isDeflected   = m.deflected      || false
+    var hasImage      = m.has_image      || false
+    var msgDate       = m.created_at ? new Date(m.created_at) : null
+
+    /* Date separator when day changes */
+    if (msgDate) {
+      var dateStr = msgDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+      if (dateStr !== lastDate) {
+        html += '<div class="chat-date-sep"><span>' + dateStr + '</span></div>'
+        lastDate = dateStr
+        prevSender = null  /* reset grouping on new day */
       }
-      html += '<div class="product-info">'
-      html += '<div class="product-name">' + esc(name) + '</div>'
-      if (price != null) html += '<div class="product-price">' + currency + price + '</div>'
-      if (category)      html += '<div class="product-category">' + esc(category) + '</div>'
-      html += '</div>'
-      html += '</div>'
-    })
-    html += '</div>'
-  }
-
-  /* ── Checkout initiated banner ── */
-  if (action === 'checkout') {
-    var checkedOutNames = []
-    productsShown.forEach(function (pid, i) {
-      var product = productsMap[String(pid)]
-      checkedOutNames.push(product ? product.name : (productNames[i] || 'Item'))
-    })
-
-    html += '<div class="checkout-banner">'
-    html += '<span class="checkout-icon">🛒</span>'
-    html += '<div class="checkout-body">'
-    html += '<div class="checkout-title">Checkout initiated</div>'
-    if (checkedOutNames.length) {
-      html += '<div class="checkout-sub">Items: ' + esc(checkedOutNames.join(', ')) + '</div>'
     }
+
+    /* ── USER bubble ── */
+    var showUserSender = prevSender !== 'user'
+    html += '<div class="chat-msg from-user">'
+    if (showUserSender) html += '<div class="chat-sender">Visitor</div>'
+    html += '<div class="chat-bubble">'
+    if (hasImage) html += '<span style="margin-right:6px;opacity:.6">📎</span>'
+    html += esc(m.question || '(image or empty)')
+    html += '</div>'
+    /* user timestamp */
+    html += '<div class="chat-meta">'
+    if (msgDate) html += '<span>' + msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span>'
     html += '</div>'
     html += '</div>'
-  }
 
-  /* ── Metadata row ── */
-  html += '<div class="msg-meta">'
+    prevSender = 'user'
 
-  /* RAG indicator */
-  if (m.rag_mode) {
-    html += '<span class="msg-meta-chip">🔍 RAG</span>'
-  }
-  if (m.kb_confidence && m.kb_confidence !== 'none') {
-    html += '<span class="msg-meta-chip" style="color:' + (m.kb_confidence === 'strong' ? 'var(--green)' : '#f59e0b') + '">' +
-      (m.kb_confidence === 'strong' ? '✅' : '⚠️') + ' KB ' + m.kb_confidence +
-    '</span>'
-  }
-  if (productsShown.length > 0) {
-    html += '<span class="msg-meta-chip">🛍️ ' + productsShown.length + ' product' + (productsShown.length !== 1 ? 's' : '') + '</span>'
-  }
+    /* ── AI bubble ── */
+    var answer = m.answer || ''
+    html += '<div class="chat-msg from-ai">'
+    html += '<div class="chat-sender">AI Agent</div>'
 
-  html += '<span>🪙 ' + fmtTokens(m.tokens_used || 0) + ' tokens</span>'
-  html += '<span>' + timeAgo(m.created_at) + '</span>'
+    if (isDeflected) {
+      var deflectIcon = agentType === 'support' ? '🛎️' : '🤷'
+      html += '<div class="chat-bubble deflect">'
+      html += '<span class="deflect-icon">' + deflectIcon + '</span>'
+      html += '<span>' + esc(answer || 'Outside my knowledge base.') + '</span>'
+      html += '</div>'
+    } else if (isSales) {
+      html += '<div class="chat-bubble sales-plain">' + esc(answer) + '</div>'
+    } else {
+      var safeAnswer = answer
+        ? sanitizeHtml(answer)
+        : '<em style="color:var(--text-3);font-size:12px">(no answer recorded)</em>'
+      html += '<div class="chat-bubble">' + safeAnswer + '</div>'
+    }
 
-  /* First token / stream latency if present */
-  if (m.first_token_ms) {
-    html += '<span style="margin-left:auto">⚡ ' + m.first_token_ms + 'ms</span>'
-  }
+    /* Product cards */
+    if (productsShown.length > 0) {
+      html += '<div class="products-grid">'
+      productsShown.slice(0, 8).forEach(function (pid, i) {
+        var product  = productsMap[String(pid)]
+        var name     = product ? product.name      : (productNames[i] || 'Product #' + (i + 1))
+        var price    = product ? product.price     : null
+        var image    = product ? product.image_url : null
+        var category = product ? product.category  : null
+        var currency = product ? (product.currency === 'USD' ? '$' : '₹') : '₹'
+        html += '<div class="product-card">'
+        if (image) {
+          html += '<img class="product-thumb" src="' + escAttr(image) + '" alt="' + escAttr(name) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+          html += '<div class="product-thumb-placeholder" style="display:none">🛍️</div>'
+        } else {
+          html += '<div class="product-thumb-placeholder">🛍️</div>'
+        }
+        html += '<div class="product-info">'
+        html += '<div class="product-name">' + esc(name) + '</div>'
+        if (price != null) html += '<div class="product-price">' + currency + price + '</div>'
+        if (category)      html += '<div class="product-category">' + esc(category) + '</div>'
+        html += '</div></div>'
+      })
+      html += '</div>'
+    }
 
-  html += '</div>'
-  html += '</div>'
+    /* Checkout banner */
+    if (action === 'checkout') {
+      var checkedOutNames = productsShown.map(function (pid, i) {
+        var p = productsMap[String(pid)]
+        return p ? p.name : (productNames[i] || 'Item')
+      })
+      html += '<div class="checkout-banner">'
+      html += '<span class="checkout-icon">🛒</span>'
+      html += '<div>'
+      html += '<div class="checkout-title">Checkout initiated</div>'
+      if (checkedOutNames.length) html += '<div class="checkout-sub">' + esc(checkedOutNames.join(', ')) + '</div>'
+      html += '</div></div>'
+    }
+
+    /* Meta row */
+    html += '<div class="chat-meta">'
+    if (msgDate) html += '<span>' + msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</span>'
+    if (m.rag_mode)       html += '<span class="chat-meta-chip">🔍 RAG</span>'
+    if (m.kb_confidence && m.kb_confidence !== 'none') {
+      var kbColor = m.kb_confidence === 'strong' ? 'var(--green)' : '#f59e0b'
+      html += '<span class="chat-meta-chip" style="color:' + kbColor + '">' +
+        (m.kb_confidence === 'strong' ? '✅' : '⚠️') + ' ' + m.kb_confidence + '</span>'
+    }
+    if (productsShown.length) html += '<span class="chat-meta-chip">🛍️ ' + productsShown.length + '</span>'
+    html += '<span class="chat-meta-chip">🪙 ' + fmtTokens(m.tokens_used || 0) + '</span>'
+    if (m.first_token_ms) html += '<span class="chat-meta-chip">⚡ ' + m.first_token_ms + 'ms</span>'
+    html += '</div>'
+
+    html += '</div>' /* end from-ai */
+
+    prevSender = 'ai'
+  })
 
   return html
 }
@@ -824,29 +1021,26 @@ function renderMessagePair(m, turnNum, totalTurns) {
 function sanitizeHtml(html) {
   if (typeof DOMPurify !== 'undefined') {
     return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['p','br','b','strong','em','i','u','s','ul','ol','li','h1','h2','h3','h4','code','pre','table','thead','tbody','tr','td','th','a','span','div','button'],
-      ALLOWED_ATTR: ['href','target','rel','class','style','onclick'],
+      ALLOWED_TAGS: ['p','br','b','strong','em','i','u','s','ul','ol','li','h1','h2','h3','h4','code','pre','table','thead','tbody','tr','td','th','a','span','div'],
+      ALLOWED_ATTR: ['href','target','rel','class','style'],
       ALLOW_DATA_ATTR: false,
     })
   }
-  /* Fallback: strip dangerous elements and on* handlers */
   var tmp = document.createElement('div')
   tmp.innerHTML = html
   tmp.querySelectorAll('script,iframe,object,embed,form,input,link,meta,base,style').forEach(function(el) { el.remove() })
   tmp.querySelectorAll('*').forEach(function(el) {
     Array.from(el.attributes).forEach(function(attr) {
-      var name = attr.name.toLowerCase()
-      var val  = attr.value
-      if (/^on/i.test(name)) { el.removeAttribute(attr.name); return }
-      if (name === 'href'   && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
-      if (name === 'src'    && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
-      if (name === 'action' && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
+      var name = attr.name.toLowerCase(), val = attr.value
+      if (/^on/i.test(name))                     { el.removeAttribute(attr.name); return }
+      if (name === 'href' && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
+      if (name === 'src'  && /^javascript:/i.test(val)) { el.removeAttribute(attr.name); return }
     })
   })
   return tmp.innerHTML
 }
 
-/* ── Panel toggle helpers ───────────────────────────────────────── */
+/* ── Panel helpers ──────────────────────────────────────────────── */
 function showEmpty() {
   document.getElementById('cv-empty').classList.remove('hidden')
   document.getElementById('cv-thread').classList.remove('visible')
@@ -867,46 +1061,40 @@ async function clearAllModal() {
   var agentId   = sel.value
   var agentName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'this agent'
   if (!agentId) { toast('Select an agent first', 'warning'); return }
-
   var ok = await confirmModal({
-    title:       'Clear all conversations?',
-    message:     'This will permanently hide all conversations for "' + agentName + '".',
-    confirmText: 'Clear All',
-    danger:      true,
+    title: 'Clear all conversations?',
+    message: 'This will permanently hide all conversations for "' + agentName + '".',
+    confirmText: 'Clear All', danger: true,
   })
   if (!ok) return
-
   try {
     await apiFetch('/agents/' + agentId + '/clear-conversations', { method: 'POST' })
     toast('Conversations cleared', 'success')
-    activeKey = null
-    showEmpty()
+    activeKey = null; showEmpty()
     await loadAgentAndSessions()
-  } catch (e) {
-    toast(e.message, 'error')
-  }
+  } catch (e) { toast(e.message, 'error') }
 }
 
 /* ── Escape / utility helpers ───────────────────────────────────── */
 function esc(s) {
   return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>')
 }
 function escAttr(s) {
   return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
 }
-function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g, '_') }
+function safeId(s) { return String(s == null ? '' : s).replace(/[^a-zA-Z0-9]/g,'_') }
 function placeholderHtml(msg) {
   return '<div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">' + esc(msg) + '</div>'
 }
 function skeletonListHtml() {
-  return '<div style="padding:12px;display:flex;flex-direction:column;gap:7px">' +
-    '<div class="skel" style="height:68px;border-radius:var(--r-sm)"></div>' +
-    '<div class="skel" style="height:68px;border-radius:var(--r-sm);opacity:.7"></div>' +
-    '<div class="skel" style="height:68px;border-radius:var(--r-sm);opacity:.45"></div>' +
+  return '<div style="padding:10px;display:flex;flex-direction:column;gap:6px">' +
+    '<div class="skel" style="height:78px;border-radius:var(--r-sm)"></div>' +
+    '<div class="skel" style="height:78px;border-radius:var(--r-sm);opacity:.7"></div>' +
+    '<div class="skel" style="height:78px;border-radius:var(--r-sm);opacity:.45"></div>' +
     '</div>'
 }
 </script>
