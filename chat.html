@@ -539,16 +539,16 @@
     <div class="agent-avatar" id="hdr-avatar">✦</div>
     <div class="agent-info">
       <div class="agent-name" id="hdr-name">Agent</div>
-      <div class="agent-status"><span class="status-dot"></span>Online</div>
+      <div class="agent-status"><span class="status-dot"></span><span id="agent-status-text">Online</span></div>
     </div>
     <div class="hdr-actions">
-      <div class="powered-by">Powered by<br><a href="https://supportagent.aasaitech.in" target="_blank" rel="noopener">SupportGent</a></div>
+      <div class="powered-by"><span id="powered-by-text">Powered by</span><br><a href="https://supportagent.aasaitech.in" target="_blank" rel="noopener">SupportGent</a></div>
     </div>
   </div>
 
   <div class="loading-screen" id="loading-screen">
     <div class="spin-ring"></div>
-    <div class="loading-label">Loading agent…</div>
+    <div class="loading-label" id="loading-label">Loading agent…</div>
   </div>
 
   <div class="chat-messages" id="chat-messages" style="display:none;"></div>
@@ -600,7 +600,7 @@
   <div class="cart-sheet">
     <div class="cart-handle"></div>
     <div class="cart-header-row">
-      <div class="cart-sheet-title">🛒 Your Cart</div>
+      <div class="cart-sheet-title" id="cart-sheet-title">🛒 Your Cart</div>
       <button class="cart-close-btn" onclick="closeCart()" title="Close">✕</button>
     </div>
     <div id="cart-items"></div>
@@ -617,6 +617,243 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  /* ── Chat widget i18n ───────────────────────────────────────────────────
+     Languages: en, ta, te, kn, ml, hi
+     Priority:  ?lang= URL param > agent.ui_lang > navigator.language > en
+  ─────────────────────────────────────────────────────────────────────── */
+  const CHAT_STRINGS = {
+    en: {
+      loadingAgent:    'Loading agent…',
+      online:          'Online',
+      poweredBy:       'Powered by',
+      askAnything:     'Ask anything…',
+      voiceLanguage:   'Voice language',
+      send:            'Send',
+      close:           'Close',
+      somethingWrong:  'Something went wrong',
+      failedGetResp:   'Failed to get response.',
+      noAgentUrl:      'No agent specified in URL.',
+      agentNotFound:   'Agent not found',
+      failedLoad:      'Failed to load agent.',
+      tryAgain:        'Please try again.',
+      addToCart:       '🛒 Add to Cart',
+      inCart:          '✓ In Cart',
+      inCartLabel:     'In Cart',
+      yourCart:        '🛒 Your Cart',
+      cartEmpty:       'Your cart is empty',
+      items:           'Items',
+      delivery:        'Delivery',
+      free:            'Free',
+      total:           'Total',
+      checkout:        'Checkout',
+      paySecurely:     'Pay Securely →',
+      voiceLangDD:     'Voice Language',
+      sorryError:      'Sorry, I encountered an error. Please try again.',
+      paymentFailed:   '❌ Unable to process payment. Please try again.',
+      checkoutFailed:  '❌ Checkout failed. Please try again.',
+      noSpeech:        '💬 No speech detected — try again',
+      each:            'each',
+      addedToCart:     "I've added your selected item to cart. Proceed to secure payment when you're ready.",
+      addedToCartMany: "I've added your selected items to cart. Proceed to secure payment when you're ready.",
+      defaultWelcome:  "Hi! I'm {name}. How can I help you today?",
+    },
+    ta: {
+      loadingAgent:    'ஏஜெண்ட் ஏற்றுகிறது…',
+      online:          'நிகழ்நேரத்தில்',
+      poweredBy:       'இயக்கப்படுகிறது',
+      askAnything:     'எதையும் கேளுங்கள்…',
+      voiceLanguage:   'குரல் மொழி',
+      send:            'அனுப்பு',
+      close:           'மூடு',
+      somethingWrong:  'ஏதோ தவறு நடந்தது',
+      failedGetResp:   'பதில் கிடைக்கவில்லை.',
+      noAgentUrl:      'URL-ல் ஏஜெண்ட் குறிப்பிடப்படவில்லை.',
+      agentNotFound:   'ஏஜெண்ட் கிடைக்கவில்லை',
+      failedLoad:      'ஏஜெண்டை ஏற்றுவதில் தோல்வி.',
+      tryAgain:        'மீண்டும் முயற்சிக்கவும்.',
+      addToCart:       '🛒 கார்ட்டில் சேர்',
+      inCart:          '✓ கார்ட்டில் உள்ளது',
+      inCartLabel:     'கார்ட்டில் உள்ளது',
+      yourCart:        '🛒 உங்கள் கார்ட்',
+      cartEmpty:       'உங்கள் கார்ட் காலியாக உள்ளது',
+      items:           'பொருட்கள்',
+      delivery:        'டெலிவரி',
+      free:            'இலவசம்',
+      total:           'மொத்தம்',
+      checkout:        'செக்அவுட்',
+      paySecurely:     'பாதுகாப்பாக பணம் செலுத்து →',
+      voiceLangDD:     'குரல் மொழி',
+      sorryError:      'மன்னிக்கவும், பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.',
+      paymentFailed:   '❌ பணம் செலுத்த முடியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+      checkoutFailed:  '❌ செக்அவுட் தோல்வி. மீண்டும் முயற்சிக்கவும்.',
+      noSpeech:        '💬 பேச்சு கண்டறியப்படவில்லை — மீண்டும் முயற்சி',
+      each:            'தலா',
+      addedToCart:     "தேர்ந்தெடுத்த பொருளை கார்ட்டில் சேர்த்தேன். பணம் செலுத்த தொடரவும்.",
+      addedToCartMany: "தேர்ந்தெடுத்த பொருட்களை கார்ட்டில் சேர்த்தேன். பணம் செலுத்த தொடரவும்.",
+      defaultWelcome:  "வணக்கம்! நான் {name}. உங்களுக்கு எப்படி உதவலாம்?",
+    },
+    te: {
+      loadingAgent:    'ఏజెంట్ లోడవుతోంది…',
+      online:          'ఆన్‌లైన్',
+      poweredBy:       'ఆధారంగా',
+      askAnything:     'ఏదైనా అడగండి…',
+      voiceLanguage:   'వాయిస్ భాష',
+      send:            'పంపు',
+      close:           'మూసివేయి',
+      somethingWrong:  'ఏదో తప్పు జరిగింది',
+      failedGetResp:   'ప్రతిస్పందన రాలేదు.',
+      noAgentUrl:      'URL లో ఏజెంట్ పేర్కొనలేదు.',
+      agentNotFound:   'ఏజెంట్ దొరకలేదు',
+      failedLoad:      'ఏజెంట్ లోడ్ చేయడం విఫలమైంది.',
+      tryAgain:        'మళ్ళీ ప్రయత్నించండి.',
+      addToCart:       '🛒 కార్ట్‌కు జోడించు',
+      inCart:          '✓ కార్ట్‌లో ఉంది',
+      inCartLabel:     'కార్ట్‌లో ఉంది',
+      yourCart:        '🛒 మీ కార్ట్',
+      cartEmpty:       'మీ కార్ట్ ఖాళీగా ఉంది',
+      items:           'వస్తువులు',
+      delivery:        'డెలివరీ',
+      free:            'ఉచితం',
+      total:           'మొత్తం',
+      checkout:        'చెక్అవుట్',
+      paySecurely:     'సురక్షితంగా చెల్లించండి →',
+      voiceLangDD:     'వాయిస్ భాష',
+      sorryError:      'క్షమించండి, లోపం వచ్చింది. మళ్ళీ ప్రయత్నించండి.',
+      paymentFailed:   '❌ చెల్లింపు విఫలమైంది. మళ్ళీ ప్రయత్నించండి.',
+      checkoutFailed:  '❌ చెక్అవుట్ విఫలమైంది. మళ్ళీ ప్రయత్నించండి.',
+      noSpeech:        '💬 మాట గుర్తించబడలేదు — మళ్ళీ ప్రయత్నించండి',
+      each:            'ఒక్కొక్కటి',
+      addedToCart:     "ఎంచుకున్న వస్తువు కార్ట్‌కు జోడించాను. చెల్లింపుకు కొనసాగండి.",
+      addedToCartMany: "ఎంచుకున్న వస్తువులు కార్ట్‌కు జోడించాను. చెల్లింపుకు కొనసాగండి.",
+      defaultWelcome:  "నమస్కారం! నేను {name}. మీకు ఎలా సహాయం చేయగలను?",
+    },
+    kn: {
+      loadingAgent:    'ಏಜೆಂಟ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ…',
+      online:          'ಆನ್‌ಲೈನ್',
+      poweredBy:       'ಚಾಲಿತ',
+      askAnything:     'ಏನಾದರೂ ಕೇಳಿ…',
+      voiceLanguage:   'ಧ್ವನಿ ಭಾಷೆ',
+      send:            'ಕಳುಹಿಸು',
+      close:           'ಮುಚ್ಚು',
+      somethingWrong:  'ಏನೋ ತಪ್ಪಾಗಿದೆ',
+      failedGetResp:   'ಪ್ರತಿಕ್ರಿಯೆ ಸಿಗಲಿಲ್ಲ.',
+      noAgentUrl:      'URL ನಲ್ಲಿ ಏಜೆಂಟ್ ನಿರ್ದಿಷ್ಟಪಡಿಸಿಲ್ಲ.',
+      agentNotFound:   'ಏಜೆಂಟ್ ಸಿಗಲಿಲ್ಲ',
+      failedLoad:      'ಏಜೆಂಟ್ ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ.',
+      tryAgain:        'ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      addToCart:       '🛒 ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ',
+      inCart:          '✓ ಕಾರ್ಟ್‌ನಲ್ಲಿ ಇದೆ',
+      inCartLabel:     'ಕಾರ್ಟ್‌ನಲ್ಲಿ ಇದೆ',
+      yourCart:        '🛒 ನಿಮ್ಮ ಕಾರ್ಟ್',
+      cartEmpty:       'ನಿಮ್ಮ ಕಾರ್ಟ್ ಖಾಲಿ ಇದೆ',
+      items:           'ಐಟಂಗಳು',
+      delivery:        'ಡೆಲಿವರಿ',
+      free:            'ಉಚಿತ',
+      total:           'ಒಟ್ಟು',
+      checkout:        'ಚೆಕ್‌ಔಟ್',
+      paySecurely:     'ಸುರಕ್ಷಿತವಾಗಿ ಪಾವತಿಸಿ →',
+      voiceLangDD:     'ಧ್ವನಿ ಭಾಷೆ',
+      sorryError:      'ಕ್ಷಮಿಸಿ, ದೋಷ ಉಂಟಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      paymentFailed:   '❌ ಪಾವತಿ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      checkoutFailed:  '❌ ಚೆಕ್‌ಔಟ್ ವಿಫಲವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+      noSpeech:        '💬 ಮಾತು ಪತ್ತೆಯಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ',
+      each:            'ಒಂದೊಂದು',
+      addedToCart:     "ಆಯ್ಕೆ ಮಾಡಿದ ವಸ್ತುವನ್ನು ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿದ್ದೇನೆ. ಪಾವತಿಗೆ ಮುಂದುವರಿಯಿರಿ.",
+      addedToCartMany: "ಆಯ್ಕೆ ಮಾಡಿದ ವಸ್ತುಗಳನ್ನು ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿದ್ದೇನೆ. ಪಾವತಿಗೆ ಮುಂದುವರಿಯಿರಿ.",
+      defaultWelcome:  "ನಮಸ್ಕಾರ! ನಾನು {name}. ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?",
+    },
+    ml: {
+      loadingAgent:    'ഏജന്റ് ലോഡ് ചെയ്യുന്നു…',
+      online:          'ഓൺലൈൻ',
+      poweredBy:       'പ്രവർത്തിക്കുന്നത്',
+      askAnything:     'എന്തും ചോദിക്കൂ…',
+      voiceLanguage:   'ശബ്ദ ഭാഷ',
+      send:            'അയക്കൂ',
+      close:           'അടയ്ക്കൂ',
+      somethingWrong:  'എന്തോ തെറ്റ് സംഭവിച്ചു',
+      failedGetResp:   'പ്രതികരണം ലഭിച്ചില്ല.',
+      noAgentUrl:      'URL-ൽ ഏജന്റ് നിർദ്ദിഷ്ടമല്ല.',
+      agentNotFound:   'ഏജന്റ് കണ്ടെത്തിയില്ല',
+      failedLoad:      'ഏജന്റ് ലോഡ് ചെയ്യുന്നതിൽ പരാജയം.',
+      tryAgain:        'ദയവായി വീണ്ടും ശ്രമിക്കൂ.',
+      addToCart:       '🛒 കാർട്ടിലേക്ക് ചേർക്കൂ',
+      inCart:          '✓ കാർട്ടിലുണ്ട്',
+      inCartLabel:     'കാർട്ടിലുണ്ട്',
+      yourCart:        '🛒 നിങ്ങളുടെ കാർട്ട്',
+      cartEmpty:       'നിങ്ങളുടെ കാർട്ട് ഒഴിഞ്ഞിരിക്കുന്നു',
+      items:           'ഇനങ്ങൾ',
+      delivery:        'ഡെലിവറി',
+      free:            'സൗജന്യം',
+      total:           'ആകെ',
+      checkout:        'ചെക്കൗട്ട്',
+      paySecurely:     'സുരക്ഷിതമായി പണം നൽകൂ →',
+      voiceLangDD:     'ശബ്ദ ഭാഷ',
+      sorryError:      'ക്ഷമിക്കൂ, ഒരു പിശക് ഉണ്ടായി. വീണ്ടും ശ്രമിക്കൂ.',
+      paymentFailed:   '❌ പണമടയ്ക്കൽ പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കൂ.',
+      checkoutFailed:  '❌ ചെക്കൗട്ട് പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കൂ.',
+      noSpeech:        '💬 ശബ്ദം കണ്ടെത്തിയില്ല — വീണ്ടും ശ്രമിക്കൂ',
+      each:            'ഒന്നിന്',
+      addedToCart:     "തിരഞ്ഞെടുത്ത ഉൽപ്പന്നം കാർട്ടിൽ ചേർത്തു. പണമടയ്ക്കൽ തുടരൂ.",
+      addedToCartMany: "തിരഞ്ഞെടുത്ത ഉൽപ്പന്നങ്ങൾ കാർട്ടിൽ ചേർത്തു. പണമടയ്ക്കൽ തുടരൂ.",
+      defaultWelcome:  "നമസ്കാരം! ഞാൻ {name}. എങ്ങനെ സഹായിക്കാം?",
+    },
+    hi: {
+      loadingAgent:    'एजेंट लोड हो रहा है…',
+      online:          'ऑनलाइन',
+      poweredBy:       'संचालित',
+      askAnything:     'कुछ भी पूछें…',
+      voiceLanguage:   'आवाज़ भाषा',
+      send:            'भेजें',
+      close:           'बंद करें',
+      somethingWrong:  'कुछ गलत हो गया',
+      failedGetResp:   'प्रतिक्रिया नहीं मिली।',
+      noAgentUrl:      'URL में एजेंट निर्दिष्ट नहीं है।',
+      agentNotFound:   'एजेंट नहीं मिला',
+      failedLoad:      'एजेंट लोड करने में विफल।',
+      tryAgain:        'कृपया पुनः प्रयास करें।',
+      addToCart:       '🛒 कार्ट में जोड़ें',
+      inCart:          '✓ कार्ट में है',
+      inCartLabel:     'कार्ट में है',
+      yourCart:        '🛒 आपका कार्ट',
+      cartEmpty:       'आपका कार्ट खाली है',
+      items:           'आइटम',
+      delivery:        'डिलीवरी',
+      free:            'मुफ़्त',
+      total:           'कुल',
+      checkout:        'चेकआउट',
+      paySecurely:     'सुरक्षित भुगतान करें →',
+      voiceLangDD:     'आवाज़ भाषा',
+      sorryError:      'माफ़ करें, कोई त्रुटि हुई। पुनः प्रयास करें।',
+      paymentFailed:   '❌ भुगतान विफल। पुनः प्रयास करें।',
+      checkoutFailed:  '❌ चेकआउट विफल। पुनः प्रयास करें।',
+      noSpeech:        '💬 आवाज़ नहीं मिली — फिर से कोशिश करें',
+      each:            'प्रति',
+      addedToCart:     "चुना गया उत्पाद कार्ट में जोड़ा गया। भुगतान के लिए आगे बढ़ें।",
+      addedToCartMany: "चुने गए उत्पाद कार्ट में जोड़े गए। भुगतान के लिए आगे बढ़ें।",
+      defaultWelcome:  "नमस्ते! मैं {name} हूँ। मैं आपकी कैसे मदद कर सकता हूँ?",
+    },
+  }
+
+  const _SUPPORTED_LANGS = new Set(Object.keys(CHAT_STRINGS))
+  let chatLang = 'en'
+
+  function _resolveLang(agentUiLang) {
+    // Priority: ?lang= param > agent.ui_lang > browser language > 'en'
+    const candidates = [
+      new URLSearchParams(location.search).get('lang'),
+      agentUiLang,
+      navigator.language?.split('-')[0],
+    ]
+    for (const c of candidates) {
+      if (c && _SUPPORTED_LANGS.has(c)) return c
+    }
+    return 'en'
+  }
+
+  function ct(key) {
+    return (CHAT_STRINGS[chatLang] && CHAT_STRINGS[chatLang][key]) || CHAT_STRINGS['en'][key] || key
+  }
+
   const API      = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
   const params   = new URLSearchParams(location.search)
   const AGENT_ID = params.get('agent') || ''
@@ -660,19 +897,36 @@
     }
     error(msg) {
       if (this._rafId) cancelAnimationFrame(this._rafId)
-      this.bubble.innerHTML = `<p style="color:var(--red);margin:0;font-size:13.5px;">⚠️ ${msg||'Failed to get response.'}</p>`
+      this.bubble.innerHTML = `<p style="color:var(--red);margin:0;font-size:13.5px;">⚠️ ${msg||ct('failedGetResp')}</p>`
       this.bubble.classList.remove('msg-bubble-streaming')
     }
   }
 
   // ── INIT ────────────────────────────────────────────────────────────────
   async function init() {
-    if (!AGENT_ID) { showError('No agent specified in URL.'); return }
+    if (!AGENT_ID) { showError(ct('noAgentUrl')); return }
     try {
       const res = await fetch(`${API}/chat/${AGENT_ID}/config`)
-      if (!res.ok) throw new Error(`Agent not found (${res.status})`)
+      if (!res.ok) throw new Error(`${ct('agentNotFound')} (${res.status})`)
       agent     = await res.json()
       agentType = agent.agent_type || 'general'
+      chatLang  = _resolveLang(agent.ui_lang)
+
+      // Apply language to static DOM elements
+      document.documentElement.lang = chatLang
+      document.getElementById('loading-label') && (document.getElementById('loading-label').textContent = ct('loadingAgent'))
+      document.getElementById('agent-status-text') && (document.getElementById('agent-status-text').textContent = ct('online'))
+      document.getElementById('powered-by-text') && (document.getElementById('powered-by-text').textContent = ct('poweredBy'))
+      const inp = document.getElementById('chat-input')
+      if (inp) inp.placeholder = ct('askAnything')
+      const sendBtn = document.getElementById('send-btn')
+      if (sendBtn) sendBtn.title = ct('send')
+      const langBtn = document.getElementById('langBtn')
+      if (langBtn) langBtn.title = ct('voiceLanguage')
+      const cartCloseBtn = document.querySelector('.cart-close-btn')
+      if (cartCloseBtn) cartCloseBtn.title = ct('close')
+      const cartTitle = document.getElementById('cart-sheet-title')
+      if (cartTitle) cartTitle.textContent = ct('yourCart')
 
       setupColors(agent); setupHeader(agent)
       document.getElementById('loading-screen').style.display  = 'none'
@@ -682,7 +936,7 @@
       document.title = (agent.name || 'Chat') + ' — SupportGent'
 
       addDateSeparator()
-      addWelcomeMsg(agent.welcome_message || `Hi! I'm ${agent.name || 'your assistant'}. How can I help you today?`)
+      addWelcomeMsg(agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant'))
       if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
 
       if (agent.shopping_enabled || agentType === 'sales') await loadProducts()
@@ -697,7 +951,7 @@
       initVoice()
     } catch(e) {
       console.error('init error', e)
-      showError('Failed to load agent. ' + (e.message || 'Please try again.'))
+      showError(ct('failedLoad') + ' ' + (e.message || ct('tryAgain')))
     }
   }
 
@@ -792,7 +1046,7 @@
 
     function renderSheet() {
       const inCart  = cart.find(i => i._id === _modalProductId)
-      const btnText = inCart ? `✓ In Cart (${inCart.qty})` : `🛒 Add to Cart`
+      const btnText = inCart ? `✓ ${ct('inCartLabel')} (${inCart.qty})` : ct('addToCart')
       const btnCls  = inCart ? 'pm-add-btn in-cart' : 'pm-add-btn'
       sheet.innerHTML = `
         <div class="pm-img-wrap">
@@ -847,7 +1101,7 @@
         _refreshAllCardActions(_modalProductId)
         const btn = sheet.querySelector('#pm-add-btn')
         const cartItem = cart.find(i => i._id === _modalProductId)
-        if (btn && cartItem) { btn.textContent = `✓ In Cart (${cartItem.qty})`; btn.className = 'pm-add-btn in-cart' }
+        if (btn && cartItem) { btn.textContent = `✓ ${ct('inCartLabel')} (${cartItem.qty})`; btn.className = 'pm-add-btn in-cart' }
         showToast(`${p.name} added to cart 🛒`)
       })
     }
@@ -889,8 +1143,8 @@
       const checkoutCard = document.createElement('div'); checkoutCard.className = 'checkout-action-card'
       checkoutCard.innerHTML = `
         <div class="checkout-action-card-title">🛒 Ready to checkout?</div>
-        <p>I've added your selected item${toCheckout.length > 1 ? 's' : ''} to cart. Proceed to secure payment when you're ready.</p>
-        <button class="checkout-action-btn" onclick="triggerCheckout(${JSON.stringify(toCheckout.map(p => p._id))})">Pay Securely →</button>`
+        <p>${toCheckout.length > 1 ? ct('addedToCartMany') : ct('addedToCart')}</p>
+        <button class="checkout-action-btn" onclick="triggerCheckout(${JSON.stringify(toCheckout.map(p => p._id))})">${ct('paySecurely')}</button>`
       salesGroup.appendChild(checkoutCard)
     }
     const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
@@ -939,7 +1193,7 @@
               <button onclick="cardQty('${p._id}',1,event)" style="width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border2);background:var(--surface-solid);cursor:pointer;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:var(--font);">+</button>
             </div>`
         } else {
-          actionArea.innerHTML = `<button class="product-btn" onclick="cardAdd('${p._id}',event)">Add to Cart</button>`
+          actionArea.innerHTML = `<button class="product-btn" onclick="cardAdd('${p._id}',event)">${ct('addToCart')}</button>`
         }
       }
       actionArea._refresh = refreshAction
@@ -968,8 +1222,8 @@
       const btn = document.querySelector('#pm-add-btn')
       if (btn) {
         const ci = cart.find(i => i._id === String(productId))
-        if (ci) { btn.textContent = `✓ In Cart (${ci.qty})`; btn.className = 'pm-add-btn in-cart' }
-        else { btn.textContent = '🛒 Add to Cart'; btn.className = 'pm-add-btn' }
+        if (ci) { btn.textContent = `✓ ${ct('inCartLabel')} (${ci.qty})`; btn.className = 'pm-add-btn in-cart' }
+        else { btn.textContent = ct('addToCart'); btn.className = 'pm-add-btn' }
       }
     }
   }
@@ -1131,7 +1385,7 @@
     } catch(e) {
       typEl.remove()
       const {bubble}=createAgentBubble()
-      bubble.innerHTML=`<p style="color:var(--red);margin:0;">Sorry, I encountered an error. Please try again.</p>`
+      bubble.innerHTML=`<p style="color:var(--red);margin:0;">${ct('sorryError')}</p>`
       bubble.classList.remove('msg-bubble-streaming')
     }
   }
@@ -1177,7 +1431,7 @@
     const summaryEl = document.getElementById('cart-summary-block')
 
     if (!cart.length) {
-      itemsEl.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">Your cart is empty</div></div>`
+      itemsEl.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><div class="cart-empty-text">${ct('cartEmpty')}</div></div>`
       summaryEl.innerHTML = ''
     } else {
       itemsEl.innerHTML = cart.map((item,i) => {
@@ -1186,7 +1440,7 @@
           <div class="cart-item-thumb">${item.image_url?`<img src="${item.image_url}" alt="">`:'📦'}</div>
           <div style="flex:1;min-width:0;">
             <div class="cart-item-name">${esc(item.name)}</div>
-            <div class="cart-item-unit">${sym}${item.price} each</div>
+            <div class="cart-item-unit">${sym}${item.price} ${ct('each')}</div>
             <div class="cart-qty">
               <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
               <span class="qty-label">${item.qty}</span>
@@ -1201,11 +1455,11 @@
       const sym = currSym()
       summaryEl.innerHTML = `
         <div class="cart-summary">
-          <div class="cart-summary-row"><span>Items (${cart.reduce((a,i)=>a+i.qty,0)})</span><span>${sym}${subtotal.toFixed(2)}</span></div>
-          <div class="cart-summary-row"><span>Delivery</span><span style="color:var(--green);font-weight:700;">Free</span></div>
-          <div class="cart-summary-row total"><span>Total</span><span>${sym}${subtotal.toFixed(2)}</span></div>
+          <div class="cart-summary-row"><span>${ct('items')} (${cart.reduce((a,i)=>a+i.qty,0)})</span><span>${sym}${subtotal.toFixed(2)}</span></div>
+          <div class="cart-summary-row"><span>${ct('delivery')}</span><span style="color:var(--green);font-weight:700;">${ct('free')}</span></div>
+          <div class="cart-summary-row total"><span>${ct('total')}</span><span>${sym}${subtotal.toFixed(2)}</span></div>
         </div>
-        <button class="checkout-btn" onclick="checkout()">Checkout</button>`
+        <button class="checkout-btn" onclick="checkout()">${ct('checkout')}</button>`
     }
     document.getElementById('cart-overlay').classList.add('open')
   }
@@ -1267,8 +1521,8 @@
           modal:{ondismiss:()=>{ checkout._running=false; showChatMsg('Payment was cancelled. Your cart is saved — tap Cart to try again.') }}
         })
         rz.open()
-      } else { checkout._running=false; showChatMsg(d.message||'❌ Unable to process payment. Please try again.') }
-    } catch(e) { prep.remove(); checkout._running=false; showChatMsg('❌ Checkout failed. Please try again.'); console.error('[checkout]',e) }
+      } else { checkout._running=false; showChatMsg(d.message||ct('paymentFailed')) }
+    } catch(e) { prep.remove(); checkout._running=false; showChatMsg(ct('checkoutFailed')); console.error('[checkout]',e) }
   }
 
   // ── NOTIFICATIONS ───────────────────────────────────────────────────────
@@ -1287,7 +1541,7 @@
     document.getElementById('loading-screen').innerHTML=`
     <div style="text-align:center;padding:40px 24px;">
       <div style="font-size:44px;margin-bottom:16px;">⚠️</div>
-      <div style="font-size:14.5px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em;">Something went wrong</div>
+      <div style="font-size:14.5px;font-weight:700;margin-bottom:8px;letter-spacing:-.02em;">${ct('somethingWrong')}</div>
       <div style="font-size:12.5px;color:var(--text3);line-height:1.65;">${msg}</div>
     </div>`
   }
@@ -1315,7 +1569,7 @@
     }
     const dd=document.getElementById('langDropdown')
     if (dd) {
-      dd.innerHTML = `<div class="lang-dd-head">Voice Language</div>` +
+      dd.innerHTML = `<div class="lang-dd-head">${ct('voiceLangDD')}</div>` +
         VOICE_LANGS.map(l=>l.sep
           ?`<div class="lang-dd-sep"></div>`
           :`<div class="lang-dd-item ${l.code===_voiceLang?'active':''}" onclick="selectVoiceLang('${l.code}',this)"><span class="dd-flag">${l.flag}</span><span class="dd-name">${l.label}</span><span class="dd-check">✓</span></div>`
@@ -1354,7 +1608,7 @@
       if (_recActive&&!_finalText.trim()) {
         _stopVoice(false)
         const i=document.getElementById('chat-input')
-        if (i) { i.placeholder='💬 No speech detected — try again'; setTimeout(()=>{i.placeholder='Ask anything…'},3000) }
+        if (i) { i.placeholder=ct('noSpeech'); setTimeout(()=>{i.placeholder=ct('askAnything')},3000) }
       }
     },11000)
     _spawnRec()
@@ -1395,7 +1649,7 @@
     const row=document.getElementById('input-row'),inp=document.getElementById('chat-input'),box=document.getElementById('voice-interim')
     _interimText=''
     if (row) row.classList.remove('listening'); if (box) box.classList.remove('show')
-    if (inp) { inp.placeholder='Ask anything…'; inp.value=_finalText.trim(); autoResize(inp) }
+    if (inp) { inp.placeholder=ct('askAnything'); inp.value=_finalText.trim(); autoResize(inp) }
     _setMicUI(false)
     if (andSend&&_finalText.trim()) setTimeout(sendMessage,100)
   }
