@@ -181,16 +181,16 @@
     document.getElementById('s-tokens').textContent=fmtTokens(d.tokens_used||0)
     document.getElementById('s-today').textContent=fmtNum(d.today_queries||0)
     document.querySelectorAll('.stat-value.loading').forEach(e=>e.classList.remove('loading'))
-    const t=d.tokens||{}
-    document.getElementById('tu-used').textContent=fmtTokens(t.monthly_used||0)
-    document.getElementById('tu-cap').textContent=fmtTokens(t.monthly_cap||0)
-    document.getElementById('tu-topup').textContent=fmtTokens(t.topup_balance||0)
-    document.getElementById('tu-plan').textContent=({starter:t('planStarter'),grower:t('planGrower'),enterprise:t('planEnterprise')}[t.plan]||t.plan||'—')
-    const pct=t.monthly_cap?Math.min(100,Math.round(t.monthly_used/t.monthly_cap*100)):0
+    const tok=d.tokens||{}
+    document.getElementById('tu-used').textContent=fmtTokens(tok.monthly_used||0)
+    document.getElementById('tu-cap').textContent=fmtTokens(tok.monthly_cap||0)
+    document.getElementById('tu-topup').textContent=fmtTokens(tok.topup_balance||0)
+    document.getElementById('tu-plan').textContent=({starter:t('planStarter'),grower:t('planGrower'),enterprise:t('planEnterprise')}[tok.plan]||tok.plan||'—')
+    const pct=tok.monthly_cap?Math.min(100,Math.round(tok.monthly_used/tok.monthly_cap*100)):0
     const bar=document.getElementById('tu-bar')
     bar.style.width=pct+'%';bar.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
     document.getElementById('tu-pct').textContent=pct+'% '+t('navUsed')
-    document.getElementById('tu-reset').textContent=t.cap_reset_at?'Resets '+fmtDate(t.cap_reset_at):''
+    document.getElementById('tu-reset').textContent=tok.cap_reset_at?'Resets '+fmtDate(tok.cap_reset_at):''
     if(!d.agents_count)document.getElementById('quickstart-banner').style.display='flex'
     // Chart
     const last14=Array.from({length:14},(_,i)=>{const dt=new Date();dt.setDate(dt.getDate()-(13-i));return dt.toISOString().slice(0,10)})
