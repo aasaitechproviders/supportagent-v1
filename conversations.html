@@ -268,6 +268,7 @@
   document.documentElement.style.background = dark ? '#07080D' : '#F2F3F9';
 })();
 </script>
+<script src="i18n.js"></script>
 <script src="api.js"></script>
 <script src="nav.js"></script>
 </head>
@@ -307,16 +308,16 @@
   <div class="topbar">
     <div class="topbar-left">
       <div>
-        <div class="topbar-title">Conversations</div>
+        <div class="topbar-title" data-i18n="conversations">Conversations</div>
         <div class="topbar-subtitle" id="convs-sub">Loading…</div>
       </div>
     </div>
     <div class="topbar-right">
       <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
-        <option value="">— Select agent —</option>
+        <option value="" id="sel-agent-opt">— Select agent —</option>
       </select>
       <button class="theme-toggle"></button>
-      <button class="btn btn-danger btn-sm" onclick="clearAllModal()">Clear All</button>
+      <button class="btn btn-danger btn-sm" onclick="clearAllModal()" data-i18n="clearAll">Clear All</button>
     </div>
   </div>
 
@@ -326,7 +327,7 @@
       <!-- LEFT -->
       <div class="cv-left">
         <div class="cv-left-hdr">
-          <span class="cv-left-hdr-title">Sessions</span>
+          <span class="cv-left-hdr-title" data-i18n="sessions">Sessions</span>
           <span class="badge badge-gray" id="sess-count">0</span>
         </div>
         <div class="cv-search">
@@ -336,7 +337,7 @@
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
             <input class="cv-search-inp" type="text" id="search-inp"
-              placeholder="Search sessions…" oninput="filterSessions()" autocomplete="off">
+              placeholder="Search sessions…" id="search-inp" oninput="filterSessions()" autocomplete="off">
           </div>
         </div>
         <div class="session-list" id="session-list">
@@ -362,7 +363,7 @@
               <div class="cv-thread-meta" id="thread-meta"></div>
             </div>
             <button class="btn btn-secondary btn-sm" id="back-btn"
-              style="display:none" onclick="backToList()">← Back</button>
+              style="display:none" onclick="backToList()" data-i18n="back">← Back</button>
           </div>
           <div class="cv-msgs" id="cv-msgs"></div>
         </div>
@@ -382,6 +383,11 @@ var activeKey   = null
 /* ── Boot ──────────────────────────────────────────────────────── */
 ;(async function () {
   var nav = await renderNav('conversations')
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n))
+  const si = document.getElementById('search-inp')
+  if (si) si.placeholder = t('searchSessions')
+  const sao = document.getElementById('sel-agent-opt')
+  if (sao) sao.textContent = t('selectAgent')
   if (!nav) return
 
   try {
@@ -470,8 +476,8 @@ function renderSessions(sessions) {
     list.innerHTML = [
       '<div style="padding:40px 20px;text-align:center">',
       '  <div style="font-size:28px;opacity:.22;margin-bottom:12px">💬</div>',
-      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">No conversations yet</div>',
-      '  <div style="font-size:12px;color:var(--text-3)">Sessions appear once visitors chat with your agent.</div>',
+      '  <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px">' + t('noConversations') + '</div>',
+      '  <div style="font-size:12px;color:var(--text-3)">' + t('noConvsDesc') + '</div>',
       '</div>'
     ].join('')
     return
@@ -592,16 +598,16 @@ async function clearAllModal() {
   if (!agentId) { toast('Select an agent first', 'warning'); return }
 
   var ok = await confirmModal({
-    title:       'Clear conversations?',
-    message:     'All conversation history for "' + agentName + '" will be hidden. This cannot be undone.',
-    confirmText: 'Clear All',
+    title:       t('confirmClearTitle'),
+    message:     t('confirmClearMsg').replace('{agent}', agentName),
+    confirmText: t('clearAll'),
     danger:      true
   })
   if (!ok) return
 
   try {
     await apiFetch('/agents/' + agentId + '/clear-conversations', { method: 'POST' })
-    toast('Conversations cleared', 'success')
+    toast(t('toastConvsCleared'), 'success')
     activeKey = null
     showEmpty()
     await loadSessions()
