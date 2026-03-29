@@ -110,13 +110,44 @@
   .src-field-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
   .src-add-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 
-  /* Skeleton override — shared.css already positions it via left:var(--sidebar-w),
-     so we only need normal content padding here */
+  /* Skeleton override — shared.css positions via left:var(--sidebar-w) */
   .skel-topbar{display:flex;justify-content:space-between;margin-bottom:28px}
   .skel-body{max-width:1360px}
 
+  @media(max-width:1024px) and (min-width:649px){
+    .editor-layout{grid-template-columns:1fr}
+  }
   @media(max-width:900px){
     .editor-layout{grid-template-columns:1fr}
+  }
+  @media(max-width:648px){
+    .editor-layout{gap:14px}
+    /* Tab bar scrolls horizontally */
+    .tab-bar{padding:0 4px}
+    .tab-btn{padding:9px 10px;font-size:11px}
+    /* KB stats: 3 → 2 cols */
+    .kb-stats-grid{grid-template-columns:repeat(2,1fr)!important}
+    /* General tab: theme+colour row stacks */
+    .general-two-col{grid-template-columns:1fr!important}
+    /* URL copy rows wrap */
+    .url-copy-row{flex-wrap:wrap;gap:6px}
+    .url-copy-link{word-break:break-all;min-width:0;flex-basis:100%;margin-bottom:2px}
+    /* DNS row wraps */
+    .dns-row{flex-wrap:wrap;gap:6px}
+    .dns-val{flex-basis:100%}
+    /* Embed box scrollable */
+    .embed-box{font-size:10px;word-break:break-all}
+    /* Product item */
+    .product-thumb{width:40px;height:40px;font-size:18px}
+    /* Source tab bar wraps */
+    .src-tab-bar{flex-wrap:wrap}
+    /* Publish hero padding */
+    #tab-publish > div:first-child{padding:20px 14px}
+    /* Onboarding tip stacks */
+    .ob-tip{flex-direction:column;gap:8px}
+    .demo-mode-bar{flex-direction:column;gap:8px;text-align:center}
+    /* Right panel stats always show below on mobile */
+    #agent-url-side-card .url-copy-row{flex-direction:column;align-items:stretch}
   }
 </style>
 <script>
@@ -272,7 +303,7 @@
                 <div class="info-banner-desc">Upload your <strong>Products CSV</strong> and <strong>Categories CSV</strong> — the AI will answer customer questions from that data automatically. You can also add FAQs, website URLs, and documents as extra knowledge sources below.</div>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+            <div class="kb-stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
               <div class="kb-stat"><div><div class="kb-stat-label">Products</div><div class="kb-stat-val" id="stat-products">0</div></div><span style="font-size:24px">📦</span></div>
               <!-- FIX F3: categories counter now tracked separately -->
               <div class="kb-stat"><div><div class="kb-stat-label">Categories</div><div class="kb-stat-val" id="stat-categories">0</div></div><span style="font-size:24px">🏷️</span></div>
