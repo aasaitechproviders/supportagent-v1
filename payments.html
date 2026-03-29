@@ -7,6 +7,32 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+.billing-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+.billing-side{display:flex;flex-direction:column;gap:16px;position:sticky;top:68px}
+/* Inline stats row in current plan card */
+.plan-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid var(--border)}
+/* Current plan header row */
+.cur-plan-row{display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:16px;flex-wrap:wrap}
+/* Billing cycle toggle */
+.cycle-toggle{display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);width:fit-content;margin-bottom:18px;flex-wrap:wrap}
+/* Tablet */
+@media(max-width:1024px) and (min-width:649px){
+  .billing-layout{grid-template-columns:1fr}
+  .billing-side{position:static;flex-direction:row;flex-wrap:wrap}
+  .billing-side > *{flex:1;min-width:200px}
+}
+/* Mobile */
+@media(max-width:648px){
+  .billing-layout{grid-template-columns:1fr;gap:14px}
+  .billing-side{position:static;gap:12px}
+  .plan-stats-row{grid-template-columns:repeat(3,1fr);gap:6px}
+  .plan-stats-row > div{padding:8px 4px}
+  .cur-plan-row{gap:12px;padding:12px}
+  .cycle-toggle{width:100%}
+  .cycle-toggle .btn{flex:1;justify-content:center}
+}
+</style>
 <link rel="stylesheet" href="shared.css">
 <script>
 ;(function(){var p=new URLSearchParams(location.search),t=p.get('token');if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();
@@ -24,7 +50,7 @@
 
 <div id="page-skeleton">
   <div class="skel-topbar"><div class="skel" style="height:13px;width:80px;border-radius:4px"></div></div>
-  <div class="skel-body" style="display:grid;grid-template-columns:1fr 280px;gap:20px">
+  <div class="skel-body billing-layout">
     <div style="display:flex;flex-direction:column;gap:14px">
       <div class="skel" style="height:160px;border-radius:var(--r-lg)"></div>
       <div class="skel" style="height:320px;border-radius:var(--r-lg)"></div>
@@ -42,14 +68,14 @@
     <div class="topbar-right"><button class="theme-toggle" style="font-size:15px"></button></div>
   </div>
   <div class="content" id="page-content" style="display:none">
-    <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+    <div class="billing-layout">
       <div style="display:flex;flex-direction:column;gap:18px">
 
         <!-- Current plan -->
         <div class="card">
           <div class="card-header"><div class="card-title"><span class="card-icon">🎯</span data-i18n="currentPlan">Current Plan</div></div>
           <div class="card-body">
-            <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:16px">
+            <div class="cur-plan-row">
               <div style="width:48px;height:48px;border-radius:13px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow)">⚡</div>
               <div>
                 <div style="font-size:20px;font-weight:800;letter-spacing:-.03em;margin-bottom:3px" id="cur-plan">—</div>
@@ -60,7 +86,7 @@
             <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px" data-i18n="monthlyTokenUsage">Monthly Token Usage</div>
             <div class="progress-bar" style="height:8px;margin-bottom:7px"><div class="progress-fill" id="usage-fill" style="width:0%"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-bottom:14px"><span id="usage-used">0 used</span><span id="usage-cap">—</span></div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-top:14px;border-top:1px solid var(--border)">
+            <div class="plan-stats-row">
               <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="monthlyCap">Monthly Cap</div></div>
               <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="topupBalance">Topup Balance</div></div>
               <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-reset">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="resetsOn">Resets On</div></div>
@@ -72,7 +98,7 @@
         <div class="card">
           <div class="card-header"><div class="card-title"><span class="card-icon">🚀</span data-i18n="upgradePlan">Upgrade Plan</div></div>
           <div class="card-body">
-            <div style="display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);width:fit-content;margin-bottom:18px">
+            <div class="cycle-toggle">
               <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px" data-i18n="save20">Save 20%</span></button>
               <button class="btn btn-ghost btn-sm" id="cycle-monthly" onclick="setCycle('monthly',this)">Monthly</button>
             </div>
@@ -105,7 +131,7 @@
       </div>
 
       <!-- Side -->
-      <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:68px">
+      <div class="billing-side">
         <div class="card">
           <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span data-i18n="topupBalance">Topup Balance</div></div>
           <div class="card-body">
