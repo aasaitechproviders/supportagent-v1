@@ -1,1357 +1,777 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>Channels — SupportGent</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Channels — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Layout ── */
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;
+            background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1200px;width:100%}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:4px;color:var(--text-2)}
 
-/* ── PAGE-SPECIFIC STYLES ─────────────────────────────────────────── */
+    /* ── Agent selector ── */
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);
+                  background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;
+                  cursor:pointer;outline:none;transition:var(--t);appearance:none;-webkit-appearance:none;
+                  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");
+                  background-repeat:no-repeat;background-position:right 10px center}
+    .agent-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
 
-/* Agent selector bar */
-.agent-selector-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  margin-bottom: 24px;
-}
-.agent-selector-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  white-space: nowrap;
-}
-.agent-selector-wrap {
-  position: relative;
-  flex: 1;
-  max-width: 340px;
-}
-.agent-selector-wrap select {
-  width: 100%;
-  height: 38px;
-  padding: 0 34px 0 12px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border-md);
-  background: var(--surface-2);
-  color: var(--text);
-  font-family: var(--font);
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: var(--t);
-}
-.agent-selector-wrap select:hover { border-color: var(--accent); }
-.agent-selector-wrap select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-.agent-selector-wrap::after {
-  content: '▾';
-  position: absolute;
-  right: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 12px;
-  color: var(--text-3);
-  pointer-events: none;
-}
-.agent-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: var(--green);
-  flex-shrink: 0;
-  box-shadow: 0 0 0 3px var(--green-dim);
-}
-.agent-dot.offline { background: var(--text-3); box-shadow: none; }
+    /* ── Section header ── */
+    .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;
+                   letter-spacing:.08em;margin-bottom:14px;margin-top:4px}
 
-/* Section label */
-.ch-section-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin-bottom: 10px;
-  padding-left: 2px;
-}
+    /* ── Channel cards grid ── */
+    .channels-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:28px}
+    .channel-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+                  padding:20px;transition:var(--t);position:relative;overflow:hidden}
+    .channel-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
+    .channel-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+    .channel-card-left{display:flex;align-items:center;gap:12px}
+    .channel-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+                  justify-content:center;font-size:22px;flex-shrink:0}
+    .channel-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .channel-desc{font-size:12px;color:var(--text-3);line-height:1.5}
+    .channel-status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+                          padding:3px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+    .channel-status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .badge-live{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .badge-live::before{background:var(--green);animation:pulse-dot 1.5s ease-in-out infinite}
+    .badge-disconnected{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .badge-disconnected::before{background:var(--text-3)}
+    .badge-connecting{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+    .badge-connecting::before{background:var(--amber)}
+    @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* Channel cards grid */
-.channels-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 28px;
-}
+    /* ── Connected info row ── */
+    .channel-connected-info{display:flex;align-items:center;gap:8px;padding:8px 12px;
+                            background:var(--surface-2);border-radius:8px;margin-bottom:14px;flex-wrap:wrap}
+    .channel-email-chip{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+                        color:var(--text-2);flex:1;min-width:0}
+    .channel-email-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .queue-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
+                 padding:2px 8px;border-radius:12px;background:var(--accent-dim);color:var(--accent);
+                 border:1px solid var(--accent-glow);cursor:pointer;transition:var(--t);white-space:nowrap}
+    .queue-badge:hover{background:var(--accent);color:#fff}
+    .queue-badge.has-items{background:var(--amber-dim);color:var(--amber);border-color:var(--amber-border)}
+    .queue-badge.has-items:hover{background:var(--amber);color:#fff}
 
-/* Channel card base */
-.ch-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
-}
-.ch-card.connected { border-color: var(--green-border); }
-.ch-card.connected:hover { box-shadow: 0 0 0 1px var(--green-border), var(--sh); }
-.ch-card:not(.connected):hover { border-color: var(--border-md); box-shadow: var(--sh); }
+    /* ── Channel actions ── */
+    .channel-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:34px;border-radius:var(--r-sm);
+         font-size:12.5px;font-weight:600;cursor:pointer;transition:var(--t);border:none;font-family:var(--font)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
+    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
+    .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-secondary:hover{background:var(--surface-3);color:var(--text)}
+    .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .btn-danger:hover{background:var(--red);color:#fff}
+    .btn-sm{height:30px;padding:0 11px;font-size:12px}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 
-/* Card header strip */
-.ch-card-strip {
-  height: 3px;
-  background: var(--border);
-}
-.ch-card-strip.gmail  { background: linear-gradient(90deg,#EA4335,#FBBC04,#34A853,#4285F4); }
-.ch-card-strip.meta   { background: linear-gradient(90deg,#0866FF,#00B2FF,#AE2DCC); }
+    /* ── Sub-channels (WhatsApp/Instagram inside Meta card) ── */
+    .sub-channels{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+    .sub-channel-row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+                     padding:10px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border)}
+    .sub-channel-left{display:flex;align-items:center;gap:9px}
+    .sub-channel-icon{font-size:16px}
+    .sub-channel-name{font-size:13px;font-weight:600;color:var(--text)}
+    .sub-channel-handle{font-size:11.5px;color:var(--text-3)}
 
-/* Card body */
-.ch-card-body { padding: 18px 20px; }
+    /* ── Coming soon overlay ── */
+    .coming-soon-overlay{position:absolute;inset:0;background:rgba(var(--surface-rgb,255,255,255),.82);
+                         backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;
+                         border-radius:var(--r-lg);z-index:5}
+    .coming-soon-pill{font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;
+                      background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md);
+                      display:flex;align-items:center;gap:6px}
+    [data-theme="dark"] .coming-soon-overlay{background:rgba(12,14,22,.82)}
 
-/* Card header row */
-.ch-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.ch-card-icon-wrap {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-.ch-card-icon {
-  width: 42px; height: 42px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-md);
-  flex-shrink: 0;
-}
-.ch-card-icon.gmail { background: rgba(234,67,53,.09); border-color: rgba(234,67,53,.2); }
-.ch-card-icon.meta  { background: rgba(8,102,255,.09); border-color: rgba(8,102,255,.2); }
-.ch-card-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-.ch-card-sub  { font-size: 11.5px; color: var(--text-3); line-height: 1.5; }
+    /* ── Setup guide card ── */
+    .setup-guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+                 padding:18px 20px;margin-bottom:24px}
+    .setup-guide-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;
+                       display:flex;align-items:center;gap:8px}
+    .setup-steps{display:flex;flex-direction:column;gap:10px}
+    .setup-step{display:flex;gap:12px;align-items:flex-start}
+    .step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
+              font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .step-num.done{background:var(--green)}
+    .step-content{flex:1;padding-top:2px}
+    .step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+    .step-desc{font-size:12px;color:var(--text-3);line-height:1.6}
+    .env-hint{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+              padding:2px 8px;border-radius:5px;background:var(--surface-3);color:var(--text-2);
+              border:1px solid var(--border-md);font-family:var(--mono)}
 
-/* Status badge */
-.ch-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 10.5px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.ch-status.live    { background: var(--green-dim);  color: var(--green);  border: 1px solid var(--green-border); }
-.ch-status.paused  { background: var(--amber-dim);  color: var(--amber);  border: 1px solid var(--amber-border); }
-.ch-status.off     { background: var(--surface-3);  color: var(--text-3); border: 1px solid var(--border-md); }
-.ch-status-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
+    /* ══════════════════════════════════════════════════════
+       INBOX PANEL
+    ══════════════════════════════════════════════════════ */
+    .inbox-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .inbox-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;
+                  border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+    .inbox-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+    .inbox-count{font-size:11.5px;font-weight:700;color:var(--accent);background:var(--accent-dim);
+                 padding:2px 9px;border-radius:12px;border:1px solid var(--accent-glow)}
+    .inbox-filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .filter-chip{height:30px;padding:0 12px;border:1px solid var(--border-md);border-radius:20px;
+                 background:var(--surface-2);color:var(--text-2);font-size:12px;font-weight:600;
+                 cursor:pointer;transition:var(--t);white-space:nowrap}
+    .filter-chip:hover{border-color:var(--accent);color:var(--accent)}
+    .filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .sync-btn{height:30px;padding:0 12px;border:1px solid var(--border-md);border-radius:8px;
+              background:var(--surface-2);color:var(--text-2);font-size:12px;font-weight:600;
+              cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:5px}
+    .sync-btn:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+    .sync-btn.spinning svg{animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Connected account chip */
-.ch-account-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-md);
-  border-radius: var(--r-sm);
-  padding: 6px 11px;
-  margin-bottom: 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-2);
-  max-width: 100%;
-  overflow: hidden;
-}
-.ch-account-chip-icon { font-size: 14px; flex-shrink: 0; }
-.ch-account-chip-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* ── Message list ── */
+    .msg-list{display:flex;flex-direction:column}
+    .msg-row{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;
+             border-bottom:1px solid var(--border);cursor:pointer;transition:var(--t);position:relative}
+    .msg-row:last-child{border-bottom:none}
+    .msg-row:hover{background:var(--surface-2)}
+    .msg-row.selected{background:var(--accent-dim)}
+    .msg-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-3));
+                display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+                color:#fff;flex-shrink:0}
+    .msg-main{flex:1;min-width:0}
+    .msg-from{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;
+              white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msg-subject{font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:3px;
+                 white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msg-preview{font-size:12px;color:var(--text-3);line-height:1.5;
+                 display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .msg-meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+    .msg-time{font-size:11px;color:var(--text-3)}
+    .msg-intent-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
+    .intent-support{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+    .intent-faq{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .intent-sales{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    .intent-other{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .intent-spam{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .auto-replied-tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;
+                      background:var(--green-dim);color:var(--green)}
 
-/* Toggle row */
-.ch-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  margin-bottom: 10px;
-}
-.ch-toggle-label { font-size: 12px; font-weight: 600; color: var(--text-2); }
+    /* ── Reply panel (slide-in) ── */
+    .reply-panel{border-top:2px solid var(--border);background:var(--surface-2)}
+    .reply-panel-header{display:flex;align-items:flex-start;justify-content:space-between;
+                        gap:12px;padding:14px 18px 0;flex-wrap:wrap}
+    .reply-to-info{font-size:13px;font-weight:600;color:var(--text-2)}
+    .reply-to-info strong{color:var(--text)}
+    .reply-subject{font-size:12px;color:var(--text-3);margin-top:2px}
+    .close-reply-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-3);
+                     padding:2px;transition:var(--t)}
+    .close-reply-btn:hover{color:var(--text)}
+    .reply-body-area{padding:12px 18px}
+    .ai-draft-label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;
+                    letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .reply-textarea{width:100%;min-height:140px;padding:12px 14px;border:1px solid var(--border-md);
+                    border-radius:var(--r-sm);background:var(--surface);color:var(--text);
+                    font-family:var(--font);font-size:13px;line-height:1.75;resize:vertical;
+                    outline:none;transition:var(--t);box-sizing:border-box}
+    .reply-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .reply-actions{display:flex;align-items:center;justify-content:space-between;
+                   padding:10px 18px 14px;flex-wrap:wrap;gap:8px}
+    .reply-actions-left{display:flex;gap:7px;flex-wrap:wrap}
+    .conf-bar{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--text-3)}
+    .conf-pip{width:60px;height:5px;border-radius:3px;background:var(--border);overflow:hidden}
+    .conf-fill{height:100%;border-radius:3px;background:var(--green);transition:width .4s}
 
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
-  width: 38px; height: 22px;
-  flex-shrink: 0;
-}
-.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
-.toggle-track {
-  position: absolute; inset: 0;
-  background: var(--surface-4);
-  border-radius: 11px;
-  cursor: pointer;
-  transition: background .2s;
-  border: 1px solid var(--border-md);
-}
-.toggle-track::after {
-  content: '';
-  position: absolute;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  top: 2px; left: 2px;
-  transition: transform .2s var(--ease);
-  box-shadow: 0 1px 3px rgba(0,0,0,.2);
-}
-.toggle-switch input:checked ~ .toggle-track { background: var(--green); border-color: var(--green); }
-.toggle-switch input:checked ~ .toggle-track::after { transform: translateX(16px); }
+    /* ── Empty state ── */
+    .empty-state{padding:48px 20px;text-align:center;color:var(--text-3)}
+    .empty-state-icon{font-size:36px;margin-bottom:10px}
+    .empty-state-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+    .empty-state-sub{font-size:13px}
 
-/* Card action row */
-.ch-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+    /* ── Toast ── */
+    .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+    .toast-item{padding:10px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;
+                color:#fff;display:flex;align-items:center;gap:8px;animation:slide-up .25s ease;
+                box-shadow:var(--sh-lg)}
+    .toast-success{background:#19a37a}
+    .toast-error{background:#e05252}
+    .toast-info{background:var(--accent)}
+    @keyframes slide-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* Meta sub-channels (inside one card) */
-.meta-sub {
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.meta-sub-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.meta-sub-row:last-child { border-bottom: none; }
-.meta-sub-icon { font-size: 18px; flex-shrink: 0; }
-.meta-sub-info { flex: 1; min-width: 0; }
-.meta-sub-name  { font-size: 12.5px; font-weight: 700; margin-bottom: 1px; }
-.meta-sub-detail { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Connect prompt (not connected state) */
-.ch-connect-prompt {
-  padding: 10px 14px;
-  background: var(--surface-2);
-  border-radius: var(--r-sm);
-  margin-bottom: 12px;
-}
-.ch-connect-prompt p {
-  font-size: 12px;
-  color: var(--text-3);
-  line-height: 1.6;
-  margin-bottom: 6px;
-}
-.ch-connect-prompt p:last-child { margin-bottom: 0; }
-.ch-connect-prereq {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-3);
-}
-.ch-connect-prereq::before { content: '•'; }
-
-/* Inbox section */
-.inbox-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-}
-.inbox-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 0;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.inbox-title { font-size: 14px; font-weight: 700; }
-.inbox-tab-bar {
-  display: flex;
-  gap: 2px;
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  margin-top: 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.inbox-tab-bar::-webkit-scrollbar { display: none; }
-.inbox-tab {
-  padding: 10px 14px;
-  font-size: 12.5px;
-  font-weight: 600;
-  background: transparent;
-  border: none;
-  color: var(--text-3);
-  cursor: pointer;
-  transition: var(--t);
-  position: relative;
-  white-space: nowrap;
-}
-.inbox-tab.active { color: var(--accent); }
-.inbox-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 0;
-  width: 100%; height: 2px;
-  background: var(--accent);
-  border-radius: 2px;
-}
-.inbox-tab .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px; height: 18px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 9px;
-  font-weight: 700;
-  padding: 0 5px;
-  margin-left: 5px;
-}
-
-/* Channel filter pills */
-.inbox-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-  flex-wrap: wrap;
-}
-.inbox-filter-bar::-webkit-scrollbar { display: none; }
-.ch-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border-md);
-  background: var(--surface-2);
-  color: var(--text-3);
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--t);
-  white-space: nowrap;
-  user-select: none;
-}
-.ch-pill:hover { border-color: var(--accent); color: var(--text); }
-.ch-pill.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-
-/* Message rows */
-.inbox-list { }
-.inbox-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 52px 20px;
-  gap: 10px;
-  color: var(--text-3);
-}
-.inbox-empty-icon { font-size: 36px; opacity: .4; }
-.inbox-empty-text { font-size: 13px; font-weight: 600; }
-.inbox-empty-sub  { font-size: 12px; text-align: center; max-width: 280px; line-height: 1.6; }
-
-.inbox-row {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 13px 20px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  transition: background .12s;
-  position: relative;
-}
-.inbox-row:last-child { border-bottom: none; }
-.inbox-row:hover { background: var(--surface-2); }
-.inbox-row.unread { background: var(--accent-soft); }
-.inbox-row.unread:hover { background: var(--accent-dim); }
-.inbox-row.unread::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--accent);
-  border-radius: 0 2px 2px 0;
-}
-
-/* Channel badge in row */
-.ch-badge {
-  width: 30px; height: 30px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-.ch-badge.email    { background: rgba(234,67,53,.1); }
-.ch-badge.whatsapp { background: rgba(37,211,102,.1); }
-.ch-badge.instagram{ background: rgba(225,48,108,.1); }
-.ch-badge.webchat  { background: var(--accent-dim); }
-
-.inbox-row-avatar {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: var(--surface-3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-2);
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.inbox-row-body { flex: 1; min-width: 0; }
-.inbox-row-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 2px;
-}
-.inbox-row-name  { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.inbox-row-time  { font-size: 10.5px; color: var(--text-3); white-space: nowrap; flex-shrink: 0; }
-.inbox-row-preview { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.inbox-row-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-}
-.inbox-reply-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--green);
-  background: var(--green-dim);
-  border: 1px solid var(--green-border);
-  border-radius: 6px;
-  padding: 1px 6px;
-}
-.inbox-pending-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--amber);
-  background: var(--amber-dim);
-  border: 1px solid var(--amber-border);
-  border-radius: 6px;
-  padding: 1px 6px;
-}
-
-/* ── THREAD DRAWER ─────────────────────────────────────────────────── */
-.drawer-backdrop {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.35);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  z-index: 300;
-  opacity: 0;
-  transition: opacity .22s var(--ease);
-}
-.drawer-backdrop.open { display: block; opacity: 1; }
-
-.thread-drawer {
-  position: fixed;
-  top: 0; right: 0; bottom: 0;
-  width: min(520px, 100vw);
-  background: var(--surface);
-  border-left: 1px solid var(--border);
-  box-shadow: var(--sh-lg);
-  z-index: 301;
-  display: flex;
-  flex-direction: column;
-  transform: translateX(100%);
-  transition: transform .28s var(--ease);
-}
-.thread-drawer.open { transform: translateX(0); }
-
-.drawer-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.drawer-close {
-  width: 30px; height: 30px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--border-md);
-  background: var(--surface-2);
-  color: var(--text-3);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--t);
-  flex-shrink: 0;
-}
-.drawer-close:hover { background: var(--surface-3); color: var(--text); }
-.drawer-contact { flex: 1; min-width: 0; }
-.drawer-contact-name  { font-size: 14px; font-weight: 700; }
-.drawer-contact-sub   { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
-.drawer-channel-badge {
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.drawer-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.msg-bubble-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.msg-bubble-wrap.outgoing { align-items: flex-end; }
-.msg-bubble-wrap.incoming { align-items: flex-start; }
-
-.msg-sender {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text-3);
-  margin-bottom: 3px;
-  padding: 0 4px;
-}
-
-.msg-bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 14px;
-  font-size: 13px;
-  line-height: 1.6;
-}
-.msg-bubble.incoming {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-bottom-left-radius: 4px;
-  color: var(--text);
-}
-.msg-bubble.outgoing {
-  background: var(--accent);
-  color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.msg-bubble.outgoing.ai {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-}
-.msg-time {
-  font-size: 9.5px;
-  color: var(--text-3);
-  padding: 0 4px;
-  margin-top: 2px;
-}
-.msg-ai-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 9.5px;
-  font-weight: 700;
-  color: var(--accent);
-  background: var(--accent-dim);
-  border: 1px solid rgba(124,111,255,.2);
-  border-radius: 5px;
-  padding: 1px 6px;
-  margin-top: 3px;
-  align-self: flex-end;
-}
-
-/* No agent selected state */
-.no-agent-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 64px 20px;
-  text-align: center;
-  color: var(--text-3);
-  gap: 12px;
-}
-.no-agent-icon { font-size: 48px; opacity: .3; }
-.no-agent-text { font-size: 15px; font-weight: 700; color: var(--text-2); }
-.no-agent-sub  { font-size: 13px; line-height: 1.65; max-width: 300px; }
-
-/* Connecting spinner state */
-@keyframes spin { to { transform: rotate(360deg); } }
-.ch-spinner {
-  width: 18px; height: 18px;
-  border: 2px solid var(--border-md);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .channels-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 648px) {
-  .agent-selector-bar { flex-wrap: wrap; }
-  .inbox-header { flex-direction: column; align-items: flex-start; }
-  .thread-drawer { width: 100vw; }
-}
-
-</style>
-<link rel="stylesheet" href="shared.css">
-<script>
-;(function(){
-  var d = localStorage.getItem('sg_theme') === 'dark';
-  document.documentElement[d ? 'setAttribute' : 'removeAttribute']('data-theme', 'dark');
-  document.documentElement.style.background = d ? '#07080D' : '#F2F3F9';
-})();
-</script>
-<script src="i18n.js"></script>
-<script src="api.js"></script>
-<script src="nav.js"></script>
+    /* ── Responsive ── */
+    @media(max-width:900px){.channels-grid{grid-template-columns:1fr}}
+    @media(max-width:768px){.main-wrap{margin-left:0}.mob-menu-btn{display:flex}.page-body{padding:14px 14px 32px}}
+  </style>
+  <script>
+    ;(function(){
+      var p=new URLSearchParams(location.search),t=p.get('token');
+      if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}
+      var d=localStorage.getItem('sg_theme')==='dark';
+      document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');
+      document.documentElement.style.background=d?'#07080D':'#F2F3F9';
+    })();
+  </script>
 </head>
 <body>
-<div id="toast-container"></div>
 
-<!-- Mobile topbar -->
-<div class="mobile-topbar">
-  <div class="mob-left">
-    <button class="hamburger" onclick="openMobileSidebar()" id="mob-menu-btn">
-      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
-    </button>
-    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
-  </div>
-  <div class="mob-right">
-    <button class="theme-toggle" style="font-size:15px;"></button>
-  </div>
-</div>
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
-<div class="sidebar" id="sidebar"></div>
+<div class="toast-wrap" id="toastWrap"></div>
 
-<!-- Skeleton -->
-<div id="page-skeleton">
-  <div class="skel-topbar">
-    <div class="skel" style="height:13px;width:160px;border-radius:4px"></div>
-    <div class="skel" style="height:34px;width:120px;border-radius:var(--r-sm)"></div>
-  </div>
-  <div class="skel-body">
-    <div class="skel" style="height:58px;border-radius:var(--r-lg);margin-bottom:6px"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
-      <div class="skel" style="height:200px;border-radius:var(--r-lg)"></div>
-      <div class="skel" style="height:200px;border-radius:var(--r-lg);opacity:.8"></div>
-    </div>
-    <div class="skel" style="height:320px;border-radius:var(--r-lg)"></div>
-  </div>
-</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<nav class="sidebar" id="sidebar"></nav>
 
-<!-- Main layout -->
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
+      <button class="mob-menu-btn" id="mob-menu-btn">☰</button>
       <span class="topbar-title">📡 Channels</span>
     </div>
     <div class="topbar-right">
-      <button class="theme-toggle" style="font-size:15px;"></button>
-    </div>
-  </div>
-
-  <div class="content" id="page-content" style="display:none">
-
-    <!-- Agent selector bar -->
-    <div class="agent-selector-bar">
-      <span class="agent-selector-label">Agent</span>
-      <div class="agent-selector-wrap">
-        <select id="agent-select" onchange="onAgentChange(this.value)">
-          <option value="">— Select an agent —</option>
-        </select>
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <div class="agent-select-wrap">
+        <select class="agent-select" id="agentSelect"></select>
       </div>
-      <div class="agent-dot offline" id="agent-status-dot" title="No agent selected"></div>
-      <span id="agent-status-text" style="font-size:12px;color:var(--text-3);"></span>
     </div>
-
-    <!-- No agent selected -->
-    <div class="no-agent-state" id="no-agent-state">
-      <div class="no-agent-icon">📡</div>
-      <div class="no-agent-text">Select an agent to manage channels</div>
-      <div class="no-agent-sub">Choose an agent from the dropdown above to connect and configure its communication channels.</div>
-    </div>
-
-    <!-- Channels content (hidden until agent selected) -->
-    <div id="channels-content" style="display:none">
-
-      <!-- Channel cards -->
-      <div class="ch-section-label">Connected Channels</div>
-      <div class="channels-grid" id="channels-grid">
-
-        <!-- Gmail card -->
-        <div class="ch-card" id="card-gmail">
-          <div class="ch-card-strip gmail"></div>
-          <div class="ch-card-body">
-            <div class="ch-card-head">
-              <div class="ch-card-icon-wrap">
-                <div class="ch-card-icon gmail">📧</div>
-                <div>
-                  <div class="ch-card-name">Gmail / Google Workspace</div>
-                  <div class="ch-card-sub">Reply to support emails using your agent's knowledge base</div>
-                </div>
-              </div>
-              <span class="ch-status off" id="gmail-status"><span class="ch-status-dot"></span> Not Connected</span>
-            </div>
-
-            <!-- Not connected state -->
-            <div id="gmail-disconnected">
-              <div class="ch-connect-prompt">
-                <p>Connect your Gmail or Google Workspace inbox. The agent will read incoming emails and reply automatically.</p>
-                <div class="ch-connect-prereq">Any Gmail or Google Workspace account</div>
-              </div>
-              <button class="btn btn-primary" style="width:100%;justify-content:center;gap:10px" onclick="connectChannel('gmail')">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor" opacity=".9"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="currentColor" opacity=".8"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="currentColor" opacity=".7"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="currentColor" opacity=".6"/></svg>
-                Connect with Google
-              </button>
-            </div>
-
-            <!-- Connected state -->
-            <div id="gmail-connected" style="display:none">
-              <div class="ch-account-chip">
-                <span class="ch-account-chip-icon">📧</span>
-                <span class="ch-account-chip-text" id="gmail-account-label">—</span>
-              </div>
-              <div class="ch-toggle-row">
-                <span class="ch-toggle-label">Agent replies to emails</span>
-                <label class="toggle-switch">
-                  <input type="checkbox" id="gmail-toggle" onchange="toggleChannel('gmail', this.checked)">
-                  <span class="toggle-track"></span>
-                </label>
-              </div>
-              <div class="ch-actions">
-                <button class="btn btn-secondary btn-sm" onclick="testChannel('gmail')">📨 Send Test</button>
-                <button class="btn btn-secondary btn-sm" style="color:var(--red);border-color:var(--red-border)" onclick="disconnectChannel('gmail')">Disconnect</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Meta card (WhatsApp + Instagram) -->
-        <div class="ch-card" id="card-meta">
-          <div class="ch-card-strip meta"></div>
-          <div class="ch-card-body">
-            <div class="ch-card-head">
-              <div class="ch-card-icon-wrap">
-                <div class="ch-card-icon meta">🔷</div>
-                <div>
-                  <div class="ch-card-name">Meta — WhatsApp & Instagram</div>
-                  <div class="ch-card-sub">One login connects both channels via Meta Business</div>
-                </div>
-              </div>
-              <span class="ch-status off" id="meta-status"><span class="ch-status-dot"></span> Not Connected</span>
-            </div>
-
-            <!-- Not connected state -->
-            <div id="meta-disconnected">
-              <div class="ch-connect-prompt">
-                <p>Connect your Meta Business account to enable WhatsApp and Instagram DM auto-replies.</p>
-                <div class="ch-connect-prereq">Meta Business Account required</div>
-                <div class="ch-connect-prereq" style="margin-top:4px">WhatsApp Business number for WhatsApp</div>
-                <div class="ch-connect-prereq" style="margin-top:4px">Instagram Professional account for DMs</div>
-              </div>
-              <button class="btn btn-primary" style="width:100%;justify-content:center;gap:10px;background:linear-gradient(135deg,#0866FF,#0099FF)" onclick="connectChannel('meta')">
-                <span style="font-size:16px">🔷</span>
-                Connect with Meta
-              </button>
-            </div>
-
-            <!-- Connected state -->
-            <div id="meta-connected" style="display:none">
-              <div class="ch-account-chip" style="margin-bottom:12px">
-                <span class="ch-account-chip-icon">🏢</span>
-                <span class="ch-account-chip-text" id="meta-page-label">—</span>
-              </div>
-
-              <!-- Sub-channel rows -->
-              <div class="meta-sub">
-                <!-- WhatsApp row -->
-                <div class="meta-sub-row">
-                  <span class="meta-sub-icon">💬</span>
-                  <div class="meta-sub-info">
-                    <div class="meta-sub-name">WhatsApp Business</div>
-                    <div class="meta-sub-detail" id="wa-number-label">Not available</div>
-                  </div>
-                  <span class="ch-status off" id="wa-status" style="font-size:10px"><span class="ch-status-dot"></span></span>
-                  <label class="toggle-switch">
-                    <input type="checkbox" id="wa-toggle" onchange="toggleChannel('whatsapp', this.checked)">
-                    <span class="toggle-track"></span>
-                  </label>
-                </div>
-                <!-- Instagram row -->
-                <div class="meta-sub-row">
-                  <span class="meta-sub-icon">📸</span>
-                  <div class="meta-sub-info">
-                    <div class="meta-sub-name">Instagram DMs</div>
-                    <div class="meta-sub-detail" id="ig-handle-label">Not available</div>
-                  </div>
-                  <span class="ch-status off" id="ig-status" style="font-size:10px"><span class="ch-status-dot"></span></span>
-                  <label class="toggle-switch">
-                    <input type="checkbox" id="ig-toggle" onchange="toggleChannel('instagram', this.checked)">
-                    <span class="toggle-track"></span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="ch-actions">
-                <button class="btn btn-secondary btn-sm" onclick="testChannel('whatsapp')">💬 Test WhatsApp</button>
-                <button class="btn btn-secondary btn-sm" onclick="testChannel('instagram')">📸 Test Instagram</button>
-                <button class="btn btn-secondary btn-sm" style="color:var(--red);border-color:var(--red-border)" onclick="disconnectChannel('meta')">Disconnect</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div><!-- /channels-grid -->
-
-      <!-- ── INBOX SECTION ──────────────────────────────────────────── -->
-      <div class="inbox-section" id="inbox-section">
-
-        <div class="inbox-header">
-          <span class="inbox-title">📥 Inbox</span>
-        </div>
-
-        <!-- Tabs: Inbox / Sent -->
-        <div class="inbox-tab-bar">
-          <button class="inbox-tab active" data-inbox="inbox" onclick="switchInboxTab('inbox', this)">
-            Inbox <span class="badge" id="inbox-unread-badge" style="display:none">0</span>
-          </button>
-          <button class="inbox-tab" data-inbox="sent" onclick="switchInboxTab('sent', this)">
-            Sent
-          </button>
-        </div>
-
-        <!-- Channel filter pills -->
-        <div class="inbox-filter-bar">
-          <div class="ch-pill active" data-filter="all" onclick="filterInbox('all', this)">All</div>
-          <div class="ch-pill" data-filter="email"     onclick="filterInbox('email', this)">📧 Email</div>
-          <div class="ch-pill" data-filter="whatsapp"  onclick="filterInbox('whatsapp', this)">💬 WhatsApp</div>
-          <div class="ch-pill" data-filter="instagram" onclick="filterInbox('instagram', this)">📸 Instagram</div>
-        </div>
-
-        <!-- Message list -->
-        <div class="inbox-list" id="inbox-list">
-          <!-- Populated by JS -->
-        </div>
-
-      </div><!-- /inbox-section -->
-
-    </div><!-- /channels-content -->
-
-  </div><!-- /content -->
-</div><!-- /main-wrap -->
-
-<!-- ── THREAD DRAWER ─────────────────────────────────────────────── -->
-<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
-<div class="thread-drawer" id="thread-drawer">
-  <div class="drawer-header">
-    <button class="drawer-close" onclick="closeDrawer()">✕</button>
-    <span class="drawer-channel-badge" id="drawer-ch-badge"></span>
-    <div class="drawer-contact">
-      <div class="drawer-contact-name" id="drawer-contact-name">—</div>
-      <div class="drawer-contact-sub"  id="drawer-contact-sub">—</div>
-    </div>
-    <span class="ch-status live" id="drawer-status" style="font-size:10.5px"><span class="ch-status-dot"></span> Agent Active</span>
   </div>
-  <div class="drawer-body" id="drawer-body">
-    <!-- Thread messages rendered here -->
+
+  <div class="page-body" id="pageBody">
+    <!-- injected by JS -->
   </div>
 </div>
 
+<script src="api.js"></script>
+<script src="nav.js"></script>
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   channels.js — Channels page logic
-══════════════════════════════════════════════════════════════════ */
+// ══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════════════
+let _agents      = []
+let _agentId     = null
+let _channels    = {}          // { gmail: {...}, meta: {...} }
+let _inboxStatus = 'queued'    // current filter
+let _inboxMsgs   = []
+let _selectedMsg = null
+let _totalQueued = 0
 
-let _agents    = []
-let _agentId   = null
-let _channels  = { gmail: null, whatsapp: null, instagram: null }
-let _inboxTab  = 'inbox'
-let _inboxFilter = 'all'
-let _messages  = []
-
-// ── INIT ──────────────────────────────────────────────────────────
-async function init() {
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+;(async () => {
   const nav = await renderNav('channels')
-  if (!nav) return  // not authenticated — renderNav redirects
+  if (!nav) return
 
-  // Load all agents for dropdown
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    toggleTheme()
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark'
+    document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙'
+  })
+
+  document.getElementById('mob-menu-btn').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open')
+    document.getElementById('sidebarBackdrop').classList.toggle('open')
+  })
+  document.getElementById('sidebarBackdrop').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('sidebarBackdrop').classList.remove('open')
+  })
+
+  // Handle OAuth callback result
+  const params = new URLSearchParams(location.search)
+  if (params.get('connected') === 'gmail') {
+    showToast('Gmail connected successfully! 🎉', 'success')
+    history.replaceState({}, '', location.pathname)
+  }
+  if (params.get('error')) {
+    showToast('Connection failed: ' + decodeURIComponent(params.get('error')), 'error')
+    history.replaceState({}, '', location.pathname)
+  }
+
   try {
     _agents = await apiFetch('/agents')
-  } catch(e) {
-    _agents = []
+    buildAgentSelect(_agents)
+    if (_agents.length) {
+      _agentId = _agents[0]._id
+      await loadPage()
+    } else {
+      renderNoAgents()
+    }
+  } catch (e) {
+    showToast('Failed to load agents', 'error')
   }
+})()
 
-  buildAgentDropdown()
-
-  // Pick last-used agent
-  const lastId = localStorage.getItem('sg_last_agent')
-  const match  = _agents.find(a => a.id === lastId) || _agents[0]
-  if (match) {
-    document.getElementById('agent-select').value = match.id
-    await onAgentChange(match.id)
-  }
-
-  document.getElementById('page-content').style.display = 'block'
-  dismissSkeleton()
+function buildAgentSelect(agents) {
+  const sel = document.getElementById('agentSelect')
+  if (!agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
+  sel.innerHTML = agents.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+  sel.addEventListener('change', async e => { _agentId = e.target.value; await loadPage() })
 }
 
-function buildAgentDropdown() {
-  const sel = document.getElementById('agent-select')
-  sel.innerHTML = '<option value="">— Select an agent —</option>'
-  _agents.forEach(a => {
-    const opt = document.createElement('option')
-    opt.value = a.id
-    opt.textContent = a.name || 'Unnamed Agent'
-    sel.appendChild(opt)
-  })
-}
-
-async function onAgentChange(agentId) {
-  _agentId = agentId || null
-  localStorage.setItem('sg_last_agent', agentId)
-
-  const noState  = document.getElementById('no-agent-state')
-  const chContent = document.getElementById('channels-content')
-  const dot      = document.getElementById('agent-status-dot')
-  const statusTxt = document.getElementById('agent-status-text')
-
-  if (!_agentId) {
-    noState.style.display  = 'flex'
-    chContent.style.display = 'none'
-    dot.className = 'agent-dot offline'
-    statusTxt.textContent = ''
-    return
-  }
-
-  noState.style.display  = 'none'
-  chContent.style.display = 'block'
-
-  const agent = _agents.find(a => a.id === _agentId)
-  dot.className = 'agent-dot'
-  statusTxt.textContent = agent?.name || ''
-
-  await loadChannels()
-  await loadInbox()
-}
-
-// ── LOAD CHANNELS ─────────────────────────────────────────────────
-async function loadChannels() {
+// ══════════════════════════════════════════════════════════════════════════════
+// LOAD PAGE
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadPage() {
   try {
     const data = await apiFetch(`/agents/${_agentId}/channels`)
-    _channels = data || {}
-  } catch(e) {
-    // API not yet live — use empty state
-    _channels = {}
-  }
-  renderChannelCards()
-}
-
-function renderChannelCards() {
-  renderGmailCard(_channels.gmail || null)
-  renderMetaCard(_channels.meta || null)
-}
-
-function renderGmailCard(ch) {
-  const card        = document.getElementById('card-gmail')
-  const statusEl    = document.getElementById('gmail-status')
-  const disconnDiv  = document.getElementById('gmail-disconnected')
-  const connDiv     = document.getElementById('gmail-connected')
-  const accountLbl  = document.getElementById('gmail-account-label')
-  const toggle      = document.getElementById('gmail-toggle')
-
-  if (!ch || !ch.connected) {
-    card.classList.remove('connected')
-    statusEl.className = 'ch-status off'
-    statusEl.innerHTML = '<span class="ch-status-dot"></span> Not Connected'
-    disconnDiv.style.display = 'block'
-    connDiv.style.display    = 'none'
-    return
-  }
-
-  card.classList.add('connected')
-  accountLbl.textContent  = ch.email || 'Connected'
-  toggle.checked          = ch.enabled !== false
-  disconnDiv.style.display = 'none'
-  connDiv.style.display    = 'block'
-
-  if (ch.enabled !== false) {
-    statusEl.className = 'ch-status live'
-    statusEl.innerHTML = '<span class="ch-status-dot"></span> Live'
-  } else {
-    statusEl.className = 'ch-status paused'
-    statusEl.innerHTML = '<span class="ch-status-dot"></span> Paused'
+    _channels  = {}
+    ;(data.channels || []).forEach(ch => { _channels[ch.type] = ch })
+    renderPage()
+  } catch (e) {
+    document.getElementById('pageBody').innerHTML = `<div class="empty-state"><div class="empty-state-icon">😵</div><div class="empty-state-sub">${esc(e.message)}</div></div>`
   }
 }
 
-function renderMetaCard(ch) {
-  const card       = document.getElementById('card-meta')
-  const statusEl   = document.getElementById('meta-status')
-  const disconnDiv = document.getElementById('meta-disconnected')
-  const connDiv    = document.getElementById('meta-connected')
-  const pageLbl    = document.getElementById('meta-page-label')
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER PAGE
+// ══════════════════════════════════════════════════════════════════════════════
+function renderPage() {
+  const gmail = _channels.gmail || null
+  const gmailConnected = gmail?.status === 'active'
+  const queuedCount = gmail?.queued_count || 0
 
-  if (!ch || !ch.connected) {
-    card.classList.remove('connected')
-    statusEl.className = 'ch-status off'
-    statusEl.innerHTML = '<span class="ch-status-dot"></span> Not Connected'
-    disconnDiv.style.display = 'block'
-    connDiv.style.display    = 'none'
-    return
-  }
+  document.getElementById('pageBody').innerHTML = `
+    <!-- Connected Channels -->
+    <div class="section-label">Connected Channels</div>
+    <div class="channels-grid">
 
-  card.classList.add('connected')
-  pageLbl.textContent      = ch.page_name || 'Meta Business Account'
-  disconnDiv.style.display = 'none'
-  connDiv.style.display    = 'block'
-
-  // WhatsApp sub
-  const waNum    = document.getElementById('wa-number-label')
-  const waStatus = document.getElementById('wa-status')
-  const waTog    = document.getElementById('wa-toggle')
-  if (ch.whatsapp) {
-    waNum.textContent  = ch.whatsapp.number || 'Connected'
-    waTog.checked      = ch.whatsapp.enabled !== false
-    waStatus.className = ch.whatsapp.enabled !== false ? 'ch-status live' : 'ch-status paused'
-    waStatus.innerHTML = (ch.whatsapp.enabled !== false ? '<span class="ch-status-dot"></span> Live' : '<span class="ch-status-dot"></span> Paused')
-  }
-
-  // Instagram sub
-  const igHandle = document.getElementById('ig-handle-label')
-  const igStatus = document.getElementById('ig-status')
-  const igTog    = document.getElementById('ig-toggle')
-  if (ch.instagram) {
-    igHandle.textContent = ch.instagram.handle ? '@' + ch.instagram.handle : 'Connected'
-    igTog.checked        = ch.instagram.enabled !== false
-    igStatus.className   = ch.instagram.enabled !== false ? 'ch-status live' : 'ch-status paused'
-    igStatus.innerHTML   = (ch.instagram.enabled !== false ? '<span class="ch-status-dot"></span> Live' : '<span class="ch-status-dot"></span> Paused')
-  }
-
-  // Top card status — live if at least one sub is live
-  const anyLive = (ch.whatsapp?.enabled !== false) || (ch.instagram?.enabled !== false)
-  statusEl.className = anyLive ? 'ch-status live' : 'ch-status paused'
-  statusEl.innerHTML = anyLive ? '<span class="ch-status-dot"></span> Live' : '<span class="ch-status-dot"></span> Paused'
-}
-
-// ── CONNECT / DISCONNECT / TOGGLE ─────────────────────────────────
-async function connectChannel(provider) {
-  if (!_agentId) return toast('Select an agent first', 'warning')
-
-  // Simulate OAuth popup (replace with real OAuth URL from backend)
-  try {
-    const data = await apiFetch(`/agents/${_agentId}/channels/${provider}/auth`, { method: 'POST' })
-    // Backend returns an OAuth redirect URL
-    if (data?.auth_url) {
-      const w = window.open(data.auth_url, '_blank', 'width=560,height=640,left=200,top=100')
-      // Poll for connection completion
-      const poll = setInterval(async () => {
-        if (w.closed) {
-          clearInterval(poll)
-          await loadChannels()
-          await loadInbox()
-        }
-      }, 800)
-    }
-  } catch(e) {
-    // API not live yet — show demo connected state
-    if (provider === 'gmail') {
-      _channels.gmail = { connected: true, email: 'support@yourstore.com', enabled: true }
-    } else {
-      _channels.meta = {
-        connected: true,
-        page_name: 'Your Business Page',
-        whatsapp:  { number: '+91 98765 43210', enabled: true },
-        instagram: { handle: 'yourstore', enabled: true }
-      }
-    }
-    renderChannelCards()
-    toast(`${provider === 'gmail' ? 'Gmail' : 'Meta'} connected! ✨`, 'success')
-    await loadInbox()
-  }
-}
-
-async function disconnectChannel(provider) {
-  const ok = await confirmModal({
-    title: `Disconnect ${provider === 'gmail' ? 'Gmail' : 'Meta'}?`,
-    message: 'The agent will stop replying on this channel. You can reconnect anytime.',
-    confirmText: 'Disconnect',
-    danger: true
-  })
-  if (!ok) return
-
-  try {
-    await apiFetch(`/agents/${_agentId}/channels/${provider}`, { method: 'DELETE' })
-  } catch(e) { /* demo fallback */ }
-
-  if (provider === 'gmail')  _channels.gmail = null
-  if (provider === 'meta')   _channels.meta  = null
-  renderChannelCards()
-  toast('Channel disconnected', 'info')
-  await loadInbox()
-}
-
-async function toggleChannel(channel, enabled) {
-  try {
-    await apiFetch(`/agents/${_agentId}/channels/${channel}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ enabled })
-    })
-  } catch(e) { /* optimistic update */ }
-
-  // Update local state
-  if (channel === 'gmail' && _channels.gmail) {
-    _channels.gmail.enabled = enabled
-  } else if (channel === 'whatsapp' && _channels.meta?.whatsapp) {
-    _channels.meta.whatsapp.enabled = enabled
-  } else if (channel === 'instagram' && _channels.meta?.instagram) {
-    _channels.meta.instagram.enabled = enabled
-  }
-
-  renderChannelCards()
-  toast(`${channel.charAt(0).toUpperCase() + channel.slice(1)} ${enabled ? 'enabled ✓' : 'paused'}`, enabled ? 'success' : 'info')
-}
-
-async function testChannel(channel) {
-  toast(`Sending test ${channel} message…`, 'info')
-  try {
-    await apiFetch(`/agents/${_agentId}/channels/${channel}/test`, { method: 'POST' })
-    toast(`Test sent! Check your ${channel} inbox.`, 'success')
-  } catch(e) {
-    toast('Test sent (demo mode)', 'success')
-  }
-}
-
-// ── INBOX ─────────────────────────────────────────────────────────
-async function loadInbox() {
-  try {
-    const tab  = _inboxTab === 'sent' ? 'sent' : 'inbox'
-    const data = await apiFetch(`/agents/${_agentId}/channels/inbox?tab=${tab}`)
-    _messages  = data?.messages || []
-  } catch(e) {
-    // Demo messages for UI preview
-    _messages = _buildDemoMessages()
-  }
-  renderInbox()
-  updateUnreadBadge()
-}
-
-function _buildDemoMessages() {
-  return [
-    { id:'m1', channel:'email',     from:'Rahul Mehta',      contact:'rahul@example.com',  preview:'My order hasn\'t arrived yet, it\'s been 5 days since I placed it.',   time: new Date(Date.now()-2*60000).toISOString(),    replied:true,  unread:false },
-    { id:'m2', channel:'whatsapp',  from:'+91 98765 43210',  contact:'+91 98765 43210',    preview:'Hi, do you have this jacket available in size L? I checked the website', time: new Date(Date.now()-15*60000).toISOString(),   replied:true,  unread:true  },
-    { id:'m3', channel:'instagram', from:'@sneakerhead_99',  contact:'@sneakerhead_99',    preview:'Is the Nike Air Max still available? I saw it in your stories 🔥',        time: new Date(Date.now()-60*60000).toISOString(),   replied:false, unread:true  },
-    { id:'m4', channel:'email',     from:'Priya Sharma',     contact:'priya@example.com',  preview:'Can I get a refund for my last order? The product was damaged.',          time: new Date(Date.now()-3*3600000).toISOString(),  replied:true,  unread:false },
-    { id:'m5', channel:'whatsapp',  from:'+91 77890 12345',  contact:'+91 77890 12345',    preview:'What are your store timings? Do you do home delivery in Chennai?',        time: new Date(Date.now()-5*3600000).toISOString(),  replied:true,  unread:false },
-    { id:'m6', channel:'instagram', from:'@fashion_diaries', contact:'@fashion_diaries',   preview:'Love this collection! Can you DM me the price for the red kurta?',        time: new Date(Date.now()-24*3600000).toISOString(), replied:false, unread:false },
-  ]
-}
-
-function renderInbox() {
-  const list = document.getElementById('inbox-list')
-
-  // Filter by active channel pill
-  let msgs = _messages
-  if (_inboxFilter !== 'all') {
-    msgs = msgs.filter(m => m.channel === _inboxFilter)
-  }
-
-  // For sent tab, only show replied messages
-  if (_inboxTab === 'sent') {
-    msgs = msgs.filter(m => m.replied)
-  }
-
-  if (!msgs.length) {
-    list.innerHTML = `
-      <div class="inbox-empty">
-        <div class="inbox-empty-icon">📭</div>
-        <div class="inbox-empty-text">No messages yet</div>
-        <div class="inbox-empty-sub">Messages from connected channels will appear here once your agent starts receiving them.</div>
-      </div>`
-    return
-  }
-
-  list.innerHTML = msgs.map(m => {
-    const chIcon = { email:'📧', whatsapp:'💬', instagram:'📸', webchat:'🌐' }[m.channel] || '💬'
-    const chClass = m.channel
-    const initials = m.from.startsWith('+') || m.from.startsWith('@')
-      ? chIcon
-      : m.from.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
-    const isPhone = m.from.startsWith('+')
-    const isHandle = m.from.startsWith('@')
-
-    return `
-      <div class="inbox-row ${m.unread && _inboxTab==='inbox' ? 'unread':''}" onclick="openThread('${m.id}')">
-        <div class="ch-badge ${chClass}">${chIcon}</div>
-        <div class="inbox-row-avatar">${isPhone || isHandle ? chIcon : initials}</div>
-        <div class="inbox-row-body">
-          <div class="inbox-row-top">
-            <span class="inbox-row-name">${m.from}</span>
-            <span class="inbox-row-time">${timeAgo(m.time)}</span>
+      <!-- ── Gmail Card ── -->
+      <div class="channel-card" id="gmailCard">
+        <div class="channel-card-top">
+          <div class="channel-card-left">
+            <div class="channel-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div>
+            <div>
+              <div class="channel-name">Gmail / Google Workspace</div>
+              <div class="channel-desc">Reply to support emails using your agent's knowledge base</div>
+            </div>
           </div>
-          <div class="inbox-row-preview">${m.preview}</div>
-          <div class="inbox-row-meta">
-            ${m.replied
-              ? '<span class="inbox-reply-tag">✓ Agent replied</span>'
-              : '<span class="inbox-pending-tag">⏳ Pending reply</span>'}
+          <div class="channel-status-badge ${gmailConnected ? 'badge-live' : 'badge-disconnected'}">
+            ${gmailConnected ? '● Live' : '● Disconnected'}
           </div>
         </div>
-      </div>`
-  }).join('')
-}
 
-function updateUnreadBadge() {
-  const unread = _messages.filter(m => m.unread && _inboxTab === 'inbox').length
-  const badge = document.getElementById('inbox-unread-badge')
-  if (unread > 0) {
-    badge.style.display = 'inline-flex'
-    badge.textContent = unread
-  } else {
-    badge.style.display = 'none'
+        ${gmailConnected ? `
+        <div class="channel-connected-info">
+          <div class="channel-email-chip">
+            <span>📬</span>
+            <span title="${esc(gmail.email)}">${esc(gmail.email)}</span>
+          </div>
+          <div class="queue-badge ${queuedCount > 0 ? 'has-items' : ''}" onclick="openInbox()">
+            ${queuedCount > 0 ? `📬 ${queuedCount} queued` : '✓ All clear'}
+          </div>
+        </div>
+        <div class="channel-actions">
+          <button class="btn btn-secondary btn-sm" onclick="syncGmail(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sync Inbox
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openInbox()">
+            📬 Open Inbox ${queuedCount > 0 ? `<span style="background:var(--amber);color:#fff;border-radius:10px;padding:0 6px;font-size:10px">${queuedCount}</span>` : ''}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="disconnectGmail()">✕ Disconnect</button>
+        </div>
+        ` : `
+        <div class="channel-actions">
+          <button class="btn btn-primary" onclick="connectGmail(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+            Connect Gmail
+          </button>
+        </div>
+        `}
+      </div>
+
+      <!-- ── Meta Card (Coming Soon) ── -->
+      <div class="channel-card" style="position:relative">
+        <div class="channel-card-top">
+          <div class="channel-card-left">
+            <div class="channel-icon" style="background:linear-gradient(135deg,#0866FF,#9333EA)">💬</div>
+            <div>
+              <div class="channel-name">Meta — WhatsApp & Instagram</div>
+              <div class="channel-desc">One login connects both channels via Meta Business</div>
+            </div>
+          </div>
+          <div class="channel-status-badge badge-disconnected">● Not set up</div>
+        </div>
+        <div class="sub-channels">
+          <div class="sub-channel-row">
+            <div class="sub-channel-left">
+              <div class="sub-channel-icon">💬</div>
+              <div>
+                <div class="sub-channel-name">WhatsApp Business</div>
+                <div class="sub-channel-handle">Requires Meta Business App</div>
+              </div>
+            </div>
+            <div class="channel-status-badge badge-disconnected" style="font-size:10.5px">● Pending</div>
+          </div>
+          <div class="sub-channel-row">
+            <div class="sub-channel-left">
+              <div class="sub-channel-icon">📸</div>
+              <div>
+                <div class="sub-channel-name">Instagram DMs</div>
+                <div class="sub-channel-handle">Requires Meta Business App</div>
+              </div>
+            </div>
+            <div class="channel-status-badge badge-disconnected" style="font-size:10.5px">● Pending</div>
+          </div>
+        </div>
+        <div class="channel-actions">
+          <button class="btn btn-secondary" onclick="showMetaSetup()">📋 View Setup Guide</button>
+        </div>
+        <div class="coming-soon-overlay">
+          <div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gmail Setup Guide (shown if not connected) -->
+    ${!gmailConnected ? renderGmailSetupGuide() : ''}
+
+    <!-- Inbox Panel -->
+    <div id="inboxSection" style="display:${gmailConnected ? 'block' : 'none'}">
+      <div class="section-label" style="margin-top:4px">📬 Gmail Inbox</div>
+      <div class="inbox-panel" id="inboxPanel">
+        ${renderInboxShell()}
+      </div>
+    </div>
+  `
+
+  if (gmailConnected) {
+    loadInbox()
   }
 }
 
-function switchInboxTab(tab, btn) {
-  _inboxTab = tab
-  document.querySelectorAll('.inbox-tab').forEach(b => b.classList.remove('active'))
-  btn.classList.add('active')
+function renderGmailSetupGuide() {
+  const pubsubConfigured = false  // will be true once env var set
+  return `
+  <div class="setup-guide">
+    <div class="setup-guide-title">🔧 How to connect Gmail</div>
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="step-num done">1</div>
+        <div class="step-content">
+          <div class="step-title">Google OAuth Credentials</div>
+          <div class="step-desc">Your existing Google OAuth app works — same client ID &amp; secret.
+          Make sure <strong>https://your-api/channels/gmail/callback</strong> is in Authorized Redirect URIs.</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Connect your inbox</div>
+          <div class="step-desc">Click "Connect Gmail" above and authorize the support email account.
+          The agent will read &amp; reply from that inbox.</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">(Optional) Real-time push notifications</div>
+          <div class="step-desc">Set <span class="env-hint">GMAIL_PUBSUB_TOPIC</span> env var to your Google Cloud Pub/Sub topic for instant email processing.
+          Without it, use the <strong>Sync Inbox</strong> button to pull latest emails.</div>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+function renderInboxShell() {
+  return `
+  <div class="inbox-header">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="inbox-title">Inbox <span class="inbox-count" id="inboxCount">—</span></div>
+    </div>
+    <div class="inbox-filters">
+      <button class="filter-chip ${_inboxStatus==='queued'?'active':''}" onclick="setInboxFilter('queued')">⏳ Needs Reply</button>
+      <button class="filter-chip ${_inboxStatus==='auto_replied'?'active':''}" onclick="setInboxFilter('auto_replied')">🤖 Auto-replied</button>
+      <button class="filter-chip ${_inboxStatus==='replied'?'active':''}" onclick="setInboxFilter('replied')">✅ Replied</button>
+      <button class="filter-chip ${_inboxStatus==='dismissed'?'active':''}" onclick="setInboxFilter('dismissed')">🗑 Dismissed</button>
+      <button class="sync-btn" id="syncBtn" onclick="syncGmail(this)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Sync
+      </button>
+    </div>
+  </div>
+  <div id="msgList"><div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-sub">Loading messages…</div></div></div>
+  <div id="replyPanel"></div>`
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INBOX LOAD & RENDER
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadInbox() {
+  try {
+    const data = await apiFetch(`/agents/${_agentId}/channels/gmail/inbox?status=${_inboxStatus}`)
+    _inboxMsgs = data.messages || []
+    document.getElementById('inboxCount').textContent = data.total || 0
+    renderMsgList()
+  } catch (e) {
+    document.getElementById('msgList').innerHTML = `<div class="empty-state"><div class="empty-state-sub">${esc(e.message)}</div></div>`
+  }
+}
+
+function setInboxFilter(status) {
+  _inboxStatus  = status
+  _selectedMsg  = null
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.classList.toggle('active', c.textContent.trim().includes(
+      status === 'queued' ? 'Needs' : status === 'auto_replied' ? 'Auto' : status === 'replied' ? 'Replied' : 'Dismissed'
+    ))
+  })
+  document.getElementById('replyPanel').innerHTML = ''
   loadInbox()
 }
 
-function filterInbox(filter, el) {
-  _inboxFilter = filter
-  document.querySelectorAll('.ch-pill').forEach(p => p.classList.remove('active'))
-  el.classList.add('active')
-  renderInbox()
+function openInbox() {
+  document.getElementById('inboxSection').style.display = 'block'
+  document.getElementById('inboxSection').scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-// ── THREAD DRAWER ─────────────────────────────────────────────────
-const _demoThreads = {
-  m1: {
-    channel: 'email', from: 'Rahul Mehta', contact: 'rahul@example.com',
-    messages: [
-      { role:'user',  text:'Hi, I placed an order 5 days ago (Order #SG-4821) and it still hasn\'t arrived. Can you help?', time:'10:02 AM' },
-      { role:'agent', text:'Hi Rahul! I checked Order #SG-4821 and it\'s currently out for delivery with Delhivery. Expected delivery is today by 8 PM. You\'ll receive an SMS with the live tracking link shortly. Is there anything else I can help you with?', time:'10:02 AM', ai:true },
-      { role:'user',  text:'Oh great, thank you! I\'ll keep an eye out.', time:'10:05 AM' },
-    ]
-  },
-  m2: {
-    channel: 'whatsapp', from: '+91 98765 43210', contact: '+91 98765 43210',
-    messages: [
-      { role:'user',  text:'Hi, do you have the denim jacket in size L?', time:'11:30 AM' },
-      { role:'agent', text:'Hello! Yes, the Classic Denim Jacket is available in Size L. It\'s priced at ₹2,499. Would you like me to add it to your cart or share the product link?', time:'11:30 AM', ai:true },
-      { role:'user',  text:'Yes please share the link!', time:'11:31 AM' },
-      { role:'agent', text:'Here you go 👉 https://store.com/p/denim-jacket-L — also, if you\'d like to pay directly here on WhatsApp, I can set that up for you!', time:'11:31 AM', ai:true },
-    ]
-  },
-  m3: {
-    channel: 'instagram', from: '@sneakerhead_99', contact: '@sneakerhead_99',
-    messages: [
-      { role:'user',  text:'Is the Nike Air Max still available? I saw it in your story 🔥', time:'12:15 PM' },
-      { role:'agent', text:'Hey! 👋 The Nike Air Max 270 is still available in sizes 7–11. Which size are you looking for?', time:'12:15 PM', ai:true },
-    ]
-  }
-}
-
-function openThread(msgId) {
-  const msg    = _messages.find(m => m.id === msgId)
-  if (!msg) return
-
-  const thread = _demoThreads[msgId] || {
-    channel: msg.channel, from: msg.from, contact: msg.contact,
-    messages: [
-      { role:'user',  text: msg.preview, time: timeAgo(msg.time) },
-      { role:'agent', text: 'Thank you for reaching out! I\'m looking into this and will get back to you shortly.', time: timeAgo(msg.time), ai:true }
-    ]
+function renderMsgList() {
+  const el = document.getElementById('msgList')
+  if (!_inboxMsgs.length) {
+    const icons = { queued: '📭', auto_replied: '🤖', replied: '✅', dismissed: '🗑' }
+    const labels = { queued: 'No emails waiting for reply', auto_replied: 'No auto-replied emails yet', replied: 'No replied emails yet', dismissed: 'Nothing dismissed' }
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">${icons[_inboxStatus]||'📭'}</div><div class="empty-state-title">${labels[_inboxStatus]||'Empty'}</div></div>`
+    return
   }
 
-  const chIcon   = { email:'📧', whatsapp:'💬', instagram:'📸' }[thread.channel] || '💬'
-  const chLabel  = { email:'via Email', whatsapp:'via WhatsApp', instagram:'via Instagram DM' }[thread.channel] || ''
+  el.innerHTML = _inboxMsgs.map(msg => {
+    const from    = parseFrom(msg.from)
+    const init    = (from.name || from.email || '?')[0].toUpperCase()
+    const time    = fmtRelTime(msg.created_at)
+    const intentCls = `intent-${msg.intent || 'other'}`
+    const isSelected = _selectedMsg?._id === msg._id
 
-  document.getElementById('drawer-ch-badge').textContent    = chIcon
-  document.getElementById('drawer-contact-name').textContent = thread.from
-  document.getElementById('drawer-contact-sub').textContent  = thread.contact + ' · ' + chLabel
-
-  const body = document.getElementById('drawer-body')
-  body.innerHTML = thread.messages.map(m => `
-    <div class="msg-bubble-wrap ${m.role === 'agent' ? 'outgoing' : 'incoming'}">
-      <div class="msg-sender">${m.role === 'agent' ? '🤖 Agent' : thread.from}</div>
-      <div class="msg-bubble ${m.role === 'agent' ? 'outgoing ai' : 'incoming'}">${m.text}</div>
-      ${m.role === 'agent' ? '<div class="msg-ai-tag">⚡ AI Reply</div>' : ''}
-      <div class="msg-time">${m.time}</div>
-    </div>`).join('')
-
-  // Mark as read
-  const orig = _messages.find(m => m.id === msgId)
-  if (orig) orig.unread = false
-  updateUnreadBadge()
-
-  // Open drawer
-  document.getElementById('drawer-backdrop').classList.add('open')
-  document.getElementById('thread-drawer').classList.add('open')
-  document.body.style.overflow = 'hidden'
+    return `
+    <div class="msg-row ${isSelected ? 'selected' : ''}" id="msg-${msg._id}" onclick="selectMsg(${JSON.stringify(JSON.stringify(msg)).slice(1,-1)})">
+      <div class="msg-avatar">${init}</div>
+      <div class="msg-main">
+        <div class="msg-from">${esc(from.name || from.email)}</div>
+        <div class="msg-subject">${esc(msg.subject || '(no subject)')}</div>
+        <div class="msg-preview">${esc(msg.body || '')}</div>
+      </div>
+      <div class="msg-meta">
+        <div class="msg-time">${time}</div>
+        <div class="msg-intent-badge ${intentCls}">${msg.intent || 'other'}</div>
+        ${msg.status === 'auto_replied' ? '<div class="auto-replied-tag">🤖 auto</div>' : ''}
+      </div>
+    </div>`
+  }).join('')
 }
 
-function closeDrawer() {
-  document.getElementById('drawer-backdrop').classList.remove('open')
-  document.getElementById('thread-drawer').classList.remove('open')
-  document.body.style.overflow = ''
-  renderInbox()
-}
-
-// ── BOOT ──────────────────────────────────────────────────────────
-;(async () => {
+function selectMsg(jsonStr) {
   try {
-    await init()
-  } catch(e) {
-    console.error(e)
-    dismissSkeleton()
+    const msg = JSON.parse(jsonStr)
+    _selectedMsg = msg
+    renderMsgList()  // re-render to update selected highlight
+    renderReplyPanel(msg)
+  } catch (e) { console.error('selectMsg parse error', e) }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPLY PANEL
+// ══════════════════════════════════════════════════════════════════════════════
+function renderReplyPanel(msg) {
+  const from = parseFrom(msg.from)
+  const conf = Math.round((msg.confidence || 0) * 100)
+  const confColor = conf >= 80 ? 'var(--green)' : conf >= 50 ? 'var(--amber)' : 'var(--red)'
+
+  const showActions = msg.status === 'queued'
+  const showDraft   = msg.ai_draft && showActions
+
+  document.getElementById('replyPanel').innerHTML = `
+  <div class="reply-panel">
+    <div class="reply-panel-header">
+      <div>
+        <div class="reply-to-info">To: <strong>${esc(from.name || from.email)}</strong> &lt;${esc(from.email)}&gt;</div>
+        <div class="reply-subject">Re: ${esc(msg.subject || '(no subject)')}</div>
+      </div>
+      <button class="close-reply-btn" onclick="closeReplyPanel()">✕</button>
+    </div>
+
+    <!-- Original message preview -->
+    <div style="margin:10px 18px 0;padding:10px 12px;background:var(--surface-3);border-radius:8px;
+                border-left:3px solid var(--border-md);font-size:12px;color:var(--text-3);
+                line-height:1.7;max-height:80px;overflow-y:auto">
+      ${esc(msg.body || '').replace(/\n/g, '<br>')}
+    </div>
+
+    <div class="reply-body-area">
+      ${showDraft ? `<div class="ai-draft-label">🤖 AI Draft <span style="font-weight:400;text-transform:none;color:var(--text-3);">— edit before sending</span></div>` : ''}
+      <textarea class="reply-textarea" id="replyText" placeholder="Write your reply…">${esc(showDraft ? msg.ai_draft : '')}</textarea>
+    </div>
+
+    <div class="reply-actions">
+      <div class="reply-actions-left">
+        ${showActions ? `
+        <button class="btn btn-primary" onclick="sendApprove('${msg._id}')">
+          ✉️ Send Reply
+        </button>
+        ${showDraft ? `
+        <button class="btn btn-secondary btn-sm" onclick="regenerateDraft('${msg._id}')">
+          🔄 Regenerate
+        </button>` : ''}
+        <button class="btn btn-secondary btn-sm" onclick="dismissMsg('${msg._id}')">
+          🗑 Dismiss
+        </button>
+        ` : `<span style="font-size:12px;color:var(--text-3);font-style:italic">
+          ${msg.status === 'auto_replied' ? '🤖 Auto-replied by agent' : msg.status === 'replied' ? '✅ Replied' : '🗑 Dismissed'}
+        </span>`}
+      </div>
+      <div class="conf-bar">
+        <span>AI confidence</span>
+        <div class="conf-pip"><div class="conf-fill" style="width:${conf}%;background:${confColor}"></div></div>
+        <span style="font-weight:700;color:${confColor}">${conf}%</span>
+      </div>
+    </div>
+  </div>`
+}
+
+function closeReplyPanel() {
+  _selectedMsg = null
+  document.getElementById('replyPanel').innerHTML = ''
+  renderMsgList()
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════════════════════════
+async function connectGmail(btn) {
+  btn.disabled = true
+  btn.textContent = '⏳ Redirecting…'
+  try {
+    const data = await apiFetch(`/agents/${_agentId}/channels/gmail/connect`)
+    window.location.href = data.url
+  } catch (e) {
+    showToast('Failed to start Gmail connection: ' + e.message, 'error')
+    btn.disabled = false
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Connect Gmail'
   }
-})()
+}
+
+async function disconnectGmail() {
+  if (!confirm('Disconnect Gmail? The agent will stop processing emails from this inbox.')) return
+  try {
+    await apiFetch(`/agents/${_agentId}/channels/gmail`, { method: 'DELETE' })
+    showToast('Gmail disconnected', 'info')
+    await loadPage()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+async function syncGmail(btn) {
+  btn.classList.add('spinning')
+  btn.disabled = true
+  try {
+    const data = await apiFetch(`/agents/${_agentId}/channels/gmail/sync`, { method: 'POST' })
+    showToast(`Synced ${data.synced} email(s)`, 'success')
+    await loadInbox()
+    await loadPage()  // refresh queued count badge
+  } catch (e) {
+    showToast('Sync failed: ' + e.message, 'error')
+  } finally {
+    btn.classList.remove('spinning')
+    btn.disabled = false
+  }
+}
+
+async function sendApprove(msgId) {
+  const text = document.getElementById('replyText')?.value?.trim()
+  if (!text) { showToast('Reply cannot be empty', 'error'); return }
+
+  const btn = event.target
+  btn.disabled = true; btn.textContent = '⏳ Sending…'
+
+  try {
+    await apiFetch(`/agents/${_agentId}/channels/gmail/approve/${msgId}`, {
+      method: 'POST',
+      body:   JSON.stringify({ reply: text }),
+    })
+    showToast('Reply sent! ✉️', 'success')
+    _selectedMsg = null
+    document.getElementById('replyPanel').innerHTML = ''
+    await loadInbox()
+  } catch (e) {
+    showToast('Send failed: ' + e.message, 'error')
+    btn.disabled = false; btn.textContent = '✉️ Send Reply'
+  }
+}
+
+async function regenerateDraft(msgId) {
+  const btn = event.target
+  btn.disabled = true; btn.textContent = '⏳…'
+  try {
+    const data = await apiFetch(`/agents/${_agentId}/channels/gmail/messages/${msgId}/regenerate`, { method: 'POST' })
+    document.getElementById('replyText').value = data.ai_draft || ''
+    showToast('Draft regenerated ✨', 'success')
+  } catch (e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = '🔄 Regenerate' }
+}
+
+async function dismissMsg(msgId) {
+  try {
+    await apiFetch(`/agents/${_agentId}/channels/gmail/messages/${msgId}/dismiss`, { method: 'PUT' })
+    showToast('Message dismissed', 'info')
+    _selectedMsg = null
+    document.getElementById('replyPanel').innerHTML = ''
+    await loadInbox()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+function showMetaSetup() {
+  alert('Meta (WhatsApp + Instagram) integration is coming in Phase 2.\n\nYou will need:\n• Meta Developer Account\n• Meta Business App\n• WhatsApp Business API access\n\nWe\'ll guide you through the full setup when it launches!')
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════════════════
+function parseFrom(from) {
+  if (!from) return { name: '', email: '' }
+  const m = from.match(/^(.*?)\s*<(.+?)>$/)
+  if (m) return { name: m[1].replace(/^["']|["']$/g, '').trim(), email: m[2].trim() }
+  return { name: '', email: from.trim() }
+}
+
+function fmtRelTime(ts) {
+  if (!ts) return ''
+  const d    = new Date(ts), now = new Date()
+  const diff = Math.floor((now - d) / 1000)
+  if (diff < 60)   return 'just now'
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago'
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago'
+  if (diff < 604800) return Math.floor(diff / 86400) + 'd ago'
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+}
+
+function fmtNum(n) { return n == null ? '—' : n.toLocaleString('en-IN') }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+function showToast(msg, type = 'info') {
+  const wrap = document.getElementById('toastWrap')
+  const el   = document.createElement('div')
+  el.className = `toast-item toast-${type}`
+  el.textContent = msg
+  wrap.appendChild(el)
+  setTimeout(() => el.remove(), 3500)
+}
+
+function renderNoAgents() {
+  document.getElementById('pageBody').innerHTML = `
+  <div class="empty-state" style="padding:80px 20px">
+    <div class="empty-state-icon">🤖</div>
+    <div class="empty-state-title">No agents yet</div>
+    <div class="empty-state-sub">Create an agent first, then connect channels to it</div>
+  </div>`
+}
 </script>
 </body>
 </html>
