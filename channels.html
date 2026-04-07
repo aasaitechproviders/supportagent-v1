@@ -917,7 +917,8 @@ let _messages  = []
 
 // ── INIT ──────────────────────────────────────────────────────────
 async function init() {
-  const { user } = await renderNav('channels')
+  const nav = await renderNav('channels')
+  if (!nav) return  // not authenticated — renderNav redirects
 
   // Load all agents for dropdown
   try {
@@ -1343,7 +1344,14 @@ function closeDrawer() {
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────
-init().catch(e => { console.error(e); dismissSkeleton() })
+;(async () => {
+  try {
+    await init()
+  } catch(e) {
+    console.error(e)
+    dismissSkeleton()
+  }
+})()
 </script>
 </body>
 </html>
