@@ -11,6 +11,7 @@ const _NAV_SECTIONS = [
       { page:'dashboard',     href:'home.html',          labelKey:'navDashboard',     icon:'🏠' },
       { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
       { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
+      { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
   },
   {
@@ -32,7 +33,7 @@ function _buildSidebar(activePage) {
       <div class="nav-section-label">${t(sec.labelKey)}</div>
       ${sec.items.map(it => `
         <a class="nav-item ${it.page === activePage ? 'active' : ''}" href="${it.href}">
-          <span class="nav-icon">${it.icon}</span>${t(it.labelKey)}
+          <span class="nav-icon">${it.icon}</span>${it.label || t(it.labelKey)}
         </a>`).join('')}
     </div>`).join('')
 
