@@ -397,6 +397,28 @@
 .checkout-title { font-size: 12px; font-weight: 700; color: #10b981; margin-bottom: 1px; }
 .checkout-sub   { font-size: 11px; color: var(--text-2); }
 
+/* ── Channel filter pills ────────────────────────────────────────── */
+.ch-filter-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 11px; border-radius: 20px;
+  border: 1px solid var(--border-md); background: var(--surface-2);
+  color: var(--text-3); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: var(--t); white-space: nowrap; user-select: none;
+}
+.ch-filter-pill:hover { border-color: var(--accent); color: var(--text); }
+.ch-filter-pill.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+/* ── Channel source badge on session row ─────────────────────────── */
+.sess-ch-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 6px;
+  font-size: 11px; flex-shrink: 0;
+}
+.sess-ch-badge.webchat   { background: var(--accent-dim); }
+.sess-ch-badge.email     { background: rgba(234,67,53,.1); }
+.sess-ch-badge.whatsapp  { background: rgba(37,211,102,.1); }
+.sess-ch-badge.instagram { background: rgba(225,48,108,.1); }
+
 /* ── Agent type badge ────────────────────────────────────────────── */
 .agent-type-badge {
   display: inline-flex; align-items: center; gap: 4px;
@@ -541,6 +563,14 @@
               placeholder="Search by IP, session, message…" oninput="filterSessions()" autocomplete="off">
           </div>
         </div>
+        <!-- Channel filter pills -->
+        <div style="display:flex;gap:5px;padding:8px 14px;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0;" id="ch-filter-bar">
+          <div class="ch-filter-pill active" data-ch="all"       onclick="filterByChannel('all',this)">All</div>
+          <div class="ch-filter-pill"        data-ch="webchat"   onclick="filterByChannel('webchat',this)">🌐 Web</div>
+          <div class="ch-filter-pill"        data-ch="email"     onclick="filterByChannel('email',this)">📧 Email</div>
+          <div class="ch-filter-pill"        data-ch="whatsapp"  onclick="filterByChannel('whatsapp',this)">💬 WhatsApp</div>
+          <div class="ch-filter-pill"        data-ch="instagram" onclick="filterByChannel('instagram',this)">📸 Instagram</div>
+        </div>
         <div class="session-list" id="session-list">
           <div style="padding:32px 20px;text-align:center;font-size:12.5px;color:var(--text-3)">
             Select an agent above to see sessions.
@@ -626,6 +656,7 @@ var curAgentId   = ''
 var curAgent     = null
 var productsMap  = {}
 var activeKey    = null
+var _chFilter    = 'all'  // channel filter
 
 /* ── Boot ───────────────────────────────────────────────────────── */
 ;(async function () {
@@ -782,8 +813,17 @@ function renderSessions(sessions) {
     if (s.has_products) tags += '<span class="session-tag tag-products">🛍️ Products</span>'
     tags += '</div>'
 
+    /* Channel badge */
+    var chMap   = { email:'📧', whatsapp:'💬', instagram:'📸', webchat:'🌐' }
+    var chKey   = s.channel || 'webchat'
+    var chIcon  = chMap[chKey] || '🌐'
+    var chBadge = '<span class="sess-ch-badge ' + chKey + '" title="' + chKey + '">' + chIcon + '</span>'
+
     return '<div class="session-item' + active + '" id="si-' + safeId(key) + '" data-key="' + escAttr(key) + '">' +
-      '<div class="sess-preview">' + esc(s.first_question || '(No message)') + '</div>' +
+      '<div style="display:flex;align-items:flex-start;gap:7px">' +
+        chBadge +
+        '<div style="flex:1;min-width:0"><div class="sess-preview">' + esc(s.first_question || '(No message)') + '</div></div>' +
+      '</div>' +
       ipHtml +
       '<div class="sess-stats">' +
         '<div class="sess-stats-left">' +
@@ -820,17 +860,28 @@ function filterByIdent(e, ident) {
   }
 }
 
-/* ── Filter sessions (search box) ──────────────────────────────── */
+/* ── Filter sessions (search box + channel pill) ───────────────── */
 function filterSessions() {
-  var inp = document.getElementById('search-inp')
-  var q   = inp ? inp.value.toLowerCase().trim() : ''
-  if (!q) { renderSessions(allSessions); return }
-  renderSessions(allSessions.filter(function (s) {
+  var inp  = document.getElementById('search-inp')
+  var q    = inp ? inp.value.toLowerCase().trim() : ''
+  var base = (_chFilter === 'all')
+    ? allSessions
+    : allSessions.filter(function(s){ return (s.channel || 'webchat') === _chFilter })
+  if (!q) { renderSessions(base); return }
+  renderSessions(base.filter(function (s) {
     return (s.first_question || '').toLowerCase().includes(q) ||
            (s.visitor_ip     || '').includes(q) ||
            (s.session_id     || '').toLowerCase().includes(q) ||
            (s.visitor_id     || '').toLowerCase().includes(q)
   }))
+}
+
+/* ── Filter by channel pill ─────────────────────────────────────── */
+function filterByChannel(ch, el) {
+  _chFilter = ch
+  document.querySelectorAll('.ch-filter-pill').forEach(function(p){ p.classList.remove('active') })
+  if (el) el.classList.add('active')
+  filterSessions()
 }
 
 /* ── Open session ───────────────────────────────────────────────── */
