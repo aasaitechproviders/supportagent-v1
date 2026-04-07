@@ -15,6 +15,12 @@ const _NAV_SECTIONS = [
     ]
   },
   {
+    labelKey: 'navSettings',
+    items: [
+      { page:'channels', href:'channels.html', labelKey:'navChannels', icon:'📡' },
+    ]
+  },
+  {
     labelKey: 'navAccount',
     items: [
       { page:'payments', href:'payments.html', labelKey:'navBilling',     icon:'⚡' },
