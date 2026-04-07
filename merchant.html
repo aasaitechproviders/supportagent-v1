@@ -881,7 +881,7 @@ function renderOrderStats(orders) {
   const total     = orders.length
   const pending   = orders.filter(o => o.status === 'pending').length
   const fulfilled = orders.filter(o => o.status === 'fulfilled').length
-  const revenue   = orders.filter(o => o.status !== 'refunded').reduce((s, o) => s + (o.amount || 0), 0)
+  const revenue   = orders.filter(o => o.status === 'paid' || o.status === 'fulfilled').reduce((s, o) => s + (o.amount || 0), 0)
   document.getElementById('o-stat-total').textContent     = fmtNum(total)
   document.getElementById('o-stat-pending').textContent   = fmtNum(pending)
   document.getElementById('o-stat-fulfilled').textContent = fmtNum(fulfilled)
