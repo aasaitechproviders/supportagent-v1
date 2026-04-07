@@ -17,9 +17,9 @@ const TRANSLATIONS = {
 
   /* ── ENGLISH ──────────────────────────────────────────────── */
   en: {
-    workspace: 'Workspace', navAccount: 'Account',
+    workspace: 'Workspace', navAccount: 'Account', navSettings: 'Settings',
     navDashboard: 'Dashboard', navMyAgents: 'My Agents',
-    navConversations: 'Conversations', navBilling: 'Billing',
+    navConversations: 'Conversations', navBilling: 'Billing', navChannels: 'Channels',
     navAccountPage: 'Account', navSignOut: 'Sign Out',
     navNewAgent: '+ New Agent', navViewAllAgents: 'View All Agents',
     navQuickActions: 'Quick Actions',
