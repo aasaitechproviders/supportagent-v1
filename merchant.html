@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Merchant Corner — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── Layout ──────────────────────────────────────────────────── */
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;
+            padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);
+            position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1300px;width:100%}
+
+    /* ── Merchant Header ─────────────────────────────────────────── */
+    .mc-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+    .mc-header-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .mc-header-right{display:flex;align-items:center;gap:8px}
+
+    /* ── Agent Selector ──────────────────────────────────────────── */
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);
+                  background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;
+                  font-weight:600;cursor:pointer;outline:none;transition:var(--t);appearance:none;
+                  -webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");
+                  background-repeat:no-repeat;background-position:right 10px center}
+    .agent-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+
+    /* ── Period Toggle ───────────────────────────────────────────── */
+    .period-toggle{display:flex;background:var(--surface-2);border:1px solid var(--border-md);
+                   border-radius:var(--r-sm);padding:3px;gap:2px}
+    .period-btn{padding:5px 12px;border:none;background:transparent;border-radius:8px;
+                font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;transition:var(--t);line-height:1}
+    .period-btn.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
+
+    /* ── Tab Bar ─────────────────────────────────────────────────── */
+    .tab-bar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
+    .tab-bar::-webkit-scrollbar{display:none}
+    .tab-btn{padding:10px 16px;font-size:13px;font-weight:600;background:transparent;border:none;
+             color:var(--text-3);cursor:pointer;transition:var(--t);position:relative;white-space:nowrap;flex-shrink:0}
+    .tab-btn.active{color:var(--accent)}
+    .tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;width:100%;height:2px;
+                            background:var(--accent);border-radius:2px}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ── Stat Cards ──────────────────────────────────────────────── */
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+               padding:16px 18px;display:flex;flex-direction:column;gap:4px;transition:var(--t)}
+    .stat-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
+    .stat-icon-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+    .stat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;
+               justify-content:center;font-size:16px;flex-shrink:0}
+    .stat-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+    .stat-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+    .stat-value{font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--text);line-height:1.1}
+    .stat-sub{font-size:11.5px;color:var(--text-3)}
+
+    /* ── Chart Grid ──────────────────────────────────────────────── */
+    .chart-grid-2{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:16px}
+    .chart-grid-2b{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+    .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px}
+    .chart-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .chart-card-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+    .chart-card-stat{font-size:13px;font-weight:700;color:var(--accent);
+                     background:var(--accent-dim);padding:3px 10px;border-radius:20px}
+    .chart-wrap{position:relative}
+
+    /* ── Top Products List ───────────────────────────────────────── */
+    .top-products-list{display:flex;flex-direction:column;gap:0}
+    .tp-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .tp-row:last-child{border-bottom:none}
+    .tp-rank{font-size:11px;font-weight:800;color:var(--text-3);width:18px;flex-shrink:0;text-align:center}
+    .tp-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
+    .tp-name{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+    .tp-bar{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--accent),rgba(124,111,255,.3));transition:width .5s var(--ease)}
+    .tp-rev{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap}
+    .tp-qty{font-size:10.5px;color:var(--text-3)}
+
+    /* ── Orders ──────────────────────────────────────────────────── */
+    .orders-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+    .search-wrap{position:relative;flex:1;min-width:200px}
+    .search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none}
+    .search-inp{width:100%;height:36px;padding:0 12px 0 32px;border:1px solid var(--border-md);
+                border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);
+                font-family:var(--font);font-size:13px;outline:none;transition:var(--t)}
+    .search-inp:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-dim)}
+    .filter-select{height:36px;padding:0 28px 0 10px;border:1px solid var(--border-md);border-radius:var(--r-sm);
+                   background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;
+                   font-weight:600;cursor:pointer;outline:none;transition:var(--t);appearance:none;
+                   -webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");
+                   background-repeat:no-repeat;background-position:right 8px center}
+    .filter-select:focus{border-color:var(--accent)}
+    .orders-count{font-size:12px;font-weight:600;color:var(--text-3);
+                  background:var(--surface-2);padding:5px 12px;border-radius:20px;
+                  border:1px solid var(--border-md);white-space:nowrap}
+
+    /* ── Table ───────────────────────────────────────────────────── */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .data-table{width:100%;border-collapse:collapse;font-size:13px}
+    .data-table thead tr{background:var(--surface-2);border-bottom:1px solid var(--border)}
+    .data-table th{padding:10px 14px;text-align:left;font-size:10.5px;font-weight:700;
+                   color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+    .data-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+    .data-table tbody tr:last-child td{border-bottom:none}
+    .data-table tbody tr:hover td{background:var(--surface-2)}
+
+    /* ── Order Row ───────────────────────────────────────────────── */
+    .order-id{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--accent)}
+    .cust-cell{display:flex;align-items:center;gap:9px}
+    .cust-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-3));
+                 display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+                 color:#fff;flex-shrink:0}
+    .cust-name{font-size:13px;font-weight:600;color:var(--text)}
+    .cust-email{font-size:11px;color:var(--text-3)}
+    .pay-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;
+              padding:2px 7px;border-radius:5px;background:var(--surface-3);color:var(--text-2);border:1px solid var(--border)}
+
+    /* ── Status Badges ───────────────────────────────────────────── */
+    .status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+                  padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .status-pending{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+    .status-pending::before{background:var(--amber)}
+    .status-paid{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+    .status-paid::before{background:var(--blue)}
+    .status-fulfilled{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .status-fulfilled::before{background:var(--green)}
+    .status-refunded{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .status-refunded::before{background:var(--red)}
+
+    /* ── Update Button ───────────────────────────────────────────── */
+    .btn-update{height:28px;padding:0 12px;font-size:11.5px;font-weight:700;border-radius:7px;
+                border:1px solid var(--border-md);background:var(--surface-2);color:var(--text-2);
+                cursor:pointer;transition:var(--t);display:inline-flex;align-items:center;gap:5px}
+    .btn-update:hover{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+    /* ── Customers ───────────────────────────────────────────────── */
+    .contact-chips{display:flex;gap:5px;flex-wrap:wrap}
+    .contact-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
+                  padding:2px 8px;border-radius:6px;border:1px solid var(--border-md);
+                  background:var(--surface-2);color:var(--text-2);max-width:160px;
+                  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .contact-chip.email{color:var(--blue);background:var(--blue-dim);border-color:var(--blue-border)}
+    .contact-chip.phone{color:var(--green);background:var(--green-dim);border-color:var(--green-border)}
+    .contact-chip.empty{color:var(--text-3);font-style:italic}
+
+    /* ── Empty State ─────────────────────────────────────────────── */
+    .empty-state{padding:48px 20px;text-align:center;color:var(--text-3)}
+    .empty-state-icon{font-size:36px;margin-bottom:10px}
+    .empty-state-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+    .empty-state-sub{font-size:13px}
+
+    /* ── Update Status Modal ─────────────────────────────────────── */
+    .status-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--surface);
+                 border:1px solid var(--border-md);border-radius:var(--r-sm);
+                 box-shadow:var(--sh-lg);z-index:200;overflow:hidden;min-width:160px}
+    .status-menu-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;
+                      font-weight:500;cursor:pointer;transition:var(--t);color:var(--text-2)}
+    .status-menu-item:hover{background:var(--surface-2);color:var(--text)}
+    .status-menu-item.current{color:var(--accent);font-weight:700}
+    .update-wrap{position:relative;display:inline-block}
+
+    /* ── Pagination ──────────────────────────────────────────────── */
+    .pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding-top:16px}
+    .page-btn{height:32px;min-width:32px;padding:0 10px;border:1px solid var(--border-md);
+              border-radius:var(--r-sm);background:var(--surface-2);color:var(--text-2);
+              font-size:12.5px;font-weight:600;cursor:pointer;transition:var(--t);
+              display:inline-flex;align-items:center;justify-content:center}
+    .page-btn:hover:not(:disabled){background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+    .page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+    .page-btn:disabled{opacity:.4;cursor:not-allowed}
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:0 14px;height:36px;border-radius:var(--r-sm);
+         font-size:13px;font-weight:600;cursor:pointer;transition:var(--t);border:none;font-family:var(--font)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
+    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
+    .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-secondary:hover{background:var(--surface-3);color:var(--text)}
+    .btn-sm{height:30px;padding:0 11px;font-size:12px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:4px;color:var(--text-2)}
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media(max-width:1100px){
+      .stat-grid{grid-template-columns:repeat(2,1fr)}
+      .chart-grid-2{grid-template-columns:1fr}
+      .chart-grid-2b{grid-template-columns:1fr}
+    }
+    @media(max-width:768px){
+      .main-wrap{margin-left:0}
+      .mob-menu-btn{display:flex}
+      #page-skeleton{left:0}
+      .page-body{padding:14px 14px 32px}
+      .stat-grid{grid-template-columns:1fr 1fr}
+      .data-table th:nth-child(4),.data-table td:nth-child(4),
+      .data-table th:nth-child(6),.data-table td:nth-child(6){display:none}
+      .mc-header{flex-direction:column;align-items:flex-start}
+    }
+    @media(max-width:480px){
+      .stat-grid{grid-template-columns:1fr}
+    }
+  </style>
+  <script>
+    ;(function(){
+      var p=new URLSearchParams(location.search),t=p.get('token');
+      if(t){localStorage.setItem('sg_token',t);history.replaceState({},'',location.pathname);}
+      var d=localStorage.getItem('sg_theme')==='dark';
+      document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');
+      document.documentElement.style.background=d?'#07080D':'#F2F3F9';
+    })();
+  </script>
+</head>
+<body>
+
+<!-- Page skeleton -->
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="width:160px;height:14px;border-radius:6px"></div>
+    <div style="display:flex;gap:8px">
+      <div class="skel" style="width:120px;height:32px;border-radius:8px"></div>
+      <div class="skel" style="width:80px;height:32px;border-radius:8px"></div>
+    </div>
+  </div>
+  <div class="skel-body">
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <div class="skel" style="width:80px;height:32px;border-radius:8px"></div>
+      <div class="skel" style="width:80px;height:32px;border-radius:8px"></div>
+      <div class="skel" style="width:80px;height:32px;border-radius:8px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+      <div class="skel" style="height:90px;border-radius:14px"></div>
+      <div class="skel" style="height:90px;border-radius:14px"></div>
+      <div class="skel" style="height:90px;border-radius:14px"></div>
+      <div class="skel" style="height:90px;border-radius:14px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px">
+      <div class="skel" style="height:240px;border-radius:14px"></div>
+      <div class="skel" style="height:240px;border-radius:14px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar backdrop -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar"></nav>
+
+<!-- Main -->
+<div class="main-wrap">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mob-menu-btn" id="mob-menu-btn">☰</button>
+      <span class="topbar-title">🏪 Merchant Corner</span>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <!-- Export button injected here -->
+      <div id="topbar-actions" style="display:flex;gap:8px"></div>
+    </div>
+  </div>
+
+  <!-- Page body -->
+  <div class="page-body">
+
+    <!-- Merchant Header -->
+    <div class="mc-header">
+      <div class="mc-header-left">
+        <div class="agent-select-wrap">
+          <select class="agent-select" id="agentSelect">
+            <option value="">Loading agents…</option>
+          </select>
+        </div>
+        <div class="period-toggle" id="periodToggle" style="display:none">
+          <button class="period-btn" data-days="7">7D</button>
+          <button class="period-btn" data-days="14">14D</button>
+          <button class="period-btn active" data-days="30">30D</button>
+          <button class="period-btn" data-days="90">90D</button>
+        </div>
+      </div>
+      <div class="mc-header-right">
+        <button class="btn btn-secondary btn-sm" id="exportBtn" style="display:none" onclick="handleExport()">
+          ⬇ Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</button>
+      <button class="tab-btn" data-tab="orders" onclick="switchTab('orders')">📦 Orders</button>
+      <button class="tab-btn" data-tab="customers" onclick="switchTab('customers')">👥 Customers</button>
+    </div>
+
+    <!-- ═══ ANALYTICS TAB ══════════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-analytics">
+      <!-- Stat Cards -->
+      <div class="stat-grid" id="analytics-stats">
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:rgba(124,111,255,.1)">💰</div>
+            <span class="stat-badge" style="background:var(--accent-dim);color:var(--accent)" id="revenue-badge">Period</span>
+          </div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="stat-revenue">—</div>
+          <div class="stat-sub" id="stat-revenue-sub">vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:var(--blue-dim)">📦</div>
+            <span class="stat-badge" style="background:var(--blue-dim);color:var(--blue)" id="orders-badge">Period</span>
+          </div>
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value" id="stat-orders">—</div>
+          <div class="stat-sub">vs yesterday</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:var(--green-dim)">📅</div>
+            <span class="stat-badge" style="background:var(--green-dim);color:var(--green)">Today</span>
+          </div>
+          <div class="stat-label">Today's Orders</div>
+          <div class="stat-value" id="stat-today">—</div>
+          <div class="stat-sub">Since midnight</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row">
+            <div class="stat-icon" style="background:var(--amber-dim)">🛍️</div>
+            <span class="stat-badge" style="background:var(--amber-dim);color:var(--amber)">Catalog</span>
+          </div>
+          <div class="stat-label">Active Products</div>
+          <div class="stat-value" id="stat-products">—</div>
+          <div class="stat-sub">Listed items</div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="chart-grid-2">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">📈 Daily Revenue <span style="font-size:11px;color:var(--text-3);font-weight:400">Click a point to inspect</span></div>
+            <span class="chart-card-stat" id="chart-rev-total">₹0</span>
+          </div>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">📊 Order Volume</div>
+            <span class="chart-card-stat" id="chart-vol-total">0 orders</span>
+          </div>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="volumeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2 -->
+      <div class="chart-grid-2b">
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">🏆 Top Products <span style="font-size:11px;color:var(--text-3);font-weight:400">By revenue in period</span></div>
+          </div>
+          <div id="topProductsList" class="top-products-list">
+            <div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-sub">No sales data yet</div></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div class="chart-card-title">🔄 Order Status <span style="font-size:11px;color:var(--text-3);font-weight:400">Distribution breakdown</span></div>
+          </div>
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ORDERS TAB ════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-orders">
+      <!-- Stat cards -->
+      <div class="stat-grid" id="orders-stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:var(--surface-3)">📋</div></div>
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value" id="o-stat-total">—</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:var(--amber-dim)">⏳</div></div>
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" style="color:var(--amber)" id="o-stat-pending">—</div>
+          <div class="stat-sub">Need attention</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:var(--green-dim)">✅</div></div>
+          <div class="stat-label">Fulfilled</div>
+          <div class="stat-value" style="color:var(--green)" id="o-stat-fulfilled">—</div>
+          <div class="stat-sub">Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:rgba(124,111,255,.1)">💰</div></div>
+          <div class="stat-label">Revenue</div>
+          <div class="stat-value" id="o-stat-revenue">—</div>
+          <div class="stat-sub">Excl. cancelled</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="orders-toolbar">
+        <div class="search-wrap">
+          <input type="text" class="search-inp" id="orderSearch" placeholder="Search orders, customers, emails…" oninput="filterOrders()"/>
+        </div>
+        <select class="filter-select" id="statusFilter" onchange="filterOrders()">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="paid">Paid</option>
+          <option value="fulfilled">Fulfilled</option>
+          <option value="refunded">Refunded</option>
+        </select>
+        <div class="orders-count" id="ordersCount">— orders</div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody">
+            <tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-sub">Loading orders…</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="ordersPagination"></div>
+    </div>
+
+    <!-- ═══ CUSTOMERS TAB ═════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-customers">
+      <!-- Stat Cards -->
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:rgba(124,111,255,.1)">👥</div></div>
+          <div class="stat-label">Total Customers</div>
+          <div class="stat-value" id="c-stat-total">—</div>
+          <div class="stat-sub">Unique buyers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:var(--green-dim)">🔄</div></div>
+          <div class="stat-label">Repeat Buyers</div>
+          <div class="stat-value" style="color:var(--green)" id="c-stat-repeat">—</div>
+          <div class="stat-sub">Ordered 2+ times</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-row"><div class="stat-icon" style="background:var(--amber-dim)">💰</div></div>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="c-stat-revenue">—</div>
+          <div class="stat-sub">From all customers</div>
+        </div>
+      </div>
+
+      <!-- Customers toolbar -->
+      <div class="orders-toolbar">
+        <div class="search-wrap">
+          <input type="text" class="search-inp" id="customerSearch" placeholder="Search customers, emails, phone…" oninput="filterCustomers()"/>
+        </div>
+        <div class="orders-count" id="customersCount">— customers</div>
+      </div>
+
+      <!-- Customers Table -->
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Contact</th>
+              <th>Orders</th>
+              <th>Total Spent</th>
+              <th>Last Order</th>
+            </tr>
+          </thead>
+          <tbody id="customersTableBody">
+            <tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-sub">Loading customers…</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end .page-body -->
+</div><!-- end .main-wrap -->
+
+<script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="nav.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+let _agents      = []
+let _agentId     = null
+let _activeTab   = 'analytics'
+let _days        = 30
+let _analyticsData = null
+let _allOrders   = []
+let _filteredOrders = []
+let _ordersPage  = 1
+const ORDERS_PER_PAGE = 20
+let _allCustomers = []
+let _filteredCustomers = []
+let _charts = {}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+;(async () => {
+  const nav = await renderNav('merchant')
+  if (!nav) return
+
+  // Theme toggle
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    toggleTheme()
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark'
+    document.getElementById('themeToggle').textContent = dark ? '☀️' : '🌙'
+    if (_analyticsData) renderCharts(_analyticsData)
+  })
+
+  // Period toggle
+  document.getElementById('periodToggle').querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      _days = parseInt(btn.dataset.days)
+      if (_agentId) loadAnalytics(_agentId, _days)
+    })
+  })
+
+  // Agent select
+  document.getElementById('agentSelect').addEventListener('change', e => {
+    _agentId = e.target.value
+    loadTabData()
+  })
+
+  // Load agents
+  try {
+    _agents = await apiFetch('/agents')
+    buildAgentSelect(_agents)
+    if (_agents.length > 0) {
+      _agentId = _agents[0]._id
+      loadTabData()
+    } else {
+      dismissSkeleton()
+      showNoAgentState()
+    }
+  } catch (e) {
+    dismissSkeleton()
+    toast('Failed to load agents', 'error')
+  }
+})()
+
+function buildAgentSelect(agents) {
+  const sel = document.getElementById('agentSelect')
+  if (!agents.length) { sel.innerHTML = '<option value="">No agents yet</option>'; return }
+  sel.innerHTML = agents.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+  sel.value = agents[0]._id
+}
+
+function showNoAgentState() {
+  document.getElementById('tab-analytics').innerHTML = `
+    <div class="empty-state" style="padding:80px 20px">
+      <div class="empty-state-icon">🤖</div>
+      <div class="empty-state-title">No agents yet</div>
+      <div class="empty-state-sub">Create an agent with shopping enabled to start tracking orders and revenue</div>
+    </div>`
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ══════════════════════════════════════════════════════════════════
+function switchTab(tab) {
+  _activeTab = tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tab}`))
+
+  // Show/hide period toggle and export
+  document.getElementById('periodToggle').style.display = tab === 'analytics' ? 'flex' : 'none'
+  document.getElementById('exportBtn').style.display = (tab === 'orders' || tab === 'customers') ? 'inline-flex' : 'none'
+
+  if (!_agentId) return
+  loadTabData()
+}
+
+function loadTabData() {
+  if (_activeTab === 'analytics') loadAnalytics(_agentId, _days)
+  else if (_activeTab === 'orders') loadOrders(_agentId)
+  else if (_activeTab === 'customers') loadCustomers(_agentId)
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ANALYTICS
+// ══════════════════════════════════════════════════════════════════
+async function loadAnalytics(agentId, days) {
+  try {
+    _analyticsData = await apiFetch(`/agents/${agentId}/analytics?days=${days}`)
+    renderAnalyticsStats(_analyticsData)
+    renderCharts(_analyticsData)
+    renderTopProducts(_analyticsData.top_products || [])
+    dismissSkeleton()
+  } catch (e) {
+    dismissSkeleton()
+    toast('Failed to load analytics', 'error')
+  }
+}
+
+function fmtRevenue(n, currency = 'INR') {
+  if (n == null) return '—'
+  const sym = currency === 'USD' ? '$' : '₹'
+  if (n >= 100000) return sym + (n / 100000).toFixed(1) + 'L'
+  if (n >= 1000)   return sym + (n / 1000).toFixed(1) + 'K'
+  return sym + parseFloat(n).toFixed(0)
+}
+
+function renderAnalyticsStats(data) {
+  const days = _days
+  document.getElementById('revenue-badge').textContent = `${days}D period`
+  document.getElementById('orders-badge').textContent  = `${days}D period`
+  document.getElementById('stat-revenue').textContent  = fmtRevenue(data.period_revenue)
+  document.getElementById('stat-orders').textContent   = fmtNum(data.total_orders)
+  document.getElementById('stat-today').textContent    = fmtNum(data.today_orders)
+  document.getElementById('stat-products').textContent = fmtNum(data.active_products)
+  const yRev = data.yesterday_revenue || 0
+  document.getElementById('stat-revenue-sub').textContent = yRev
+    ? `Yesterday: ${fmtRevenue(yRev)}`
+    : 'vs yesterday'
+}
+
+function getChartColors() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark'
+  return {
+    grid:   dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+    text:   dark ? '#878BAA' : '#9EA3BB',
+    accent: '#7C6FFF',
+    blue:   dark ? '#60A5FA' : '#3B82F6',
+    green:  dark ? '#2DD4A0' : '#19a37a',
+    amber:  dark ? '#F5A523' : '#d97706',
+    red:    dark ? '#F26B6B' : '#e05252',
+    bg:     dark ? '#0C0E16' : '#FFFFFF',
+  }
+}
+
+function renderCharts(data) {
+  const c = getChartColors()
+  const daily = data.daily_revenue || []
+  const volume = data.order_volume || []
+
+  // Fill date gaps for smooth charts
+  const labels = fillDateRange(daily.map(d => d._id), _days)
+  const revMap  = Object.fromEntries(daily.map(d => [d._id, d.revenue]))
+  const volMap  = Object.fromEntries(volume.map(d => [d._id, d.orders]))
+  const revData = labels.map(l => revMap[l] || 0)
+  const volData = labels.map(l => volMap[l] || 0)
+
+  const totalRev = revData.reduce((a, b) => a + b, 0)
+  const totalVol = volData.reduce((a, b) => a + b, 0)
+  document.getElementById('chart-rev-total').textContent = fmtRevenue(totalRev)
+  document.getElementById('chart-vol-total').textContent = totalVol + ' orders'
+
+  const shortLabels = labels.map(l => {
+    const d = new Date(l)
+    return `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`
+  })
+
+  // Revenue line chart
+  destroyChart('revenue')
+  const revCtx = document.getElementById('revenueChart').getContext('2d')
+  const gradient = revCtx.createLinearGradient(0, 0, 0, 200)
+  gradient.addColorStop(0, 'rgba(124,111,255,0.22)')
+  gradient.addColorStop(1, 'rgba(124,111,255,0.01)')
+  _charts.revenue = new Chart(revCtx, {
+    type: 'line',
+    data: {
+      labels: shortLabels,
+      datasets: [{
+        data: revData,
+        borderColor: c.accent,
+        backgroundColor: gradient,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: c.accent,
+        tension: 0.3,
+        fill: true,
+      }]
+    },
+    options: chartOptions(c, true)
+  })
+
+  // Volume bar chart
+  destroyChart('volume')
+  const volCtx = document.getElementById('volumeChart').getContext('2d')
+  _charts.volume = new Chart(volCtx, {
+    type: 'bar',
+    data: {
+      labels: shortLabels,
+      datasets: [{
+        data: volData,
+        backgroundColor: 'rgba(124,111,255,0.35)',
+        borderColor: c.accent,
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+        hoverBackgroundColor: 'rgba(124,111,255,0.6)',
+      }]
+    },
+    options: chartOptions(c, false)
+  })
+
+  // Status donut
+  const statusMap = {}
+  ;(data.order_status || []).forEach(s => { statusMap[s._id] = s.count })
+  const statusLabels  = ['Pending', 'Paid', 'Fulfilled', 'Refunded']
+  const statusValues  = [
+    statusMap['pending']   || 0,
+    statusMap['paid']      || 0,
+    statusMap['fulfilled'] || 0,
+    statusMap['refunded']  || 0,
+  ]
+  const hasStatus = statusValues.some(v => v > 0)
+
+  destroyChart('status')
+  const statusCtx = document.getElementById('statusChart').getContext('2d')
+  _charts.status = new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: statusLabels,
+      datasets: [{
+        data: hasStatus ? statusValues : [1],
+        backgroundColor: hasStatus
+          ? [c.amber, c.blue, c.green, c.red]
+          : ['rgba(150,150,150,0.15)'],
+        borderColor: c.bg,
+        borderWidth: 2,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: c.text, font: { size: 11, family: "'Plus Jakarta Sans'" }, padding: 12, boxWidth: 10, boxHeight: 10 }
+        },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}` } }
+      }
+    }
+  })
+}
+
+function chartOptions(c, isLine) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(15,17,27,0.92)',
+        titleColor: '#fff',
+        bodyColor: '#878BAA',
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+          label: ctx => isLine
+            ? ` Revenue: ₹${parseFloat(ctx.parsed.y).toLocaleString('en-IN')}`
+            : ` Orders: ${ctx.parsed.y}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { color: c.text, font: { size: 10 }, maxTicksLimit: 8 }
+      },
+      y: {
+        grid: { color: c.grid, drawBorder: false },
+        border: { display: false, dash: [3, 3] },
+        ticks: { color: c.text, font: { size: 10 }, maxTicksLimit: 5,
+          callback: v => isLine ? fmtRevenue(v) : v }
+      }
+    }
+  }
+}
+
+function renderTopProducts(products) {
+  const el = document.getElementById('topProductsList')
+  if (!products.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-sub">No sales data yet</div></div>`
+    return
+  }
+  const maxRev = products[0]?.revenue || 1
+  el.innerHTML = products.slice(0, 6).map((p, i) => {
+    const pct = Math.round((p.revenue / maxRev) * 100)
+    return `
+    <div class="tp-row">
+      <div class="tp-rank">#${i + 1}</div>
+      <div class="tp-bar-wrap">
+        <div class="tp-name" title="${esc(p._id)}">${esc(p._id)}</div>
+        <div class="tp-bar" style="width:${pct}%"></div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="tp-rev">${fmtRevenue(p.revenue)}</div>
+        <div class="tp-qty">${p.qty} sold</div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function fillDateRange(dates, days) {
+  const result = []
+  const end = new Date(); end.setHours(0,0,0,0)
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(end); d.setDate(d.getDate() - i)
+    result.push(d.toISOString().slice(0, 10))
+  }
+  return result
+}
+
+function destroyChart(key) {
+  if (_charts[key]) { _charts[key].destroy(); delete _charts[key] }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ORDERS
+// ══════════════════════════════════════════════════════════════════
+async function loadOrders(agentId) {
+  try {
+    // Load all pages for client-side filtering
+    let allOrders = []
+    let page = 1, pages = 1
+    while (page <= pages && page <= 10) {
+      const data = await apiFetch(`/agents/${agentId}/orders?page=${page}`)
+      allOrders = allOrders.concat(data.orders || [])
+      pages = data.pages || 1
+      page++
+    }
+    _allOrders = allOrders
+    renderOrderStats(_allOrders)
+    filterOrders()
+    dismissSkeleton()
+  } catch (e) {
+    dismissSkeleton()
+    toast('Failed to load orders', 'error')
+  }
+}
+
+function renderOrderStats(orders) {
+  const total     = orders.length
+  const pending   = orders.filter(o => o.status === 'pending').length
+  const fulfilled = orders.filter(o => o.status === 'fulfilled').length
+  const revenue   = orders.filter(o => o.status !== 'refunded').reduce((s, o) => s + (o.amount || 0), 0)
+  document.getElementById('o-stat-total').textContent     = fmtNum(total)
+  document.getElementById('o-stat-pending').textContent   = fmtNum(pending)
+  document.getElementById('o-stat-fulfilled').textContent = fmtNum(fulfilled)
+  document.getElementById('o-stat-revenue').textContent   = fmtRevenue(revenue)
+}
+
+function filterOrders() {
+  const q      = (document.getElementById('orderSearch').value || '').toLowerCase()
+  const status = document.getElementById('statusFilter').value
+  _filteredOrders = _allOrders.filter(o => {
+    const matchStatus = !status || o.status === status
+    const matchQ = !q || (
+      o._id.toString().toLowerCase().includes(q) ||
+      (o.customer?.name  || '').toLowerCase().includes(q) ||
+      (o.customer?.email || '').toLowerCase().includes(q)
+    )
+    return matchStatus && matchQ
+  })
+  _ordersPage = 1
+  renderOrdersTable()
+}
+
+function renderOrdersTable() {
+  const start  = (_ordersPage - 1) * ORDERS_PER_PAGE
+  const slice  = _filteredOrders.slice(start, start + ORDERS_PER_PAGE)
+  const tbody  = document.getElementById('ordersTableBody')
+  const countEl = document.getElementById('ordersCount')
+  countEl.textContent = `${_filteredOrders.length} orders`
+
+  if (!slice.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-title">No orders found</div><div class="empty-state-sub">Try adjusting your filters</div></div></td></tr>`
+    document.getElementById('ordersPagination').innerHTML = ''
+    return
+  }
+
+  tbody.innerHTML = slice.map(o => {
+    const id         = o._id.toString()
+    const shortId    = 'ORD-' + id.slice(-8).toUpperCase()
+    const custName   = o.customer?.name  || 'Guest'
+    const custEmail  = o.customer?.email || ''
+    const custInit   = custName[0]?.toUpperCase() || 'G'
+    const items      = (o.items || [])
+    const itemsLabel = items.length === 1
+      ? `${esc(items[0]?.name || '1 item')}`
+      : `${items.length} items`
+    const total    = fmtRevenue(o.amount, o.currency)
+    const payLabel = o.razorpay_payment_id ? '💳 Razorpay' : '💵 COD'
+    const date     = fmtDate(o.created_at)
+    const statusCls = `status-${o.status || 'pending'}`
+    const statusLabel = (o.status || 'pending').charAt(0).toUpperCase() + (o.status || 'pending').slice(1)
+    return `
+    <tr>
+      <td><div class="order-id">${shortId}</div></td>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar">${custInit}</div>
+          <div>
+            <div class="cust-name">${esc(custName)}</div>
+            ${custEmail ? `<div class="cust-email">${esc(custEmail)}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      <td>
+        <div style="font-size:13px;color:var(--text)">${esc(itemsLabel)}</div>
+        <div class="pay-chip">${payLabel}</div>
+      </td>
+      <td><strong style="font-size:13.5px">${total}</strong></td>
+      <td><span class="status-badge ${statusCls}">${statusLabel}</span></td>
+      <td style="color:var(--text-3);font-size:12px;white-space:nowrap">${date}</td>
+      <td>
+        <div class="update-wrap" id="uw-${id}">
+          <button class="btn-update" onclick="toggleStatusMenu('${id}', '${o.status || 'pending'}')">✏️ Update</button>
+        </div>
+      </td>
+    </tr>`
+  }).join('')
+
+  renderPagination()
+}
+
+function renderPagination() {
+  const total  = _filteredOrders.length
+  const pages  = Math.ceil(total / ORDERS_PER_PAGE)
+  const el     = document.getElementById('ordersPagination')
+  if (pages <= 1) { el.innerHTML = ''; return }
+  let html = `<button class="page-btn" onclick="goPage(${_ordersPage - 1})" ${_ordersPage <= 1 ? 'disabled' : ''}>‹</button>`
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 7 && Math.abs(i - _ordersPage) > 2 && i !== 1 && i !== pages) {
+      if (i === 2 || i === pages - 1) html += `<span style="color:var(--text-3);padding:0 4px">…</span>`
+      continue
+    }
+    html += `<button class="page-btn ${i === _ordersPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`
+  }
+  html += `<button class="page-btn" onclick="goPage(${_ordersPage + 1})" ${_ordersPage >= pages ? 'disabled' : ''}>›</button>`
+  el.innerHTML = html
+}
+
+function goPage(p) {
+  const pages = Math.ceil(_filteredOrders.length / ORDERS_PER_PAGE)
+  _ordersPage = Math.max(1, Math.min(p, pages))
+  renderOrdersTable()
+  document.querySelector('.tab-panel.active')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+// Status update menu
+let _openMenuId = null
+function toggleStatusMenu(orderId, currentStatus) {
+  // Close any open menu
+  if (_openMenuId && _openMenuId !== orderId) closeStatusMenu()
+  if (_openMenuId === orderId) { closeStatusMenu(); return }
+
+  const wrap  = document.getElementById(`uw-${orderId}`)
+  if (!wrap) return
+  _openMenuId = orderId
+
+  const statuses = [
+    { value: 'pending',   label: '⏳ Pending',   cls: 'status-pending' },
+    { value: 'paid',      label: '💳 Paid',       cls: 'status-paid' },
+    { value: 'fulfilled', label: '✅ Fulfilled',  cls: 'status-fulfilled' },
+    { value: 'refunded',  label: '↩️ Refunded',  cls: 'status-refunded' },
+  ]
+
+  const menu = document.createElement('div')
+  menu.className = 'status-menu'
+  menu.id = 'status-menu-popup'
+  menu.innerHTML = statuses.map(s => `
+    <div class="status-menu-item ${s.value === currentStatus ? 'current' : ''}" onclick="setOrderStatus('${orderId}', '${s.value}')">
+      <span class="status-badge ${s.cls}" style="pointer-events:none">${s.label}</span>
+      ${s.value === currentStatus ? '<span style="margin-left:auto;color:var(--accent)">✓</span>' : ''}
+    </div>`).join('')
+
+  wrap.appendChild(menu)
+  setTimeout(() => document.addEventListener('click', closeStatusMenuOutside), 0)
+}
+
+function closeStatusMenu() {
+  document.getElementById('status-menu-popup')?.remove()
+  _openMenuId = null
+  document.removeEventListener('click', closeStatusMenuOutside)
+}
+
+function closeStatusMenuOutside(e) {
+  if (!e.target.closest('.update-wrap')) closeStatusMenu()
+}
+
+async function setOrderStatus(orderId, status) {
+  closeStatusMenu()
+  try {
+    await apiFetch(`/agents/${_agentId}/orders/${orderId}`, {
+      method: 'PUT', body: JSON.stringify({ status })
+    })
+    // Update local state
+    const order = _allOrders.find(o => o._id.toString() === orderId)
+    if (order) order.status = status
+    renderOrderStats(_allOrders)
+    renderOrdersTable()
+    toast(`Order updated to ${status}`, 'success')
+  } catch (e) {
+    toast('Failed to update order status', 'error')
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CUSTOMERS
+// ══════════════════════════════════════════════════════════════════
+async function loadCustomers(agentId) {
+  try {
+    const data = await apiFetch(`/agents/${agentId}/customers`)
+    _allCustomers = data.customers || []
+    renderCustomerStats(_allCustomers)
+    filterCustomers()
+    dismissSkeleton()
+  } catch (e) {
+    dismissSkeleton()
+    toast('Failed to load customers', 'error')
+  }
+}
+
+function renderCustomerStats(customers) {
+  const total   = customers.length
+  const repeat  = customers.filter(c => c.total_orders >= 2).length
+  const revenue = customers.reduce((s, c) => s + (c.total_spent || 0), 0)
+  document.getElementById('c-stat-total').textContent   = fmtNum(total)
+  document.getElementById('c-stat-repeat').textContent  = fmtNum(repeat)
+  document.getElementById('c-stat-revenue').textContent = fmtRevenue(revenue)
+}
+
+function filterCustomers() {
+  const q = (document.getElementById('customerSearch').value || '').toLowerCase()
+  _filteredCustomers = _allCustomers.filter(c => {
+    if (!q) return true
+    return (
+      (c.name  || '').toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q) ||
+      (c.phone || '').toLowerCase().includes(q)
+    )
+  })
+  renderCustomersTable()
+}
+
+function renderCustomersTable() {
+  const tbody = document.getElementById('customersTableBody')
+  document.getElementById('customersCount').textContent = `${_filteredCustomers.length} customers`
+
+  if (!_filteredCustomers.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">No customers yet</div><div class="empty-state-sub">Customers will appear here after their first order</div></div></td></tr>`
+    return
+  }
+
+  tbody.innerHTML = _filteredCustomers.map(c => {
+    const name  = c.name  || 'Unknown'
+    const init  = name[0]?.toUpperCase() || '?'
+    const chips = buildContactChips(c)
+    const badge = c.total_orders >= 2
+      ? `<span style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-dim);padding:1px 7px;border-radius:10px;margin-left:6px;">Repeat</span>`
+      : ''
+    return `
+    <tr>
+      <td>
+        <div class="cust-cell">
+          <div class="cust-avatar">${init}</div>
+          <div>
+            <div class="cust-name">${esc(name)}${badge}</div>
+          </div>
+        </div>
+      </td>
+      <td><div class="contact-chips">${chips}</div></td>
+      <td><strong>${fmtNum(c.total_orders)}</strong></td>
+      <td><strong>${fmtRevenue(c.total_spent)}</strong></td>
+      <td style="color:var(--text-3);font-size:12px">${fmtDate(c.last_order)}</td>
+    </tr>`
+  }).join('')
+}
+
+function buildContactChips(c) {
+  const chips = []
+  if (c.email) chips.push(`<span class="contact-chip email" title="${esc(c.email)}">📧 ${esc(c.email)}</span>`)
+  if (c.phone) chips.push(`<span class="contact-chip phone" title="${esc(c.phone)}">📱 ${esc(c.phone)}</span>`)
+  // Future: whatsapp, instagram
+  if (!chips.length) chips.push(`<span class="contact-chip empty">No contact</span>`)
+  return chips.join('')
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT CSV (client-side)
+// ══════════════════════════════════════════════════════════════════
+function handleExport() {
+  if (_activeTab === 'orders') exportOrdersCSV()
+  else if (_activeTab === 'customers') exportCustomersCSV()
+}
+
+function exportOrdersCSV() {
+  if (!_allOrders.length) { toast('No orders to export', 'info'); return }
+  const rows = [['Order ID', 'Short ID', 'Customer Name', 'Customer Email', 'Customer Phone', 'Items', 'Amount', 'Currency', 'Payment Method', 'Status', 'Date']]
+  _allOrders.forEach(o => {
+    const items = (o.items || []).map(i => `${i.name} x${i.qty}`).join('; ')
+    rows.push([
+      o._id.toString(),
+      'ORD-' + o._id.toString().slice(-8).toUpperCase(),
+      o.customer?.name  || '',
+      o.customer?.email || '',
+      o.customer?.phone || '',
+      items,
+      o.amount || 0,
+      o.currency || 'INR',
+      o.razorpay_payment_id ? 'Razorpay' : 'COD',
+      o.status || 'pending',
+      o.created_at ? new Date(o.created_at).toISOString() : ''
+    ])
+  })
+  downloadCSV(rows, 'orders.csv')
+  toast('Orders exported!', 'success')
+}
+
+function exportCustomersCSV() {
+  if (!_allCustomers.length) { toast('No customers to export', 'info'); return }
+  const rows = [['Name', 'Email', 'Phone', 'Total Orders', 'Total Spent', 'First Order', 'Last Order']]
+  _allCustomers.forEach(c => {
+    rows.push([
+      c.name  || '',
+      c.email || '',
+      c.phone || '',
+      c.total_orders || 0,
+      c.total_spent  || 0,
+      c.first_order ? new Date(c.first_order).toISOString() : '',
+      c.last_order  ? new Date(c.last_order).toISOString()  : '',
+    ])
+  })
+  downloadCSV(rows, 'customers.csv')
+  toast('Customers exported!', 'success')
+}
+
+function downloadCSV(rows, filename) {
+  const csv  = rows.map(r => r.map(f => `"${String(f).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url  = URL.createObjectURL(blob)
+  const a    = document.createElement('a')
+  a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+// On init: show export button only for orders/customers tab
+document.getElementById('exportBtn').style.display = 'none'
+</script>
+</body>
+</html>
