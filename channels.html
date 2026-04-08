@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="shared.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
   <style>
     /* ════════════════════════════════════════════════════════════════
        LAYOUT
@@ -31,7 +31,30 @@
     /* ════════════════════════════════════════════════════════════════
        PAGE BODY
     ════════════════════════════════════════════════════════════════ */
-    .page-body{padding:20px 24px 40px;flex:1;max-width:1400px;width:100%;box-sizing:border-box}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1500px;width:100%;box-sizing:border-box}
+
+    /* ════════════════════════════════════════════════════════════════
+       SALES METRICS BAR  ← NEW
+    ════════════════════════════════════════════════════════════════ */
+    .sales-metrics-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+    .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+                 padding:14px 16px;position:relative;overflow:hidden;cursor:default;transition:var(--t)}
+    .metric-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+    .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .metric-card.mc-inbox::before{background:var(--accent)}
+    .metric-card.mc-noise::before{background:var(--amber)}
+    .metric-card.mc-replied::before{background:var(--green)}
+    .metric-card.mc-time::before{background:#0ea5e9}
+    .metric-card.mc-rate::before{background:#8b5cf6}
+    .metric-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;
+                  letter-spacing:.07em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+    .metric-value{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
+    .metric-sub{font-size:10.5px;color:var(--text-3);margin-top:4px}
+    .metric-trend{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;
+                  padding:2px 6px;border-radius:6px;margin-top:5px}
+    .metric-trend.up{background:var(--green-dim);color:var(--green)}
+    .metric-trend.dn{background:var(--red-dim);color:var(--red)}
+    .metric-trend.neu{background:var(--surface-3);color:var(--text-3)}
 
     /* ════════════════════════════════════════════════════════════════
        SECTION LABEL
@@ -40,9 +63,9 @@
                    letter-spacing:.08em;margin-bottom:14px;margin-top:4px}
 
     /* ════════════════════════════════════════════════════════════════
-       CHANNEL CONNECTION CARDS (top row)
+       CHANNEL CONNECTION CARDS
     ════════════════════════════════════════════════════════════════ */
-    .channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+    .channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
     .channel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);
                   padding:18px;transition:var(--t);position:relative;overflow:hidden;cursor:pointer}
     .channel-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
@@ -63,7 +86,25 @@
     .badge-soon::before{background:#7c3aed}
     @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 
-    .channel-email-info{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+    /* ── AI Auto-Reply Toggle ── NEW */
+    .auto-reply-row{display:flex;align-items:center;justify-content:space-between;
+                    padding:9px 12px;background:var(--surface-2);border-radius:8px;
+                    border:1px solid var(--border);margin-bottom:10px;gap:8px}
+    .auto-reply-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-2)}
+    .auto-reply-label span{font-size:13px}
+    .toggle-wrap{display:flex;align-items:center;gap:6px}
+    .toggle-switch{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-slider{position:absolute;inset:0;background:var(--border-md);border-radius:20px;transition:.25s}
+    .toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;
+                           background:#fff;border-radius:50%;transition:.25s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+    .toggle-switch input:checked + .toggle-slider{background:var(--accent)}
+    .toggle-switch input:checked + .toggle-slider::before{transform:translateX(16px)}
+    .toggle-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap}
+    .toggle-badge.on{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .toggle-badge.off{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+
+    .channel-email-info{display:flex;align-items:center;gap:7px;margin-bottom:10px}
     .channel-email-text{font-size:12px;font-weight:600;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
     .inbox-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
                  padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;cursor:pointer}
@@ -81,7 +122,7 @@
     [data-theme="dark"] .coming-soon-overlay{background:rgba(12,14,22,.88)}
 
     /* ════════════════════════════════════════════════════════════════
-       PLATFORM TABS BAR  (Email · WhatsApp · Instagram)
+       PLATFORM TABS BAR
     ════════════════════════════════════════════════════════════════ */
     .platform-tabs-bar{display:flex;align-items:center;gap:0;border-bottom:2px solid var(--border);
                        margin-bottom:20px;background:transparent}
@@ -98,15 +139,18 @@
     .platform-tab.disabled{opacity:.45;cursor:not-allowed}
     .pt-soon-tag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;
                  background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;line-height:1.5}
+    /* AI auto tag on tab */
+    .pt-ai-tag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;
+               background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);line-height:1.5}
 
     /* ════════════════════════════════════════════════════════════════
-       PLATFORM PANEL (content area for each platform)
+       PLATFORM PANEL
     ════════════════════════════════════════════════════════════════ */
     .platform-panel{display:none}
     .platform-panel.active{display:block}
 
     /* ════════════════════════════════════════════════════════════════
-       SUB-NAV TABS  (Inbox · Sent · AI Drafts · Noise · Dismissed)
+       SUB-NAV TABS
     ════════════════════════════════════════════════════════════════ */
     .subnav-wrap{display:flex;align-items:center;justify-content:space-between;
                  margin-bottom:16px;gap:12px;flex-wrap:wrap}
@@ -123,6 +167,17 @@
     .subnav-tab.noise-tab:not(.active) .snt-count{background:var(--amber-dim);color:var(--amber)}
 
     .subnav-right{display:flex;align-items:center;gap:8px}
+
+    /* ════════════════════════════════════════════════════════════════
+       SEARCH BAR  ← NEW
+    ════════════════════════════════════════════════════════════════ */
+    .search-wrap{position:relative;flex:1;max-width:240px}
+    .search-input{width:100%;height:34px;padding:0 12px 0 34px;border:1px solid var(--border-md);
+                  border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);
+                  font-family:var(--font);font-size:12.5px;outline:none;transition:var(--t)}
+    .search-input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-dim)}
+    .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+                 font-size:13px;color:var(--text-3);pointer-events:none}
 
     /* ════════════════════════════════════════════════════════════════
        INTENT FILTER PILLS
@@ -170,9 +225,16 @@
                 border:1px solid var(--border);white-space:nowrap}
     .token-chip.loaded{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
 
+    /* ── Bulk actions bar ── NEW */
+    .bulk-bar{display:none;align-items:center;gap:8px;padding:8px 14px;
+              background:var(--accent-dim);border-bottom:1px solid var(--accent);flex-shrink:0}
+    .bulk-bar.visible{display:flex}
+    .bulk-count{font-size:12.5px;font-weight:700;color:var(--accent)}
+    .bulk-sep{width:1px;height:20px;background:var(--border-md)}
+
     /* ── Split pane ── */
     .inbox-split{display:flex;flex:1;min-height:520px;overflow:hidden}
-    .msg-list-pane{width:340px;flex-shrink:0;border-right:1px solid var(--border);
+    .msg-list-pane{width:350px;flex-shrink:0;border-right:1px solid var(--border);
                    overflow-y:auto;display:flex;flex-direction:column}
     .msg-list-pane::-webkit-scrollbar{width:4px}
     .msg-list-pane::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
@@ -197,7 +259,15 @@
     .msg-row:hover{background:var(--surface-2)}
     .msg-row.selected{background:var(--accent-dim);border-left:3px solid var(--accent)}
     .msg-row.selected .msg-from-name{color:var(--accent)}
-    .msg-row.noise-row{opacity:.7}
+    .msg-row.noise-row{opacity:.65}
+    .msg-row.unread-row .msg-from-name{font-weight:700}
+    .msg-row.unread-row .msg-subj{font-weight:600;color:var(--text)}
+    .msg-checkbox{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-md);
+                  background:var(--surface);cursor:pointer;flex-shrink:0;margin-top:9px;
+                  appearance:none;transition:var(--t)}
+    .msg-checkbox:checked{background:var(--accent);border-color:var(--accent)}
+    .msg-checkbox:checked::after{content:'✓';color:#fff;font-size:10px;font-weight:700;
+                                  display:flex;align-items:center;justify-content:center;height:100%}
     .msg-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;
                 justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
     .msg-right{flex:1;min-width:0}
@@ -221,6 +291,10 @@
     .bp-other{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     [data-theme="dark"] .bp-order{background:#0c2d3f;color:#38bdf8;border-color:#0c4a6e}
 
+    /* auto-replied badge */
+    .bp-auto-replied{background:linear-gradient(135deg,var(--green-dim),#d1fae5);
+                     color:var(--green);border:1px solid var(--green-border)}
+
     /* ── Reading pane ── */
     .email-read-pane{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
     .read-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -239,6 +313,20 @@
     .email-read-from-email{font-size:12px;color:var(--text-3)}
     .email-read-timestamp{font-size:11.5px;color:var(--text-3);white-space:nowrap;padding-top:3px;flex-shrink:0}
     .email-status-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+    /* ── Thread history ── NEW */
+    .thread-history{padding:12px 22px;border-bottom:1px solid var(--border);
+                    background:var(--surface-2);flex-shrink:0;max-height:180px;overflow-y:auto}
+    .thread-history::-webkit-scrollbar{width:4px}
+    .thread-history::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
+    .thread-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--border)}
+    .thread-item:last-child{border-bottom:none}
+    .thread-dir{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+    .thread-dir.sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .thread-dir.recv{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .thread-text{font-size:12px;color:var(--text-2);line-height:1.5;flex:1;
+                 overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+    .thread-time{font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
 
     .email-read-body{flex:1;overflow-y:auto;padding:18px 22px;font-size:13.5px;line-height:1.8;color:var(--text-2)}
     .email-read-body::-webkit-scrollbar{width:4px}
@@ -266,6 +354,12 @@
                             margin-top:10px;flex-wrap:wrap;gap:8px}
     .reply-action-left{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
     .replied-notice{font-size:12px;color:var(--text-3);font-style:italic;display:flex;align-items:center;gap:6px}
+
+    /* Auto-reply status banner */
+    .auto-reply-banner{display:flex;align-items:center;gap:8px;padding:8px 14px;
+                       background:linear-gradient(135deg,var(--green-dim),#d1fae522);
+                       border:1px solid var(--green-border);border-radius:8px;
+                       font-size:12px;font-weight:600;color:var(--green);margin-bottom:8px}
 
     /* ── Token usage bar ── */
     .token-usage-bar{display:flex;align-items:center;gap:14px;padding:10px 16px;
@@ -339,7 +433,7 @@
     @keyframes slide-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
     /* ════════════════════════════════════════════════════════════════
-       COMING SOON PANEL (WhatsApp / Instagram)
+       COMING SOON PANEL
     ════════════════════════════════════════════════════════════════ */
     .coming-soon-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
                        min-height:400px;gap:16px;text-align:center;padding:60px 40px;
@@ -351,20 +445,35 @@
                    padding:5px 14px;border-radius:20px;background:#f3e8ff;color:#7c3aed;
                    border:1px solid #ddd6fe;margin-top:4px}
 
+    /* ── coming soon feature bullets ── */
+    .cs-features{display:flex;flex-direction:column;gap:8px;text-align:left;margin-top:8px;width:100%;max-width:340px}
+    .cs-feature{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);
+                padding:8px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border)}
+    .cs-feature-icon{font-size:16px;flex-shrink:0}
+
+    /* ── notify me form ── */
+    .notify-form{display:flex;gap:8px;margin-top:4px;width:100%;max-width:320px}
+    .notify-input{flex:1;height:36px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);
+                  background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+    .notify-input:focus{border-color:var(--accent)}
+
     /* ════════════════════════════════════════════════════════════════
        RESPONSIVE
     ════════════════════════════════════════════════════════════════ */
+    @media(max-width:1300px){.sales-metrics-bar{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:1100px){.channels-grid{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:900px){.channels-grid{grid-template-columns:1fr}}
+    @media(max-width:900px){.channels-grid{grid-template-columns:1fr};.sales-metrics-bar{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:768px){
       .main-wrap{margin-left:0}.mob-menu-btn{display:flex}.page-body{padding:14px 14px 32px}
       .inbox-split{flex-direction:column}
       .msg-list-pane{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:300px}
       .channels-grid{grid-template-columns:1fr}
+      .sales-metrics-bar{grid-template-columns:repeat(2,1fr)}
     }
     @media(max-width:600px){
       .platform-tab .pt-label{display:none}
       .subnav-tab .snt-label{display:none}
+      .sales-metrics-bar{grid-template-columns:1fr 1fr}
     }
   </style>
   <script>
@@ -406,39 +515,29 @@
 <script src="nav.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════════════
-// STATE — Single source of truth. Never mutate directly; always use setters.
+// STATE
 // ══════════════════════════════════════════════════════════════════════════════
 const STATE = {
-  agents:       [],
-  agentId:      null,
-  channels:     {},
-
-  // Platform: 'email' | 'whatsapp' | 'instagram'
-  platform:     'email',
-
-  // Email sub-tabs:
-  //   inbox     → status=inbox
-  //   sent      → status=replied
-  //   drafts    → status=inbox, ai_draft exists
-  //   noise     → status=noise
-  //   dismissed → status=dismissed
-  bucket:       'inbox',
-
-  intent:       'all',
-  page:         1,
-  total:        0,
-  msgs:         [],
-  msgMap:       {},
-  selectedId:   null,
-  tokenUsage:   {},
-
-  // Loading flags — prevent duplicate in-flight requests
-  loadingInbox: false,
+  agents:          [],
+  agentId:         null,
+  channels:        {},
+  platform:        'email',
+  bucket:          'inbox',
+  intent:          'all',
+  page:            1,
+  total:           0,
+  msgs:            [],
+  msgMap:          {},
+  selectedId:      null,
+  tokenUsage:      {},
+  loadingInbox:    false,
+  searchQuery:     '',
+  selectedMsgIds:  new Set(),
+  autoReplySettings: {}, // { gmail: true/false, whatsapp: false, instagram: false }
 }
 
 const PAGE_SIZE = 20
 
-// Intent display config
 const INTENT_CFG = {
   enquiry:       { label:'Enquiry',       emoji:'❓', cls:'bp-enquiry'       },
   order:         { label:'Order',         emoji:'📦', cls:'bp-order'         },
@@ -450,8 +549,8 @@ const INTENT_CFG = {
   other:         { label:'Other',         emoji:'•',  cls:'bp-other'         },
 }
 
-// Bucket count cache — updated by loadBucketCounts
 const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
+const METRICS = { avgResponseHrs: null, replyRate: null, autoReplied: 0 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // INIT
@@ -460,14 +559,11 @@ const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
   const nav = await renderNav('channels')
   if (!nav) return
 
-  // Theme toggle
   document.getElementById('themeToggle').addEventListener('click', () => {
     toggleTheme()
     document.getElementById('themeToggle').textContent =
       document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'
   })
-
-  // Mobile menu
   document.getElementById('mob-menu-btn').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open')
     document.getElementById('sidebarBackdrop').classList.toggle('open')
@@ -477,7 +573,6 @@ const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
     document.getElementById('sidebarBackdrop').classList.remove('open')
   })
 
-  // URL param feedback
   const params = new URLSearchParams(location.search)
   if (params.get('connected') === 'gmail') {
     showToast('Gmail connected! 🎉', 'success')
@@ -502,7 +597,6 @@ const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
   }
 })()
 
-// ── Agent selector ───────────────────────────────────────────────────────────
 function buildAgentSelect(agents) {
   const sel = document.getElementById('agentSelect')
   if (!agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
@@ -516,13 +610,18 @@ function buildAgentSelect(agents) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// LOAD PAGE (channels overview + renders everything)
+// LOAD PAGE
 // ══════════════════════════════════════════════════════════════════════════════
 async function loadPage() {
   try {
-    const data = await apiFetch(`/agents/${STATE.agentId}/channels`)
+    // Fetch channels + auto-reply settings in parallel
+    const [data, arData] = await Promise.allSettled([
+      apiFetch(`/agents/${STATE.agentId}/channels`),
+      apiFetch(`/agents/${STATE.agentId}/channels/auto-reply-settings`).catch(() => ({ settings: {} })),
+    ])
     STATE.channels = {}
-    ;(data.channels || []).forEach(ch => { STATE.channels[ch.type] = ch })
+    ;((data.value || {}).channels || []).forEach(ch => { STATE.channels[ch.type] = ch })
+    STATE.autoReplySettings = (arData.value || {}).settings || {}
     renderPage()
   } catch (e) {
     document.getElementById('pageBody').innerHTML =
@@ -537,8 +636,38 @@ function renderPage() {
   const gmail     = STATE.channels.gmail || null
   const connected = gmail?.status === 'active'
   const inboxCnt  = gmail?.inbox_count || 0
+  const arGmail   = !!STATE.autoReplySettings.gmail
 
   document.getElementById('pageBody').innerHTML = `
+
+    <!-- ── Sales Metrics Bar ── -->
+    <div class="sales-metrics-bar" id="salesMetricsBar">
+      <div class="metric-card mc-inbox">
+        <div class="metric-label">📬 Open Inbox</div>
+        <div class="metric-value" id="m-inbox">${inboxCnt || '—'}</div>
+        <div class="metric-sub">Need your attention</div>
+      </div>
+      <div class="metric-card mc-noise">
+        <div class="metric-label">🔕 Auto-Filtered</div>
+        <div class="metric-value" id="m-noise">—</div>
+        <div class="metric-sub">0 tokens used</div>
+      </div>
+      <div class="metric-card mc-replied">
+        <div class="metric-label">✅ Replied (30d)</div>
+        <div class="metric-value" id="m-replied">—</div>
+        <div class="metric-sub" id="m-auto-sub">Including AI auto-replies</div>
+      </div>
+      <div class="metric-card mc-time">
+        <div class="metric-label">⏱ Avg Response</div>
+        <div class="metric-value" id="m-time">—</div>
+        <div class="metric-sub">hrs to first reply</div>
+      </div>
+      <div class="metric-card mc-rate">
+        <div class="metric-label">📈 Reply Rate</div>
+        <div class="metric-value" id="m-rate">—</div>
+        <div class="metric-sub">of inbox emails replied</div>
+      </div>
+    </div>
 
     <!-- ── Connection Cards ── -->
     <div class="section-label">Connected Channels</div>
@@ -560,6 +689,17 @@ function renderPage() {
           </div>
         </div>
         ${connected ? `
+        <!-- AI Auto-Reply Toggle -->
+        <div class="auto-reply-row" onclick="event.stopPropagation()">
+          <div class="auto-reply-label">
+            <span>✦</span> AI Auto-Reply
+            <span class="toggle-badge ${arGmail?'on':'off'}" id="ar-badge-gmail">${arGmail?'ON':'OFF'}</span>
+          </div>
+          <label class="toggle-switch" title="${arGmail?'Auto-reply is ON — AI sends replies automatically':'Auto-reply is OFF — AI drafts for review'}">
+            <input type="checkbox" ${arGmail?'checked':''} onchange="toggleAutoReply('gmail', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
         <div class="channel-email-info">
           <span style="font-size:13px">📬</span>
           <span class="channel-email-text" title="${esc(gmail.email)}">${esc(gmail.email)}</span>
@@ -570,7 +710,7 @@ function renderPage() {
         <div class="channel-actions" onclick="event.stopPropagation()">
           <button class="btn btn-secondary btn-sm" onclick="syncGmail(this)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Sync
+            Sync (200)
           </button>
           <button class="btn btn-danger btn-sm" onclick="disconnectGmail()">✕ Disconnect</button>
         </div>
@@ -624,6 +764,7 @@ function renderPage() {
         <span class="pt-icon">📧</span>
         <span class="pt-label">Email</span>
         <span class="pt-badge" id="pt-badge-email">${inboxCnt||'—'}</span>
+        ${arGmail?`<span class="pt-ai-tag" id="pt-ai-gmail">AI Auto</span>`:''}
       </button>
       <button class="platform-tab disabled" data-platform="whatsapp" title="Coming in Phase 2">
         <span class="pt-icon">💬</span>
@@ -644,16 +785,19 @@ function renderPage() {
 
     <!-- ── WhatsApp Panel ── -->
     <div class="platform-panel ${STATE.platform==='whatsapp'?'active':''}" id="panel-whatsapp">
-      ${renderComingSoonPanel('WhatsApp Business', '💬', 'Connect with customers directly via WhatsApp. Smart noise filtering, AI draft replies and bulk message management — all in one place.', 'Phase 2')}
+      ${renderComingSoonPanel('WhatsApp Business','💬',
+        'Connect with customers directly via WhatsApp. Smart noise filtering, AI auto-replies, and full conversation history — all in one place.',
+        'whatsapp')}
     </div>
 
     <!-- ── Instagram Panel ── -->
     <div class="platform-panel ${STATE.platform==='instagram'?'active':''}" id="panel-instagram">
-      ${renderComingSoonPanel('Instagram DMs', '📸', 'Handle Instagram direct messages with the same AI-powered inbox. Auto-classify, draft replies and never miss a DM.', 'Phase 2')}
+      ${renderComingSoonPanel('Instagram DMs','📸',
+        'Handle Instagram DMs with the same AI-powered inbox. Auto-classify customer intent, generate replies, and never miss a lead.',
+        'instagram')}
     </div>
   `
 
-  // Wire platform tab clicks ONCE
   document.getElementById('platformTabsBar').addEventListener('click', e => {
     const tab = e.target.closest('.platform-tab')
     if (!tab || tab.classList.contains('disabled')) return
@@ -664,6 +808,73 @@ function renderPage() {
     loadInbox()
     loadBucketCounts()
     loadTokenUsage()
+    loadMetrics()
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SALES METRICS
+// ══════════════════════════════════════════════════════════════════════════════
+async function loadMetrics() {
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/metrics`).catch(() => null)
+    if (!data) return
+
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v }
+    set('m-noise',   data.noise_count   ?? '—')
+    set('m-replied', data.replied_count ?? '—')
+    if (data.avg_response_hrs != null)
+      set('m-time', data.avg_response_hrs < 1
+        ? Math.round(data.avg_response_hrs * 60) + 'm'
+        : data.avg_response_hrs.toFixed(1) + 'h')
+    if (data.reply_rate != null)
+      set('m-rate', Math.round(data.reply_rate * 100) + '%')
+
+    const autoSubEl = document.getElementById('m-auto-sub')
+    if (autoSubEl && data.auto_replied_count)
+      autoSubEl.textContent = `${data.auto_replied_count} AI auto-replied`
+  } catch {}
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// AUTO-REPLY TOGGLE
+// ══════════════════════════════════════════════════════════════════════════════
+async function toggleAutoReply(channelType, enabled) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/auto-reply-settings`, {
+      method: 'PUT',
+      body: JSON.stringify({ channel: channelType, enabled }),
+    })
+    STATE.autoReplySettings[channelType] = enabled
+    const badge = document.getElementById(`ar-badge-${channelType}`)
+    if (badge) {
+      badge.textContent = enabled ? 'ON' : 'OFF'
+      badge.className = `toggle-badge ${enabled ? 'on' : 'off'}`
+    }
+    const ptAi = document.getElementById(`pt-ai-${channelType}`)
+    if (channelType === 'gmail') {
+      const tab = document.querySelector('.platform-tab[data-platform="email"]')
+      if (tab) {
+        const existing = tab.querySelector('.pt-ai-tag')
+        if (enabled && !existing) {
+          const tag = document.createElement('span')
+          tag.id = 'pt-ai-gmail'
+          tag.className = 'pt-ai-tag'
+          tag.textContent = 'AI Auto'
+          tab.appendChild(tag)
+        } else if (!enabled && existing) {
+          existing.remove()
+        }
+      }
+    }
+    showToast(
+      enabled
+        ? `✦ AI Auto-Reply ON for ${channelType} — AI will send replies automatically`
+        : `⏸ AI Auto-Reply OFF — AI will draft for your review`,
+      enabled ? 'success' : 'info'
+    )
+  } catch (e) {
+    showToast('Failed to update setting: ' + e.message, 'error')
   }
 }
 
@@ -672,19 +883,14 @@ function renderPage() {
 // ══════════════════════════════════════════════════════════════════════════════
 function switchPlatform(platform) {
   STATE.platform = platform
-
-  // Update platform tab active state
   document.querySelectorAll('.platform-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.platform === platform)
   })
-
-  // Update channel cards active state
   document.querySelectorAll('.channel-card').forEach((c, i) => {
-    const platforms = ['email', 'whatsapp', 'instagram']
-    c.classList.toggle('active-platform', platforms[i] === platform && STATE.channels.gmail?.status === 'active' && platform === 'email')
+    const platforms = ['email','whatsapp','instagram']
+    c.classList.toggle('active-platform',
+      platforms[i] === platform && STATE.channels.gmail?.status === 'active' && platform === 'email')
   })
-
-  // Show/hide panels
   document.querySelectorAll('.platform-panel').forEach(p => {
     p.classList.toggle('active', p.id === `panel-${platform}`)
   })
@@ -694,6 +900,7 @@ function switchPlatform(platform) {
 // RENDER EMAIL PANEL
 // ══════════════════════════════════════════════════════════════════════════════
 function renderEmailPanel(gmail) {
+  const arOn = !!STATE.autoReplySettings.gmail
   return `
   <!-- Sub-nav -->
   <div class="subnav-wrap">
@@ -720,18 +927,33 @@ function renderEmailPanel(gmail) {
       </button>
     </div>
     <div class="subnav-right">
-      <div class="token-chip" id="tokenChip" title="AI tokens used — last 30 days">
+      <!-- Search -->
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search emails…"
+               value="${esc(STATE.searchQuery)}" oninput="handleSearch(this.value)">
+      </div>
+      <div class="token-chip ${STATE.tokenUsage?'loaded':''}" id="tokenChip" title="AI tokens used — last 30 days">
         ⚡ <span id="tokenChipVal">loading…</span>
       </div>
-      <button class="icon-btn" id="syncBtn" title="Sync inbox" onclick="syncGmail(this)">
+      <button class="icon-btn" id="syncBtn" title="Sync inbox (200 emails)" onclick="syncGmail(this)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </button>
     </div>
   </div>
 
+  ${arOn && STATE.bucket === 'inbox' ? `
+  <div class="auto-reply-banner">
+    ✦ AI Auto-Reply is ON — incoming emails will be replied to automatically using your knowledge base
+    <button class="btn btn-secondary btn-sm" style="margin-left:auto"
+            onclick="toggleAutoReply('gmail', false); document.querySelector('.auto-reply-row input').checked=false">
+      Pause
+    </button>
+  </div>` : ''}
+
   <!-- Inbox wrap -->
   <div class="inbox-wrap">
-    <!-- Intent filter bar (hidden for noise/dismissed) -->
+    <!-- Intent filter bar -->
     <div class="intent-filter-bar" id="intentFilterBar"
          style="display:${['noise','dismissed'].includes(STATE.bucket)?'none':'flex'}">
       <span class="filter-label">Filter:</span>
@@ -741,6 +963,15 @@ function renderEmailPanel(gmail) {
       <button class="intent-pill ${STATE.intent==='complaint'?'active':''}" data-intent="complaint">😤 Complaint <span class="pill-count" id="ic-complaint">0</span></button>
       <button class="intent-pill ${STATE.intent==='refund'?'active':''}" data-intent="refund">💸 Refund <span class="pill-count" id="ic-refund">0</span></button>
       <button class="intent-pill ${STATE.intent==='other'?'active':''}" data-intent="other">• Other <span class="pill-count" id="ic-other">0</span></button>
+    </div>
+
+    <!-- Bulk actions bar -->
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bulk-count" id="bulkCount">0 selected</span>
+      <div class="bulk-sep"></div>
+      <button class="btn btn-ai btn-sm" onclick="bulkGenerateDrafts()">✦ Generate Drafts</button>
+      <button class="btn btn-danger btn-sm" onclick="bulkDismiss()">🗑 Dismiss All</button>
+      <button class="btn btn-secondary btn-sm" onclick="clearSelection()">✕ Clear</button>
     </div>
 
     <!-- Split pane -->
@@ -756,13 +987,29 @@ function renderEmailPanel(gmail) {
       <div class="token-stat"><span class="token-stat-val" id="tu-draft">—</span><span class="token-stat-lbl">draft tokens</span></div>
       <div class="token-stat"><span class="token-stat-val" id="tu-total">—</span><span class="token-stat-lbl">total tokens</span></div>
       <div class="token-stat"><span class="token-stat-val" id="tu-calls">—</span><span class="token-stat-lbl">AI calls</span></div>
+      <div class="token-stat"><span class="token-stat-val" id="tu-auto">—</span><span class="token-stat-lbl">auto-sent</span></div>
     </div>
   </div>`
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// WIRE TABS — called ONCE after renderEmailPanel. Uses event delegation.
-// This is the fix for the duplicate-listener / infinite-refresh bug.
+// SEARCH HANDLER
+// ══════════════════════════════════════════════════════════════════════════════
+let _searchTimer = null
+function handleSearch(val) {
+  STATE.searchQuery = val
+  clearTimeout(_searchTimer)
+  _searchTimer = setTimeout(() => {
+    STATE.page = 1
+    STATE.selectedId = null
+    const rp = document.getElementById('emailReadPane')
+    if (rp) rp.innerHTML = renderReadEmpty()
+    loadInbox()
+  }, 350)
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// WIRE TABS
 // ══════════════════════════════════════════════════════════════════════════════
 function wireSubnavOnce() {
   const subnavTabs = document.getElementById('subnavTabs')
@@ -773,23 +1020,23 @@ function wireSubnavOnce() {
     const btn = e.target.closest('.subnav-tab')
     if (!btn) return
     const bucket = btn.dataset.bucket
-    if (bucket === STATE.bucket) return   // no-op if already selected
+    if (bucket === STATE.bucket) return
 
     STATE.bucket     = bucket
     STATE.intent     = 'all'
     STATE.page       = 1
     STATE.selectedId = null
+    STATE.searchQuery= ''
+    const si = document.getElementById('searchInput')
+    if (si) si.value = ''
 
-    // Update active states
     subnavTabs.querySelectorAll('.subnav-tab').forEach(b =>
       b.classList.toggle('active', b === btn)
     )
 
-    // Show/hide intent filter bar
     const ifb = document.getElementById('intentFilterBar')
     if (ifb) ifb.style.display = ['noise','dismissed'].includes(bucket) ? 'none' : 'flex'
 
-    // Reset intent pills
     const intentBar = document.getElementById('intentFilterBar')
     if (intentBar) {
       intentBar.querySelectorAll('.intent-pill').forEach(p =>
@@ -797,10 +1044,10 @@ function wireSubnavOnce() {
       )
     }
 
-    // Clear reading pane
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
 
+    clearSelection()
     loadInbox()
   })
 }
@@ -809,58 +1056,58 @@ function wireIntentFilterOnce() {
   const ifb = document.getElementById('intentFilterBar')
   if (!ifb || ifb._wired) return
   ifb._wired = true
-
   ifb.addEventListener('click', e => {
     const pill = e.target.closest('.intent-pill')
     if (!pill) return
     const intent = pill.dataset.intent
     if (intent === STATE.intent) return
-
-    STATE.intent     = intent
-    STATE.page       = 1
+    STATE.intent = intent
+    STATE.page = 1
     STATE.selectedId = null
-
     ifb.querySelectorAll('.intent-pill').forEach(p =>
       p.classList.toggle('active', p === pill)
     )
-
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-
     loadInbox()
   })
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// LOAD INBOX — guarded against concurrent calls
+// LOAD INBOX
 // ══════════════════════════════════════════════════════════════════════════════
 async function loadInbox(page) {
   if (page !== undefined) STATE.page = page
-
-  // Guard: skip if already loading
   if (STATE.loadingInbox) return
   STATE.loadingInbox = true
 
-  // Wire tabs once (idempotent)
   wireSubnavOnce()
   wireIntentFilterOnce()
 
   try {
-    // Map internal bucket names to API bucket param
-    const apiBucket = STATE.bucket === 'sent' ? 'replied' : STATE.bucket
-
-    // For "drafts" tab: fetch inbox and filter client-side for ai_draft
+    const apiBucket   = STATE.bucket === 'sent' ? 'replied' : STATE.bucket
     const intentParam = (STATE.intent && STATE.intent !== 'all') ? `&intent=${STATE.intent}` : ''
-    const url = `/agents/${STATE.agentId}/channels/gmail/inbox?bucket=${apiBucket}&page=${STATE.page}&limit=${PAGE_SIZE}${intentParam}`
+    const searchParam = STATE.searchQuery ? `&search=${encodeURIComponent(STATE.searchQuery)}` : ''
+    const url = `/agents/${STATE.agentId}/channels/gmail/inbox?bucket=${apiBucket}&page=${STATE.page}&limit=${PAGE_SIZE}${intentParam}${searchParam}`
 
     const data = await apiFetch(url)
 
     let msgs  = data.messages || []
     let total = data.total    || msgs.length
 
-    // Client-side filter for AI Drafts tab
     if (STATE.bucket === 'drafts') {
       msgs  = msgs.filter(m => !!m.ai_draft)
+      total = msgs.length
+    }
+
+    // Client-side search fallback
+    if (STATE.searchQuery && msgs.length) {
+      const q = STATE.searchQuery.toLowerCase()
+      msgs = msgs.filter(m =>
+        (m.subject || '').toLowerCase().includes(q) ||
+        (m.from    || '').toLowerCase().includes(q) ||
+        (m.body    || '').toLowerCase().includes(q)
+      )
       total = msgs.length
     }
 
@@ -869,7 +1116,6 @@ async function loadInbox(page) {
     STATE.msgMap = {}
     msgs.forEach(m => { STATE.msgMap[m._id] = m })
 
-    // Update intent counts
     const ic = data.intent_counts || {}
     ;['enquiry','order','complaint','refund','other'].forEach(k => {
       const el = document.getElementById(`ic-${k}`)
@@ -890,15 +1136,8 @@ async function loadInbox(page) {
   }
 }
 
-// ── Bucket counts for sub-nav badges ─────────────────────────────────────────
 async function loadBucketCounts() {
-  const bucketMap = {
-    inbox:     'inbox',
-    sent:      'replied',
-    noise:     'noise',
-    dismissed: 'dismissed',
-  }
-
+  const bucketMap = { inbox:'inbox', sent:'replied', noise:'noise', dismissed:'dismissed' }
   const tasks = Object.entries(bucketMap).map(async ([key, apiBucket]) => {
     try {
       const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?bucket=${apiBucket}&page=1&limit=1`)
@@ -907,10 +1146,8 @@ async function loadBucketCounts() {
       if (el) el.textContent = data.total || 0
     } catch {}
   })
-
   await Promise.allSettled(tasks)
 
-  // Drafts: count inbox msgs with ai_draft
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?bucket=inbox&page=1&limit=200`)
     const draftCount = (data.messages || []).filter(m => !!m.ai_draft).length
@@ -919,21 +1156,24 @@ async function loadBucketCounts() {
     if (el) el.textContent = draftCount
   } catch {}
 
-  // Update platform tab badge
   const ptBadge = document.getElementById('pt-badge-email')
   if (ptBadge) ptBadge.textContent = BUCKET_COUNTS.inbox || 0
+
+  // Update noise metric card
+  const nm = document.getElementById('m-noise')
+  if (nm) nm.textContent = BUCKET_COUNTS.noise || 0
 }
 
-// ── Token usage ───────────────────────────────────────────────────────────────
 async function loadTokenUsage() {
   try {
-    const data      = await apiFetch(`/agents/${STATE.agentId}/channels/token-usage`)
-    const summary   = data.summary || {}
-    const total     = data.total_tokens_30d || 0
-    const classify  = summary['channel_classify']?.tokens || 0
-    const draft     = summary['channel_draft']?.tokens    || 0
-    const calls     = (summary['channel_classify']?.calls || 0) +
-                      (summary['channel_draft']?.calls    || 0)
+    const data     = await apiFetch(`/agents/${STATE.agentId}/channels/token-usage`)
+    const summary  = data.summary || {}
+    const total    = data.total_tokens_30d || 0
+    const classify = summary['channel_classify']?.tokens || 0
+    const draft    = summary['channel_draft']?.tokens    || 0
+    const autoSent = summary['channel_auto_reply']?.calls || 0
+    const calls    = (summary['channel_classify']?.calls || 0) +
+                     (summary['channel_draft']?.calls    || 0)
 
     const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n)
 
@@ -947,9 +1187,73 @@ async function loadTokenUsage() {
     set('tu-draft',    fmt(draft))
     set('tu-total',    fmt(total))
     set('tu-calls',    calls)
+    set('tu-auto',     autoSent || '0')
 
     STATE.tokenUsage = summary
   } catch {}
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// BULK ACTIONS
+// ══════════════════════════════════════════════════════════════════════════════
+function updateBulkBar() {
+  const bar  = document.getElementById('bulkBar')
+  const cnt  = document.getElementById('bulkCount')
+  const n    = STATE.selectedMsgIds.size
+  if (!bar) return
+  bar.classList.toggle('visible', n > 0)
+  if (cnt) cnt.textContent = `${n} selected`
+}
+
+function clearSelection() {
+  STATE.selectedMsgIds.clear()
+  document.querySelectorAll('.msg-checkbox').forEach(cb => { cb.checked = false })
+  updateBulkBar()
+}
+
+async function bulkGenerateDrafts() {
+  const ids = [...STATE.selectedMsgIds]
+  if (!ids.length) return
+  showToast(`Generating drafts for ${ids.length} emails…`, 'info')
+  let done = 0
+  for (const id of ids) {
+    try {
+      const data = await apiFetch(
+        `/agents/${STATE.agentId}/channels/gmail/messages/${id}/generate-draft`,
+        { method: 'POST' }
+      )
+      if (STATE.msgMap[id]) {
+        STATE.msgMap[id].ai_draft = data.ai_draft
+        STATE.msgMap[id].draft_tokens_used = data.tokens_used
+      }
+      done++
+    } catch {}
+  }
+  showToast(`Generated ${done}/${ids.length} drafts`, 'success')
+  clearSelection()
+  loadInbox()
+  loadBucketCounts()
+  loadTokenUsage()
+}
+
+async function bulkDismiss() {
+  const ids = [...STATE.selectedMsgIds]
+  if (!ids.length) return
+  if (!confirm(`Dismiss ${ids.length} emails?`)) return
+  let done = 0
+  for (const id of ids) {
+    try {
+      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${id}/dismiss`, { method: 'PUT' })
+      STATE.msgs  = STATE.msgs.filter(m => m._id !== id)
+      STATE.total = Math.max(0, STATE.total - 1)
+      delete STATE.msgMap[id]
+      done++
+    } catch {}
+  }
+  showToast(`Dismissed ${done} emails`, 'info')
+  clearSelection()
+  renderMsgList()
+  loadBucketCounts()
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -977,18 +1281,21 @@ function renderMsgList() {
 
   if (!STATE.msgs.length) {
     const EMPTY_COPY = {
-      inbox:     { icon:'📭', title:'No messages',          sub:'Sync inbox to fetch emails' },
-      drafts:    { icon:'✦',  title:'No AI drafts ready',   sub:'Open a message and click Generate Reply' },
-      sent:      { icon:'✅', title:'No sent replies yet',  sub:'Sent replies will appear here' },
-      noise:     { icon:'🔕', title:'No noise filtered',    sub:'Promotions and alerts will appear here' },
-      dismissed: { icon:'🗑', title:'Nothing dismissed',    sub:'' },
+      inbox:     { icon:'📭', title:'Inbox is clear',          sub:'All caught up! Sync to check for new emails.' },
+      drafts:    { icon:'✦',  title:'No AI drafts ready',      sub:'Open a message and click Generate Reply' },
+      sent:      { icon:'✅', title:'No sent replies yet',     sub:'Sent replies will appear here' },
+      noise:     { icon:'🔕', title:'No noise filtered',       sub:'Transactional & promotional emails appear here' },
+      dismissed: { icon:'🗑', title:'Nothing dismissed',       sub:'' },
     }
-    const e = EMPTY_COPY[STATE.bucket] || EMPTY_COPY.inbox
+    const copyKey = STATE.searchQuery ? 'inbox' : STATE.bucket
+    const e = EMPTY_COPY[copyKey] || EMPTY_COPY.inbox
+    const title = STATE.searchQuery ? 'No results found' : e.title
+    const sub   = STATE.searchQuery ? `No emails match "${esc(STATE.searchQuery)}"` : e.sub
     pane.innerHTML = `
       <div class="msg-list-empty">
         <div class="msg-list-empty-icon">${e.icon}</div>
-        <div class="msg-list-empty-title">${e.title}</div>
-        <div class="msg-list-empty-sub">${e.sub}</div>
+        <div class="msg-list-empty-title">${title}</div>
+        <div class="msg-list-empty-sub">${sub}</div>
       </div>`
     return
   }
@@ -999,14 +1306,17 @@ function renderMsgList() {
     const init    = (name[0] || '?').toUpperCase()
     const bg      = avatarColor(name)
     const time    = fmtRelTime(msg.created_at)
-    const snippet = cleanBody(msg.body, 100)
+    const snippet = cleanBody(msg.body, 120)
     const subject = msg.subject || '(no subject)'
     const sel     = STATE.selectedId === msg._id
     const cfg     = INTENT_CFG[msg.intent] || INTENT_CFG.other
     const isNoise = msg.status === 'noise'
+    const checked = STATE.selectedMsgIds.has(msg._id)
+    const canSelect = !['noise','dismissed'].includes(STATE.bucket)
 
     return `
     <div class="msg-row ${sel?'selected':''} ${isNoise?'noise-row':''}" data-msgid="${esc(msg._id)}">
+      ${canSelect ? `<input class="msg-checkbox" type="checkbox" ${checked?'checked':''} data-chk="${esc(msg._id)}" onclick="event.stopPropagation();toggleCheck('${esc(msg._id)}',this.checked)">` : ''}
       <div class="msg-avatar" style="background:${bg}">${init}</div>
       <div class="msg-right">
         <div class="msg-row-top">
@@ -1018,7 +1328,8 @@ function renderMsgList() {
         <div class="msg-badges">
           <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
           ${msg.ai_draft ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ Draft ready</span>` : ''}
-          ${msg.status==='replied' ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>` : ''}
+          ${msg.status==='replied' && msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
+          ${msg.status==='replied' && !msg.auto_replied ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>` : ''}
         </div>
       </div>
     </div>`
@@ -1029,28 +1340,27 @@ function renderMsgList() {
 
   pane.innerHTML = listHTML + paginHTML
 
-  // Attach click via delegation (not per-row) — prevents listener accumulation
   pane.addEventListener('click', e => {
     const row = e.target.closest('.msg-row[data-msgid]')
-    if (!row) return
+    if (!row || e.target.classList.contains('msg-checkbox')) return
     const msg = STATE.msgMap[row.dataset.msgid]
     if (!msg) return
-    if (STATE.selectedId === row.dataset.msgid) return // already selected
+    if (STATE.selectedId === row.dataset.msgid) return
 
     STATE.selectedId = row.dataset.msgid
-
-    // Update selection styling without re-rendering list
     pane.querySelectorAll('.msg-row').forEach(r => {
       r.classList.toggle('selected', r.dataset.msgid === STATE.selectedId)
       const nameEl = r.querySelector('.msg-from-name')
       if (nameEl) nameEl.style.color = r.classList.contains('selected') ? 'var(--accent)' : ''
     })
-
     renderReadPane(msg)
-  }, { once: false })  // persistent delegation — only added per render, replaced on re-render
+  })
+}
 
-  // Prevent double-binding by marking pane
-  // (pane.innerHTML replaces DOM so old listeners are garbage-collected)
+function toggleCheck(msgId, checked) {
+  if (checked) STATE.selectedMsgIds.add(msgId)
+  else STATE.selectedMsgIds.delete(msgId)
+  updateBulkBar()
 }
 
 function renderPagination(totalPages) {
@@ -1063,7 +1373,6 @@ function renderPagination(totalPages) {
   for (let p=lo; p<=hi; p++)
     btns += `<button class="pg-btn ${p===STATE.page?'active':''}" onclick="loadInbox(${p})">${p}</button>`
   btns += `<button class="pg-btn" onclick="loadInbox(${STATE.page+1})" ${STATE.page>=totalPages?'disabled':''}>→</button>`
-
   return `
   <div class="pagination-bar">
     <span class="pagination-info">${start}–${end} of ${STATE.total}</span>
@@ -1078,15 +1387,29 @@ function renderReadPane(msg) {
   const pane = document.getElementById('emailReadPane')
   if (!pane) return
 
-  const from      = parseFrom(msg.from)
-  const name      = from.name || from.email || 'Unknown'
-  const init      = (name[0] || '?').toUpperCase()
-  const bg        = avatarColor(name)
-  const cfg       = INTENT_CFG[msg.intent] || INTENT_CFG.other
-  const body      = cleanBodyFull(msg.body)
-  const canReply  = msg.status === 'inbox'
-  const isNoise   = msg.status === 'noise'
-  const hasDraft  = !!msg.ai_draft
+  const from     = parseFrom(msg.from)
+  const name     = from.name || from.email || 'Unknown'
+  const init     = (name[0] || '?').toUpperCase()
+  const bg       = avatarColor(name)
+  const cfg      = INTENT_CFG[msg.intent] || INTENT_CFG.other
+  const body     = cleanBodyFull(msg.body)
+  const canReply = msg.status === 'inbox'
+  const isNoise  = msg.status === 'noise'
+  const hasDraft = !!msg.ai_draft
+
+  // Thread history (if available)
+  const threadHtml = msg.thread_history?.length ? `
+  <div class="thread-history">
+    <div style="font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">
+      📎 Conversation Thread (${msg.thread_history.length})
+    </div>
+    ${msg.thread_history.map(t => `
+    <div class="thread-item">
+      <span class="thread-dir ${t.direction==='sent'?'sent':'recv'}">${t.direction==='sent'?'↑ You':'↓ Them'}</span>
+      <span class="thread-text">${esc(cleanBody(t.body, 120))}</span>
+      <span class="thread-time">${fmtRelTime(t.created_at)}</span>
+    </div>`).join('')}
+  </div>` : ''
 
   pane.innerHTML = `
   <div class="email-read-header">
@@ -1103,9 +1426,12 @@ function renderReadPane(msg) {
       <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
       ${msg.intent_source==='pre_filter' ? `<span class="badge-pill bp-other" title="Zero tokens — rule-based">🔕 auto-filtered</span>` : ''}
       ${msg.intent_source==='ai_classify'||msg.intent_source==='ai_draft' ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ AI classified</span>` : ''}
+      ${msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
       ${msg.draft_tokens_used ? `<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>` : ''}
     </div>
   </div>
+
+  ${threadHtml}
 
   <div class="email-read-body">
     <div class="email-body-text">${formatBody(body)}</div>
@@ -1117,15 +1443,14 @@ function renderReadPane(msg) {
     </div>
   </div>`
 
-  // Wire composer buttons
   if (canReply) {
     if (!hasDraft) {
-      const genBtn = pane.querySelector('#generateDraftBtn')
-      if (genBtn) genBtn.addEventListener('click', () => generateDraft(msg._id))
+      pane.querySelector('#generateDraftBtn')?.addEventListener('click', () => generateDraft(msg._id))
+      pane.querySelector('#dismissBtnCta')  ?.addEventListener('click', () => dismissMsg(msg._id))
     } else {
-      pane.querySelector('#sendReplyBtn') ?.addEventListener('click', () => sendReply(msg._id))
-      pane.querySelector('#regenBtn')     ?.addEventListener('click', () => regenerateDraft(msg._id))
-      pane.querySelector('#dismissBtn')   ?.addEventListener('click', () => dismissMsg(msg._id))
+      pane.querySelector('#sendReplyBtn')?.addEventListener('click', () => sendReply(msg._id))
+      pane.querySelector('#regenBtn')    ?.addEventListener('click', () => regenerateDraft(msg._id))
+      pane.querySelector('#dismissBtn')  ?.addEventListener('click', () => dismissMsg(msg._id))
     }
   } else if (isNoise) {
     pane.querySelector('#moveToInboxBtn')?.addEventListener('click', () => moveToInbox(msg._id))
@@ -1135,12 +1460,6 @@ function renderReadPane(msg) {
       if (w) w.style.display = w.style.display === 'none' ? 'block' : 'none'
     })
   }
-
-  // Wire dismiss from CTA (pre-draft state)
-  if (canReply && !hasDraft) {
-    const dismissCta = pane.querySelector('#dismissBtnCta')
-    if (dismissCta) dismissCta.addEventListener('click', () => dismissMsg(msg._id))
-  }
 }
 
 function renderComposer(msg) {
@@ -1149,8 +1468,7 @@ function renderComposer(msg) {
     return `
     <div class="generate-reply-cta">
       <div class="generate-reply-hint">
-        No AI draft yet. Click <strong>Generate Reply</strong> to let the AI write a response
-        using your knowledge base.
+        No AI draft yet. Click <strong>Generate Reply</strong> to let the AI write a response using your knowledge base.
         <br><span class="token-cost-hint">⚡ ~3,000–4,000 tokens per draft</span>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -1162,7 +1480,6 @@ function renderComposer(msg) {
       </div>
     </div>`
   }
-
   return `
   <div class="reply-ai-label">
     ✦ AI Draft
@@ -1196,7 +1513,7 @@ function renderNonActionableFooter(msg, isNoise) {
   }
   return `
   <div class="replied-notice">
-    ${msg.status==='replied' ? '✅ Replied' : '🗑 Dismissed'}
+    ${msg.auto_replied ? '✦ Auto-replied by AI' : (msg.status==='replied' ? '✅ Replied' : '🗑 Dismissed')}
     ${msg.reply_sent ? `<button class="btn btn-secondary btn-sm" id="toggleSentBtn" style="margin-left:8px">View Sent Reply</button>` : ''}
   </div>
   ${msg.reply_sent ? `
@@ -1211,7 +1528,6 @@ function renderNonActionableFooter(msg, isNoise) {
 async function generateDraft(msgId) {
   const btn = document.getElementById('generateDraftBtn')
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating…' }
-
   try {
     const data = await apiFetch(
       `/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`,
@@ -1236,7 +1552,6 @@ async function generateDraft(msgId) {
 async function regenerateDraft(msgId) {
   const btn = document.getElementById('regenBtn')
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Regenerating…' }
-
   try {
     const data = await apiFetch(
       `/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`,
@@ -1261,10 +1576,8 @@ async function sendReply(msgId) {
   const textarea = document.getElementById('replyText')
   const text     = textarea?.value?.trim()
   if (!text) { showToast('Reply cannot be empty', 'error'); return }
-
   const btn = document.getElementById('sendReplyBtn')
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Sending…' }
-
   try {
     await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, {
       method: 'POST',
@@ -1274,16 +1587,13 @@ async function sendReply(msgId) {
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-
-    // Optimistic update — remove from list without full reload
-    STATE.msgs    = STATE.msgs.filter(m => m._id !== msgId)
-    STATE.total   = Math.max(0, STATE.total - 1)
+    STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
+    STATE.total = Math.max(0, STATE.total - 1)
     delete STATE.msgMap[msgId]
     renderMsgList()
-
-    // Refresh counts in background
     loadBucketCounts()
-    loadPage()         // updates the Gmail card inbox_count badge
+    loadPage()
+    loadMetrics()
   } catch (e) {
     showToast('Send failed: ' + e.message, 'error')
     if (btn) {
@@ -1300,8 +1610,6 @@ async function dismissMsg(msgId) {
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-
-    // Optimistic update
     STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
     STATE.total = Math.max(0, STATE.total - 1)
     delete STATE.msgMap[msgId]
@@ -1317,7 +1625,6 @@ async function moveToInbox(msgId) {
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-
     STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
     STATE.total = Math.max(0, STATE.total - 1)
     delete STATE.msgMap[msgId]
@@ -1342,7 +1649,7 @@ async function connectGmail(btn) {
 }
 
 async function disconnectGmail() {
-  if (!confirm('Disconnect Gmail? The agent will stop processing emails from this inbox.')) return
+  if (!confirm('Disconnect Gmail? The agent will stop processing emails.')) return
   try {
     await apiFetch(`/agents/${STATE.agentId}/channels/gmail`, { method: 'DELETE' })
     showToast('Gmail disconnected', 'info')
@@ -1352,26 +1659,23 @@ async function disconnectGmail() {
 
 async function syncGmail(btn) {
   if (btn) { btn.classList?.add('spinning'); btn.disabled = true }
-
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/sync`, { method: 'POST' })
-    showToast(`Synced ${data.synced || 0} new email(s), ${data.filtered || 0} already stored`, 'success')
-
-    // Reset to first page and reload
+    showToast(`Synced ${data.synced || 0} new email(s) — ${data.noise_filtered || 0} auto-filtered as noise`, 'success')
     STATE.page = 1
     await loadInbox()
     await loadBucketCounts()
-
-    // Update Gmail card badge
+    await loadMetrics()
     const ptBadge = document.getElementById('pt-badge-email')
     if (ptBadge) ptBadge.textContent = data.inbox_count || BUCKET_COUNTS.inbox || 0
-
     const inboxBadge = document.querySelector('.inbox-badge')
     if (inboxBadge) {
       const cnt = data.inbox_count || 0
       inboxBadge.className = `inbox-badge ${cnt>0?'has-items':'clear'}`
       inboxBadge.textContent = cnt>0 ? `📬 ${cnt}` : '✓ Clear'
     }
+    const mInbox = document.getElementById('m-inbox')
+    if (mInbox) mInbox.textContent = data.inbox_count || 0
   } catch (e) {
     showToast('Sync failed: ' + e.message, 'error')
   } finally {
@@ -1380,7 +1684,7 @@ async function syncGmail(btn) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// SKELETON + EMPTY STATES
+// SKELETON + EMPTY
 // ══════════════════════════════════════════════════════════════════════════════
 function renderSkeletonList() {
   return Array.from({length:6}).map(() => `
@@ -1399,7 +1703,7 @@ function renderReadEmpty() {
     inbox:     { sub:'AI only activates when you click Generate Reply — no tokens wasted' },
     drafts:    { sub:'Select a message with a ready draft to review and send' },
     sent:      { sub:'Select a sent email to view the reply' },
-    noise:     { sub:'Select a noise message to review or move to inbox' },
+    noise:     { sub:'Select a noise email to review or rescue to inbox' },
     dismissed: { sub:'Select a dismissed email to view its contents' },
   }
   const c = COPY[STATE.bucket] || COPY.inbox
@@ -1412,7 +1716,7 @@ function renderReadEmpty() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// SETUP GUIDE (when Gmail not connected)
+// SETUP GUIDE
 // ══════════════════════════════════════════════════════════════════════════════
 function renderSetupGuide() {
   return `
@@ -1436,6 +1740,13 @@ function renderSetupGuide() {
       <div class="setup-step">
         <div class="step-num">3</div>
         <div class="step-content">
+          <div class="step-title">(Optional) AI Auto-Reply</div>
+          <div class="step-desc">Once connected, enable AI Auto-Reply to have the AI respond to customer enquiries automatically from your knowledge base.</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
           <div class="step-title">(Optional) Real-time push via Pub/Sub</div>
           <div class="step-desc">Set <span class="env-hint">GMAIL_PUBSUB_TOPIC</span> for instant email processing instead of manual sync.</div>
         </div>
@@ -1445,21 +1756,70 @@ function renderSetupGuide() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// COMING SOON PANEL
+// COMING SOON PANEL (enhanced with features + notify)
 // ══════════════════════════════════════════════════════════════════════════════
-function renderComingSoonPanel(name, icon, desc, phase) {
+function renderComingSoonPanel(name, icon, desc, channelKey) {
+  const features = {
+    whatsapp: [
+      { icon:'🤖', text:'AI Auto-Reply with your product knowledge base' },
+      { icon:'🔕', text:'Smart noise filtering — promotions & bots filtered out' },
+      { icon:'📊', text:'Conversation analytics & response time tracking' },
+      { icon:'⚡', text:'Bulk reply to common questions instantly' },
+    ],
+    instagram: [
+      { icon:'📸', text:'DM inbox with AI intent classification' },
+      { icon:'✦',  text:'AI draft replies from your knowledge base' },
+      { icon:'🏷', text:'Auto-tag leads by product interest' },
+      { icon:'📈', text:'Story reply & mention tracking' },
+    ],
+  }
+  const fList = (features[channelKey] || []).map(f => `
+    <div class="cs-feature">
+      <span class="cs-feature-icon">${f.icon}</span>
+      ${esc(f.text)}
+    </div>`).join('')
+
   return `
   <div class="coming-soon-panel">
     <div class="coming-soon-panel-icon">${icon}</div>
     <div class="coming-soon-panel-title">${esc(name)}</div>
     <div class="coming-soon-panel-sub">${esc(desc)}</div>
-    <div class="roadmap-badge">🔜 ${esc(phase)} — Coming Soon</div>
+    <div class="cs-features">${fList}</div>
+    <div class="roadmap-badge">🔜 Phase 2 — Coming Soon</div>
+    <div class="notify-form">
+      <input class="notify-input" type="email" placeholder="your@email.com" id="notify-${channelKey}">
+      <button class="btn btn-primary btn-sm" onclick="notifyMe('${channelKey}')">Notify me</button>
+    </div>
   </div>`
 }
 
+function notifyMe(channel) {
+  const input = document.getElementById(`notify-${channel}`)
+  const email = input?.value?.trim()
+  if (!email || !email.includes('@')) { showToast('Enter a valid email address', 'error'); return }
+  // Optimistic — store locally + show toast
+  const key = `sg_notify_${channel}`
+  localStorage.setItem(key, email)
+  showToast(`You'll be notified at ${email} when ${channel} launches! 🎉`, 'success')
+  if (input) input.value = ''
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
-// EMAIL BODY HELPERS
+// EMAIL BODY HELPERS  — fixed &zwnj; and HTML entity stripping
 // ══════════════════════════════════════════════════════════════════════════════
+const HTML_ENTITIES = {
+  '&nbsp;':' ','&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'",
+  '&zwnj;':'','&zwj;':'','&lrm;':'','&rlm;':'','&ensp;':' ','&emsp;':' ',
+  '&thinsp;':' ','&mdash;':'—','&ndash;':'–','&hellip;':'…','&trade;':'™',
+  '&copy;':'©','&reg;':'®','&bull;':'•',
+}
+function decodeEntities(str) {
+  return str
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&[a-z]+;/gi, m => HTML_ENTITIES[m.toLowerCase()] ?? m)
+}
+
 function cleanBody(raw, maxLen) {
   if (!raw) return ''
   let text = raw
@@ -1470,11 +1830,10 @@ function cleanBody(raw, maxLen) {
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<')
-    .replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'")
     .replace(/https?:\/\/[^\s\])"]+/g, '')
-    .replace(/\\n/g,'\n').replace(/\\r/g,'').replace(/\\t/g,' ')
-    .replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()
+    .replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\t/g, ' ')
+  text = decodeEntities(text)
+  text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim()
   if (maxLen && text.length > maxLen) return text.slice(0, maxLen).trimEnd() + '…'
   return text
 }
@@ -1488,12 +1847,11 @@ function cleanBodyFull(raw) {
   text = text
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n\n')
-    .replace(/<\/div>/gi,'\n').replace(/<\/li>/gi,'\n').replace(/<[^>]+>/g,'')
-    .replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<')
-    .replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&#\d+;/g,'')
-    .replace(/\\n/g,'\n').replace(/\\r/g,'').replace(/\\t/g,' ')
-    .replace(/[ \t]+/g,' ').replace(/\n{4,}/g,'\n\n\n').trim()
+    .replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/div>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<[^>]+>/g, '')
+    .replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\t/g, ' ')
+  text = decodeEntities(text)
+  text = text.replace(/[ \t]+/g, ' ').replace(/\n{4,}/g, '\n\n\n').trim()
   return text
 }
 
