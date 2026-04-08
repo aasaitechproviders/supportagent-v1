@@ -27,14 +27,10 @@
                   cursor:pointer;outline:none;transition:var(--t);appearance:none;-webkit-appearance:none;
                   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");
                   background-repeat:no-repeat;background-position:right 10px center}
-
-    /* ════════════════════════════════════════════════════════════════
-       PAGE BODY
-    ════════════════════════════════════════════════════════════════ */
     .page-body{padding:20px 24px 40px;flex:1;max-width:1500px;width:100%;box-sizing:border-box}
 
     /* ════════════════════════════════════════════════════════════════
-       SALES METRICS BAR  ← NEW
+       SALES METRICS BAR
     ════════════════════════════════════════════════════════════════ */
     .sales-metrics-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
     .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
@@ -54,16 +50,11 @@
                   padding:2px 6px;border-radius:6px;margin-top:5px}
     .metric-trend.up{background:var(--green-dim);color:var(--green)}
     .metric-trend.dn{background:var(--red-dim);color:var(--red)}
-    .metric-trend.neu{background:var(--surface-3);color:var(--text-3)}
-
-    /* ════════════════════════════════════════════════════════════════
-       SECTION LABEL
-    ════════════════════════════════════════════════════════════════ */
     .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;
                    letter-spacing:.08em;margin-bottom:14px;margin-top:4px}
 
     /* ════════════════════════════════════════════════════════════════
-       CHANNEL CONNECTION CARDS
+       CHANNEL CARDS
     ════════════════════════════════════════════════════════════════ */
     .channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
     .channel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);
@@ -85,13 +76,10 @@
     .badge-soon{background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe}
     .badge-soon::before{background:#7c3aed}
     @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
-
-    /* ── AI Auto-Reply Toggle ── NEW */
     .auto-reply-row{display:flex;align-items:center;justify-content:space-between;
                     padding:9px 12px;background:var(--surface-2);border-radius:8px;
                     border:1px solid var(--border);margin-bottom:10px;gap:8px}
     .auto-reply-label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-2)}
-    .auto-reply-label span{font-size:13px}
     .toggle-wrap{display:flex;align-items:center;gap:6px}
     .toggle-switch{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
     .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
@@ -103,16 +91,13 @@
     .toggle-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap}
     .toggle-badge.on{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .toggle-badge.off{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
-
     .channel-email-info{display:flex;align-items:center;gap:7px;margin-bottom:10px}
     .channel-email-text{font-size:12px;font-weight:600;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
     .inbox-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
                  padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;cursor:pointer}
     .inbox-badge.has-items{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
     .inbox-badge.clear{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
-
     .channel-actions{display:flex;gap:6px;flex-wrap:wrap}
-
     .coming-soon-overlay{position:absolute;inset:0;background:rgba(var(--surface-rgb,255,255,255),.88);
                          backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;
                          border-radius:var(--r-lg);z-index:5}
@@ -122,10 +107,10 @@
     [data-theme="dark"] .coming-soon-overlay{background:rgba(12,14,22,.88)}
 
     /* ════════════════════════════════════════════════════════════════
-       PLATFORM TABS BAR
+       PLATFORM TABS
     ════════════════════════════════════════════════════════════════ */
     .platform-tabs-bar{display:flex;align-items:center;gap:0;border-bottom:2px solid var(--border);
-                       margin-bottom:20px;background:transparent}
+                       margin-bottom:20px}
     .platform-tab{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;
                   font-size:13.5px;font-weight:600;cursor:pointer;border:none;background:transparent;
                   color:var(--text-3);font-family:var(--font);border-bottom:2.5px solid transparent;
@@ -139,13 +124,8 @@
     .platform-tab.disabled{opacity:.45;cursor:not-allowed}
     .pt-soon-tag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;
                  background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;line-height:1.5}
-    /* AI auto tag on tab */
     .pt-ai-tag{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;
                background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);line-height:1.5}
-
-    /* ════════════════════════════════════════════════════════════════
-       PLATFORM PANEL
-    ════════════════════════════════════════════════════════════════ */
     .platform-panel{display:none}
     .platform-panel.active{display:block}
 
@@ -165,12 +145,7 @@
                            background:rgba(255,255,255,.25);color:inherit;line-height:1.5}
     .subnav-tab:not(.active) .snt-count{background:var(--surface-3);color:var(--text-3)}
     .subnav-tab.noise-tab:not(.active) .snt-count{background:var(--amber-dim);color:var(--amber)}
-
     .subnav-right{display:flex;align-items:center;gap:8px}
-
-    /* ════════════════════════════════════════════════════════════════
-       SEARCH BAR  ← NEW
-    ════════════════════════════════════════════════════════════════ */
     .search-wrap{position:relative;flex:1;max-width:240px}
     .search-input{width:100%;height:34px;padding:0 12px 0 34px;border:1px solid var(--border-md);
                   border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);
@@ -180,7 +155,7 @@
                  font-size:13px;color:var(--text-3);pointer-events:none}
 
     /* ════════════════════════════════════════════════════════════════
-       INTENT FILTER PILLS
+       INTENT FILTER
     ════════════════════════════════════════════════════════════════ */
     .intent-filter-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;
                        border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--surface-2);flex-shrink:0}
@@ -191,8 +166,7 @@
                  border:1px solid var(--border);background:var(--surface);color:var(--text-3)}
     .intent-pill:hover{border-color:var(--border-md);color:var(--text-2)}
     .intent-pill.active{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
-    .intent-pill .pill-count{font-size:10px;font-weight:700;padding:0 5px;border-radius:8px;
-                              background:var(--surface-3);color:var(--text-3)}
+    .intent-pill .pill-count{font-size:10px;font-weight:700;padding:0 5px;border-radius:8px;background:var(--surface-3);color:var(--text-3)}
     .intent-pill.active .pill-count{background:var(--accent);color:#fff}
     .intent-pill[data-intent="order"].active{border-color:#0ea5e9;background:#e0f2fe;color:#0369a1}
     .intent-pill[data-intent="complaint"].active{border-color:var(--red-border);background:var(--red-dim);color:var(--red)}
@@ -204,8 +178,6 @@
     ════════════════════════════════════════════════════════════════ */
     .inbox-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
                 overflow:hidden;display:flex;flex-direction:column;min-height:600px}
-
-    /* ── Toolbar ── */
     .inbox-toolbar{display:flex;align-items:center;justify-content:space-between;
                    padding:0 16px;height:50px;border-bottom:1px solid var(--border);
                    background:var(--surface);gap:10px;flex-shrink:0}
@@ -224,22 +196,20 @@
                 padding:3px 9px;border-radius:8px;background:var(--surface-3);color:var(--text-3);
                 border:1px solid var(--border);white-space:nowrap}
     .token-chip.loaded{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
-
-    /* ── Bulk actions bar ── NEW */
     .bulk-bar{display:none;align-items:center;gap:8px;padding:8px 14px;
               background:var(--accent-dim);border-bottom:1px solid var(--accent);flex-shrink:0}
     .bulk-bar.visible{display:flex}
     .bulk-count{font-size:12.5px;font-weight:700;color:var(--accent)}
     .bulk-sep{width:1px;height:20px;background:var(--border-md)}
 
-    /* ── Split pane ── */
+    /* ════════════════════════════════════════════════════════════════
+       SPLIT PANE
+    ════════════════════════════════════════════════════════════════ */
     .inbox-split{display:flex;flex:1;min-height:520px;overflow:hidden}
     .msg-list-pane{width:350px;flex-shrink:0;border-right:1px solid var(--border);
                    overflow-y:auto;display:flex;flex-direction:column}
     .msg-list-pane::-webkit-scrollbar{width:4px}
     .msg-list-pane::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
-
-    /* ── Pagination ── */
     .pagination-bar{display:flex;align-items:center;justify-content:space-between;
                     padding:8px 12px;border-top:1px solid var(--border);
                     background:var(--surface-2);flex-shrink:0;gap:8px}
@@ -252,7 +222,9 @@
     .pg-btn:disabled{opacity:.4;cursor:not-allowed}
     .pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-    /* ── Message rows ── */
+    /* ════════════════════════════════════════════════════════════════
+       MESSAGE ROWS
+    ════════════════════════════════════════════════════════════════ */
     .msg-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
              border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;position:relative}
     .msg-row:last-child{border-bottom:none}
@@ -260,8 +232,6 @@
     .msg-row.selected{background:var(--accent-dim);border-left:3px solid var(--accent)}
     .msg-row.selected .msg-from-name{color:var(--accent)}
     .msg-row.noise-row{opacity:.65}
-    .msg-row.unread-row .msg-from-name{font-weight:700}
-    .msg-row.unread-row .msg-subj{font-weight:600;color:var(--text)}
     .msg-checkbox{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-md);
                   background:var(--surface);cursor:pointer;flex-shrink:0;margin-top:9px;
                   appearance:none;transition:var(--t)}
@@ -289,22 +259,20 @@
     .bp-promotional{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .bp-transactional{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .bp-other{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .bp-auto-replied{background:linear-gradient(135deg,var(--green-dim),#d1fae5);color:var(--green);border:1px solid var(--green-border)}
     [data-theme="dark"] .bp-order{background:#0c2d3f;color:#38bdf8;border-color:#0c4a6e}
 
-    /* auto-replied badge */
-    .bp-auto-replied{background:linear-gradient(135deg,var(--green-dim),#d1fae5);
-                     color:var(--green);border:1px solid var(--green-border)}
-
-    /* ── Reading pane ── */
+    /* ════════════════════════════════════════════════════════════════
+       READING PANE
+    ════════════════════════════════════════════════════════════════ */
     .email-read-pane{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
     .read-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
                 color:var(--text-3);gap:10px;padding:40px}
     .read-empty-icon{font-size:44px;opacity:.4}
     .read-empty-title{font-size:14px;font-weight:600;color:var(--text-2)}
     .read-empty-sub{font-size:12.5px;text-align:center;line-height:1.6;max-width:280px}
-
-    .email-read-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
-    .email-read-subject{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.4}
+    .email-read-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .email-read-subject{font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4}
     .email-read-meta{display:flex;align-items:flex-start;gap:12px}
     .email-read-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
                        justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
@@ -312,30 +280,57 @@
     .email-read-from-name{font-size:13.5px;font-weight:700;color:var(--text)}
     .email-read-from-email{font-size:12px;color:var(--text-3)}
     .email-read-timestamp{font-size:11.5px;color:var(--text-3);white-space:nowrap;padding-top:3px;flex-shrink:0}
-    .email-status-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .email-status-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
 
-    /* ── Thread history ── NEW */
-    .thread-history{padding:12px 22px;border-bottom:1px solid var(--border);
-                    background:var(--surface-2);flex-shrink:0;max-height:180px;overflow-y:auto}
-    .thread-history::-webkit-scrollbar{width:4px}
-    .thread-history::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
-    .thread-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed var(--border)}
-    .thread-item:last-child{border-bottom:none}
-    .thread-dir{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
-    .thread-dir.sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
-    .thread-dir.recv{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
-    .thread-text{font-size:12px;color:var(--text-2);line-height:1.5;flex:1;
-                 overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-    .thread-time{font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+    /* ════════════════════════════════════════════════════════════════
+       v4.0 CONVERSATION THREAD PANEL
+       Full chronological conversation view with expandable messages
+    ════════════════════════════════════════════════════════════════ */
+    .conversation-panel{flex:1;overflow-y:auto;padding:0;display:flex;flex-direction:column;background:var(--surface-2)}
+    .conversation-panel::-webkit-scrollbar{width:4px}
+    .conversation-panel::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
 
-    .email-read-body{flex:1;overflow-y:auto;padding:18px 22px;font-size:13.5px;line-height:1.8;color:var(--text-2)}
-    .email-read-body::-webkit-scrollbar{width:4px}
-    .email-read-body::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:4px}
-    .email-body-text{white-space:pre-wrap;word-break:break-word;font-family:var(--font);
-                     font-size:13.5px;line-height:1.9;color:var(--text-2);max-width:680px}
-    .email-body-separator{border:none;border-top:1px dashed var(--border);margin:16px 0}
+    /* Loading skeleton for thread */
+    .thread-loading{display:flex;flex-direction:column;gap:12px;padding:16px 20px}
+    .thread-loading-item{display:flex;gap:10px;align-items:flex-start}
 
-    /* ── Composer ── */
+    /* Individual message bubble in thread */
+    .conv-message{display:flex;flex-direction:column;padding:12px 20px;border-bottom:1px solid var(--border);
+                  position:relative;transition:background .15s}
+    .conv-message:last-child{border-bottom:none}
+    .conv-message.direction-recv{background:var(--surface)}
+    .conv-message.direction-sent{background:linear-gradient(135deg,var(--green-dim),transparent 60%)}
+    .conv-message.direction-sent .conv-bubble{background:var(--surface)}
+    .conv-message-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .conv-dir-chip{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+                   padding:2px 8px;border-radius:10px;flex-shrink:0}
+    .conv-dir-chip.sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .conv-dir-chip.recv{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    .conv-from{font-size:12px;font-weight:600;color:var(--text-2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .conv-time{font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+    .conv-body{font-size:13px;line-height:1.75;color:var(--text-2);white-space:pre-wrap;word-break:break-word;
+               font-family:var(--font);max-width:680px}
+    .conv-body.collapsed{max-height:80px;overflow:hidden;position:relative}
+    .conv-body.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:30px;
+                                 background:linear-gradient(transparent,var(--surface))}
+    .conv-expand-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+                     color:var(--accent);cursor:pointer;margin-top:6px;border:none;background:none;
+                     font-family:var(--font);padding:0;transition:opacity .15s}
+    .conv-expand-btn:hover{opacity:.7}
+    .conv-ai-label{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;
+                   padding:1px 7px;border-radius:6px;background:linear-gradient(135deg,var(--accent-dim),#f3e8ff);
+                   color:var(--accent);border:1px solid var(--accent-glow);margin-left:4px}
+
+    /* Thread load state */
+    .thread-fetch-bar{display:flex;align-items:center;justify-content:center;gap:8px;
+                      padding:10px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+    .thread-fetch-spinner{width:14px;height:14px;border:2px solid var(--border-md);
+                          border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    .thread-fetch-label{font-size:12px;color:var(--text-3)}
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPOSER (reply + cc/bcc)
+    ════════════════════════════════════════════════════════════════ */
     .email-reply-composer{border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
     .reply-composer-inner{padding:14px 20px}
     .reply-ai-label{font-size:10.5px;font-weight:700;color:var(--accent);text-transform:uppercase;
@@ -345,7 +340,19 @@
     .generate-reply-hint{font-size:12px;color:var(--text-3);line-height:1.6}
     .token-cost-hint{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
                      padding:2px 8px;border-radius:8px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
-    .reply-textarea{width:100%;min-height:110px;max-height:260px;padding:12px 14px;
+
+    /* CC/BCC row */
+    .ccbcc-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+    .ccbcc-field{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+    .ccbcc-label{font-size:11px;font-weight:700;color:var(--text-3);white-space:nowrap;min-width:24px}
+    .ccbcc-input{flex:1;height:28px;padding:0 8px;border:1px solid var(--border);border-radius:6px;
+                 background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:var(--t)}
+    .ccbcc-input:focus{border-color:var(--accent);background:var(--surface)}
+    .toggle-cc-btn{font-size:11px;font-weight:600;color:var(--text-3);cursor:pointer;
+                   border:none;background:none;font-family:var(--font);padding:0;text-decoration:underline}
+    .toggle-cc-btn:hover{color:var(--accent)}
+
+    .reply-textarea{width:100%;min-height:110px;max-height:220px;padding:12px 14px;
                     border:1px solid var(--border-md);border-radius:10px;background:var(--surface-2);color:var(--text);
                     font-family:var(--font);font-size:13px;line-height:1.75;resize:vertical;
                     outline:none;transition:border .2s,box-shadow .2s;box-sizing:border-box}
@@ -354,21 +361,51 @@
                             margin-top:10px;flex-wrap:wrap;gap:8px}
     .reply-action-left{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
     .replied-notice{font-size:12px;color:var(--text-3);font-style:italic;display:flex;align-items:center;gap:6px}
-
-    /* Auto-reply status banner */
     .auto-reply-banner{display:flex;align-items:center;gap:8px;padding:8px 14px;
                        background:linear-gradient(135deg,var(--green-dim),#d1fae522);
                        border:1px solid var(--green-border);border-radius:8px;
                        font-size:12px;font-weight:600;color:var(--green);margin-bottom:8px}
-
-    /* ── Token usage bar ── */
     .token-usage-bar{display:flex;align-items:center;gap:14px;padding:10px 16px;
                      border-top:1px solid var(--border);background:var(--surface-2);flex-shrink:0;flex-wrap:wrap}
-    .token-usage-bar-label{font-size:10.5px;font-weight:700;color:var(--text-3);
-                           text-transform:uppercase;letter-spacing:.06em}
+    .token-usage-bar-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
     .token-stat{display:flex;flex-direction:column;gap:1px}
     .token-stat-val{font-size:12px;font-weight:700;color:var(--text)}
     .token-stat-lbl{font-size:10px;color:var(--text-3)}
+
+    /* ════════════════════════════════════════════════════════════════
+       v4.0 COMPOSE MODAL — Send a new email from the portal
+    ════════════════════════════════════════════════════════════════ */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+                    display:flex;align-items:center;justify-content:center;padding:20px;
+                    animation:fade-in .18s ease}
+    @keyframes fade-in{from{opacity:0}to{opacity:1}}
+    .modal-box{background:var(--surface);border:1px solid var(--border-md);border-radius:var(--r-lg);
+               width:100%;max-width:600px;box-shadow:var(--sh-lg);animation:slide-up-modal .2s ease;
+               display:flex;flex-direction:column;max-height:90vh;overflow:hidden}
+    @keyframes slide-up-modal{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;
+                  padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .modal-title{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+    .modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--surface-3);
+                 color:var(--text-2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
+                 transition:var(--t)}
+    .modal-close:hover{background:var(--red-dim);color:var(--red)}
+    .modal-body{padding:20px;overflow-y:auto;flex:1}
+    .modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;
+                  gap:8px;flex-shrink:0}
+    .compose-field{margin-bottom:12px}
+    .compose-label{font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+    .compose-input{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:8px;
+                   background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;
+                   outline:none;transition:var(--t);box-sizing:border-box}
+    .compose-input:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-dim)}
+    .compose-textarea{width:100%;min-height:160px;max-height:320px;padding:12px;border:1px solid var(--border-md);
+                      border-radius:8px;background:var(--surface-2);color:var(--text);font-family:var(--font);
+                      font-size:13px;line-height:1.75;resize:vertical;outline:none;transition:var(--t);box-sizing:border-box}
+    .compose-textarea:focus{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-dim)}
+    .compose-optional{font-size:10px;color:var(--text-3);font-weight:400;margin-left:3px}
+    .compose-from-label{font-size:12px;color:var(--text-3);padding:6px 10px;background:var(--surface-2);
+                        border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:6px}
 
     /* ════════════════════════════════════════════════════════════════
        BUTTONS
@@ -389,10 +426,8 @@
     /* ════════════════════════════════════════════════════════════════
        SETUP GUIDE
     ════════════════════════════════════════════════════════════════ */
-    .setup-guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
-                 padding:18px 20px;margin-bottom:24px}
-    .setup-guide-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;
-                       display:flex;align-items:center;gap:8px}
+    .setup-guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:24px}
+    .setup-guide-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .setup-steps{display:flex;flex-direction:column;gap:10px}
     .setup-step{display:flex;gap:12px;align-items:flex-start}
     .step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;
@@ -405,17 +440,13 @@
               background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md);font-family:var(--mono)}
 
     /* ════════════════════════════════════════════════════════════════
-       EMPTY STATES
+       EMPTY + SKELETONS
     ════════════════════════════════════════════════════════════════ */
     .msg-list-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
                     padding:40px 20px;text-align:center;color:var(--text-3)}
     .msg-list-empty-icon{font-size:32px;margin-bottom:8px}
     .msg-list-empty-title{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:4px}
     .msg-list-empty-sub{font-size:12px}
-
-    /* ════════════════════════════════════════════════════════════════
-       SKELETONS
-    ════════════════════════════════════════════════════════════════ */
     .skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--border-md) 50%,var(--border) 75%);
               background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -442,16 +473,11 @@
     .coming-soon-panel-title{font-size:18px;font-weight:700;color:var(--text)}
     .coming-soon-panel-sub{font-size:13.5px;color:var(--text-3);max-width:380px;line-height:1.7}
     .roadmap-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
-                   padding:5px 14px;border-radius:20px;background:#f3e8ff;color:#7c3aed;
-                   border:1px solid #ddd6fe;margin-top:4px}
-
-    /* ── coming soon feature bullets ── */
+                   padding:5px 14px;border-radius:20px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;margin-top:4px}
     .cs-features{display:flex;flex-direction:column;gap:8px;text-align:left;margin-top:8px;width:100%;max-width:340px}
     .cs-feature{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-2);
                 padding:8px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border)}
     .cs-feature-icon{font-size:16px;flex-shrink:0}
-
-    /* ── notify me form ── */
     .notify-form{display:flex;gap:8px;margin-top:4px;width:100%;max-width:320px}
     .notify-input{flex:1;height:36px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);
                   background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none}
@@ -461,7 +487,6 @@
        RESPONSIVE
     ════════════════════════════════════════════════════════════════ */
     @media(max-width:1300px){.sales-metrics-bar{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:1100px){.channels-grid{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:900px){.channels-grid{grid-template-columns:1fr};.sales-metrics-bar{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:768px){
       .main-wrap{margin-left:0}.mob-menu-btn{display:flex}.page-body{padding:14px 14px 32px}
@@ -469,11 +494,6 @@
       .msg-list-pane{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:300px}
       .channels-grid{grid-template-columns:1fr}
       .sales-metrics-bar{grid-template-columns:repeat(2,1fr)}
-    }
-    @media(max-width:600px){
-      .platform-tab .pt-label{display:none}
-      .subnav-tab .snt-label{display:none}
-      .sales-metrics-bar{grid-template-columns:1fr 1fr}
     }
   </style>
   <script>
@@ -491,8 +511,53 @@
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <nav class="sidebar" id="sidebar"></nav>
 
+<!-- Compose Modal (v4.0) -->
+<div class="modal-backdrop" id="composeModal" style="display:none" onclick="if(event.target===this)closeCompose()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">✉️ New Email</div>
+      <button class="modal-close" onclick="closeCompose()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="compose-field">
+        <div class="compose-label">From</div>
+        <div class="compose-from-label" id="composeFrom">📧 —</div>
+      </div>
+      <div class="compose-field">
+        <div class="compose-label">To <span style="color:var(--red)">*</span></div>
+        <input class="compose-input" id="composeTo" type="email" placeholder="customer@example.com">
+      </div>
+      <div class="compose-field" id="composeCcField" style="display:none">
+        <div class="compose-label">CC <span class="compose-optional">(optional)</span></div>
+        <input class="compose-input" id="composeCc" type="text" placeholder="cc@example.com, another@example.com">
+      </div>
+      <div class="compose-field" id="composeBccField" style="display:none">
+        <div class="compose-label">BCC <span class="compose-optional">(optional)</span></div>
+        <input class="compose-input" id="composeBcc" type="text" placeholder="bcc@example.com">
+      </div>
+      <div style="margin-bottom:10px">
+        <button class="toggle-cc-btn" onclick="toggleCcBcc()">+ Add CC / BCC</button>
+      </div>
+      <div class="compose-field">
+        <div class="compose-label">Subject <span style="color:var(--red)">*</span></div>
+        <input class="compose-input" id="composeSubject" type="text" placeholder="How can we help you?">
+      </div>
+      <div class="compose-field">
+        <div class="compose-label">Message <span style="color:var(--red)">*</span></div>
+        <textarea class="compose-textarea" id="composeBody" placeholder="Type your message here…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeCompose()">Cancel</button>
+      <button class="btn btn-primary" id="composeSendBtn" onclick="sendCompose()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Email
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="main-wrap">
-  <!-- ── Topbar ── -->
   <div class="topbar">
     <div class="topbar-left">
       <button class="mob-menu-btn" id="mob-menu-btn">☰</button>
@@ -505,8 +570,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ── Page Body ── -->
   <div class="page-body" id="pageBody"></div>
 </div>
 
@@ -518,22 +581,24 @@
 // STATE
 // ══════════════════════════════════════════════════════════════════════════════
 const STATE = {
-  agents:          [],
-  agentId:         null,
-  channels:        {},
-  platform:        'email',
-  bucket:          'inbox',
-  intent:          'all',
-  page:            1,
-  total:           0,
-  msgs:            [],
-  msgMap:          {},
-  selectedId:      null,
-  tokenUsage:      {},
-  loadingInbox:    false,
-  searchQuery:     '',
-  selectedMsgIds:  new Set(),
-  autoReplySettings: {}, // { gmail: true/false, whatsapp: false, instagram: false }
+  agents:            [],
+  agentId:           null,
+  channels:          {},
+  platform:          'email',
+  bucket:            'inbox',
+  intent:            'all',
+  page:              1,
+  total:             0,
+  msgs:              [],
+  msgMap:            {},
+  selectedId:        null,
+  tokenUsage:        {},
+  loadingInbox:      false,
+  searchQuery:       '',
+  selectedMsgIds:    new Set(),
+  autoReplySettings: {},
+  channelEmail:      null,   // the connected Gmail address
+  threadCache:       {},     // msgId → thread messages (v4.0)
 }
 
 const PAGE_SIZE = 20
@@ -550,7 +615,6 @@ const INTENT_CFG = {
 }
 
 const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
-const METRICS = { avgResponseHrs: null, replyRate: null, autoReplied: 0 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // INIT
@@ -575,7 +639,7 @@ const METRICS = { avgResponseHrs: null, replyRate: null, autoReplied: 0 }
 
   const params = new URLSearchParams(location.search)
   if (params.get('connected') === 'gmail') {
-    showToast('Gmail connected! 🎉', 'success')
+    showToast('Gmail connected! 🎉 Only emails received from now on will be processed.', 'success')
     history.replaceState({}, '', location.pathname)
   }
   if (params.get('error')) {
@@ -605,6 +669,7 @@ function buildAgentSelect(agents) {
     STATE.agentId = e.target.value
     STATE.selectedId = null
     STATE.page = 1
+    STATE.threadCache = {}
     await loadPage()
   })
 }
@@ -614,13 +679,15 @@ function buildAgentSelect(agents) {
 // ══════════════════════════════════════════════════════════════════════════════
 async function loadPage() {
   try {
-    // Fetch channels + auto-reply settings in parallel
     const [data, arData] = await Promise.allSettled([
       apiFetch(`/agents/${STATE.agentId}/channels`),
       apiFetch(`/agents/${STATE.agentId}/channels/auto-reply-settings`).catch(() => ({ settings: {} })),
     ])
     STATE.channels = {}
-    ;((data.value || {}).channels || []).forEach(ch => { STATE.channels[ch.type] = ch })
+    ;((data.value || {}).channels || []).forEach(ch => {
+      STATE.channels[ch.type] = ch
+      if (ch.type === 'gmail' && ch.email) STATE.channelEmail = ch.email
+    })
     STATE.autoReplySettings = (arData.value || {}).settings || {}
     renderPage()
   } catch (e) {
@@ -639,8 +706,6 @@ function renderPage() {
   const arGmail   = !!STATE.autoReplySettings.gmail
 
   document.getElementById('pageBody').innerHTML = `
-
-    <!-- ── Sales Metrics Bar ── -->
     <div class="sales-metrics-bar" id="salesMetricsBar">
       <div class="metric-card mc-inbox">
         <div class="metric-label">📬 Open Inbox</div>
@@ -669,13 +734,9 @@ function renderPage() {
       </div>
     </div>
 
-    <!-- ── Connection Cards ── -->
     <div class="section-label">Connected Channels</div>
     <div class="channels-grid">
-
-      <!-- Gmail Card -->
-      <div class="channel-card ${STATE.platform==='email'&&connected?'active-platform':''}"
-           onclick="switchPlatform('email')">
+      <div class="channel-card ${STATE.platform==='email'&&connected?'active-platform':''}" onclick="switchPlatform('email')">
         <div class="channel-card-top">
           <div class="channel-card-left">
             <div class="channel-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div>
@@ -689,13 +750,12 @@ function renderPage() {
           </div>
         </div>
         ${connected ? `
-        <!-- AI Auto-Reply Toggle -->
         <div class="auto-reply-row" onclick="event.stopPropagation()">
           <div class="auto-reply-label">
             <span>✦</span> AI Auto-Reply
             <span class="toggle-badge ${arGmail?'on':'off'}" id="ar-badge-gmail">${arGmail?'ON':'OFF'}</span>
           </div>
-          <label class="toggle-switch" title="${arGmail?'Auto-reply is ON — AI sends replies automatically':'Auto-reply is OFF — AI drafts for review'}">
+          <label class="toggle-switch">
             <input type="checkbox" ${arGmail?'checked':''} onchange="toggleAutoReply('gmail', this.checked)">
             <span class="toggle-slider"></span>
           </label>
@@ -712,6 +772,7 @@ function renderPage() {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             Sync (200)
           </button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openCompose()">✉️ New Email</button>
           <button class="btn btn-danger btn-sm" onclick="disconnectGmail()">✕ Disconnect</button>
         </div>
         ` : `
@@ -723,7 +784,6 @@ function renderPage() {
         </div>`}
       </div>
 
-      <!-- WhatsApp Card -->
       <div class="channel-card" onclick="switchPlatform('whatsapp')">
         <div class="channel-card-top">
           <div class="channel-card-left">
@@ -735,12 +795,9 @@ function renderPage() {
           </div>
           <div class="channel-status-badge badge-soon">🔜 Phase 2</div>
         </div>
-        <div class="coming-soon-overlay">
-          <div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div>
-        </div>
+        <div class="coming-soon-overlay"><div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div></div>
       </div>
 
-      <!-- Instagram Card -->
       <div class="channel-card" onclick="switchPlatform('instagram')">
         <div class="channel-card-top">
           <div class="channel-card-left">
@@ -752,13 +809,10 @@ function renderPage() {
           </div>
           <div class="channel-status-badge badge-soon">🔜 Phase 2</div>
         </div>
-        <div class="coming-soon-overlay">
-          <div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div>
-        </div>
+        <div class="coming-soon-overlay"><div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div></div>
       </div>
     </div>
 
-    <!-- ── Platform Tabs ── -->
     <div class="platform-tabs-bar" id="platformTabsBar">
       <button class="platform-tab ${STATE.platform==='email'?'active':''}" data-platform="email">
         <span class="pt-icon">📧</span>
@@ -767,34 +821,21 @@ function renderPage() {
         ${arGmail?`<span class="pt-ai-tag" id="pt-ai-gmail">AI Auto</span>`:''}
       </button>
       <button class="platform-tab disabled" data-platform="whatsapp" title="Coming in Phase 2">
-        <span class="pt-icon">💬</span>
-        <span class="pt-label">WhatsApp</span>
-        <span class="pt-soon-tag">Soon</span>
+        <span class="pt-icon">💬</span><span class="pt-label">WhatsApp</span><span class="pt-soon-tag">Soon</span>
       </button>
       <button class="platform-tab disabled" data-platform="instagram" title="Coming in Phase 2">
-        <span class="pt-icon">📸</span>
-        <span class="pt-label">Instagram</span>
-        <span class="pt-soon-tag">Soon</span>
+        <span class="pt-icon">📸</span><span class="pt-label">Instagram</span><span class="pt-soon-tag">Soon</span>
       </button>
     </div>
 
-    <!-- ── Email Panel ── -->
     <div class="platform-panel ${STATE.platform==='email'?'active':''}" id="panel-email">
       ${connected ? renderEmailPanel(gmail) : renderSetupGuide()}
     </div>
-
-    <!-- ── WhatsApp Panel ── -->
     <div class="platform-panel ${STATE.platform==='whatsapp'?'active':''}" id="panel-whatsapp">
-      ${renderComingSoonPanel('WhatsApp Business','💬',
-        'Connect with customers directly via WhatsApp. Smart noise filtering, AI auto-replies, and full conversation history — all in one place.',
-        'whatsapp')}
+      ${renderComingSoonPanel('WhatsApp Business','💬','Connect with customers directly via WhatsApp.','whatsapp')}
     </div>
-
-    <!-- ── Instagram Panel ── -->
     <div class="platform-panel ${STATE.platform==='instagram'?'active':''}" id="panel-instagram">
-      ${renderComingSoonPanel('Instagram DMs','📸',
-        'Handle Instagram DMs with the same AI-powered inbox. Auto-classify customer intent, generate replies, and never miss a lead.',
-        'instagram')}
+      ${renderComingSoonPanel('Instagram DMs','📸','Handle Instagram DMs with AI-powered inbox.','instagram')}
     </div>
   `
 
@@ -813,23 +854,19 @@ function renderPage() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// SALES METRICS
+// METRICS
 // ══════════════════════════════════════════════════════════════════════════════
 async function loadMetrics() {
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/metrics`).catch(() => null)
     if (!data) return
-
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v }
     set('m-noise',   data.noise_count   ?? '—')
     set('m-replied', data.replied_count ?? '—')
     if (data.avg_response_hrs != null)
-      set('m-time', data.avg_response_hrs < 1
-        ? Math.round(data.avg_response_hrs * 60) + 'm'
-        : data.avg_response_hrs.toFixed(1) + 'h')
+      set('m-time', data.avg_response_hrs < 1 ? Math.round(data.avg_response_hrs*60)+'m' : data.avg_response_hrs.toFixed(1)+'h')
     if (data.reply_rate != null)
-      set('m-rate', Math.round(data.reply_rate * 100) + '%')
-
+      set('m-rate', Math.round(data.reply_rate*100)+'%')
     const autoSubEl = document.getElementById('m-auto-sub')
     if (autoSubEl && data.auto_replied_count)
       autoSubEl.textContent = `${data.auto_replied_count} AI auto-replied`
@@ -847,35 +884,20 @@ async function toggleAutoReply(channelType, enabled) {
     })
     STATE.autoReplySettings[channelType] = enabled
     const badge = document.getElementById(`ar-badge-${channelType}`)
-    if (badge) {
-      badge.textContent = enabled ? 'ON' : 'OFF'
-      badge.className = `toggle-badge ${enabled ? 'on' : 'off'}`
-    }
-    const ptAi = document.getElementById(`pt-ai-${channelType}`)
+    if (badge) { badge.textContent = enabled?'ON':'OFF'; badge.className=`toggle-badge ${enabled?'on':'off'}` }
     if (channelType === 'gmail') {
       const tab = document.querySelector('.platform-tab[data-platform="email"]')
       if (tab) {
         const existing = tab.querySelector('.pt-ai-tag')
         if (enabled && !existing) {
           const tag = document.createElement('span')
-          tag.id = 'pt-ai-gmail'
-          tag.className = 'pt-ai-tag'
-          tag.textContent = 'AI Auto'
+          tag.id = 'pt-ai-gmail'; tag.className = 'pt-ai-tag'; tag.textContent = 'AI Auto'
           tab.appendChild(tag)
-        } else if (!enabled && existing) {
-          existing.remove()
-        }
+        } else if (!enabled && existing) { existing.remove() }
       }
     }
-    showToast(
-      enabled
-        ? `✦ AI Auto-Reply ON for ${channelType} — AI will send replies automatically`
-        : `⏸ AI Auto-Reply OFF — AI will draft for your review`,
-      enabled ? 'success' : 'info'
-    )
-  } catch (e) {
-    showToast('Failed to update setting: ' + e.message, 'error')
-  }
+    showToast(enabled ? `✦ AI Auto-Reply ON — AI will send replies automatically` : `⏸ AI Auto-Reply OFF — AI will draft for your review`, enabled?'success':'info')
+  } catch (e) { showToast('Failed to update: ' + e.message, 'error') }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -883,17 +905,8 @@ async function toggleAutoReply(channelType, enabled) {
 // ══════════════════════════════════════════════════════════════════════════════
 function switchPlatform(platform) {
   STATE.platform = platform
-  document.querySelectorAll('.platform-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.platform === platform)
-  })
-  document.querySelectorAll('.channel-card').forEach((c, i) => {
-    const platforms = ['email','whatsapp','instagram']
-    c.classList.toggle('active-platform',
-      platforms[i] === platform && STATE.channels.gmail?.status === 'active' && platform === 'email')
-  })
-  document.querySelectorAll('.platform-panel').forEach(p => {
-    p.classList.toggle('active', p.id === `panel-${platform}`)
-  })
+  document.querySelectorAll('.platform-tab').forEach(t => t.classList.toggle('active', t.dataset.platform===platform))
+  document.querySelectorAll('.platform-panel').forEach(p => p.classList.toggle('active', p.id===`panel-${platform}`))
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -902,7 +915,6 @@ function switchPlatform(platform) {
 function renderEmailPanel(gmail) {
   const arOn = !!STATE.autoReplySettings.gmail
   return `
-  <!-- Sub-nav -->
   <div class="subnav-wrap">
     <div class="subnav-tabs" id="subnavTabs">
       <button class="subnav-tab ${STATE.bucket==='inbox'?'active':''}" data-bucket="inbox">
@@ -927,33 +939,31 @@ function renderEmailPanel(gmail) {
       </button>
     </div>
     <div class="subnav-right">
-      <!-- Search -->
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
         <input class="search-input" id="searchInput" type="text" placeholder="Search emails…"
                value="${esc(STATE.searchQuery)}" oninput="handleSearch(this.value)">
       </div>
-      <div class="token-chip ${STATE.tokenUsage?'loaded':''}" id="tokenChip" title="AI tokens used — last 30 days">
+      <div class="token-chip ${STATE.tokenUsage?'loaded':''}" id="tokenChip">
         ⚡ <span id="tokenChipVal">loading…</span>
       </div>
-      <button class="icon-btn" id="syncBtn" title="Sync inbox (200 emails)" onclick="syncGmail(this)">
+      <button class="btn btn-primary btn-sm" onclick="openCompose()" title="Compose new email">
+        ✉️ Compose
+      </button>
+      <button class="icon-btn" id="syncBtn" title="Sync inbox" onclick="syncGmail(this)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </button>
     </div>
   </div>
 
-  ${arOn && STATE.bucket === 'inbox' ? `
+  ${arOn && STATE.bucket==='inbox' ? `
   <div class="auto-reply-banner">
-    ✦ AI Auto-Reply is ON — incoming emails will be replied to automatically using your knowledge base
+    ✦ AI Auto-Reply is ON — incoming emails will be replied to automatically
     <button class="btn btn-secondary btn-sm" style="margin-left:auto"
-            onclick="toggleAutoReply('gmail', false); document.querySelector('.auto-reply-row input').checked=false">
-      Pause
-    </button>
+            onclick="toggleAutoReply('gmail',false);document.querySelector('.auto-reply-row input').checked=false">Pause</button>
   </div>` : ''}
 
-  <!-- Inbox wrap -->
   <div class="inbox-wrap">
-    <!-- Intent filter bar -->
     <div class="intent-filter-bar" id="intentFilterBar"
          style="display:${['noise','dismissed'].includes(STATE.bucket)?'none':'flex'}">
       <span class="filter-label">Filter:</span>
@@ -965,7 +975,6 @@ function renderEmailPanel(gmail) {
       <button class="intent-pill ${STATE.intent==='other'?'active':''}" data-intent="other">• Other <span class="pill-count" id="ic-other">0</span></button>
     </div>
 
-    <!-- Bulk actions bar -->
     <div class="bulk-bar" id="bulkBar">
       <span class="bulk-count" id="bulkCount">0 selected</span>
       <div class="bulk-sep"></div>
@@ -974,13 +983,11 @@ function renderEmailPanel(gmail) {
       <button class="btn btn-secondary btn-sm" onclick="clearSelection()">✕ Clear</button>
     </div>
 
-    <!-- Split pane -->
     <div class="inbox-split">
       <div class="msg-list-pane" id="msgListPane">${renderSkeletonList()}</div>
       <div class="email-read-pane" id="emailReadPane">${renderReadEmpty()}</div>
     </div>
 
-    <!-- Token usage bar -->
     <div class="token-usage-bar">
       <span class="token-usage-bar-label">⚡ AI Usage (30d)</span>
       <div class="token-stat"><span class="token-stat-val" id="tu-classify">—</span><span class="token-stat-lbl">classify tokens</span></div>
@@ -993,15 +1000,14 @@ function renderEmailPanel(gmail) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// SEARCH HANDLER
+// SEARCH
 // ══════════════════════════════════════════════════════════════════════════════
 let _searchTimer = null
 function handleSearch(val) {
   STATE.searchQuery = val
   clearTimeout(_searchTimer)
   _searchTimer = setTimeout(() => {
-    STATE.page = 1
-    STATE.selectedId = null
+    STATE.page = 1; STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
     loadInbox()
@@ -1015,40 +1021,24 @@ function wireSubnavOnce() {
   const subnavTabs = document.getElementById('subnavTabs')
   if (!subnavTabs || subnavTabs._wired) return
   subnavTabs._wired = true
-
   subnavTabs.addEventListener('click', e => {
     const btn = e.target.closest('.subnav-tab')
     if (!btn) return
     const bucket = btn.dataset.bucket
     if (bucket === STATE.bucket) return
-
-    STATE.bucket     = bucket
-    STATE.intent     = 'all'
-    STATE.page       = 1
-    STATE.selectedId = null
-    STATE.searchQuery= ''
+    STATE.bucket = bucket; STATE.intent = 'all'; STATE.page = 1
+    STATE.selectedId = null; STATE.searchQuery = ''
     const si = document.getElementById('searchInput')
     if (si) si.value = ''
-
-    subnavTabs.querySelectorAll('.subnav-tab').forEach(b =>
-      b.classList.toggle('active', b === btn)
-    )
-
+    subnavTabs.querySelectorAll('.subnav-tab').forEach(b => b.classList.toggle('active', b===btn))
     const ifb = document.getElementById('intentFilterBar')
-    if (ifb) ifb.style.display = ['noise','dismissed'].includes(bucket) ? 'none' : 'flex'
-
-    const intentBar = document.getElementById('intentFilterBar')
-    if (intentBar) {
-      intentBar.querySelectorAll('.intent-pill').forEach(p =>
-        p.classList.toggle('active', p.dataset.intent === 'all')
-      )
+    if (ifb) {
+      ifb.style.display = ['noise','dismissed'].includes(bucket) ? 'none' : 'flex'
+      ifb.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p.dataset.intent==='all'))
     }
-
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-
-    clearSelection()
-    loadInbox()
+    clearSelection(); loadInbox()
   })
 }
 
@@ -1061,12 +1051,8 @@ function wireIntentFilterOnce() {
     if (!pill) return
     const intent = pill.dataset.intent
     if (intent === STATE.intent) return
-    STATE.intent = intent
-    STATE.page = 1
-    STATE.selectedId = null
-    ifb.querySelectorAll('.intent-pill').forEach(p =>
-      p.classList.toggle('active', p === pill)
-    )
+    STATE.intent = intent; STATE.page = 1; STATE.selectedId = null
+    ifb.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p===pill))
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
     loadInbox()
@@ -1080,16 +1066,12 @@ async function loadInbox(page) {
   if (page !== undefined) STATE.page = page
   if (STATE.loadingInbox) return
   STATE.loadingInbox = true
-
-  wireSubnavOnce()
-  wireIntentFilterOnce()
-
+  wireSubnavOnce(); wireIntentFilterOnce()
   try {
     const apiBucket   = STATE.bucket === 'sent' ? 'replied' : STATE.bucket
     const intentParam = (STATE.intent && STATE.intent !== 'all') ? `&intent=${STATE.intent}` : ''
     const searchParam = STATE.searchQuery ? `&search=${encodeURIComponent(STATE.searchQuery)}` : ''
     const url = `/agents/${STATE.agentId}/channels/gmail/inbox?bucket=${apiBucket}&page=${STATE.page}&limit=${PAGE_SIZE}${intentParam}${searchParam}`
-
     const data = await apiFetch(url)
 
     let msgs  = data.messages || []
@@ -1099,20 +1081,17 @@ async function loadInbox(page) {
       msgs  = msgs.filter(m => !!m.ai_draft)
       total = msgs.length
     }
-
-    // Client-side search fallback
     if (STATE.searchQuery && msgs.length) {
       const q = STATE.searchQuery.toLowerCase()
       msgs = msgs.filter(m =>
-        (m.subject || '').toLowerCase().includes(q) ||
-        (m.from    || '').toLowerCase().includes(q) ||
-        (m.body    || '').toLowerCase().includes(q)
+        (m.subject||'').toLowerCase().includes(q) ||
+        (m.from||'').toLowerCase().includes(q) ||
+        (m.body||'').toLowerCase().includes(q)
       )
       total = msgs.length
     }
 
-    STATE.msgs  = msgs
-    STATE.total = total
+    STATE.msgs = msgs; STATE.total = total
     STATE.msgMap = {}
     msgs.forEach(m => { STATE.msgMap[m._id] = m })
 
@@ -1147,48 +1126,36 @@ async function loadBucketCounts() {
     } catch {}
   })
   await Promise.allSettled(tasks)
-
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?bucket=inbox&page=1&limit=200`)
-    const draftCount = (data.messages || []).filter(m => !!m.ai_draft).length
+    const draftCount = (data.messages||[]).filter(m => !!m.ai_draft).length
     BUCKET_COUNTS.drafts = draftCount
     const el = document.getElementById('snt-drafts')
     if (el) el.textContent = draftCount
   } catch {}
-
   const ptBadge = document.getElementById('pt-badge-email')
   if (ptBadge) ptBadge.textContent = BUCKET_COUNTS.inbox || 0
-
-  // Update noise metric card
   const nm = document.getElementById('m-noise')
   if (nm) nm.textContent = BUCKET_COUNTS.noise || 0
 }
 
 async function loadTokenUsage() {
   try {
-    const data     = await apiFetch(`/agents/${STATE.agentId}/channels/token-usage`)
-    const summary  = data.summary || {}
-    const total    = data.total_tokens_30d || 0
+    const data    = await apiFetch(`/agents/${STATE.agentId}/channels/token-usage`)
+    const summary = data.summary || {}
+    const total   = data.total_tokens_30d || 0
     const classify = summary['channel_classify']?.tokens || 0
     const draft    = summary['channel_draft']?.tokens    || 0
     const autoSent = summary['channel_auto_reply']?.calls || 0
-    const calls    = (summary['channel_classify']?.calls || 0) +
-                     (summary['channel_draft']?.calls    || 0)
-
-    const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : String(n)
-
+    const calls    = (summary['channel_classify']?.calls||0) + (summary['channel_draft']?.calls||0)
+    const fmt = n => n>=1000 ? (n/1000).toFixed(1)+'K' : String(n)
     const chip = document.getElementById('tokenChip')
     const val  = document.getElementById('tokenChipVal')
-    if (val)  val.textContent  = fmt(total) + ' tokens'
-    if (chip && total > 0) chip.classList.add('loaded')
-
+    if (val)  val.textContent  = fmt(total)+' tokens'
+    if (chip && total>0) chip.classList.add('loaded')
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v }
-    set('tu-classify', fmt(classify))
-    set('tu-draft',    fmt(draft))
-    set('tu-total',    fmt(total))
-    set('tu-calls',    calls)
-    set('tu-auto',     autoSent || '0')
-
+    set('tu-classify', fmt(classify)); set('tu-draft', fmt(draft))
+    set('tu-total', fmt(total)); set('tu-calls', calls); set('tu-auto', autoSent||'0')
     STATE.tokenUsage = summary
   } catch {}
 }
@@ -1197,20 +1164,17 @@ async function loadTokenUsage() {
 // BULK ACTIONS
 // ══════════════════════════════════════════════════════════════════════════════
 function updateBulkBar() {
-  const bar  = document.getElementById('bulkBar')
-  const cnt  = document.getElementById('bulkCount')
-  const n    = STATE.selectedMsgIds.size
+  const bar = document.getElementById('bulkBar'), cnt = document.getElementById('bulkCount')
+  const n = STATE.selectedMsgIds.size
   if (!bar) return
-  bar.classList.toggle('visible', n > 0)
+  bar.classList.toggle('visible', n>0)
   if (cnt) cnt.textContent = `${n} selected`
 }
-
 function clearSelection() {
   STATE.selectedMsgIds.clear()
   document.querySelectorAll('.msg-checkbox').forEach(cb => { cb.checked = false })
   updateBulkBar()
 }
-
 async function bulkGenerateDrafts() {
   const ids = [...STATE.selectedMsgIds]
   if (!ids.length) return
@@ -1218,24 +1182,14 @@ async function bulkGenerateDrafts() {
   let done = 0
   for (const id of ids) {
     try {
-      const data = await apiFetch(
-        `/agents/${STATE.agentId}/channels/gmail/messages/${id}/generate-draft`,
-        { method: 'POST' }
-      )
-      if (STATE.msgMap[id]) {
-        STATE.msgMap[id].ai_draft = data.ai_draft
-        STATE.msgMap[id].draft_tokens_used = data.tokens_used
-      }
+      const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${id}/generate-draft`, { method:'POST' })
+      if (STATE.msgMap[id]) { STATE.msgMap[id].ai_draft = data.ai_draft; STATE.msgMap[id].draft_tokens_used = data.tokens_used }
       done++
     } catch {}
   }
   showToast(`Generated ${done}/${ids.length} drafts`, 'success')
-  clearSelection()
-  loadInbox()
-  loadBucketCounts()
-  loadTokenUsage()
+  clearSelection(); loadInbox(); loadBucketCounts(); loadTokenUsage()
 }
-
 async function bulkDismiss() {
   const ids = [...STATE.selectedMsgIds]
   if (!ids.length) return
@@ -1243,21 +1197,22 @@ async function bulkDismiss() {
   let done = 0
   for (const id of ids) {
     try {
-      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${id}/dismiss`, { method: 'PUT' })
-      STATE.msgs  = STATE.msgs.filter(m => m._id !== id)
-      STATE.total = Math.max(0, STATE.total - 1)
-      delete STATE.msgMap[id]
-      done++
+      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${id}/dismiss`, { method:'PUT' })
+      STATE.msgs = STATE.msgs.filter(m => m._id!==id); STATE.total = Math.max(0, STATE.total-1)
+      delete STATE.msgMap[id]; done++
     } catch {}
   }
   showToast(`Dismissed ${done} emails`, 'info')
-  clearSelection()
-  renderMsgList()
-  loadBucketCounts()
+  clearSelection(); renderMsgList(); loadBucketCounts()
+}
+function toggleCheck(msgId, checked) {
+  if (checked) STATE.selectedMsgIds.add(msgId)
+  else STATE.selectedMsgIds.delete(msgId)
+  updateBulkBar()
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// RENDER MESSAGE LIST
+// AVATAR HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 const AVATAR_COLORS = [
   'linear-gradient(135deg,#6366f1,#8b5cf6)',
@@ -1268,34 +1223,33 @@ const AVATAR_COLORS = [
   'linear-gradient(135deg,#14b8a6,#6366f1)',
   'linear-gradient(135deg,#f97316,#ec4899)',
 ]
-
 function avatarColor(str) {
   let h = 0
-  for (const c of String(str||'')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff
+  for (const c of String(str||'')) h = (h*31 + c.charCodeAt(0)) & 0xffffffff
   return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length]
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER MESSAGE LIST
+// ══════════════════════════════════════════════════════════════════════════════
 function renderMsgList() {
   const pane = document.getElementById('msgListPane')
   if (!pane) return
-
   if (!STATE.msgs.length) {
     const EMPTY_COPY = {
-      inbox:     { icon:'📭', title:'Inbox is clear',          sub:'All caught up! Sync to check for new emails.' },
-      drafts:    { icon:'✦',  title:'No AI drafts ready',      sub:'Open a message and click Generate Reply' },
-      sent:      { icon:'✅', title:'No sent replies yet',     sub:'Sent replies will appear here' },
-      noise:     { icon:'🔕', title:'No noise filtered',       sub:'Transactional & promotional emails appear here' },
-      dismissed: { icon:'🗑', title:'Nothing dismissed',       sub:'' },
+      inbox:{ icon:'📭',title:'Inbox is clear',sub:'All caught up! Sync to check for new emails.' },
+      drafts:{ icon:'✦',title:'No AI drafts ready',sub:'Open a message and click Generate Reply' },
+      sent:{ icon:'✅',title:'No sent replies yet',sub:'Sent replies will appear here' },
+      noise:{ icon:'🔕',title:'No noise filtered',sub:'Transactional & promotional emails appear here' },
+      dismissed:{ icon:'🗑',title:'Nothing dismissed',sub:'' },
     }
     const copyKey = STATE.searchQuery ? 'inbox' : STATE.bucket
     const e = EMPTY_COPY[copyKey] || EMPTY_COPY.inbox
-    const title = STATE.searchQuery ? 'No results found' : e.title
-    const sub   = STATE.searchQuery ? `No emails match "${esc(STATE.searchQuery)}"` : e.sub
     pane.innerHTML = `
       <div class="msg-list-empty">
         <div class="msg-list-empty-icon">${e.icon}</div>
-        <div class="msg-list-empty-title">${title}</div>
-        <div class="msg-list-empty-sub">${sub}</div>
+        <div class="msg-list-empty-title">${STATE.searchQuery ? 'No results found' : e.title}</div>
+        <div class="msg-list-empty-sub">${STATE.searchQuery ? `No emails match "${esc(STATE.searchQuery)}"` : e.sub}</div>
       </div>`
     return
   }
@@ -1303,7 +1257,7 @@ function renderMsgList() {
   const listHTML = STATE.msgs.map(msg => {
     const from    = parseFrom(msg.from)
     const name    = from.name || from.email || 'Unknown'
-    const init    = (name[0] || '?').toUpperCase()
+    const init    = (name[0]||'?').toUpperCase()
     const bg      = avatarColor(name)
     const time    = fmtRelTime(msg.created_at)
     const snippet = cleanBody(msg.body, 120)
@@ -1312,11 +1266,12 @@ function renderMsgList() {
     const cfg     = INTENT_CFG[msg.intent] || INTENT_CFG.other
     const isNoise = msg.status === 'noise'
     const checked = STATE.selectedMsgIds.has(msg._id)
-    const canSelect = !['noise','dismissed'].includes(STATE.bucket)
+    const canSel  = !['noise','dismissed'].includes(STATE.bucket)
+    const threadCount = (msg.thread_history || []).length
 
     return `
     <div class="msg-row ${sel?'selected':''} ${isNoise?'noise-row':''}" data-msgid="${esc(msg._id)}">
-      ${canSelect ? `<input class="msg-checkbox" type="checkbox" ${checked?'checked':''} data-chk="${esc(msg._id)}" onclick="event.stopPropagation();toggleCheck('${esc(msg._id)}',this.checked)">` : ''}
+      ${canSel ? `<input class="msg-checkbox" type="checkbox" ${checked?'checked':''} data-chk="${esc(msg._id)}" onclick="event.stopPropagation();toggleCheck('${esc(msg._id)}',this.checked)">` : ''}
       <div class="msg-avatar" style="background:${bg}">${init}</div>
       <div class="msg-right">
         <div class="msg-row-top">
@@ -1327,9 +1282,10 @@ function renderMsgList() {
         <div class="msg-snippet">${esc(snippet)}</div>
         <div class="msg-badges">
           <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
+          ${threadCount > 0 ? `<span class="badge-pill bp-other">💬 ${threadCount+1} msgs</span>` : ''}
           ${msg.ai_draft ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ Draft ready</span>` : ''}
-          ${msg.status==='replied' && msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
-          ${msg.status==='replied' && !msg.auto_replied ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>` : ''}
+          ${msg.status==='replied'&&msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
+          ${msg.status==='replied'&&!msg.auto_replied ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>` : ''}
         </div>
       </div>
     </div>`
@@ -1337,19 +1293,16 @@ function renderMsgList() {
 
   const totalPages = Math.ceil(STATE.total / PAGE_SIZE)
   const paginHTML  = totalPages > 1 ? renderPagination(totalPages) : ''
-
-  pane.innerHTML = listHTML + paginHTML
+  pane.innerHTML   = listHTML + paginHTML
 
   pane.addEventListener('click', e => {
     const row = e.target.closest('.msg-row[data-msgid]')
     if (!row || e.target.classList.contains('msg-checkbox')) return
     const msg = STATE.msgMap[row.dataset.msgid]
-    if (!msg) return
-    if (STATE.selectedId === row.dataset.msgid) return
-
+    if (!msg || STATE.selectedId === row.dataset.msgid) return
     STATE.selectedId = row.dataset.msgid
     pane.querySelectorAll('.msg-row').forEach(r => {
-      r.classList.toggle('selected', r.dataset.msgid === STATE.selectedId)
+      r.classList.toggle('selected', r.dataset.msgid===STATE.selectedId)
       const nameEl = r.querySelector('.msg-from-name')
       if (nameEl) nameEl.style.color = r.classList.contains('selected') ? 'var(--accent)' : ''
     })
@@ -1357,15 +1310,9 @@ function renderMsgList() {
   })
 }
 
-function toggleCheck(msgId, checked) {
-  if (checked) STATE.selectedMsgIds.add(msgId)
-  else STATE.selectedMsgIds.delete(msgId)
-  updateBulkBar()
-}
-
 function renderPagination(totalPages) {
-  const start = (STATE.page - 1) * PAGE_SIZE + 1
-  const end   = Math.min(STATE.page * PAGE_SIZE, STATE.total)
+  const start = (STATE.page-1)*PAGE_SIZE+1
+  const end   = Math.min(STATE.page*PAGE_SIZE, STATE.total)
   let btns = ''
   btns += `<button class="pg-btn" onclick="loadInbox(${STATE.page-1})" ${STATE.page<=1?'disabled':''}>←</button>`
   let lo = Math.max(1, STATE.page-2), hi = Math.min(totalPages, lo+4)
@@ -1373,15 +1320,11 @@ function renderPagination(totalPages) {
   for (let p=lo; p<=hi; p++)
     btns += `<button class="pg-btn ${p===STATE.page?'active':''}" onclick="loadInbox(${p})">${p}</button>`
   btns += `<button class="pg-btn" onclick="loadInbox(${STATE.page+1})" ${STATE.page>=totalPages?'disabled':''}>→</button>`
-  return `
-  <div class="pagination-bar">
-    <span class="pagination-info">${start}–${end} of ${STATE.total}</span>
-    <div class="pagination-btns">${btns}</div>
-  </div>`
+  return `<div class="pagination-bar"><span class="pagination-info">${start}–${end} of ${STATE.total}</span><div class="pagination-btns">${btns}</div></div>`
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// READING PANE
+// v4.0 — READING PANE WITH FULL CONVERSATION THREAD
 // ══════════════════════════════════════════════════════════════════════════════
 function renderReadPane(msg) {
   const pane = document.getElementById('emailReadPane')
@@ -1389,27 +1332,11 @@ function renderReadPane(msg) {
 
   const from     = parseFrom(msg.from)
   const name     = from.name || from.email || 'Unknown'
-  const init     = (name[0] || '?').toUpperCase()
+  const init     = (name[0]||'?').toUpperCase()
   const bg       = avatarColor(name)
   const cfg      = INTENT_CFG[msg.intent] || INTENT_CFG.other
-  const body     = cleanBodyFull(msg.body)
   const canReply = msg.status === 'inbox'
   const isNoise  = msg.status === 'noise'
-  const hasDraft = !!msg.ai_draft
-
-  // Thread history (if available)
-  const threadHtml = msg.thread_history?.length ? `
-  <div class="thread-history">
-    <div style="font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">
-      📎 Conversation Thread (${msg.thread_history.length})
-    </div>
-    ${msg.thread_history.map(t => `
-    <div class="thread-item">
-      <span class="thread-dir ${t.direction==='sent'?'sent':'recv'}">${t.direction==='sent'?'↑ You':'↓ Them'}</span>
-      <span class="thread-text">${esc(cleanBody(t.body, 120))}</span>
-      <span class="thread-time">${fmtRelTime(t.created_at)}</span>
-    </div>`).join('')}
-  </div>` : ''
 
   pane.innerHTML = `
   <div class="email-read-header">
@@ -1424,17 +1351,16 @@ function renderReadPane(msg) {
     </div>
     <div class="email-status-row">
       <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
-      ${msg.intent_source==='pre_filter' ? `<span class="badge-pill bp-other" title="Zero tokens — rule-based">🔕 auto-filtered</span>` : ''}
+      ${msg.intent_source==='pre_filter' ? `<span class="badge-pill bp-other">🔕 auto-filtered</span>` : ''}
       ${msg.intent_source==='ai_classify'||msg.intent_source==='ai_draft' ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ AI classified</span>` : ''}
       ${msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
       ${msg.draft_tokens_used ? `<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>` : ''}
     </div>
   </div>
 
-  ${threadHtml}
-
-  <div class="email-read-body">
-    <div class="email-body-text">${formatBody(body)}</div>
+  <!-- v4.0 Conversation Thread Panel -->
+  <div class="conversation-panel" id="convPanel">
+    ${renderConversationFromCache(msg)}
   </div>
 
   <div class="email-reply-composer">
@@ -1443,8 +1369,9 @@ function renderReadPane(msg) {
     </div>
   </div>`
 
+  // Wire composer buttons
   if (canReply) {
-    if (!hasDraft) {
+    if (!msg.ai_draft) {
       pane.querySelector('#generateDraftBtn')?.addEventListener('click', () => generateDraft(msg._id))
       pane.querySelector('#dismissBtnCta')  ?.addEventListener('click', () => dismissMsg(msg._id))
     } else {
@@ -1457,11 +1384,152 @@ function renderReadPane(msg) {
   } else {
     pane.querySelector('#toggleSentBtn')?.addEventListener('click', () => {
       const w = document.getElementById('sentWrap')
-      if (w) w.style.display = w.style.display === 'none' ? 'block' : 'none'
+      if (w) w.style.display = w.style.display==='none' ? 'block' : 'none'
     })
+  }
+
+  // Fetch full Gmail thread in background (v4.0)
+  fetchAndRenderThread(msg)
+}
+
+// Render conversation from DB cache (immediate, then replaced by Gmail thread)
+function renderConversationFromCache(msg) {
+  // If we have cached Gmail thread data, use that
+  if (STATE.threadCache[msg._id]) {
+    return renderThreadMessages(STATE.threadCache[msg._id], msg)
+  }
+
+  // Build from DB data: current message + thread_history
+  const allMessages = []
+
+  // Add prior thread history
+  if (msg.thread_history && msg.thread_history.length > 0) {
+    msg.thread_history.forEach(h => {
+      allMessages.push({
+        direction: h.direction,
+        from:      h.direction === 'sent' ? (STATE.channelEmail || 'You') : (h.from || msg.from),
+        body:      h.body || '',
+        date:      h.created_at,
+        isAi:      false,
+      })
+    })
+  }
+
+  // Add current message
+  allMessages.push({
+    direction: 'recv',
+    from:      msg.from,
+    body:      msg.body || '',
+    date:      msg.created_at,
+    isCurrent: true,
+  })
+
+  // Add sent reply if available
+  if (msg.reply_sent) {
+    allMessages.push({
+      direction: 'sent',
+      from:      STATE.channelEmail || 'You',
+      body:      msg.reply_sent,
+      date:      msg.replied_at || msg.updated_at,
+      isAi:      msg.auto_replied,
+    })
+  }
+
+  return allMessages.map((m, i) => renderSingleMessage(m, i, allMessages.length)).join('')
+}
+
+// Render thread from Gmail API data
+function renderThreadMessages(threadMsgs, currentMsg) {
+  if (!threadMsgs || !threadMsgs.length) {
+    return renderSingleMessage({
+      direction: 'recv', from: currentMsg.from,
+      body: currentMsg.body || '', date: currentMsg.created_at, isCurrent: true,
+    }, 0, 1)
+  }
+  return threadMsgs.map((m, i) => {
+    const isCurrent = m.gmail_message_id === currentMsg.channel_message_id
+    return renderSingleMessage({
+      direction: m.direction,
+      from:      m.from || (m.direction==='sent' ? STATE.channelEmail : currentMsg.from),
+      body:      m.body || '',
+      date:      m.date || m.internalDate,
+      isCurrent,
+      snippet:   m.snippet,
+    }, i, threadMsgs.length)
+  }).join('')
+}
+
+function renderSingleMessage(m, index, total) {
+  const isLast   = index === total - 1
+  const isSent   = m.direction === 'sent'
+  const fromParsed = parseFrom(m.from || '')
+  const fromName   = fromParsed.name || fromParsed.email || (isSent ? 'You' : 'Customer')
+  const fromEmail  = fromParsed.email || ''
+  const body       = cleanBodyFull(m.body || '')
+  const time       = m.date ? fmtRelTime(m.date) : ''
+  // Collapse older messages, keep last 2 expanded
+  const shouldCollapse = !isLast && index < total - 2 && body.length > 200
+
+  return `
+  <div class="conv-message direction-${isSent?'sent':'recv'}">
+    <div class="conv-message-header">
+      <span class="conv-dir-chip ${isSent?'sent':'recv'}">${isSent?'↑ Sent':'↓ Received'}</span>
+      <span class="conv-from" title="${esc(fromEmail)}">${esc(fromName)}${fromEmail && fromName !== fromEmail ? ` <span style="opacity:.6;font-weight:400">&lt;${esc(fromEmail)}&gt;</span>` : ''}</span>
+      ${m.isAi ? `<span class="conv-ai-label">✦ AI Reply</span>` : ''}
+      ${m.isCurrent ? `<span class="conv-ai-label" style="background:var(--accent-dim);color:var(--accent)">● Current</span>` : ''}
+      <span class="conv-time">${time}</span>
+    </div>
+    <div class="conv-body ${shouldCollapse?'collapsed':''}" id="conv-body-${index}">${formatBody(body)}</div>
+    ${shouldCollapse ? `<button class="conv-expand-btn" onclick="expandMsg(${index})">▾ Show full message</button>` : ''}
+  </div>`
+}
+
+function expandMsg(index) {
+  const body = document.getElementById(`conv-body-${index}`)
+  const btn  = body?.nextElementSibling
+  if (body) body.classList.remove('collapsed')
+  if (btn)  btn.remove()
+}
+
+async function fetchAndRenderThread(msg) {
+  const convPanel = document.getElementById('convPanel')
+  if (!convPanel) return
+
+  // Skip fetch if we already have cached data
+  if (STATE.threadCache[msg._id]) return
+
+  // Show loading indicator at top of panel
+  const loadingBar = document.createElement('div')
+  loadingBar.className = 'thread-fetch-bar'
+  loadingBar.innerHTML = `<div class="thread-fetch-spinner"></div><span class="thread-fetch-label">Loading full conversation…</span>`
+  convPanel.insertBefore(loadingBar, convPanel.firstChild)
+
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msg._id}/thread`)
+    const threadMsgs = data.messages || []
+
+    // Cache for this session
+    STATE.threadCache[msg._id] = threadMsgs
+
+    // Re-render the conversation panel if this message is still selected
+    if (STATE.selectedId === msg._id) {
+      const panel = document.getElementById('convPanel')
+      if (panel) {
+        panel.innerHTML = renderThreadMessages(threadMsgs, msg)
+        // Scroll to bottom to show latest message
+        panel.scrollTop = panel.scrollHeight
+      }
+    }
+  } catch (e) {
+    // Silently fail — the cached DB data is already shown
+    const loadingEl = document.querySelector('.thread-fetch-bar')
+    if (loadingEl) loadingEl.remove()
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// COMPOSER
+// ══════════════════════════════════════════════════════════════════════════════
 function renderComposer(msg) {
   const toEmail = esc(parseFrom(msg.from).email)
   if (!msg.ai_draft) {
@@ -1473,10 +1541,9 @@ function renderComposer(msg) {
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-ai" id="generateDraftBtn">✦ Generate Reply</button>
+        <button class="btn btn-secondary btn-sm" onclick="openReplyManual('${esc(msg._id)}')">✏️ Reply Manually</button>
         <button class="btn btn-danger btn-sm" id="dismissBtnCta">🗑 Dismiss</button>
-        <span style="font-size:11.5px;color:var(--text-3);margin-left:auto">
-          To: <strong style="color:var(--text-2)">${toEmail}</strong>
-        </span>
+        <span style="font-size:11.5px;color:var(--text-3);margin-left:auto">To: <strong style="color:var(--text-2)">${toEmail}</strong></span>
       </div>
     </div>`
   }
@@ -1484,6 +1551,16 @@ function renderComposer(msg) {
   <div class="reply-ai-label">
     ✦ AI Draft
     <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-3)">— review &amp; edit before sending</span>
+  </div>
+  <div class="ccbcc-row" id="ccbccRow" style="display:none">
+    <div class="ccbcc-field">
+      <span class="ccbcc-label">CC</span>
+      <input class="ccbcc-input" id="replyCc" type="text" placeholder="cc@example.com">
+    </div>
+    <div class="ccbcc-field">
+      <span class="ccbcc-label">BCC</span>
+      <input class="ccbcc-input" id="replyBcc" type="text" placeholder="bcc@example.com">
+    </div>
   </div>
   <textarea class="reply-textarea" id="replyText">${esc(msg.ai_draft)}</textarea>
   <div class="reply-composer-actions">
@@ -1495,9 +1572,43 @@ function renderComposer(msg) {
       <button class="btn btn-secondary btn-sm" id="regenBtn">🔄 Regenerate</button>
       <button class="btn btn-danger btn-sm" id="dismissBtn">🗑 Dismiss</button>
     </div>
-    <span style="font-size:11.5px;color:var(--text-3)">
-      To: <strong style="color:var(--text-2)">${toEmail}</strong>
-    </span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="toggle-cc-btn" onclick="document.getElementById('ccbccRow').style.display=document.getElementById('ccbccRow').style.display==='none'?'flex':'none'">+ CC / BCC</button>
+      <span style="font-size:11.5px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${toEmail}</strong></span>
+    </div>
+  </div>`
+}
+
+// Open manual reply mode (no AI draft needed)
+function openReplyManual(msgId) {
+  const msg = STATE.msgMap[msgId]
+  if (!msg) return
+  // Inject a manual reply composer
+  const composerInner = document.querySelector('.reply-composer-inner')
+  if (!composerInner) return
+  const toEmail = esc(parseFrom(msg.from).email)
+  composerInner.innerHTML = `
+  <div class="reply-ai-label" style="color:var(--text-2)">
+    ✏️ Manual Reply
+  </div>
+  <div class="ccbcc-row" id="ccbccRow" style="display:none">
+    <div class="ccbcc-field"><span class="ccbcc-label">CC</span><input class="ccbcc-input" id="replyCc" type="text" placeholder="cc@example.com"></div>
+    <div class="ccbcc-field"><span class="ccbcc-label">BCC</span><input class="ccbcc-input" id="replyBcc" type="text" placeholder="bcc@example.com"></div>
+  </div>
+  <textarea class="reply-textarea" id="replyText" placeholder="Type your reply here…"></textarea>
+  <div class="reply-composer-actions">
+    <div class="reply-action-left">
+      <button class="btn btn-primary" onclick="sendReply('${esc(msgId)}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Send Reply
+      </button>
+      <button class="btn btn-ai btn-sm" onclick="generateDraft('${esc(msgId)}')">✦ AI Draft Instead</button>
+      <button class="btn btn-danger btn-sm" onclick="dismissMsg('${esc(msgId)}')">🗑 Dismiss</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="toggle-cc-btn" onclick="document.getElementById('ccbccRow').style.display=document.getElementById('ccbccRow').style.display==='none'?'flex':'none'">+ CC / BCC</button>
+      <span style="font-size:11.5px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${toEmail}</strong></span>
+    </div>
   </div>`
 }
 
@@ -1505,10 +1616,8 @@ function renderNonActionableFooter(msg, isNoise) {
   if (isNoise) {
     return `
     <div class="replied-notice">
-      🔕 Auto-filtered as ${esc(msg.intent || 'noise')} — 0 tokens used
-      <button class="btn btn-secondary btn-sm" id="moveToInboxBtn" style="margin-left:8px">
-        ↑ Move to Inbox
-      </button>
+      🔕 Auto-filtered as ${esc(msg.intent||'noise')} — 0 tokens used
+      <button class="btn btn-secondary btn-sm" id="moveToInboxBtn" style="margin-left:8px">↑ Move to Inbox</button>
     </div>`
   }
   return `
@@ -1527,160 +1636,188 @@ function renderNonActionableFooter(msg, isNoise) {
 // ══════════════════════════════════════════════════════════════════════════════
 async function generateDraft(msgId) {
   const btn = document.getElementById('generateDraftBtn')
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Generating…' }
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Generating…' }
   try {
-    const data = await apiFetch(
-      `/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`,
-      { method: 'POST' }
-    )
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`, { method:'POST' })
     if (STATE.msgMap[msgId]) {
-      STATE.msgMap[msgId].ai_draft          = data.ai_draft
+      STATE.msgMap[msgId].ai_draft = data.ai_draft
       STATE.msgMap[msgId].draft_tokens_used = data.tokens_used
-      STATE.msgMap[msgId].intent_source     = 'ai_draft'
+      STATE.msgMap[msgId].intent_source = 'ai_draft'
     }
     showToast(`Draft generated ✦ (${data.tokens_used} tokens)`, 'success')
     renderReadPane(STATE.msgMap[msgId])
-    renderMsgList()
-    loadTokenUsage()
-    loadBucketCounts()
+    renderMsgList(); loadTokenUsage(); loadBucketCounts()
   } catch (e) {
     showToast('Draft generation failed: ' + e.message, 'error')
-    if (btn) { btn.disabled = false; btn.textContent = '✦ Generate Reply' }
+    if (btn) { btn.disabled=false; btn.textContent='✦ Generate Reply' }
   }
 }
 
 async function regenerateDraft(msgId) {
   const btn = document.getElementById('regenBtn')
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Regenerating…' }
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Regenerating…' }
   try {
-    const data = await apiFetch(
-      `/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`,
-      { method: 'POST' }
-    )
-    if (STATE.msgMap[msgId]) {
-      STATE.msgMap[msgId].ai_draft          = data.ai_draft
-      STATE.msgMap[msgId].draft_tokens_used = data.tokens_used
-    }
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/generate-draft`, { method:'POST' })
+    if (STATE.msgMap[msgId]) { STATE.msgMap[msgId].ai_draft=data.ai_draft; STATE.msgMap[msgId].draft_tokens_used=data.tokens_used }
     const ta = document.getElementById('replyText')
     if (ta) ta.value = data.ai_draft || ''
     showToast(`Regenerated ✦ (${data.tokens_used} tokens)`, 'success')
     loadTokenUsage()
-  } catch (e) {
-    showToast('Regenerate failed: ' + e.message, 'error')
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = '🔄 Regenerate' }
-  }
+  } catch (e) { showToast('Regenerate failed: ' + e.message, 'error') }
+  finally { if (btn) { btn.disabled=false; btn.textContent='🔄 Regenerate' } }
 }
 
 async function sendReply(msgId) {
   const textarea = document.getElementById('replyText')
-  const text     = textarea?.value?.trim()
+  const text = textarea?.value?.trim()
   if (!text) { showToast('Reply cannot be empty', 'error'); return }
+  const cc  = document.getElementById('replyCc')?.value?.trim()  || ''
+  const bcc = document.getElementById('replyBcc')?.value?.trim() || ''
   const btn = document.getElementById('sendReplyBtn')
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Sending…' }
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Sending…' }
   try {
     await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, {
-      method: 'POST',
-      body:   JSON.stringify({ reply: text }),
+      method:'POST',
+      body: JSON.stringify({ reply: text, cc: cc || undefined, bcc: bcc || undefined }),
     })
     showToast('Reply sent! ✉️', 'success')
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-    STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
-    STATE.total = Math.max(0, STATE.total - 1)
-    delete STATE.msgMap[msgId]
-    renderMsgList()
-    loadBucketCounts()
-    loadPage()
-    loadMetrics()
+    STATE.msgs = STATE.msgs.filter(m => m._id!==msgId)
+    STATE.total = Math.max(0, STATE.total-1)
+    delete STATE.msgMap[msgId]; delete STATE.threadCache[msgId]
+    renderMsgList(); loadBucketCounts(); loadPage(); loadMetrics()
   } catch (e) {
     showToast('Send failed: ' + e.message, 'error')
-    if (btn) {
-      btn.disabled  = false
-      btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Reply`
-    }
+    if (btn) { btn.disabled=false; btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Reply` }
   }
 }
 
 async function dismissMsg(msgId) {
   try {
-    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/dismiss`, { method: 'PUT' })
+    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/dismiss`, { method:'PUT' })
     showToast('Dismissed', 'info')
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-    STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
-    STATE.total = Math.max(0, STATE.total - 1)
-    delete STATE.msgMap[msgId]
-    renderMsgList()
-    loadBucketCounts()
+    STATE.msgs = STATE.msgs.filter(m => m._id!==msgId); STATE.total = Math.max(0, STATE.total-1)
+    delete STATE.msgMap[msgId]; delete STATE.threadCache[msgId]
+    renderMsgList(); loadBucketCounts()
   } catch (e) { showToast(e.message, 'error') }
 }
 
 async function moveToInbox(msgId) {
   try {
-    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/move-to-inbox`, { method: 'PUT' })
+    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/move-to-inbox`, { method:'PUT' })
     showToast('Moved to inbox', 'success')
     STATE.selectedId = null
     const rp = document.getElementById('emailReadPane')
     if (rp) rp.innerHTML = renderReadEmpty()
-    STATE.msgs  = STATE.msgs.filter(m => m._id !== msgId)
-    STATE.total = Math.max(0, STATE.total - 1)
+    STATE.msgs = STATE.msgs.filter(m => m._id!==msgId); STATE.total = Math.max(0, STATE.total-1)
     delete STATE.msgMap[msgId]
-    renderMsgList()
-    loadBucketCounts()
+    renderMsgList(); loadBucketCounts()
   } catch (e) { showToast(e.message, 'error') }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// v4.0 — COMPOSE MODAL (send brand-new email from portal)
+// ══════════════════════════════════════════════════════════════════════════════
+function openCompose() {
+  const gmail = STATE.channels.gmail
+  if (!gmail) { showToast('Gmail not connected', 'error'); return }
+  const fromEl = document.getElementById('composeFrom')
+  if (fromEl) fromEl.textContent = `📧 ${gmail.email}`
+  // Clear fields
+  ;['composeTo','composeCc','composeBcc','composeSubject','composeBody'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = ''
+  })
+  document.getElementById('composeCcField').style.display = 'none'
+  document.getElementById('composeBccField').style.display = 'none'
+  document.getElementById('composeModal').style.display = 'flex'
+  setTimeout(() => document.getElementById('composeTo')?.focus(), 50)
+}
+
+function closeCompose() {
+  document.getElementById('composeModal').style.display = 'none'
+}
+
+function toggleCcBcc() {
+  const ccField  = document.getElementById('composeCcField')
+  const bccField = document.getElementById('composeBccField')
+  const bothHidden = ccField.style.display === 'none' && bccField.style.display === 'none'
+  ccField.style.display  = bothHidden ? 'block' : 'none'
+  bccField.style.display = bothHidden ? 'block' : 'none'
+}
+
+async function sendCompose() {
+  const to      = document.getElementById('composeTo')?.value?.trim()
+  const subject = document.getElementById('composeSubject')?.value?.trim()
+  const body    = document.getElementById('composeBody')?.value?.trim()
+  const cc      = document.getElementById('composeCc')?.value?.trim()
+  const bcc     = document.getElementById('composeBcc')?.value?.trim()
+
+  if (!to)      { showToast('Recipient email is required', 'error'); return }
+  if (!subject) { showToast('Subject is required', 'error'); return }
+  if (!body)    { showToast('Message body is required', 'error'); return }
+
+  const btn = document.getElementById('composeSendBtn')
+  if (btn) { btn.disabled=true; btn.textContent='⏳ Sending…' }
+
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/compose`, {
+      method: 'POST',
+      body: JSON.stringify({ to, subject, body, cc: cc||undefined, bcc: bcc||undefined }),
+    })
+    showToast(`Email sent to ${to} ✉️`, 'success')
+    closeCompose()
+    loadBucketCounts()
+  } catch (e) {
+    showToast('Failed to send: ' + e.message, 'error')
+  } finally {
+    if (btn) { btn.disabled=false; btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Email` }
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CHANNEL ACTIONS
 // ══════════════════════════════════════════════════════════════════════════════
 async function connectGmail(btn) {
-  btn.disabled = true; btn.textContent = '⏳ Redirecting…'
+  btn.disabled=true; btn.textContent='⏳ Redirecting…'
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/connect`)
     window.location.href = data.url
   } catch (e) {
     showToast('Failed: ' + e.message, 'error')
-    btn.disabled = false
-    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Connect Gmail`
+    btn.disabled=false
+    btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Connect Gmail`
   }
 }
 
 async function disconnectGmail() {
   if (!confirm('Disconnect Gmail? The agent will stop processing emails.')) return
   try {
-    await apiFetch(`/agents/${STATE.agentId}/channels/gmail`, { method: 'DELETE' })
+    await apiFetch(`/agents/${STATE.agentId}/channels/gmail`, { method:'DELETE' })
     showToast('Gmail disconnected', 'info')
+    STATE.channelEmail = null; STATE.threadCache = {}
     await loadPage()
   } catch (e) { showToast(e.message, 'error') }
 }
 
 async function syncGmail(btn) {
-  if (btn) { btn.classList?.add('spinning'); btn.disabled = true }
+  if (btn) { btn.classList?.add('spinning'); btn.disabled=true }
   try {
-    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/sync`, { method: 'POST' })
-    showToast(`Synced ${data.synced || 0} new email(s) — ${data.noise_filtered || 0} auto-filtered as noise`, 'success')
-    STATE.page = 1
-    await loadInbox()
-    await loadBucketCounts()
-    await loadMetrics()
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/sync`, { method:'POST' })
+    const sinceMsg = data.synced_since ? ` (since ${new Date(data.synced_since).toLocaleDateString()})` : ''
+    showToast(`Synced ${data.synced||0} new email(s) — ${data.noise_filtered||0} auto-filtered${sinceMsg}`, 'success')
+    STATE.page = 1; STATE.threadCache = {}
+    await loadInbox(); await loadBucketCounts(); await loadMetrics()
     const ptBadge = document.getElementById('pt-badge-email')
     if (ptBadge) ptBadge.textContent = data.inbox_count || BUCKET_COUNTS.inbox || 0
-    const inboxBadge = document.querySelector('.inbox-badge')
-    if (inboxBadge) {
-      const cnt = data.inbox_count || 0
-      inboxBadge.className = `inbox-badge ${cnt>0?'has-items':'clear'}`
-      inboxBadge.textContent = cnt>0 ? `📬 ${cnt}` : '✓ Clear'
-    }
     const mInbox = document.getElementById('m-inbox')
     if (mInbox) mInbox.textContent = data.inbox_count || 0
-  } catch (e) {
-    showToast('Sync failed: ' + e.message, 'error')
-  } finally {
-    if (btn) { btn.classList?.remove('spinning'); btn.disabled = false }
-  }
+  } catch (e) { showToast('Sync failed: ' + e.message, 'error') }
+  finally { if (btn) { btn.classList?.remove('spinning'); btn.disabled=false } }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1700,11 +1837,11 @@ function renderSkeletonList() {
 
 function renderReadEmpty() {
   const COPY = {
-    inbox:     { sub:'AI only activates when you click Generate Reply — no tokens wasted' },
-    drafts:    { sub:'Select a message with a ready draft to review and send' },
-    sent:      { sub:'Select a sent email to view the reply' },
-    noise:     { sub:'Select a noise email to review or rescue to inbox' },
-    dismissed: { sub:'Select a dismissed email to view its contents' },
+    inbox:    { sub:'Click any email to view the full conversation thread' },
+    drafts:   { sub:'Select a message with a ready draft to review and send' },
+    sent:     { sub:'Select a sent email to view the conversation' },
+    noise:    { sub:'Select a noise email to review or rescue to inbox' },
+    dismissed:{ sub:'Select a dismissed email to view its contents' },
   }
   const c = COPY[STATE.bucket] || COPY.inbox
   return `
@@ -1734,21 +1871,21 @@ function renderSetupGuide() {
         <div class="step-num">2</div>
         <div class="step-content">
           <div class="step-title">Connect your support inbox</div>
-          <div class="step-desc">Click "Connect Gmail" on the card above and authorize your support email account.</div>
+          <div class="step-desc">Click "Connect Gmail" on the card above and authorize your support email account. Only emails received <strong>after this moment</strong> will be processed.</div>
         </div>
       </div>
       <div class="setup-step">
         <div class="step-num">3</div>
         <div class="step-content">
-          <div class="step-title">(Optional) AI Auto-Reply</div>
-          <div class="step-desc">Once connected, enable AI Auto-Reply to have the AI respond to customer enquiries automatically from your knowledge base.</div>
+          <div class="step-title">Reply directly from this portal</div>
+          <div class="step-desc">Use <strong>Compose</strong> to send new emails, or reply to any inbox email — all without opening Gmail.</div>
         </div>
       </div>
       <div class="setup-step">
         <div class="step-num">4</div>
         <div class="step-content">
-          <div class="step-title">(Optional) Real-time push via Pub/Sub</div>
-          <div class="step-desc">Set <span class="env-hint">GMAIL_PUBSUB_TOPIC</span> for instant email processing instead of manual sync.</div>
+          <div class="step-title">(Optional) AI Auto-Reply</div>
+          <div class="step-desc">Enable AI Auto-Reply to have the AI respond to customer enquiries automatically from your knowledge base.</div>
         </div>
       </div>
     </div>
@@ -1756,29 +1893,25 @@ function renderSetupGuide() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// COMING SOON PANEL (enhanced with features + notify)
+// COMING SOON PANEL
 // ══════════════════════════════════════════════════════════════════════════════
 function renderComingSoonPanel(name, icon, desc, channelKey) {
   const features = {
-    whatsapp: [
-      { icon:'🤖', text:'AI Auto-Reply with your product knowledge base' },
-      { icon:'🔕', text:'Smart noise filtering — promotions & bots filtered out' },
-      { icon:'📊', text:'Conversation analytics & response time tracking' },
-      { icon:'⚡', text:'Bulk reply to common questions instantly' },
+    whatsapp:[
+      {icon:'🤖',text:'AI Auto-Reply with your product knowledge base'},
+      {icon:'🔕',text:'Smart noise filtering'},
+      {icon:'📊',text:'Conversation analytics & response time tracking'},
+      {icon:'⚡',text:'Bulk reply to common questions instantly'},
     ],
-    instagram: [
-      { icon:'📸', text:'DM inbox with AI intent classification' },
-      { icon:'✦',  text:'AI draft replies from your knowledge base' },
-      { icon:'🏷', text:'Auto-tag leads by product interest' },
-      { icon:'📈', text:'Story reply & mention tracking' },
+    instagram:[
+      {icon:'📸',text:'DM inbox with AI intent classification'},
+      {icon:'✦', text:'AI draft replies from your knowledge base'},
+      {icon:'🏷',text:'Auto-tag leads by product interest'},
+      {icon:'📈',text:'Story reply & mention tracking'},
     ],
   }
-  const fList = (features[channelKey] || []).map(f => `
-    <div class="cs-feature">
-      <span class="cs-feature-icon">${f.icon}</span>
-      ${esc(f.text)}
-    </div>`).join('')
-
+  const fList = (features[channelKey]||[]).map(f => `
+    <div class="cs-feature"><span class="cs-feature-icon">${f.icon}</span>${esc(f.text)}</div>`).join('')
   return `
   <div class="coming-soon-panel">
     <div class="coming-soon-panel-icon">${icon}</div>
@@ -1797,15 +1930,13 @@ function notifyMe(channel) {
   const input = document.getElementById(`notify-${channel}`)
   const email = input?.value?.trim()
   if (!email || !email.includes('@')) { showToast('Enter a valid email address', 'error'); return }
-  // Optimistic — store locally + show toast
-  const key = `sg_notify_${channel}`
-  localStorage.setItem(key, email)
+  localStorage.setItem(`sg_notify_${channel}`, email)
   showToast(`You'll be notified at ${email} when ${channel} launches! 🎉`, 'success')
   if (input) input.value = ''
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// EMAIL BODY HELPERS  — fixed &zwnj; and HTML entity stripping
+// EMAIL BODY HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 const HTML_ENTITIES = {
   '&nbsp;':' ','&amp;':'&','&lt;':'<','&gt;':'>','&quot;':'"','&#39;':"'",
@@ -1816,45 +1947,38 @@ const HTML_ENTITIES = {
 function decodeEntities(str) {
   return str
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h,16)))
     .replace(/&[a-z]+;/gi, m => HTML_ENTITIES[m.toLowerCase()] ?? m)
 }
-
 function cleanBody(raw, maxLen) {
   if (!raw) return ''
   let text = raw
-  if (text.trim().startsWith('{')) {
-    try { const p = JSON.parse(text); text = p.body || p.text || p.content || text } catch {}
-  }
+  if (text.trim().startsWith('{')) { try { const p=JSON.parse(text); text=p.body||p.text||p.content||text } catch {} }
   text = text
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/https?:\/\/[^\s\])"]+/g, '')
-    .replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\t/g, ' ')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'')
+    .replace(/<[^>]+>/g,' ')
+    .replace(/https?:\/\/[^\s\])"]+/g,'')
+    .replace(/\\n/g,'\n').replace(/\\r/g,'').replace(/\\t/g,' ')
   text = decodeEntities(text)
-  text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim()
-  if (maxLen && text.length > maxLen) return text.slice(0, maxLen).trimEnd() + '…'
+  text = text.replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()
+  if (maxLen && text.length > maxLen) return text.slice(0, maxLen).trimEnd()+'…'
   return text
 }
-
 function cleanBodyFull(raw) {
   if (!raw) return ''
   let text = raw
-  if (text.trim().startsWith('{')) {
-    try { const p = JSON.parse(text); text = p.body || p.text || p.content || text } catch {}
-  }
+  if (text.trim().startsWith('{')) { try { const p=JSON.parse(text); text=p.body||p.text||p.content||text } catch {} }
   text = text
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n')
-    .replace(/<\/div>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<[^>]+>/g, '')
-    .replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\t/g, ' ')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'')
+    .replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n\n')
+    .replace(/<\/div>/gi,'\n').replace(/<\/li>/gi,'\n').replace(/<[^>]+>/g,'')
+    .replace(/\\n/g,'\n').replace(/\\r/g,'').replace(/\\t/g,' ')
   text = decodeEntities(text)
-  text = text.replace(/[ \t]+/g, ' ').replace(/\n{4,}/g, '\n\n\n').trim()
+  text = text.replace(/[ \t]+/g,' ').replace(/\n{4,}/g,'\n\n\n').trim()
   return text
 }
-
 function formatBody(text) {
   if (!text) return '<span style="color:var(--text-3);font-style:italic">No message content</span>'
   const lines = text.split('\n')
@@ -1863,8 +1987,8 @@ function formatBody(text) {
     const trimmed = line.trim()
     const isQ = trimmed.startsWith('>') ||
       /^(On .+ wrote:|From:|Sent:|To:|Subject:|--{2,}|-{3,}|_{3,}|={3,})/.test(trimmed)
-    if (isQ && !inQuote) { inQuote = true; result += `<hr class="email-body-separator"><div style="opacity:.5;font-size:12px;color:var(--text-3)">` }
-    if (!isQ && inQuote) { inQuote = false; result += '</div>' }
+    if (isQ && !inQuote) { inQuote=true; result+=`<hr style="border:none;border-top:1px dashed var(--border);margin:12px 0"><div style="opacity:.5;font-size:12px;color:var(--text-3)">` }
+    if (!isQ && inQuote) { inQuote=false; result+='</div>' }
     result += esc(isQ ? trimmed.replace(/^>+ ?/,'') : line) + '\n'
   }
   if (inQuote) result += '</div>'
@@ -1880,31 +2004,27 @@ function parseFrom(from) {
   if (m) return { name: m[1].replace(/^["']|["']$/g,'').trim(), email: m[2].trim() }
   return { name:'', email: from.trim() }
 }
-
 function fmtRelTime(ts) {
   if (!ts) return ''
-  const d = new Date(ts), now = new Date(), diff = Math.floor((now - d) / 1000)
-  if (diff < 60)     return 'just now'
-  if (diff < 3600)   return Math.floor(diff/60)+'m ago'
-  if (diff < 86400)  return Math.floor(diff/3600)+'h ago'
+  const d = new Date(ts), now = new Date(), diff = Math.floor((now-d)/1000)
+  if (diff < 60) return 'just now'
+  if (diff < 3600) return Math.floor(diff/60)+'m ago'
+  if (diff < 86400) return Math.floor(diff/3600)+'h ago'
   if (diff < 604800) return Math.floor(diff/86400)+'d ago'
-  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short' })
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})
 }
-
 function esc(s) {
   return String(s||'')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
-
 function showToast(msg, type='info') {
   const wrap = document.getElementById('toastWrap')
   const el   = document.createElement('div')
   el.className  = `toast-item toast-${type}`
   el.textContent = msg
   wrap.appendChild(el)
-  setTimeout(() => el.remove(), 3500)
+  setTimeout(() => el.remove(), 4000)
 }
-
 function renderNoAgents() {
   document.getElementById('pageBody').innerHTML = `
   <div style="padding:80px 20px;text-align:center;color:var(--text-3)">
