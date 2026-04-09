@@ -9,9 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
   <style>
-    /* ═══════════════════════════════════════════════════════════════
-       CSS CUSTOM PROPERTIES — ENHANCED ANIMATIONS
-    ═══════════════════════════════════════════════════════════════ */
     :root {
       --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
       --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -23,9 +20,6 @@
       --dur-page:    400ms;
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-       LAYOUT
-    ═══════════════════════════════════════════════════════════════ */
     .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
     .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;
             background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;
@@ -50,9 +44,6 @@
                animation:page-enter var(--dur-page) var(--ease-out)}
     @keyframes page-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       GLOBAL PAGE LOADER OVERLAY
-    ═══════════════════════════════════════════════════════════════ */
     .page-loader{position:fixed;inset:0;z-index:9998;background:var(--surface);
                  display:flex;flex-direction:column;align-items:center;justify-content:center;
                  gap:20px;transition:opacity var(--dur-slow) var(--ease-smooth),
@@ -68,9 +59,6 @@
                  animation:loader-pulse 1.2s ease-in-out infinite alternate}
     @keyframes loader-pulse{from{opacity:.5}to{opacity:1}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       SECTION REVEAL ANIMATIONS
-    ═══════════════════════════════════════════════════════════════ */
     .reveal{opacity:0;transform:translateY(14px);transition:opacity var(--dur-slow) var(--ease-out),
             transform var(--dur-slow) var(--ease-out)}
     .reveal.visible{opacity:1;transform:translateY(0)}
@@ -80,9 +68,6 @@
     .reveal-delay-4{transition-delay:240ms}
     .reveal-delay-5{transition-delay:300ms}
 
-    /* ═══════════════════════════════════════════════════════════════
-       METRICS BAR
-    ═══════════════════════════════════════════════════════════════ */
     .sales-metrics-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
     .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
                  padding:14px 16px;position:relative;overflow:hidden;cursor:default;
@@ -108,8 +93,6 @@
                   padding:2px 6px;border-radius:6px;margin-top:5px}
     .metric-trend.up{background:var(--green-dim);color:var(--green)}
     .metric-trend.dn{background:var(--red-dim);color:var(--red)}
-
-    /* Metric skeleton */
     .metric-skeleton .metric-value{background:var(--border);border-radius:6px;color:transparent;
                                     animation:skeleton-pulse 1.5s ease-in-out infinite}
     .metric-skeleton .metric-sub{background:var(--border);border-radius:4px;color:transparent;width:70%;
@@ -119,9 +102,7 @@
     .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;
                    letter-spacing:.08em;margin-bottom:14px;margin-top:4px}
 
-    /* ═══════════════════════════════════════════════════════════════
-       CHANNEL CARDS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Channel Cards ── */
     .channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
     .channel-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);
                   padding:18px;transition:border-color var(--dur-base) var(--ease-smooth),
@@ -192,9 +173,7 @@
                       display:flex;align-items:center;gap:6px}
     [data-theme="dark"] .coming-soon-overlay{background:rgba(12,14,22,.88)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       PLATFORM TABS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Platform Tabs ── */
     .platform-tabs-bar{display:flex;align-items:center;gap:0;border-bottom:2px solid var(--border);
                        margin-bottom:20px;position:relative}
     .platform-tab{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;
@@ -225,9 +204,7 @@
     .platform-panel.active{display:block}
     @keyframes panel-enter{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       SUB-NAV TABS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Sub-Nav ── */
     .subnav-wrap{display:flex;align-items:center;justify-content:space-between;
                  margin-bottom:16px;gap:12px;flex-wrap:wrap}
     .subnav-tabs{display:flex;align-items:center;gap:4px;background:var(--surface);
@@ -260,9 +237,7 @@
                  transition:color var(--dur-fast)}
     .search-wrap:focus-within .search-icon{color:var(--accent)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       INTENT FILTER
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Intent Filter ── */
     .intent-filter-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;
                        border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--surface-2);flex-shrink:0}
     .filter-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;
@@ -284,9 +259,7 @@
     .intent-pill[data-intent="refund"].active{border-color:var(--amber-border);background:var(--amber-dim);color:var(--amber)}
     [data-theme="dark"] .intent-pill[data-intent="order"].active{background:#0c2d3f;color:#38bdf8}
 
-    /* ═══════════════════════════════════════════════════════════════
-       INBOX WRAPPER
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Inbox Wrapper ── */
     .inbox-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
                 overflow:hidden;display:flex;flex-direction:column;min-height:600px}
     .inbox-toolbar{display:flex;align-items:center;justify-content:space-between;
@@ -324,9 +297,7 @@
     .bulk-count{font-size:12.5px;font-weight:700;color:var(--accent)}
     .bulk-sep{width:1px;height:20px;background:var(--border-md)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       SPLIT PANE
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Split Pane ── */
     .inbox-split{display:flex;flex:1;min-height:520px;overflow:hidden}
     .msg-list-pane{width:350px;flex-shrink:0;border-right:1px solid var(--border);
                    overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--border-md) transparent}
@@ -347,9 +318,7 @@
     .pg-btn:disabled{opacity:.4;cursor:not-allowed}
     .pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       MESSAGE ROWS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Message Rows ── */
     .msg-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;
              border-bottom:1px solid var(--border);cursor:pointer;
              transition:background var(--dur-fast) var(--ease-smooth),
@@ -397,11 +366,14 @@
     .bp-transactional{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .bp-other{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .bp-auto-replied{background:linear-gradient(135deg,var(--green-dim),#d1fae5);color:var(--green);border:1px solid var(--green-border)}
+    /* Change 7: WA + IG badge pills */
+    .bp-wa{background:#dcfce7;color:#15803d;border:1px solid #86efac}
+    .bp-ig{background:#fce7f3;color:#be185d;border:1px solid #f9a8d4}
+    [data-theme="dark"] .bp-wa{background:#052e16;color:#4ade80;border-color:#166534}
+    [data-theme="dark"] .bp-ig{background:#500724;color:#f472b6;border-color:#9d174d}
     [data-theme="dark"] .bp-order{background:#0c2d3f;color:#38bdf8;border-color:#0c4a6e}
 
-    /* ═══════════════════════════════════════════════════════════════
-       READING PANE
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Reading Pane ── */
     .email-read-pane{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
     .read-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
                 color:var(--text-3);gap:10px;padding:40px;animation:fade-in .3s var(--ease-out)}
@@ -422,15 +394,12 @@
     .email-read-timestamp{font-size:11.5px;color:var(--text-3);white-space:nowrap;padding-top:3px;flex-shrink:0}
     .email-status-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
 
-    /* ═══════════════════════════════════════════════════════════════
-       INLINE LOADING SPINNER (reusable)
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Spinners ── */
     .spin-ring{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
                border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0}
     .spin-ring-sm{width:12px;height:12px;border-width:1.5px;
                   border-color:var(--accent-dim);border-top-color:var(--accent)}
     .spin-ring-dark{border-color:var(--border-md);border-top-color:var(--accent)}
-    /* Dots loader */
     .dots-loader{display:inline-flex;gap:4px;align-items:center}
     .dots-loader span{width:5px;height:5px;background:var(--accent);border-radius:50%;
                       animation:dot-bounce .8s ease-in-out infinite alternate}
@@ -438,9 +407,7 @@
     .dots-loader span:nth-child(3){animation-delay:.3s}
     @keyframes dot-bounce{from{transform:translateY(0);opacity:.4}to{transform:translateY(-5px);opacity:1}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       CONVERSATION THREAD PANEL
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Conversation Panel ── */
     .conversation-panel{flex:1;overflow-y:auto;padding:0;display:flex;flex-direction:column;
                         background:var(--surface-2);scrollbar-width:thin;scrollbar-color:var(--border-md) transparent}
     .conversation-panel::-webkit-scrollbar{width:4px}
@@ -479,9 +446,7 @@
                           border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
     .thread-fetch-label{font-size:12px;color:var(--text-3)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       COMPOSER
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Composer ── */
     .email-reply-composer{border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;
                           animation:composer-enter .25s var(--ease-out)}
     @keyframes composer-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -529,9 +494,7 @@
     .token-stat-val{font-size:12px;font-weight:700;color:var(--text);transition:color var(--dur-base)}
     .token-stat-lbl{font-size:10px;color:var(--text-3)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       COMPOSE MODAL
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Compose Modal ── */
     .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
                     display:flex;align-items:center;justify-content:center;padding:20px;
                     animation:backdrop-in .2s var(--ease-smooth);backdrop-filter:blur(2px)}
@@ -567,9 +530,7 @@
     .compose-from-label{font-size:12px;color:var(--text-3);padding:6px 10px;background:var(--surface-2);
                         border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:6px}
 
-    /* ═══════════════════════════════════════════════════════════════
-       BUTTONS — ENHANCED
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Buttons ── */
     .btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:34px;border-radius:var(--r-sm);
          font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);
          transition:background var(--dur-fast) var(--ease-smooth),
@@ -578,7 +539,6 @@
          box-shadow var(--dur-fast) var(--ease-smooth),
          opacity var(--dur-fast);
          white-space:nowrap;position:relative;overflow:hidden}
-    /* ripple effect */
     .btn::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.15);
                   transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease-smooth)}
     .btn:active::before{transform:scaleX(1)}
@@ -595,17 +555,20 @@
             box-shadow:0 2px 10px rgba(99,102,241,.35)}
     .btn-ai:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 16px rgba(99,102,241,.45)}
     .btn-ai:active{transform:translateY(0) scale(.97)}
+    /* Change 7: Meta button */
+    .btn-meta{background:#fff;color:#1877f2;border:1.5px solid #1877f2;box-shadow:0 2px 8px rgba(24,119,242,.15)}
+    .btn-meta:hover{background:#1877f2;color:#fff;transform:translateY(-1px);box-shadow:0 4px 14px rgba(24,119,242,.35)}
+    .btn-meta:active{transform:translateY(0) scale(.97)}
+    [data-theme="dark"] .btn-meta{background:#1a2236;color:#60a5fa;border-color:#3b82f6}
+    [data-theme="dark"] .btn-meta:hover{background:#3b82f6;color:#fff}
     .btn-sm{height:30px;padding:0 11px;font-size:12px}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;pointer-events:none}
-    /* Loading state for buttons */
     .btn.loading{pointer-events:none;opacity:.8}
     .btn.loading .btn-text{opacity:0}
     .btn.loading::after{content:'';position:absolute;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);
                          border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
 
-    /* ═══════════════════════════════════════════════════════════════
-       SETUP GUIDE
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Setup Guide ── */
     .setup-guide{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:24px}
     .setup-guide-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .setup-steps{display:flex;flex-direction:column;gap:10px}
@@ -626,9 +589,7 @@
     .env-hint{font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;
               background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md);font-family:var(--mono)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       ENHANCED SKELETONS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Skeletons ── */
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
     .skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--border-md) 50%,var(--border) 75%);
               background-size:200% 100%;animation:shimmer 1.6s linear infinite;border-radius:6px}
@@ -636,7 +597,6 @@
     .msg-row.skeleton-row:hover{background:transparent;transform:none}
     .msg-row.skeleton-row .msg-avatar.skeleton{animation:shimmer 1.6s linear infinite}
     .skel-line{display:block}
-
     .msg-list-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
                     padding:40px 20px;text-align:center;color:var(--text-3);
                     animation:fade-in .3s var(--ease-out)}
@@ -645,9 +605,7 @@
     .msg-list-empty-sub{font-size:12px}
     @keyframes fade-in{from{opacity:0}to{opacity:1}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       ENHANCED TOASTS
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Toasts ── */
     .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;
                 pointer-events:none}
     .toast-item{padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;
@@ -670,9 +628,24 @@
                     animation:toast-progress linear forwards}
     @keyframes toast-progress{from{width:100%}to{width:0%}}
 
-    /* ═══════════════════════════════════════════════════════════════
-       COMING SOON PANEL
-    ═══════════════════════════════════════════════════════════════ */
+    /* Change 7: Meta connect banner + WA 24h warning */
+    .meta-connect-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;
+                         padding:16px 20px;
+                         background:linear-gradient(135deg,#1877f215,#e7f3ff);
+                         border:1px solid #bfdbfe;border-radius:var(--r-lg);
+                         margin-bottom:20px;animation:banner-enter .3s var(--ease-spring)}
+    .meta-connect-banner-left{display:flex;align-items:center;gap:12px}
+    .meta-connect-banner-icons{display:flex;gap:-4px}
+    .meta-connect-banner-icons span{font-size:22px}
+    .meta-connect-banner-text strong{font-size:13.5px;font-weight:700;color:var(--text);display:block;margin-bottom:2px}
+    .meta-connect-banner-text p{font-size:12px;color:var(--text-3);margin:0}
+    [data-theme="dark"] .meta-connect-banner{background:linear-gradient(135deg,#1877f220,#1e293b);border-color:#1d4ed8}
+    .wa-window-warning{display:flex;align-items:center;gap:8px;padding:8px 14px;
+                       background:var(--amber-dim);border:1px solid var(--amber-border);
+                       border-radius:8px;font-size:12px;font-weight:600;color:var(--amber);
+                       margin-bottom:8px;animation:banner-enter .3s var(--ease-spring)}
+
+    /* ── Coming Soon Panel ── */
     .coming-soon-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
                        min-height:400px;gap:16px;text-align:center;padding:60px 40px;
                        background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
@@ -693,20 +666,16 @@
                   transition:border-color var(--dur-base)}
     .notify-input:focus{border-color:var(--accent)}
 
-    /* ═══════════════════════════════════════════════════════════════
-       INBOX LOADING OVERLAY (for refresh/sync)
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Inbox loading overlay ── */
     .inbox-loading-overlay{position:absolute;inset:0;background:rgba(var(--surface-rgb,255,255,255),.7);
                             backdrop-filter:blur(2px);z-index:10;display:flex;align-items:center;justify-content:center;
                             flex-direction:column;gap:12px;border-radius:var(--r-lg);
                             animation:fade-in .15s var(--ease-smooth)}
     .inbox-loading-text{font-size:13px;font-weight:600;color:var(--text-2)}
     [data-theme="dark"] .inbox-loading-overlay{background:rgba(7,8,13,.7)}
-    .inbox-wrap{position:relative}/* needed for overlay */
+    .inbox-wrap{position:relative}
 
-    /* ═══════════════════════════════════════════════════════════════
-       SYNC PROGRESS BAR (top of screen)
-    ═══════════════════════════════════════════════════════════════ */
+    /* ── Sync bar ── */
     .sync-progress-bar{position:fixed;top:0;left:0;right:0;height:3px;z-index:9997;
                        background:linear-gradient(90deg,var(--accent),#7c3aed,var(--accent));
                        background-size:200% 100%;animation:sync-progress 1.5s var(--ease-smooth) infinite;
@@ -714,9 +683,6 @@
     @keyframes sync-progress{0%{background-position:200% 0}100%{background-position:-200% 0}}
     .sync-progress-bar.done{animation:none;background:var(--green);transition:opacity .5s .2s;opacity:0}
 
-    /* ═══════════════════════════════════════════════════════════════
-       RESPONSIVE
-    ═══════════════════════════════════════════════════════════════ */
     @media(max-width:1300px){.sales-metrics-bar{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:900px){.channels-grid{grid-template-columns:1fr};.sales-metrics-bar{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:768px){
@@ -738,7 +704,6 @@
   </script>
 </head>
 <body>
-<!-- PAGE LOADER -->
 <div class="page-loader" id="pageLoader">
   <div class="loader-logo">📡</div>
   <div class="loader-track"><div class="loader-bar"></div></div>
@@ -837,6 +802,13 @@ const STATE = {
   autoReplySettings: {},
   channelEmail:      null,
   threadCache:       {},
+  // Chat channel state (WA/IG)
+  chatMsgs:          { whatsapp: [], instagram: [] },
+  chatTotal:         { whatsapp: 0,  instagram: 0  },
+  chatPage:          { whatsapp: 1,  instagram: 1  },
+  chatSelectedId:    { whatsapp: null, instagram: null },
+  chatBucket:        { whatsapp: 'inbox', instagram: 'inbox' },
+  loadingChat:       { whatsapp: false, instagram: false },
 }
 
 const PAGE_SIZE = 20
@@ -875,9 +847,20 @@ const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
     document.getElementById('sidebarBackdrop').classList.remove('open')
   })
 
+  // Change 1: Handle all Meta callback toasts
   const params = new URLSearchParams(location.search)
-  if (params.get('connected') === 'gmail') {
+  const connected = params.get('connected') || ''
+  if (connected === 'gmail') {
     showToast('Gmail connected! 🎉 Only emails received from now on will be processed.', 'success')
+    history.replaceState({}, '', location.pathname)
+  } else if (connected.includes('whatsapp') && connected.includes('instagram')) {
+    showToast('WhatsApp + Instagram connected! 🎉 Both channels are now live.', 'success')
+    history.replaceState({}, '', location.pathname)
+  } else if (connected.includes('whatsapp')) {
+    showToast('WhatsApp connected! 💬 Messages will be processed in real time.', 'success')
+    history.replaceState({}, '', location.pathname)
+  } else if (connected.includes('instagram')) {
+    showToast('Instagram connected! 📸 DMs will be processed in real time.', 'success')
     history.replaceState({}, '', location.pathname)
   }
   if (params.get('error')) {
@@ -897,13 +880,11 @@ const BUCKET_COUNTS = { inbox:0, sent:0, drafts:0, noise:0, dismissed:0 }
   } catch (e) {
     showToast('Failed to load agents', 'error')
   } finally {
-    // Hide page loader
     const loader = document.getElementById('pageLoader')
     if (loader) {
       loader.classList.add('hidden')
       setTimeout(() => loader.remove(), 500)
     }
-    // Trigger reveal animations
     triggerReveals()
   }
 })()
@@ -940,9 +921,6 @@ function hideSyncProgress() {
   setTimeout(() => bar.remove(), 800)
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// REVEAL ANIMATIONS
-// ══════════════════════════════════════════════════════════════════════════════
 function triggerReveals() {
   requestAnimationFrame(() => {
     document.querySelectorAll('.reveal').forEach((el, i) => {
@@ -977,10 +955,22 @@ async function loadPage() {
 // RENDER PAGE
 // ══════════════════════════════════════════════════════════════════════════════
 function renderPage() {
-  const gmail     = STATE.channels.gmail || null
-  const connected = gmail?.status === 'active'
-  const inboxCnt  = gmail?.inbox_count || 0
-  const arGmail   = !!STATE.autoReplySettings.gmail
+  const gmail      = STATE.channels.gmail      || null
+  const waChannel  = STATE.channels.whatsapp   || null
+  const igChannel  = STATE.channels.instagram  || null
+  const gmailConn  = gmail?.status === 'active'
+  const waConn     = waChannel?.status === 'active'
+  const igConn     = igChannel?.status === 'active'
+  const inboxCnt   = gmail?.inbox_count || 0
+  const arGmail    = !!STATE.autoReplySettings.gmail
+  const arWA       = !!STATE.autoReplySettings.whatsapp
+  const arIG       = !!STATE.autoReplySettings.instagram
+  const waCnt      = waChannel?.inbox_count || 0
+  const igCnt      = igChannel?.inbox_count || 0
+
+  // Change 3 & 4: Dynamic tab disabled state based on connection
+  const waBadge = waConn ? `<span class="pt-badge" id="pt-badge-whatsapp">${waCnt||'0'}</span>` : `<span class="pt-soon-tag">Soon</span>`
+  const igBadge = igConn ? `<span class="pt-badge" id="pt-badge-instagram">${igCnt||'0'}</span>` : `<span class="pt-soon-tag">Soon</span>`
 
   document.getElementById('pageBody').innerHTML = `
     <div class="sales-metrics-bar" id="salesMetricsBar">
@@ -1020,8 +1010,25 @@ function renderPage() {
     </div>
 
     <div class="section-label reveal">Connected Channels</div>
+
+    ${!waConn && !igConn ? `
+    <div class="meta-connect-banner reveal">
+      <div class="meta-connect-banner-left">
+        <div class="meta-connect-banner-icons"><span>💬</span>&nbsp;<span>📸</span></div>
+        <div class="meta-connect-banner-text">
+          <strong>Connect WhatsApp &amp; Instagram</strong>
+          <p>One tap — Meta Embedded Signup connects both channels simultaneously via your Facebook Business account.</p>
+        </div>
+      </div>
+      <button class="btn btn-meta" onclick="connectMeta(this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <span class="btn-text">Connect via Meta</span>
+      </button>
+    </div>` : ''}
+
     <div class="channels-grid">
-      <div class="channel-card reveal ${STATE.platform==='email'&&connected?'active-platform':''}" onclick="switchPlatform('email')">
+      <!-- Gmail Card -->
+      <div class="channel-card reveal ${STATE.platform==='email'&&gmailConn?'active-platform':''}" onclick="switchPlatform('email')">
         <div class="channel-card-top">
           <div class="channel-card-left">
             <div class="channel-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div>
@@ -1030,11 +1037,11 @@ function renderPage() {
               <div class="channel-desc">Smart inbox — AI only when you need it</div>
             </div>
           </div>
-          <div class="channel-status-badge ${connected?'badge-live':'badge-disconnected'}">
-            ${connected?'● Live':'● Disconnected'}
+          <div class="channel-status-badge ${gmailConn?'badge-live':'badge-disconnected'}">
+            ${gmailConn?'● Live':'● Disconnected'}
           </div>
         </div>
-        ${connected ? `
+        ${gmailConn ? `
         <div class="auto-reply-row" onclick="event.stopPropagation()">
           <div class="auto-reply-label">
             <span>✦</span> AI Auto-Reply
@@ -1069,7 +1076,8 @@ function renderPage() {
         </div>`}
       </div>
 
-      <div class="channel-card reveal reveal-delay-1" onclick="switchPlatform('whatsapp')">
+      <!-- Change 2: WhatsApp Card — real card -->
+      <div class="channel-card reveal reveal-delay-1 ${STATE.platform==='whatsapp'&&waConn?'active-platform':''}" onclick="${waConn?'switchPlatform(\'whatsapp\')':''}">
         <div class="channel-card-top">
           <div class="channel-card-left">
             <div class="channel-icon" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
@@ -1078,12 +1086,43 @@ function renderPage() {
               <div class="channel-desc">Real-time customer conversations</div>
             </div>
           </div>
-          <div class="channel-status-badge badge-soon">🔜 Phase 2</div>
+          <div class="channel-status-badge ${waConn?'badge-live':'badge-disconnected'}">
+            ${waConn?'● Live':'● Disconnected'}
+          </div>
         </div>
-        <div class="coming-soon-overlay"><div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div></div>
+        ${waConn ? `
+        <div class="auto-reply-row" onclick="event.stopPropagation()">
+          <div class="auto-reply-label">
+            <span>✦</span> AI Auto-Reply
+            <span class="toggle-badge ${arWA?'on':'off'}" id="ar-badge-whatsapp">${arWA?'ON':'OFF'}</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${arWA?'checked':''} onchange="toggleAutoReply('whatsapp', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="channel-email-info">
+          <span style="font-size:13px">📱</span>
+          <span class="channel-email-text">${esc(waChannel.phone_number || waChannel.waba_id || 'WhatsApp Business')}</span>
+          <span class="inbox-badge ${waCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('whatsapp')">
+            ${waCnt>0?`💬 ${waCnt}`:'✓ Clear'}
+          </span>
+        </div>
+        <div class="channel-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-danger btn-sm" onclick="disconnectChannel('whatsapp')">✕ <span class="btn-text">Disconnect</span></button>
+        </div>
+        ` : `
+        <div class="channel-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-meta" onclick="connectMeta(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+            <span class="btn-text">Connect via Meta</span>
+          </button>
+        </div>`}
+        ${!waConn ? `<div class="coming-soon-overlay" style="pointer-events:none;opacity:${waConn?0:1}"></div>` : ''}
       </div>
 
-      <div class="channel-card reveal reveal-delay-2" onclick="switchPlatform('instagram')">
+      <!-- Change 3: Instagram Card — real card -->
+      <div class="channel-card reveal reveal-delay-2 ${STATE.platform==='instagram'&&igConn?'active-platform':''}" onclick="${igConn?'switchPlatform(\'instagram\')':''}">
         <div class="channel-card-top">
           <div class="channel-card-left">
             <div class="channel-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div>
@@ -1092,12 +1131,43 @@ function renderPage() {
               <div class="channel-desc">Manage DM conversations at scale</div>
             </div>
           </div>
-          <div class="channel-status-badge badge-soon">🔜 Phase 2</div>
+          <div class="channel-status-badge ${igConn?'badge-live':'badge-disconnected'}">
+            ${igConn?'● Live':'● Disconnected'}
+          </div>
         </div>
-        <div class="coming-soon-overlay"><div class="coming-soon-pill">🔜 Phase 2 — Coming Soon</div></div>
+        ${igConn ? `
+        <div class="auto-reply-row" onclick="event.stopPropagation()">
+          <div class="auto-reply-label">
+            <span>✦</span> AI Auto-Reply
+            <span class="toggle-badge ${arIG?'on':'off'}" id="ar-badge-instagram">${arIG?'ON':'OFF'}</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" ${arIG?'checked':''} onchange="toggleAutoReply('instagram', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="channel-email-info">
+          <span style="font-size:13px">📸</span>
+          <span class="channel-email-text">${esc(igChannel.page_name || igChannel.ig_user_id || 'Instagram Business')}</span>
+          <span class="inbox-badge ${igCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('instagram')">
+            ${igCnt>0?`📸 ${igCnt}`:'✓ Clear'}
+          </span>
+        </div>
+        <div class="channel-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-danger btn-sm" onclick="disconnectChannel('instagram')">✕ <span class="btn-text">Disconnect</span></button>
+        </div>
+        ` : `
+        <div class="channel-actions" onclick="event.stopPropagation()">
+          <button class="btn btn-meta" onclick="connectMeta(this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+            <span class="btn-text">Connect via Meta</span>
+          </button>
+        </div>`}
+        ${!igConn ? `<div class="coming-soon-overlay" style="pointer-events:none"></div>` : ''}
       </div>
     </div>
 
+    <!-- Change 4: Platform tabs — disabled only when not connected -->
     <div class="platform-tabs-bar reveal" id="platformTabsBar">
       <button class="platform-tab ${STATE.platform==='email'?'active':''}" data-platform="email">
         <span class="pt-icon">📧</span>
@@ -1105,22 +1175,29 @@ function renderPage() {
         <span class="pt-badge" id="pt-badge-email">${inboxCnt||'—'}</span>
         ${arGmail?`<span class="pt-ai-tag" id="pt-ai-gmail">AI Auto</span>`:''}
       </button>
-      <button class="platform-tab disabled" data-platform="whatsapp" title="Coming in Phase 2">
-        <span class="pt-icon">💬</span><span class="pt-label">WhatsApp</span><span class="pt-soon-tag">Soon</span>
+      <button class="platform-tab ${waConn?'':' disabled'} ${STATE.platform==='whatsapp'?'active':''}" data-platform="whatsapp" ${!waConn?'title="Connect WhatsApp via Meta to enable"':''}>
+        <span class="pt-icon">💬</span>
+        <span class="pt-label">WhatsApp</span>
+        ${waBadge}
+        ${arWA&&waConn?`<span class="pt-ai-tag">AI Auto</span>`:''}
       </button>
-      <button class="platform-tab disabled" data-platform="instagram" title="Coming in Phase 2">
-        <span class="pt-icon">📸</span><span class="pt-label">Instagram</span><span class="pt-soon-tag">Soon</span>
+      <button class="platform-tab ${igConn?'':' disabled'} ${STATE.platform==='instagram'?'active':''}" data-platform="instagram" ${!igConn?'title="Connect Instagram via Meta to enable"':''}>
+        <span class="pt-icon">📸</span>
+        <span class="pt-label">Instagram</span>
+        ${igBadge}
+        ${arIG&&igConn?`<span class="pt-ai-tag">AI Auto</span>`:''}
       </button>
     </div>
 
+    <!-- Change 5: Panels — chat panel when connected, coming-soon when not -->
     <div class="platform-panel ${STATE.platform==='email'?'active':''}" id="panel-email">
-      ${connected ? renderEmailPanel(gmail) : renderSetupGuide()}
+      ${gmailConn ? renderEmailPanel(gmail) : renderSetupGuide()}
     </div>
     <div class="platform-panel ${STATE.platform==='whatsapp'?'active':''}" id="panel-whatsapp">
-      ${renderComingSoonPanel('WhatsApp Business','💬','Connect with customers directly via WhatsApp.','whatsapp')}
+      ${waConn ? renderChatPanel('whatsapp', waChannel) : renderComingSoonPanel('WhatsApp Business','💬','Connect WhatsApp via Meta Embedded Signup to handle customer conversations with AI.','whatsapp')}
     </div>
     <div class="platform-panel ${STATE.platform==='instagram'?'active':''}" id="panel-instagram">
-      ${renderComingSoonPanel('Instagram DMs','📸','Handle Instagram DMs with AI-powered inbox.','instagram')}
+      ${igConn ? renderChatPanel('instagram', igChannel) : renderComingSoonPanel('Instagram DMs','📸','Handle Instagram DMs with AI-powered inbox.','instagram')}
     </div>
   `
 
@@ -1130,25 +1207,26 @@ function renderPage() {
     switchPlatform(tab.dataset.platform)
   })
 
-  // Trigger reveals
   requestAnimationFrame(() => triggerReveals())
 
-  if (connected) {
+  if (gmailConn) {
     loadInbox()
     loadBucketCounts()
     loadTokenUsage()
     loadMetrics()
   }
+  if (waConn)  loadChatInbox('whatsapp')
+  if (igConn)  loadChatInbox('instagram')
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// METRICS — animated number update
+// METRICS
 // ══════════════════════════════════════════════════════════════════════════════
 function animateValue(el, newVal) {
   if (!el) return
   el.textContent = newVal
   el.classList.remove('counting')
-  void el.offsetWidth // reflow
+  void el.offsetWidth
   el.classList.add('counting')
 }
 
@@ -1170,7 +1248,6 @@ async function loadMetrics() {
     const autoSubEl = document.getElementById('m-auto-sub')
     if (autoSubEl && data.auto_replied_count)
       autoSubEl.textContent = `${data.auto_replied_count} AI auto-replied`
-    // Remove dots loaders
     document.querySelectorAll('.dots-loader').forEach(d => {
       const parent = d.closest('.metric-value')
       if (parent) parent.style.minHeight = ''
@@ -1312,6 +1389,444 @@ function renderEmailPanel(gmail) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Change 5: RENDER CHAT PANEL (WhatsApp / Instagram)
+// ══════════════════════════════════════════════════════════════════════════════
+function renderChatPanel(channelType, channelDoc) {
+  const isWA    = channelType === 'whatsapp'
+  const icon    = isWA ? '💬' : '📸'
+  const label   = isWA ? 'WhatsApp' : 'Instagram'
+  const arOn    = !!STATE.autoReplySettings[channelType]
+  const bucket  = STATE.chatBucket[channelType] || 'inbox'
+
+  return `
+  <div class="subnav-wrap">
+    <div class="subnav-tabs" id="chat-subnav-${channelType}">
+      <button class="subnav-tab ${bucket==='inbox'?'active':''}" data-bucket="inbox" data-channel="${channelType}">
+        <span class="snt-label">${icon} Inbox</span>
+        <span class="snt-count" id="chat-cnt-inbox-${channelType}">—</span>
+      </button>
+      <button class="subnav-tab ${bucket==='replied'?'active':''}" data-bucket="replied" data-channel="${channelType}">
+        <span class="snt-label">✅ Replied</span>
+        <span class="snt-count" id="chat-cnt-replied-${channelType}">0</span>
+      </button>
+      <button class="subnav-tab ${bucket==='dismissed'?'active':''}" data-bucket="dismissed" data-channel="${channelType}">
+        <span class="snt-label">🗑 Dismissed</span>
+        <span class="snt-count" id="chat-cnt-dismissed-${channelType}">0</span>
+      </button>
+    </div>
+    <div class="subnav-right">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="chat-search-${channelType}" type="text" placeholder="Search messages…"
+               oninput="handleChatSearch('${channelType}', this.value)">
+      </div>
+    </div>
+  </div>
+
+  ${arOn && bucket === 'inbox' ? `
+  <div class="auto-reply-banner">
+    ✦ AI Auto-Reply is ON — incoming ${label} messages will be replied to automatically
+    <button class="btn btn-secondary btn-sm" style="margin-left:auto"
+            onclick="toggleAutoReply('${channelType}',false)">
+      <span class="btn-text">Pause</span>
+    </button>
+  </div>` : ''}
+
+  <div class="inbox-wrap" id="chat-inbox-wrap-${channelType}">
+    <div class="inbox-split">
+      <div class="msg-list-pane" id="chat-list-${channelType}">${renderSkeletonList()}</div>
+      <div class="email-read-pane" id="chat-read-${channelType}">
+        <div class="read-empty">
+          <div class="read-empty-icon">${icon}</div>
+          <div class="read-empty-title">Select a message</div>
+          <div class="read-empty-sub">Click any ${label} message to view and reply</div>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Change 6: connectMeta
+// ══════════════════════════════════════════════════════════════════════════════
+async function connectMeta(btn) {
+  setBtnLoading(btn, true)
+  showSyncProgress()
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/meta/connect`)
+    window.location.href = data.url
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error')
+    setBtnLoading(btn, false)
+    hideSyncProgress()
+  }
+}
+
+// Change 6: disconnectChannel (WA / IG)
+async function disconnectChannel(channelType) {
+  const label = channelType === 'whatsapp' ? 'WhatsApp' : 'Instagram'
+  if (!confirm(`Disconnect ${label}? The agent will stop processing messages.`)) return
+  showSyncProgress()
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${channelType}`, { method: 'DELETE' })
+    showToast(`${label} disconnected`, 'info')
+    STATE.threadCache = {}
+    await loadPage()
+  } catch (e) { showToast(e.message, 'error') }
+  finally { hideSyncProgress() }
+}
+
+// Change 6: loadChatInbox
+let _chatSearchTimers = {}
+function handleChatSearch(channelType, val) {
+  clearTimeout(_chatSearchTimers[channelType])
+  _chatSearchTimers[channelType] = setTimeout(() => {
+    STATE.chatPage[channelType] = 1
+    STATE.chatSelectedId[channelType] = null
+    const rp = document.getElementById(`chat-read-${channelType}`)
+    if (rp) rp.innerHTML = `<div class="read-empty"><div class="read-empty-icon">${channelType==='whatsapp'?'💬':'📸'}</div><div class="read-empty-title">Select a message</div></div>`
+    loadChatInbox(channelType, val)
+  }, 350)
+}
+
+async function loadChatInbox(channelType, searchQuery) {
+  if (STATE.loadingChat[channelType]) return
+  STATE.loadingChat[channelType] = true
+
+  // Wire subnav tabs
+  const subnav = document.getElementById(`chat-subnav-${channelType}`)
+  if (subnav && !subnav._wired) {
+    subnav._wired = true
+    subnav.addEventListener('click', e => {
+      const btn = e.target.closest('.subnav-tab')
+      if (!btn) return
+      const bucket = btn.dataset.bucket
+      if (bucket === STATE.chatBucket[channelType]) return
+      STATE.chatBucket[channelType] = bucket
+      STATE.chatPage[channelType] = 1
+      STATE.chatSelectedId[channelType] = null
+      subnav.querySelectorAll('.subnav-tab').forEach(b => b.classList.toggle('active', b === btn))
+      const rp = document.getElementById(`chat-read-${channelType}`)
+      if (rp) rp.innerHTML = `<div class="read-empty"><div class="read-empty-icon">${channelType==='whatsapp'?'💬':'📸'}</div><div class="read-empty-title">Select a message</div></div>`
+      loadChatInbox(channelType)
+    })
+  }
+
+  const listPane = document.getElementById(`chat-list-${channelType}`)
+  try {
+    const bucket      = STATE.chatBucket[channelType] || 'inbox'
+    const page        = STATE.chatPage[channelType] || 1
+    const searchParam = searchQuery ? `&search=${encodeURIComponent(searchQuery)}` : ''
+    const url = `/agents/${STATE.agentId}/channels/gmail/inbox?channel=${channelType}&bucket=${bucket}&page=${page}&limit=${PAGE_SIZE}${searchParam}`
+    const data = await apiFetch(url)
+    const msgs = (data.messages || []).filter(m => m.channel === channelType || !m.channel || channelType !== 'email')
+    STATE.chatMsgs[channelType]  = msgs
+    STATE.chatTotal[channelType] = data.total || msgs.length
+
+    // Update counts
+    const cntEl = document.getElementById(`chat-cnt-inbox-${channelType}`)
+    if (cntEl) cntEl.textContent = data.total || msgs.length
+
+    renderChatMsgList(channelType)
+  } catch (e) {
+    if (listPane) listPane.innerHTML = `<div class="msg-list-empty"><div class="msg-list-empty-icon">😵</div><div class="msg-list-empty-title">Failed to load</div><div class="msg-list-empty-sub" style="color:var(--red)">${esc(e.message)}</div></div>`
+  } finally {
+    STATE.loadingChat[channelType] = false
+  }
+}
+
+// Change 6: renderChatMsgList
+function renderChatMsgList(channelType) {
+  const pane = document.getElementById(`chat-list-${channelType}`)
+  if (!pane) return
+  const msgs   = STATE.chatMsgs[channelType] || []
+  const isWA   = channelType === 'whatsapp'
+  const icon   = isWA ? '💬' : '📸'
+  const label  = isWA ? 'WhatsApp' : 'Instagram'
+
+  if (!msgs.length) {
+    pane.innerHTML = `
+      <div class="msg-list-empty">
+        <div class="msg-list-empty-icon">${icon}</div>
+        <div class="msg-list-empty-title">No messages</div>
+        <div class="msg-list-empty-sub">Incoming ${label} messages will appear here</div>
+      </div>`
+    return
+  }
+
+  pane.innerHTML = msgs.map((msg, idx) => {
+    const from    = msg.from || 'Unknown'
+    const name    = from.replace(/^(\+?\d+)$/, (m) => m) // show phone as-is
+    const init    = (name[0] || '?').toUpperCase()
+    const bg      = avatarColor(name)
+    const time    = fmtRelTime(msg.created_at)
+    const snippet = cleanBody(msg.body, 100)
+    const sel     = STATE.chatSelectedId[channelType] === msg._id
+    const cfg     = INTENT_CFG[msg.intent] || INTENT_CFG.other
+    const chanBadgeCls = isWA ? 'bp-wa' : 'bp-ig'
+
+    return `
+    <div class="msg-row ${sel?'selected':''}" data-msgid="${esc(msg._id)}" data-channel="${channelType}"
+         style="animation-delay:${idx*30}ms">
+      <div class="msg-avatar" style="background:${bg}">${init}</div>
+      <div class="msg-right">
+        <div class="msg-row-top">
+          <div class="msg-from-name">${esc(name)}</div>
+          <div class="msg-time">${time}</div>
+        </div>
+        <div class="msg-snippet">${esc(snippet)}</div>
+        <div class="msg-badges">
+          <span class="badge-pill ${chanBadgeCls}">${icon} ${label}</span>
+          <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
+          ${msg.ai_draft ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ Draft ready</span>` : ''}
+          ${msg.status==='replied'&&msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
+          ${msg.status==='replied'&&!msg.auto_replied ? `<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>` : ''}
+        </div>
+      </div>
+    </div>`
+  }).join('')
+
+  // Wire click
+  pane.addEventListener('click', e => {
+    const row = e.target.closest('.msg-row[data-msgid]')
+    if (!row) return
+    const ch  = row.dataset.channel || channelType
+    const msg = (STATE.chatMsgs[ch] || []).find(m => m._id === row.dataset.msgid)
+    if (!msg || STATE.chatSelectedId[ch] === row.dataset.msgid) return
+    STATE.chatSelectedId[ch] = row.dataset.msgid
+    pane.querySelectorAll('.msg-row').forEach(r => r.classList.toggle('selected', r.dataset.msgid === row.dataset.msgid))
+    renderChatReadPane(ch, msg)
+  })
+}
+
+// Change 6: renderChatReadPane
+function renderChatReadPane(channelType, msg) {
+  const pane = document.getElementById(`chat-read-${channelType}`)
+  if (!pane) return
+  const isWA    = channelType === 'whatsapp'
+  const icon    = isWA ? '💬' : '📸'
+  const label   = isWA ? 'WhatsApp' : 'Instagram'
+  const from    = msg.from || 'Unknown'
+  const init    = (from[0] || '?').toUpperCase()
+  const bg      = avatarColor(from)
+  const cfg     = INTENT_CFG[msg.intent] || INTENT_CFG.other
+  const canReply = msg.status === 'inbox'
+
+  // Check 24h window for WhatsApp
+  const msgAgeMs    = Date.now() - new Date(msg.created_at).getTime()
+  const waExpired   = isWA && msgAgeMs > 24 * 60 * 60 * 1000
+  const chanBadgeCls = isWA ? 'bp-wa' : 'bp-ig'
+
+  pane.innerHTML = `
+  <div class="email-read-header">
+    <div class="email-read-subject">${icon} ${label} Message</div>
+    <div class="email-read-meta">
+      <div class="email-read-avatar" style="background:${bg}">${init}</div>
+      <div class="email-read-from-wrap">
+        <div class="email-read-from-name">${esc(from)}</div>
+        <div class="email-read-from-email">${isWA ? '📱 WhatsApp' : '📸 Instagram DM'}</div>
+      </div>
+      <div class="email-read-timestamp">${fmtRelTime(msg.created_at)}</div>
+    </div>
+    <div class="email-status-row">
+      <span class="badge-pill ${chanBadgeCls}">${icon} ${label}</span>
+      <span class="badge-pill ${cfg.cls}">${cfg.emoji} ${cfg.label}</span>
+      ${msg.auto_replied ? `<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>` : ''}
+      ${msg.draft_tokens_used ? `<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>` : ''}
+    </div>
+  </div>
+
+  <div class="conversation-panel" id="chat-conv-${channelType}">
+    <div class="conv-message direction-recv">
+      <div class="conv-message-header">
+        <span class="conv-dir-chip recv">↓ Received</span>
+        <span class="conv-from">${esc(from)}</span>
+        <span class="conv-time">${fmtRelTime(msg.created_at)}</span>
+      </div>
+      <div class="conv-body">${esc(msg.body || '')}</div>
+    </div>
+    ${msg.reply_sent ? `
+    <div class="conv-message direction-sent">
+      <div class="conv-message-header">
+        <span class="conv-dir-chip sent">↑ Sent</span>
+        <span class="conv-from">You${msg.auto_replied?'':''}</span>
+        ${msg.auto_replied?'<span class="conv-ai-label">✦ AI Reply</span>':''}
+        <span class="conv-time">${fmtRelTime(msg.replied_at||msg.updated_at)}</span>
+      </div>
+      <div class="conv-body">${esc(msg.reply_sent)}</div>
+    </div>` : ''}
+  </div>
+
+  <div class="email-reply-composer">
+    <div class="reply-composer-inner" id="chat-composer-inner-${channelType}">
+      ${canReply ? renderChatComposer(channelType, msg, waExpired) : `
+      <div class="replied-notice">
+        ${msg.auto_replied ? '✦ Auto-replied by AI' : (msg.status==='replied' ? '✅ Replied' : '🗑 Dismissed')}
+      </div>`}
+    </div>
+  </div>`
+
+  if (canReply && !waExpired) {
+    if (!msg.ai_draft) {
+      pane.querySelector('#chat-gen-draft-btn')?.addEventListener('click', () => generateChatDraft(channelType, msg._id))
+      pane.querySelector('#chat-dismiss-btn-cta')?.addEventListener('click', () => dismissChatMsg(channelType, msg._id))
+    } else {
+      pane.querySelector('#chat-send-btn')?.addEventListener('click', () => sendChatReply(channelType, msg._id))
+      pane.querySelector('#chat-regen-btn')?.addEventListener('click', () => regenChatDraft(channelType, msg._id))
+      pane.querySelector('#chat-dismiss-btn')?.addEventListener('click', () => dismissChatMsg(channelType, msg._id))
+    }
+  } else if (canReply && waExpired) {
+    pane.querySelector('#chat-dismiss-btn-exp')?.addEventListener('click', () => dismissChatMsg(channelType, msg._id))
+  } else {
+    pane.querySelector('#chat-dismiss-btn-replied')?.addEventListener('click', () => dismissChatMsg(channelType, msg._id))
+  }
+}
+
+function renderChatComposer(channelType, msg, waExpired) {
+  if (waExpired) {
+    return `
+    <div class="wa-window-warning">
+      ⚠️ The 24-hour WhatsApp messaging window has expired. You can only reply using a template message via the WhatsApp Business Manager.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-danger btn-sm" id="chat-dismiss-btn-exp"><span class="btn-text">🗑 Dismiss</span></button>
+    </div>`
+  }
+  if (!msg.ai_draft) {
+    return `
+    <div class="generate-reply-cta">
+      <div class="generate-reply-hint">
+        No AI draft yet. Click <strong>Generate Reply</strong> to let the AI write a response.
+        <br><span class="token-cost-hint">⚡ ~1,000–2,000 tokens per draft</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-ai" id="chat-gen-draft-btn">✦ <span class="btn-text">Generate Reply</span></button>
+        <button class="btn btn-secondary btn-sm" onclick="openChatManualReply('${channelType}','${esc(msg._id)}')">✏️ <span class="btn-text">Reply Manually</span></button>
+        <button class="btn btn-danger btn-sm" id="chat-dismiss-btn-cta">🗑 <span class="btn-text">Dismiss</span></button>
+        <span style="font-size:11.5px;color:var(--text-3);margin-left:auto">To: <strong style="color:var(--text-2)">${esc(msg.from)}</strong></span>
+      </div>
+    </div>`
+  }
+  return `
+  <div class="reply-ai-label">
+    ✦ AI Draft
+    <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-3)">— review &amp; edit before sending</span>
+  </div>
+  <textarea class="reply-textarea" id="chat-reply-text" style="min-height:80px">${esc(msg.ai_draft)}</textarea>
+  <div class="reply-composer-actions">
+    <div class="reply-action-left">
+      <button class="btn btn-primary" id="chat-send-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span class="btn-text">Send</span>
+      </button>
+      <button class="btn btn-secondary btn-sm" id="chat-regen-btn">🔄 <span class="btn-text">Regenerate</span></button>
+      <button class="btn btn-danger btn-sm" id="chat-dismiss-btn">🗑 <span class="btn-text">Dismiss</span></button>
+    </div>
+    <span style="font-size:11.5px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${esc(msg.from)}</strong></span>
+  </div>`
+}
+
+function openChatManualReply(channelType, msgId) {
+  const inner = document.getElementById(`chat-composer-inner-${channelType}`)
+  if (!inner) return
+  const msgs = STATE.chatMsgs[channelType] || []
+  const msg  = msgs.find(m => m._id === msgId)
+  if (!msg) return
+  inner.innerHTML = `
+  <div class="reply-ai-label" style="color:var(--text-2)">✏️ Manual Reply</div>
+  <textarea class="reply-textarea" id="chat-reply-text" style="min-height:80px" placeholder="Type your reply…"></textarea>
+  <div class="reply-composer-actions">
+    <div class="reply-action-left">
+      <button class="btn btn-primary" onclick="sendChatReply('${channelType}','${esc(msgId)}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span class="btn-text">Send</span>
+      </button>
+      <button class="btn btn-ai btn-sm" onclick="generateChatDraft('${channelType}','${esc(msgId)}')">✦ <span class="btn-text">AI Draft</span></button>
+      <button class="btn btn-danger btn-sm" onclick="dismissChatMsg('${channelType}','${esc(msgId)}')">🗑 <span class="btn-text">Dismiss</span></button>
+    </div>
+    <span style="font-size:11.5px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${esc(msg.from)}</strong></span>
+  </div>`
+}
+
+// Change 6: generateChatDraft
+async function generateChatDraft(channelType, msgId) {
+  const btn = document.getElementById('chat-gen-draft-btn')
+  setBtnLoading(btn, true)
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/${channelType}/messages/${msgId}/generate-draft`, { method: 'POST' })
+    const msgs = STATE.chatMsgs[channelType] || []
+    const msg  = msgs.find(m => m._id === msgId)
+    if (msg) { msg.ai_draft = data.ai_draft; msg.draft_tokens_used = data.tokens_used }
+    showToast(`Draft generated ✦ (${data.tokens_used} tokens)`, 'success')
+    if (msg) renderChatReadPane(channelType, msg)
+    renderChatMsgList(channelType)
+    loadTokenUsage()
+  } catch (e) {
+    showToast('Draft generation failed: ' + e.message, 'error')
+    setBtnLoading(btn, false)
+  }
+}
+
+// Change 6: regenChatDraft
+async function regenChatDraft(channelType, msgId) {
+  const btn = document.getElementById('chat-regen-btn')
+  setBtnLoading(btn, true)
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/${channelType}/messages/${msgId}/generate-draft`, { method: 'POST' })
+    const msgs = STATE.chatMsgs[channelType] || []
+    const msg  = msgs.find(m => m._id === msgId)
+    if (msg) { msg.ai_draft = data.ai_draft; msg.draft_tokens_used = data.tokens_used }
+    const ta = document.getElementById('chat-reply-text')
+    if (ta) {
+      ta.style.transition = 'opacity .2s'; ta.style.opacity = '0'
+      setTimeout(() => { ta.value = data.ai_draft || ''; ta.style.opacity = '1' }, 200)
+    }
+    showToast(`Regenerated ✦ (${data.tokens_used} tokens)`, 'success')
+    loadTokenUsage()
+  } catch (e) { showToast('Regenerate failed: ' + e.message, 'error') }
+  finally { setBtnLoading(btn, false) }
+}
+
+// Change 6: sendChatReply
+async function sendChatReply(channelType, msgId) {
+  const textarea = document.getElementById('chat-reply-text')
+  const text     = textarea?.value?.trim()
+  if (!text) { showToast('Reply cannot be empty', 'error'); return }
+  const btn = document.getElementById('chat-send-btn')
+  setBtnLoading(btn, true)
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${channelType}/reply/${msgId}`, {
+      method: 'POST',
+      body: JSON.stringify({ reply: text }),
+    })
+    showToast('Reply sent! ✉️', 'success')
+    STATE.chatSelectedId[channelType] = null
+    const rp = document.getElementById(`chat-read-${channelType}`)
+    if (rp) rp.innerHTML = `<div class="read-empty"><div class="read-empty-icon">${channelType==='whatsapp'?'💬':'📸'}</div><div class="read-empty-title">Select a message</div></div>`
+    STATE.chatMsgs[channelType] = (STATE.chatMsgs[channelType] || []).filter(m => m._id !== msgId)
+    renderChatMsgList(channelType)
+    loadPage()
+  } catch (e) {
+    showToast('Send failed: ' + e.message, 'error')
+    setBtnLoading(btn, false)
+  }
+}
+
+// Change 6: dismissChatMsg
+async function dismissChatMsg(channelType, msgId) {
+  try {
+    // Reuse the gmail dismiss endpoint with generic path — backend uses same collection
+    await apiFetch(`/agents/${STATE.agentId}/channels/gmail/messages/${msgId}/dismiss`, { method: 'PUT' })
+    showToast('Dismissed', 'info')
+    STATE.chatSelectedId[channelType] = null
+    const rp = document.getElementById(`chat-read-${channelType}`)
+    if (rp) rp.innerHTML = `<div class="read-empty"><div class="read-empty-icon">${channelType==='whatsapp'?'💬':'📸'}</div><div class="read-empty-title">Select a message</div></div>`
+    STATE.chatMsgs[channelType] = (STATE.chatMsgs[channelType] || []).filter(m => m._id !== msgId)
+    renderChatMsgList(channelType)
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // SEARCH
 // ══════════════════════════════════════════════════════════════════════════════
 let _searchTimer = null
@@ -1372,7 +1887,7 @@ function wireIntentFilterOnce() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// LOAD INBOX — with overlay loader
+// LOAD INBOX
 // ══════════════════════════════════════════════════════════════════════════════
 async function loadInbox(page) {
   if (page !== undefined) STATE.page = page
@@ -1380,7 +1895,6 @@ async function loadInbox(page) {
   STATE.loadingInbox = true
   wireSubnavOnce(); wireIntentFilterOnce()
 
-  // Show subtle list loading shimmer
   const listPane = document.getElementById('msgListPane')
   if (listPane && page !== undefined) {
     listPane.innerHTML = renderSkeletonList()
@@ -1560,7 +2074,7 @@ function avatarColor(str) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// RENDER MESSAGE LIST — with staggered entry animations
+// RENDER MESSAGE LIST
 // ══════════════════════════════════════════════════════════════════════════════
 function renderMsgList() {
   const pane = document.getElementById('msgListPane')
@@ -1626,7 +2140,6 @@ function renderMsgList() {
   const paginHTML  = totalPages > 1 ? renderPagination(totalPages) : ''
   pane.innerHTML   = listHTML + paginHTML
 
-  // Staggered enter animations
   pane.querySelectorAll('.msg-row').forEach((row, i) => {
     row.classList.add('entering')
     setTimeout(() => row.classList.remove('entering'), 300 + i*30)
@@ -1705,7 +2218,6 @@ function renderReadPane(msg) {
     </div>
   </div>`
 
-  // Wire composer buttons
   if (canReply) {
     if (!msg.ai_draft) {
       pane.querySelector('#generateDraftBtn')?.addEventListener('click', () => generateDraft(msg._id))
@@ -1724,7 +2236,6 @@ function renderReadPane(msg) {
     })
   }
 
-  // Scroll conversation to bottom
   requestAnimationFrame(() => {
     const panel = document.getElementById('convPanel')
     if (panel) panel.scrollTop = panel.scrollHeight
@@ -1840,7 +2351,7 @@ async function fetchAndRenderThread(msg) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// COMPOSER
+// COMPOSER (Gmail)
 // ══════════════════════════════════════════════════════════════════════════════
 function renderComposer(msg) {
   const toEmail = esc(parseFrom(msg.from).email)
@@ -1940,7 +2451,7 @@ function renderNonActionableFooter(msg, isNoise) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// AI ACTIONS — with proper button loading states
+// AI ACTIONS (Gmail)
 // ══════════════════════════════════════════════════════════════════════════════
 function setBtnLoading(btn, loading, originalHTML) {
   if (!btn) return
@@ -2110,7 +2621,7 @@ async function sendCompose() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CHANNEL ACTIONS
+// CHANNEL ACTIONS (Gmail)
 // ══════════════════════════════════════════════════════════════════════════════
 async function connectGmail(btn) {
   setBtnLoading(btn, true)
@@ -2141,7 +2652,6 @@ async function syncGmail(btn) {
   if (btn) btn.classList?.add('spinning')
   showSyncProgress()
 
-  // Show inbox overlay while syncing
   const inboxWrap = document.getElementById('inboxWrap')
   let overlay = null
   if (inboxWrap) {
@@ -2257,7 +2767,7 @@ function renderSetupGuide() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// COMING SOON PANEL
+// COMING SOON PANEL (for unconnected channels)
 // ══════════════════════════════════════════════════════════════════════════════
 function renderComingSoonPanel(name, icon, desc, channelKey) {
   const features = {
@@ -2282,21 +2792,13 @@ function renderComingSoonPanel(name, icon, desc, channelKey) {
     <div class="coming-soon-panel-title">${esc(name)}</div>
     <div class="coming-soon-panel-sub">${esc(desc)}</div>
     <div class="cs-features">${fList}</div>
-    <div class="roadmap-badge">🔜 Phase 2 — Coming Soon</div>
-    <div class="notify-form">
-      <input class="notify-input" type="email" placeholder="your@email.com" id="notify-${channelKey}">
-      <button class="btn btn-primary btn-sm" onclick="notifyMe('${channelKey}')"><span class="btn-text">Notify me</span></button>
+    <div style="margin-top:12px">
+      <button class="btn btn-meta" onclick="connectMeta(this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        <span class="btn-text">Connect via Meta Embedded Signup</span>
+      </button>
     </div>
   </div>`
-}
-
-function notifyMe(channel) {
-  const input = document.getElementById(`notify-${channel}`)
-  const email = input?.value?.trim()
-  if (!email || !email.includes('@')) { showToast('Enter a valid email address', 'error'); return }
-  localStorage.setItem(`sg_notify_${channel}`, email)
-  showToast(`You'll be notified at ${email} when ${channel} launches! 🎉`, 'success')
-  if (input) input.value = ''
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2383,19 +2885,17 @@ function esc(s) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ENHANCED TOAST — with progress bar and click-to-dismiss
+// TOASTS
 // ══════════════════════════════════════════════════════════════════════════════
 function showToast(msg, type='info', duration=4000) {
   const wrap = document.getElementById('toastWrap')
   const el   = document.createElement('div')
   el.className = `toast-item toast-${type}`
   el.innerHTML = `<span style="flex:1">${esc(msg)}</span>`
-  // progress bar
   const prog = document.createElement('div')
   prog.className = 'toast-progress'
   prog.style.animationDuration = duration + 'ms'
   el.appendChild(prog)
-  // click to dismiss
   el.addEventListener('click', () => removeToast(el))
   wrap.appendChild(el)
   const timer = setTimeout(() => removeToast(el), duration)
