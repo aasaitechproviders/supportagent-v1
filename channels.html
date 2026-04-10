@@ -350,6 +350,8 @@ const STATE = {
   total:        {email:0,     whatsapp:0,      instagram:0},
   page:         {email:1,     whatsapp:1,      instagram:1},
   selId:        {email:null,  whatsapp:null,   instagram:null},
+  // Patch 1 — STATE.loaded tracker
+  loaded:       {email:false, whatsapp:false,  instagram:false},
   search:       {email:'',    whatsapp:'',     instagram:''},
   loading:      {email:false, whatsapp:false,  instagram:false},
   msgMap:       {email:{},    whatsapp:{},     instagram:{}},
@@ -427,6 +429,8 @@ function buildAgentSelect(agents, agentFromUrl) {
     STATE.agentId = e.target.value
     STATE.platform = 'email'
     Object.keys(STATE.bucket).forEach(p => { STATE.bucket[p]='inbox'; STATE.page[p]=1; STATE.selId[p]=null; STATE.search[p]=''; STATE.intentFilter[p]='all' })
+    // Patch 2 — Reset loaded on agent switch
+    Object.keys(STATE.loaded).forEach(p => { STATE.loaded[p]=false })
     showSyncProgress(); await loadPage(); hideSyncProgress()
   })
 }
@@ -482,11 +486,11 @@ function renderPage() {
     </div>
     <div class="channel-card reveal reveal-delay-1 ${STATE.platform==='whatsapp'&&waOn?'active-platform':''}" onclick="${waOn?'switchPlatform(\'whatsapp\')':''}">
       <div class="channel-card-top"><div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div><div><div class="channel-name">WhatsApp Business</div><div class="channel-desc">Real-time customer conversations</div></div></div><div class="status-badge ${waOn?'badge-live':'badge-disconnected'}">${waOn?'● Live':'● Disconnected'}</div></div>
-      ${waOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arWA?'on':'off'}" id="ar-badge-whatsapp">${arWA?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arWA?'checked':''} onchange="toggleAutoReply('whatsapp',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">📱</span><span class="channel-info-text">${esc(wa.phone_number||wa.waba_id||'WhatsApp Business')}</span><span class="inbox-badge ${waCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('whatsapp')">${waCnt>0?`💬 ${waCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('whatsapp')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
+      ${waOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arWA?'on':'off'}" id="ar-badge-whatsapp">${arWA?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arWA?'checked':''} onchange="toggleAutoReply('whatsapp',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">📱</span><span class="channel-info-text">${esc(wa.display_account||wa.phone_number||(wa.waba_id?`WA Business (${wa.waba_id})`:'WhatsApp Business'))}</span><span class="inbox-badge ${waCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('whatsapp')">${waCnt>0?`💬 ${waCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('whatsapp')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
     </div>
     <div class="channel-card reveal reveal-delay-2 ${STATE.platform==='instagram'&&igOn?'active-platform':''}" onclick="${igOn?'switchPlatform(\'instagram\')':''}">
       <div class="channel-card-top"><div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div><div><div class="channel-name">Instagram DMs</div><div class="channel-desc">Manage DM conversations at scale</div></div></div><div class="status-badge ${igOn?'badge-live':'badge-disconnected'}">${igOn?'● Live':'● Disconnected'}</div></div>
-      ${igOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arIG?'on':'off'}" id="ar-badge-instagram">${arIG?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arIG?'checked':''} onchange="toggleAutoReply('instagram',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">📸</span><span class="channel-info-text">${esc(ig.page_name||ig.ig_user_id||'Instagram Business')}</span><span class="inbox-badge ${igCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('instagram')">${igCnt>0?`📸 ${igCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('instagram')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
+      ${igOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arIG?'on':'off'}" id="ar-badge-instagram">${arIG?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arIG?'checked':''} onchange="toggleAutoReply('instagram',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">📸</span><span class="channel-info-text">${esc(ig.display_account||ig.page_name||(ig.ig_user_id?`@${ig.ig_user_id}`:'Instagram Business'))}</span><span class="inbox-badge ${igCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('instagram')">${igCnt>0?`📸 ${igCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('instagram')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
     </div>
   </div>
   <div class="platform-tabs-bar reveal" id="platformTabsBar">
@@ -530,6 +534,9 @@ function renderPage() {
 
 // ── RENDER INBOX PANEL (unified) ──────────────────────────────────────────────
 function renderInboxPanel(platform) {
+  // Patch 7 — wire inbox panel early via rAF before HTML is returned
+  requestAnimationFrame(() => wireInboxPanel(platform))
+
   const isEmail = platform === 'email'
   const bucket  = STATE.bucket[platform]
   const arKey   = isEmail ? 'gmail' : platform
@@ -644,6 +651,8 @@ async function loadInbox(platform) {
       msgs=data.messages||[]; total=data.total||msgs.length; intentCounts=data.intent_counts||{}
     }
 
+    // Patch 6 — mark platform as loaded before storing msgs
+    STATE.loaded[platform]=true
     STATE.msgs[platform]=msgs; STATE.total[platform]=total
     STATE.msgMap[platform]={}; msgs.forEach(m=>{STATE.msgMap[platform][m._id]=m})
 
@@ -977,8 +986,8 @@ function switchPlatform(platform) {
   STATE.platform=platform
   document.querySelectorAll('.platform-tab').forEach(t=>t.classList.toggle('active',t.dataset.platform===platform))
   document.querySelectorAll('.platform-panel').forEach(p=>p.classList.toggle('active',p.id===`panel-${platform}`))
-  // Load if switching to a platform that hasn't loaded yet
-  if (!(STATE.msgs[platform]||[]).length) {
+  // Patch 5 — use STATE.loaded instead of msgs length
+  if (!STATE.loaded[platform]) {
     const ch=platform==='email'?STATE.channels.gmail:STATE.channels[platform]
     if(ch?.status==='active') loadInbox(platform)
   }
