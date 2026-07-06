@@ -407,7 +407,29 @@ const platCh = p => p === 'email' ? 'gmail' : p
   if (connected || params.get('error')) history.replaceState({}, '', location.pathname)
   try {
     STATE.agents = await apiFetch('/agents')
-    buildAgentSelect(STATE.agents, agentFromUrl)
+
+    // Auto-detect which agent has connected channels (whatsapp/instagram/gmail)
+    let preferredAgentId = null
+    if (!agentFromUrl && STATE.agents.length > 1) {
+      try {
+        const channelChecks = await Promise.all(
+          STATE.agents.map(a =>
+            apiFetch(`/agents/${a._id}/channels`)
+              .then(d => ({ id: a._id, channels: d.channels || [] }))
+              .catch(() => ({ id: a._id, channels: [] }))
+          )
+        )
+        // Prefer agent with most connected channels, then most inbox messages
+        const scored = channelChecks.map(({ id, channels }) => {
+          const connected = channels.filter(c => c.status === 'active').length
+          const inbox = channels.reduce((sum, c) => sum + (c.inbox_count || 0), 0)
+          return { id, score: connected * 1000 + inbox }
+        }).sort((a, b) => b.score - a.score)
+        if (scored[0]?.score > 0) preferredAgentId = scored[0].id
+      } catch {}
+    }
+
+    buildAgentSelect(STATE.agents, agentFromUrl, preferredAgentId)
     if (STATE.agents.length) await loadPage()
     else renderNoAgents()
   } catch (e) { showToast('Failed to load agents', 'error') }
@@ -418,18 +440,18 @@ const platCh = p => p === 'email' ? 'gmail' : p
   }
 })()
 
-function buildAgentSelect(agents, agentFromUrl) {
+function buildAgentSelect(agents, agentFromUrl, preferredAgentId) {
   const sel = document.getElementById('agentSelect')
   if (!agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
   sel.innerHTML = agents.map(a => `<option value="${a._id}">${esc(a.name)}</option>`).join('')
-  const matchId = agentFromUrl && agents.find(a => a._id === agentFromUrl)?._id
+  const matchId = (agentFromUrl && agents.find(a => a._id === agentFromUrl)?._id)
+               || (preferredAgentId && agents.find(a => a._id === preferredAgentId)?._id)
   STATE.agentId = matchId || agents[0]._id
-  if (matchId) sel.value = matchId
+  sel.value = STATE.agentId
   sel.addEventListener('change', async e => {
     STATE.agentId = e.target.value
     STATE.platform = 'email'
     Object.keys(STATE.bucket).forEach(p => { STATE.bucket[p]='inbox'; STATE.page[p]=1; STATE.selId[p]=null; STATE.search[p]=''; STATE.intentFilter[p]='all' })
-    // Patch 2 — Reset loaded on agent switch
     Object.keys(STATE.loaded).forEach(p => { STATE.loaded[p]=false })
     showSyncProgress(); await loadPage(); hideSyncProgress()
   })
