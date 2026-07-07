@@ -1160,6 +1160,9 @@ async function connectMeta(btn) {
   _ensureFBInit()
 
   // Step 3: open embedded signup popup
+  // redirect_uri must match what FB SDK uses internally for code exchange
+  const EMBEDDED_REDIRECT_URI = 'https://www.facebook.com/connect/login_success.html'
+
   FB.login(function(response) {
     console.log('[meta embedded] FB.login response:', JSON.stringify(response))
 
