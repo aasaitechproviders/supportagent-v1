@@ -373,6 +373,8 @@
     }
   </style>
   <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9'})();</script>
+  <!-- Facebook JS SDK for Embedded Signup -->
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
 </head>
 <body>
 <div class="page-loader" id="pageLoader">
@@ -1115,10 +1117,87 @@ async function syncGmail(btn) {
 }
 
 // ── META CONNECT / DISCONNECT ─────────────────────────────────────────────────
+// Embedded Signup — opens as a popup, no page redirect.
+// FB SDK is loaded async in <head>. FB.init is called here on first use.
+let _fbInitDone = false
+function _ensureFBInit() {
+  if (_fbInitDone || typeof FB === 'undefined') return
+  FB.init({ appId: '957411050339754', autoLogAppEvents: true, xfbml: false, version: 'v18.0' })
+  _fbInitDone = true
+}
+
 async function connectMeta(btn) {
-  setBtnLoading(btn,true); showSyncProgress()
-  try{const data=await apiFetch(`/agents/${STATE.agentId}/channels/meta/connect`);window.location.href=data.url}
-  catch(e){showToast('Failed: '+e.message,'error');setBtnLoading(btn,false);hideSyncProgress()}
+  setBtnLoading(btn, true)
+  showSyncProgress()
+
+  // Get state token from backend first (same as before — used for CSRF + agent binding)
+  let stateToken
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/meta/connect`)
+    // data.url contains the state param — extract it
+    const url  = new URL(data.url)
+    stateToken = url.searchParams.get('state')
+  } catch (e) {
+    showToast('Failed to start Meta connect: ' + e.message, 'error')
+    setBtnLoading(btn, false)
+    hideSyncProgress()
+    return
+  }
+
+  // Wait for FB SDK to be ready
+  let attempts = 0
+  while (typeof FB === 'undefined' && attempts < 20) {
+    await new Promise(r => setTimeout(r, 200))
+    attempts++
+  }
+  if (typeof FB === 'undefined') {
+    showToast('Facebook SDK failed to load. Please disable ad blockers and try again.', 'error')
+    setBtnLoading(btn, false)
+    hideSyncProgress()
+    return
+  }
+
+  _ensureFBInit()
+
+  FB.login(function(response) {
+    if (response.authResponse?.code) {
+      // Send the code to our existing callback endpoint
+      const callbackUrl = (window.API_BASE || '') + '/channels/meta/callback'
+        + '?code=' + encodeURIComponent(response.authResponse.code)
+        + '&state=' + encodeURIComponent(stateToken)
+      fetch(callbackUrl, {
+        credentials: 'include',
+        headers: { 'Accept': 'application/json', 'X-Embedded-Signup': '1' }
+      })
+        .then(async r => {
+          const json = await r.json()
+          if (!r.ok) throw new Error(json.error || 'Callback failed')
+          return json
+        })
+        .then(json => {
+          const ch = (json.connected || [])
+          const label = ch.includes('whatsapp') && ch.includes('instagram')
+            ? 'WhatsApp & Instagram' : ch.includes('whatsapp') ? 'WhatsApp' : 'Instagram'
+          showToast(`✅ ${label} connected!`, 'success')
+          loadPage()
+        })
+        .catch(e => showToast('Connect failed: ' + e.message, 'error'))
+        .finally(() => { setBtnLoading(btn, false); hideSyncProgress() })
+    } else if (response.status === 'not_authorized' || response.status === 'unknown') {
+      showToast('Meta login cancelled or not authorized.', 'error')
+      setBtnLoading(btn, false)
+      hideSyncProgress()
+    } else {
+      showToast('Meta login failed. Please try again.', 'error')
+      setBtnLoading(btn, false)
+      hideSyncProgress()
+    }
+  }, {
+    config_id:     '2068241570458882',
+    response_type: 'code',
+    override_default_response_type: true,
+    extras: { setup: {}, featureType: '', sessionInfoVersion: '3' }
+  })
 }
 async function disconnectChannel(channelType) {
   const label=channelType==='whatsapp'?'WhatsApp':'Instagram'
