@@ -1167,7 +1167,7 @@ async function connectMeta(btn) {
     console.log('[meta embedded] FB.login response:', JSON.stringify(response))
 
     // FB JS SDK returns access_token directly — no code exchange needed
-    const accessToken = response.authResponse?.access_token
+    const accessToken = response.authResponse?.accessToken || response.authResponse?.access_token
     if (!accessToken) {
       const status = response.status || 'unknown'
       showToast(status === 'not_authorized' ? 'Meta connection cancelled.' : 'Meta login failed — please try again.', 'error')
