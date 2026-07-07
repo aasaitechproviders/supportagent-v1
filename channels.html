@@ -1172,14 +1172,19 @@ async function connectMeta(btn) {
       return
     }
 
-    // Step 4: send code to backend callback via fetch (JSON mode)
+    // Step 4: send code to backend callback via POST with JSON body
+    // Using POST to avoid URL length limits with long auth codes
     const callbackUrl = LAMBDA_API + '/channels/meta/callback'
-      + '?code=' + encodeURIComponent(code)
-      + '&state=' + encodeURIComponent(stateToken)
 
     fetch(callbackUrl, {
+      method: 'POST',
       credentials: 'include',
-      headers: { 'Accept': 'application/json', 'X-Embedded-Signup': '1' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Embedded-Signup': '1'
+      },
+      body: JSON.stringify({ code, state: stateToken })
     })
       .then(async r => {
         const json = await r.json().catch(() => ({}))
