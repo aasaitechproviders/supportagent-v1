@@ -407,28 +407,28 @@ const STATE = {
   agents:[], agentId:null,
   channels:{}, autoReplySettings:{}, channelEmail:null,
   platform:'email',
-  bucket:       {email:'inbox',whatsapp:'inbox',instagram:'inbox'},
-  intentFilter: {email:'all', whatsapp:'all', instagram:'all'},
-  msgs:         {email:[],    whatsapp:[],     instagram:[]},
-  total:        {email:0,     whatsapp:0,      instagram:0},
-  page:         {email:1,     whatsapp:1,      instagram:1},
-  selId:        {email:null,  whatsapp:null,   instagram:null},
+  bucket:       {email:'inbox',whatsapp:'inbox',instagram:'inbox',messenger:'inbox'},
+  intentFilter: {email:'all', whatsapp:'all', instagram:'all', messenger:'all'},
+  msgs:         {email:[],    whatsapp:[],     instagram:[],    messenger:[]},
+  total:        {email:0,     whatsapp:0,      instagram:0,     messenger:0},
+  page:         {email:1,     whatsapp:1,      instagram:1,     messenger:1},
+  selId:        {email:null,  whatsapp:null,   instagram:null,  messenger:null},
   // Patch 1 — STATE.loaded tracker
-  loaded:       {email:false, whatsapp:false,  instagram:false},
-  search:       {email:'',    whatsapp:'',     instagram:''},
-  loading:      {email:false, whatsapp:false,  instagram:false},
-  msgMap:       {email:{},    whatsapp:{},     instagram:{}},
-  counts:       {email:{inbox:0,replied:0,filtered:0},whatsapp:{inbox:0,replied:0,filtered:0},instagram:{inbox:0,replied:0,filtered:0}},
+  loaded:       {email:false, whatsapp:false,  instagram:false, messenger:false},
+  search:       {email:'',    whatsapp:'',     instagram:'',    messenger:''},
+  loading:      {email:false, whatsapp:false,  instagram:false, messenger:false},
+  msgMap:       {email:{},    whatsapp:{},     instagram:{},    messenger:{}},
+  counts:       {email:{inbox:0,replied:0,filtered:0},whatsapp:{inbox:0,replied:0,filtered:0},instagram:{inbox:0,replied:0,filtered:0},messenger:{inbox:0,replied:0,filtered:0}},
   tokenUsage:{},
-  // Conversation state for WhatsApp/Instagram
-  convs:        {whatsapp:[], instagram:[]},
-  convTotal:    {whatsapp:0,  instagram:0},
-  convPage:     {whatsapp:1,  instagram:1},
-  convSearch:   {whatsapp:'', instagram:''},
-  convBucket:   {whatsapp:'all', instagram:'all'},
-  selThread:    {whatsapp:null, instagram:null},
-  threadData:   {whatsapp:null, instagram:null},
-  convLoading:  {whatsapp:false, instagram:false},
+  // Conversation state for WhatsApp/Instagram/Messenger
+  convs:        {whatsapp:[], instagram:[], messenger:[]},
+  convTotal:    {whatsapp:0,  instagram:0,  messenger:0},
+  convPage:     {whatsapp:1,  instagram:1,  messenger:1},
+  convSearch:   {whatsapp:'', instagram:'', messenger:''},
+  convBucket:   {whatsapp:'all', instagram:'all', messenger:'all'},
+  selThread:    {whatsapp:null, instagram:null, messenger:null},
+  threadData:   {whatsapp:null, instagram:null, messenger:null},
+  convLoading:  {whatsapp:false, instagram:false, messenger:false},
 }
 const PAGE_SIZE = 20
 const INTENT_CFG = {
@@ -465,7 +465,10 @@ const platCh = p => p === 'email' ? 'gmail' : p
   const agentFromUrl = params.get('agent')
   if (connected === 'gmail')
     showToast('Gmail connected! 🎉 Only emails from now on will be processed.', 'success')
-  else if (connected.includes('whatsapp') && connected.includes('instagram')) {
+  else if (connected.includes('whatsapp') && connected.includes('instagram') && connected.includes('messenger')) {
+    showToast('WhatsApp + Instagram + Messenger connected! 🎉 All three channels are now live.', 'success')
+    STATE.platform = 'whatsapp'
+  } else if (connected.includes('whatsapp') && connected.includes('instagram')) {
     showToast('WhatsApp + Instagram connected! 🎉 Both channels are now live.', 'success')
     STATE.platform = 'whatsapp'
   } else if (connected.includes('whatsapp')) {
@@ -474,6 +477,9 @@ const platCh = p => p === 'email' ? 'gmail' : p
   } else if (connected.includes('instagram')) {
     showToast('Instagram connected! 📸 DMs will be processed in real time.', 'success')
     STATE.platform = 'instagram'
+  } else if (connected.includes('messenger')) {
+    showToast('Facebook Messenger connected! 💙 Messages will be processed in real time.', 'success')
+    STATE.platform = 'messenger'
   }
   if (params.get('error')) showToast('Connection failed: ' + decodeURIComponent(params.get('error')), 'error')
   if (connected || params.get('error')) history.replaceState({}, '', location.pathname)
@@ -559,9 +565,10 @@ function renderPage() {
   const gmail   = STATE.channels.gmail     || null
   const wa      = STATE.channels.whatsapp  || null
   const ig      = STATE.channels.instagram || null
-  const gmailOn = gmail?.status === 'active', waOn = wa?.status === 'active', igOn = ig?.status === 'active'
-  const arGmail = !!STATE.autoReplySettings.gmail, arWA = !!STATE.autoReplySettings.whatsapp, arIG = !!STATE.autoReplySettings.instagram
-  const inboxCnt = gmail?.inbox_count||0, waCnt = wa?.inbox_count||0, igCnt = ig?.inbox_count||0
+  const fb      = STATE.channels.messenger || null
+  const gmailOn = gmail?.status === 'active', waOn = wa?.status === 'active', igOn = ig?.status === 'active', fbOn = fb?.status === 'active'
+  const arGmail = !!STATE.autoReplySettings.gmail, arWA = !!STATE.autoReplySettings.whatsapp, arIG = !!STATE.autoReplySettings.instagram, arFB = !!STATE.autoReplySettings.messenger
+  const inboxCnt = gmail?.inbox_count||0, waCnt = wa?.inbox_count||0, igCnt = ig?.inbox_count||0, fbCnt = fb?.inbox_count||0
 
   document.getElementById('pageBody').innerHTML = `
   <div class="metrics-bar">
@@ -572,7 +579,7 @@ function renderPage() {
     <div class="metric-card mc-rate reveal reveal-delay-4"><div class="metric-label">📈 Reply Rate</div><div class="metric-value" id="m-rate"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">of inbox emails replied</div></div>
   </div>
   <div class="section-label reveal">Connected Channels</div>
-  ${!waOn&&!igOn?`<div class="meta-connect-banner reveal"><div class="meta-connect-banner-left"><div class="meta-connect-banner-icons">💬&nbsp;📸</div><div class="meta-connect-banner-text"><strong>Connect WhatsApp &amp; Instagram</strong><p>One tap — Meta Embedded Signup connects both channels simultaneously.</p></div></div><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`:''}
+  ${!waOn&&!igOn&&!fbOn?`<div class="meta-connect-banner reveal"><div class="meta-connect-banner-left"><div class="meta-connect-banner-icons">💬&nbsp;📸</div><div class="meta-connect-banner-text"><strong>Connect WhatsApp, Instagram &amp; Messenger</strong><p>One tap — Meta Embedded Signup connects all three channels simultaneously.</p></div></div><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`:''}
   <div class="channels-grid">
     <div class="channel-card reveal ${STATE.platform==='email'&&gmailOn?'active-platform':''}" onclick="switchPlatform('email')">
       <div class="channel-card-top"><div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div><div><div class="channel-name">Gmail / Google Workspace</div><div class="channel-desc">Smart inbox with AI drafts</div></div></div><div class="status-badge ${gmailOn?'badge-live':'badge-disconnected'}">${gmailOn?'● Live':'● Disconnected'}</div></div>
@@ -585,6 +592,10 @@ function renderPage() {
     <div class="channel-card reveal reveal-delay-2 ${STATE.platform==='instagram'&&igOn?'active-platform':''}" onclick="${igOn?'switchPlatform(\'instagram\')':''}">
       <div class="channel-card-top"><div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div><div><div class="channel-name">Instagram DMs</div><div class="channel-desc">Manage DM conversations at scale</div></div></div><div class="status-badge ${igOn?'badge-live':'badge-disconnected'}">${igOn?'● Live':'● Disconnected'}</div></div>
       ${igOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arIG?'on':'off'}" id="ar-badge-instagram">${arIG?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arIG?'checked':''} onchange="toggleAutoReply('instagram',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">📸</span><span class="channel-info-text">${esc(ig.display_account||ig.page_name||(ig.ig_user_id?`@${ig.ig_user_id}`:'Instagram Business'))}</span><span class="inbox-badge ${igCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('instagram')">${igCnt>0?`📸 ${igCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('instagram')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
+    </div>
+    <div class="channel-card reveal reveal-delay-3 ${STATE.platform==='messenger'&&fbOn?'active-platform':''}" onclick="${fbOn?'switchPlatform(\'messenger\')':''}">
+      <div class="channel-card-top"><div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#0084FF,#00B2FF)">💙</div><div><div class="channel-name">Facebook Messenger</div><div class="channel-desc">Automate Messenger conversations</div></div></div><div class="status-badge ${fbOn?'badge-live':'badge-disconnected'}">${fbOn?'● Live':'● Disconnected'}</div></div>
+      ${fbOn?`<div class="auto-reply-row" onclick="event.stopPropagation()"><div class="auto-reply-label"><span>✦</span> AI Auto-Reply <span class="toggle-badge ${arFB?'on':'off'}" id="ar-badge-messenger">${arFB?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arFB?'checked':''} onchange="toggleAutoReply('messenger',this.checked)"><span class="toggle-slider"></span></label></div><div class="channel-info-row"><span style="font-size:13px">💙</span><span class="channel-info-text">${esc(fb.page_name||'Facebook Page')}</span><span class="inbox-badge ${fbCnt>0?'has-items':'clear'}" onclick="event.stopPropagation();switchPlatform('messenger')">${fbCnt>0?`💙 ${fbCnt}`:'✓ Clear'}</span></div><div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('messenger')">✕ <span class="btn-text">Disconnect</span></button></div>`:`<div class="channel-actions" onclick="event.stopPropagation()"><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`}
     </div>
   </div>
   <div class="platform-tabs-bar reveal" id="platformTabsBar">
@@ -603,6 +614,11 @@ function renderPage() {
       ${igOn?`<span class="pt-badge" id="pt-badge-instagram">${igCnt||'0'}</span>`:`<span class="pt-soon">Soon</span>`}
       ${arIG&&igOn?`<span class="pt-ai-tag">AI Auto</span>`:''}
     </button>
+    <button class="platform-tab${fbOn?'':' disabled'} ${STATE.platform==='messenger'?'active':''}" data-platform="messenger" ${!fbOn?'title="Connect Messenger via Meta"':''}>
+      <span class="pt-icon">💙</span><span>Messenger</span>
+      ${fbOn?`<span class="pt-badge" id="pt-badge-messenger">${fbCnt||'0'}</span>`:`<span class="pt-soon">Soon</span>`}
+      ${arFB&&fbOn?`<span class="pt-ai-tag">AI Auto</span>`:''}
+    </button>
   </div>
   <div class="platform-panel ${STATE.platform==='email'?'active':''}" id="panel-email">
     ${gmailOn?renderInboxPanel('email'):renderSetupGuide()}
@@ -612,6 +628,9 @@ function renderPage() {
   </div>
   <div class="platform-panel ${STATE.platform==='instagram'?'active':''}" id="panel-instagram">
     ${igOn?renderConvPanel('instagram'):renderComingSoonPanel('Instagram DMs','📸','Handle Instagram DMs with AI-powered inbox management.')}
+  </div>
+  <div class="platform-panel ${STATE.platform==='messenger'?'active':''}" id="panel-messenger">
+    ${fbOn?renderConvPanel('messenger'):renderComingSoonPanel('Facebook Messenger','💙','Connect via Meta Embedded Signup to automate Messenger conversations with AI.')}
   </div>`
 
   // Single platform tab listener — never duplicated
@@ -1197,10 +1216,13 @@ async function connectMeta(btn) {
       })
       .then(json => {
         const ch    = json.connected || []
-        const label = ch.includes('whatsapp') && ch.includes('instagram')
+        const label = ch.includes('whatsapp') && ch.includes('instagram') && ch.includes('messenger')
+          ? 'WhatsApp, Instagram & Messenger'
+          : ch.includes('whatsapp') && ch.includes('instagram')
           ? 'WhatsApp & Instagram'
           : ch.includes('whatsapp') ? 'WhatsApp'
           : ch.includes('instagram') ? 'Instagram'
+          : ch.includes('messenger') ? 'Facebook Messenger'
           : 'Meta channels'
         showToast(`✅ ${label} connected!`, 'success')
         loadPage()
@@ -1217,7 +1239,7 @@ async function connectMeta(btn) {
   })
 }
 async function disconnectChannel(channelType) {
-  const label=channelType==='whatsapp'?'WhatsApp':'Instagram'
+  const label=channelType==='whatsapp'?'WhatsApp':channelType==='instagram'?'Instagram':'Facebook Messenger'
   if(!confirm(`Disconnect ${label}? The agent will stop processing messages.`)) return
   showSyncProgress()
   try{await apiFetch(`/agents/${STATE.agentId}/channels/${channelType}`,{method:'DELETE'});showToast(`${label} disconnected`,'info');await loadPage()}
