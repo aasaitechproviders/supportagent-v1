@@ -1117,12 +1117,16 @@ async function syncGmail(btn) {
 }
 
 // ── META CONNECT / DISCONNECT ─────────────────────────────────────────────────
-// Embedded Signup — opens as a popup, no page redirect.
-// FB SDK is loaded async in <head>. FB.init is called here on first use.
+// Embedded Signup — opens as a FB popup, no page redirect.
+// FB SDK loaded async in <head>. FB.init called on first use.
+const META_APP_ID = '957411050339754'
+const META_CONFIG_ID = '2068241570458882'
+const LAMBDA_API = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
+
 let _fbInitDone = false
 function _ensureFBInit() {
   if (_fbInitDone || typeof FB === 'undefined') return
-  FB.init({ appId: '957411050339754', autoLogAppEvents: true, xfbml: false, version: 'v18.0' })
+  FB.init({ appId: META_APP_ID, autoLogAppEvents: true, xfbml: false, version: 'v18.0' })
   _fbInitDone = true
 }
 
@@ -1130,73 +1134,79 @@ async function connectMeta(btn) {
   setBtnLoading(btn, true)
   showSyncProgress()
 
-  // Get state token from backend first (same as before — used for CSRF + agent binding)
+  // Step 1: get state token from backend (CSRF + agent binding)
   let stateToken
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/channels/meta/connect`)
-    // data.url contains the state param — extract it
     const url  = new URL(data.url)
     stateToken = url.searchParams.get('state')
   } catch (e) {
     showToast('Failed to start Meta connect: ' + e.message, 'error')
-    setBtnLoading(btn, false)
-    hideSyncProgress()
+    setBtnLoading(btn, false); hideSyncProgress()
     return
   }
 
-  // Wait for FB SDK to be ready
+  // Step 2: wait for FB SDK (loaded async)
   let attempts = 0
-  while (typeof FB === 'undefined' && attempts < 20) {
+  while (typeof FB === 'undefined' && attempts < 30) {
     await new Promise(r => setTimeout(r, 200))
     attempts++
   }
   if (typeof FB === 'undefined') {
-    showToast('Facebook SDK failed to load. Please disable ad blockers and try again.', 'error')
-    setBtnLoading(btn, false)
-    hideSyncProgress()
+    showToast('Facebook SDK failed to load. Please disable any ad blockers and try again.', 'error')
+    setBtnLoading(btn, false); hideSyncProgress()
     return
   }
-
   _ensureFBInit()
 
+  // Step 3: open embedded signup popup
   FB.login(function(response) {
-    if (response.authResponse?.code) {
-      // Send the code to our existing callback endpoint
-      const callbackUrl = (window.API_BASE || '') + '/channels/meta/callback'
-        + '?code=' + encodeURIComponent(response.authResponse.code)
-        + '&state=' + encodeURIComponent(stateToken)
-      fetch(callbackUrl, {
-        credentials: 'include',
-        headers: { 'Accept': 'application/json', 'X-Embedded-Signup': '1' }
-      })
-        .then(async r => {
-          const json = await r.json()
-          if (!r.ok) throw new Error(json.error || 'Callback failed')
-          return json
-        })
-        .then(json => {
-          const ch = (json.connected || [])
-          const label = ch.includes('whatsapp') && ch.includes('instagram')
-            ? 'WhatsApp & Instagram' : ch.includes('whatsapp') ? 'WhatsApp' : 'Instagram'
-          showToast(`✅ ${label} connected!`, 'success')
-          loadPage()
-        })
-        .catch(e => showToast('Connect failed: ' + e.message, 'error'))
-        .finally(() => { setBtnLoading(btn, false); hideSyncProgress() })
-    } else if (response.status === 'not_authorized' || response.status === 'unknown') {
-      showToast('Meta login cancelled or not authorized.', 'error')
-      setBtnLoading(btn, false)
-      hideSyncProgress()
-    } else {
-      showToast('Meta login failed. Please try again.', 'error')
-      setBtnLoading(btn, false)
-      hideSyncProgress()
+    console.log('[meta embedded] FB.login response:', JSON.stringify(response))
+
+    // Embedded signup returns code in authResponse.code
+    const code = response.authResponse?.code
+    if (!code) {
+      const status = response.status || 'unknown'
+      showToast(status === 'not_authorized' ? 'Meta connection cancelled.' : 'Meta login failed — please try again.', 'error')
+      setBtnLoading(btn, false); hideSyncProgress()
+      return
     }
+
+    // Step 4: send code to backend callback via fetch (JSON mode)
+    const callbackUrl = LAMBDA_API + '/channels/meta/callback'
+      + '?code=' + encodeURIComponent(code)
+      + '&state=' + encodeURIComponent(stateToken)
+
+    fetch(callbackUrl, {
+      credentials: 'include',
+      headers: { 'Accept': 'application/json', 'X-Embedded-Signup': '1' }
+    })
+      .then(async r => {
+        const json = await r.json().catch(() => ({}))
+        if (!r.ok) throw new Error(json.error || `Callback failed (${r.status})`)
+        return json
+      })
+      .then(json => {
+        const ch    = json.connected || []
+        const label = ch.includes('whatsapp') && ch.includes('instagram')
+          ? 'WhatsApp & Instagram'
+          : ch.includes('whatsapp') ? 'WhatsApp'
+          : ch.includes('instagram') ? 'Instagram'
+          : 'Meta channels'
+        showToast(`✅ ${label} connected!`, 'success')
+        loadPage()
+      })
+      .catch(e => {
+        console.error('[meta embedded] callback error:', e.message)
+        showToast('Connect failed: ' + e.message, 'error')
+      })
+      .finally(() => { setBtnLoading(btn, false); hideSyncProgress() })
+
   }, {
-    config_id:     '2068241570458882',
-    response_type: 'code',
-    override_default_response_type: true,
-    extras: { setup: {}, featureType: '', sessionInfoVersion: '3' }
+    config_id:                       META_CONFIG_ID,
+    response_type:                   'code',
+    override_default_response_type:  true,
+    extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
   })
 }
 async function disconnectChannel(channelType) {
