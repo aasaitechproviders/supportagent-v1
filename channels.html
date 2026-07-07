@@ -1166,17 +1166,18 @@ async function connectMeta(btn) {
   FB.login(function(response) {
     console.log('[meta embedded] FB.login response:', JSON.stringify(response))
 
-    // Embedded signup returns code in authResponse.code
-    const code = response.authResponse?.code
-    if (!code) {
+    // FB JS SDK returns access_token directly — no code exchange needed
+    const accessToken = response.authResponse?.access_token
+    if (!accessToken) {
       const status = response.status || 'unknown'
       showToast(status === 'not_authorized' ? 'Meta connection cancelled.' : 'Meta login failed — please try again.', 'error')
       setBtnLoading(btn, false); hideSyncProgress()
       return
     }
 
-    // Step 4: send code to backend callback via POST with JSON body
-    // Using POST to avoid URL length limits with long auth codes
+    console.log('[meta embedded] got access token, sending to backend...')
+
+    // Send token directly to backend — no code exchange needed
     const callbackUrl = LAMBDA_API + '/channels/meta/callback'
 
     fetch(callbackUrl, {
@@ -1187,7 +1188,7 @@ async function connectMeta(btn) {
         'Accept': 'application/json',
         'X-Embedded-Signup': '1'
       },
-      body: JSON.stringify({ code, state: stateToken })
+      body: JSON.stringify({ access_token: accessToken, state: stateToken })
     })
       .then(async r => {
         const json = await r.json().catch(() => ({}))
@@ -1211,10 +1212,8 @@ async function connectMeta(btn) {
       .finally(() => { setBtnLoading(btn, false); hideSyncProgress() })
 
   }, {
-    config_id:                       META_CONFIG_ID,
-    response_type:                   'code',
-    override_default_response_type:  true,
-    extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
+    config_id: META_CONFIG_ID,
+    // Use default response_type (token) — avoids redirect_uri mismatch issues with code flow
   })
 }
 async function disconnectChannel(channelType) {
