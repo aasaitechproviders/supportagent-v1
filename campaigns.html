@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Campaigns — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background .2s,transform .2s}
+    .theme-toggle:hover{background:var(--surface-2);transform:rotate(20deg)}
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1200px;width:100%;box-sizing:border-box}
+    .page-grid{display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:start}
+    @media(max-width:900px){.page-grid{grid-template-columns:1fr}}
+    /* New campaign card */
+    .new-campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;position:sticky;top:80px}
+    .card-header{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:10px}
+    .card-title{font-size:13.5px;font-weight:700;color:var(--text)}
+    .card-body{padding:18px}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:11.5px;font-weight:700;color:var(--text-3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+    .inp{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box}
+    .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .sel{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+    .sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .textarea{width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
+    .textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .segment-box{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+    .segment-title{font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .segment-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .audience-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);margin-bottom:14px;min-height:42px}
+    .audience-num{font-size:20px;font-weight:800;color:var(--accent);min-width:30px}
+    .audience-label{font-size:12px;color:var(--text-3);line-height:1.4}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:38px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:background .15s,transform .15s,box-shadow .15s;white-space:nowrap;position:relative;overflow:hidden}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
+    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px);box-shadow:0 4px 14px var(--accent-glow)}
+    .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-secondary:hover{background:var(--surface-3)}
+    .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .btn-danger:hover{background:var(--red);color:#fff}
+    .btn-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .btn-success:hover{background:var(--green);color:#fff}
+    .btn-sm{height:30px;padding:0 11px;font-size:12px}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+    .btn.loading .btn-text{opacity:0}
+    .btn.loading::after{content:'';position:absolute;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .btn-full{width:100%;justify-content:center}
+    /* Campaigns list */
+    .campaigns-list{display:flex;flex-direction:column;gap:12px}
+    .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+    .campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+    .campaign-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
+    .campaign-card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border)}
+    .campaign-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    .campaign-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px}
+    .campaign-meta{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .status-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+    .sp-draft{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .sp-sending{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+    .sp-sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .sp-failed{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .campaign-body{padding:14px 16px}
+    .campaign-message{font-size:12.5px;color:var(--text-2);line-height:1.6;background:var(--surface-2);padding:10px 12px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent)}
+    .campaign-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+    .cstat{display:flex;flex-direction:column;gap:2px}
+    .cstat-val{font-size:16px;font-weight:800;color:var(--text)}
+    .cstat-lbl{font-size:10.5px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .campaign-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .prog-bar{height:4px;background:var(--border-md);border-radius:4px;overflow:hidden;margin-bottom:10px}
+    .prog-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s}
+    /* Empty */
+    .empty-campaigns{padding:60px 20px;text-align:center;color:var(--text-3)}
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.open{display:flex}
+    .confirm-modal{background:var(--surface);border-radius:var(--r-lg);padding:24px;max-width:420px;width:100%;box-shadow:var(--sh-lg)}
+    .confirm-modal h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .confirm-modal p{font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:20px}
+    .confirm-modal .actions{display:flex;gap:10px;justify-content:flex-end}
+    /* Toast */
+    .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .toast-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;min-width:220px;box-shadow:var(--sh-lg);cursor:pointer;animation:toast-in .25s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes toast-in{from{opacity:0;transform:translateX(20px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+    .toast-item.removing{animation:toast-out .2s ease both}
+    @keyframes toast-out{to{opacity:0;transform:translateX(20px) scale(.9)}}
+    .toast-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .toast-error{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .toast-info{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
+    .char-count{font-size:11px;color:var(--text-3);text-align:right;margin-top:3px}
+    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.segment-grid{grid-template-columns:1fr}}
+  </style>
+  <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark')})()</script>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<nav class="sidebar" id="sidebar"></nav>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mob-menu-btn" id="mobMenuBtn">☰</button>
+      <span class="topbar-title">📣 Campaigns</span>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <div class="agent-select-wrap"><select class="agent-select" id="agentSelect"></select></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="page-grid">
+
+      <!-- New Campaign Form -->
+      <div class="new-campaign-card">
+        <div class="card-header">
+          <span style="font-size:18px">📣</span>
+          <div class="card-title">New Campaign</div>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label>Campaign Name</label>
+            <input class="inp" id="camp-name" type="text" placeholder="e.g. Diwali offer 2025">
+          </div>
+          <div class="field">
+            <label>Channel</label>
+            <select class="sel" id="camp-channel" onchange="previewAudience()">
+              <option value="whatsapp">💬 WhatsApp</option>
+              <option value="gmail">📧 Email</option>
+            </select>
+          </div>
+          <div class="segment-box">
+            <div class="segment-title">🎯 Target Segment</div>
+            <div class="segment-grid">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Intent</label>
+                <select class="sel" id="seg-intent" onchange="previewAudience()">
+                  <option value="">All intents</option>
+                  <option value="order">📦 Order</option>
+                  <option value="enquiry">❓ Enquiry</option>
+                  <option value="complaint">😤 Complaint</option>
+                  <option value="refund">💸 Refund</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Min Lead Score</label>
+                <select class="sel" id="seg-score" onchange="previewAudience()">
+                  <option value="">Any score</option>
+                  <option value="5">≥ 5</option>
+                  <option value="10">≥ 10</option>
+                  <option value="20">≥ 20 (high value)</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:10px">
+              <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Tag filter (optional)</label>
+              <input class="inp" id="seg-tag" type="text" placeholder="e.g. vip" oninput="debouncePreview()" style="height:34px">
+            </div>
+          </div>
+          <div class="audience-preview" id="audiencePreview">
+            <div class="audience-num" id="audienceNum">—</div>
+            <div class="audience-label" id="audienceLabel">Select filters to see audience size</div>
+          </div>
+          <div class="field">
+            <label>Message <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-3)">— keep under 1024 chars for WhatsApp</span></label>
+            <textarea class="textarea" id="camp-message" placeholder="Hi {name}, we have an exciting offer for you…" oninput="updateCharCount(this)"></textarea>
+            <div class="char-count" id="charCount">0 / 1024</div>
+          </div>
+          <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:14px;line-height:1.6">
+            ⚠️ <strong>WhatsApp policy:</strong> You can only message contacts who previously messaged your business. Campaigns go to your existing contact list. Use only pre-approved message templates to avoid account restrictions.
+          </div>
+          <button class="btn btn-primary btn-full" id="createBtn" onclick="createCampaign()">
+            <span class="btn-text">Create Campaign →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Campaigns List -->
+      <div>
+        <div class="section-label">Past Campaigns</div>
+        <div class="campaigns-list" id="campaignsList">
+          <div style="text-align:center;padding:40px;color:var(--text-3)">Loading…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
+<script>
+const STATE = { agents: [], agentId: null, campaigns: [] }
+
+;(async () => {
+  const nav = await renderNav('campaigns')
+  if (!nav) return
+  document.getElementById('themeToggle').addEventListener('click', () => toggleTheme())
+  document.getElementById('mobMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open')
+    document.getElementById('sidebarBackdrop').classList.toggle('open')
+  })
+  document.getElementById('sidebarBackdrop').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('sidebarBackdrop').classList.remove('open')
+  })
+  try {
+    STATE.agents = await apiFetch('/agents')
+    buildAgentSelect()
+    if (STATE.agents.length) { await loadCampaigns(); previewAudience() }
+  } catch (e) { showToast('Failed to load', 'error') }
+})()
+
+function buildAgentSelect() {
+  const sel = document.getElementById('agentSelect')
+  if (!STATE.agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
+  sel.innerHTML = STATE.agents.map(a => `<option value="${esc(a._id)}">${esc(a.name)}</option>`).join('')
+  STATE.agentId = STATE.agents[0]._id
+  sel.value = STATE.agentId
+  sel.addEventListener('change', async e => {
+    STATE.agentId = e.target.value
+    await loadCampaigns(); previewAudience()
+  })
+}
+
+async function loadCampaigns() {
+  const list = document.getElementById('campaignsList')
+  list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-3)">Loading…</div>'
+  try {
+    STATE.campaigns = await apiFetch(`/agents/${STATE.agentId}/campaigns`)
+    renderCampaigns()
+  } catch (e) {
+    list.innerHTML = `<div style="padding:20px;color:var(--red);text-align:center">${esc(e.message)}</div>`
+  }
+}
+
+function renderCampaigns() {
+  const list = document.getElementById('campaignsList')
+  if (!STATE.campaigns.length) {
+    list.innerHTML = `<div class="empty-campaigns">
+      <div style="font-size:36px;margin-bottom:12px">📣</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">No campaigns yet</div>
+      <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Create your first campaign to bulk-message a segment of your contacts</div>
+    </div>`
+    return
+  }
+
+  list.innerHTML = STATE.campaigns.map(c => {
+    const chIcon = c.channel === 'whatsapp' ? '💬' : '📧'
+    const chColor = c.channel === 'whatsapp' ? '#25D366' : '#EA4335'
+    const statusCls = { draft:'sp-draft', sending:'sp-sending', sent:'sp-sent', failed:'sp-failed' }[c.status] || 'sp-draft'
+    const statusLabel = { draft:'Draft', sending:'⏳ Sending…', sent:'✅ Sent', failed:'❌ Failed' }[c.status] || c.status
+    const sentPct = c.recipient_count > 0 ? Math.round((c.sent_count||0) / c.recipient_count * 100) : 0
+
+    const segmentParts = []
+    if (c.segment_filter?.intent)    segmentParts.push(`Intent: ${c.segment_filter.intent}`)
+    if (c.segment_filter?.min_score) segmentParts.push(`Score ≥ ${c.segment_filter.min_score}`)
+    if (c.segment_filter?.tag)       segmentParts.push(`Tag: ${c.segment_filter.tag}`)
+    const segLabel = segmentParts.length ? segmentParts.join(' · ') : 'All contacts'
+
+    return `<div class="campaign-card">
+      <div class="campaign-card-header">
+        <div class="campaign-icon" style="background:${chColor}22;border:1px solid ${chColor}44">${chIcon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="campaign-name">${esc(c.name)}</div>
+          <div class="campaign-meta">
+            <span class="status-pill ${statusCls}">${statusLabel}</span>
+            <span>${esc(segLabel)}</span>
+            <span>${fmtDate(c.created_at)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="campaign-body">
+        <div class="campaign-message">${esc((c.message||'').slice(0,200))}${(c.message||'').length>200?'…':''}</div>
+        ${c.status === 'sent' || c.status === 'sending' ? `
+        <div class="prog-bar"><div class="prog-fill" style="width:${sentPct}%"></div></div>
+        <div class="campaign-stats">
+          <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
+          <div class="cstat"><div class="cstat-val" style="color:var(--green)">${c.sent_count||0}</div><div class="cstat-lbl">Sent</div></div>
+          <div class="cstat"><div class="cstat-val" style="color:var(--red)">${c.failed_count||0}</div><div class="cstat-lbl">Failed</div></div>
+          <div class="cstat"><div class="cstat-val">${sentPct}%</div><div class="cstat-lbl">Success</div></div>
+        </div>` : `
+        <div class="campaign-stats">
+          <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
+        </div>`}
+        <div class="campaign-actions">
+          ${c.status === 'draft' ? `<button class="btn btn-success btn-sm" onclick="sendCampaign('${esc(c._id)}', this)">🚀 <span class="btn-text">Send Now</span></button>` : ''}
+          ${c.status === 'failed' ? `<button class="btn btn-primary btn-sm" onclick="sendCampaign('${esc(c._id)}', this)">🔄 <span class="btn-text">Retry</span></button>` : ''}
+          <button class="btn btn-secondary btn-sm" onclick="deleteCampaign('${esc(c._id)}')">🗑 Delete</button>
+          ${c.status === 'sent' ? `<span style="font-size:12px;color:var(--text-3);align-self:center">Sent ${fmtDate(c.sent_at)}</span>` : ''}
+        </div>
+        ${c.errors?.length ? `<div style="margin-top:8px;padding:8px 10px;background:var(--red-dim);border-radius:6px;font-size:11.5px;color:var(--red)">${esc(c.errors.slice(0,3).join(' | '))}</div>` : ''}
+      </div>
+    </div>`
+  }).join('')
+}
+
+// ── Audience Preview
+let _previewTimer = null
+function debouncePreview() { clearTimeout(_previewTimer); _previewTimer = setTimeout(previewAudience, 500) }
+
+async function previewAudience() {
+  if (!STATE.agentId) return
+  const numEl   = document.getElementById('audienceNum')
+  const labelEl = document.getElementById('audienceLabel')
+  numEl.textContent = '…'; labelEl.textContent = 'Counting audience…'
+  try {
+    const channel  = document.getElementById('camp-channel').value
+    const intent   = document.getElementById('seg-intent').value
+    const minScore = document.getElementById('seg-score').value
+    const tag      = document.getElementById('seg-tag').value.trim()
+    const p = new URLSearchParams({ channel, limit: 1 })
+    if (intent)   p.set('intent', intent)
+    if (minScore) p.set('min_score', minScore)
+    if (tag)      p.set('tag', tag)
+    const data = await apiFetch(`/agents/${STATE.agentId}/contacts?${p}`)
+    const n = data.total || 0
+    numEl.textContent   = n
+    numEl.style.color   = n === 0 ? 'var(--red)' : n < 10 ? 'var(--amber)' : 'var(--accent)'
+    labelEl.textContent = n === 0
+      ? 'No contacts match this segment'
+      : `${n} contact${n===1?'':'s'} will receive this message`
+  } catch {
+    numEl.textContent = '?'; labelEl.textContent = 'Could not load audience'
+  }
+}
+
+function updateCharCount(ta) {
+  const el = document.getElementById('charCount')
+  if (el) {
+    const n = ta.value.length
+    el.textContent = `${n} / 1024`
+    el.style.color = n > 1024 ? 'var(--red)' : n > 800 ? 'var(--amber)' : 'var(--text-3)'
+  }
+}
+
+// ── Create Campaign
+async function createCampaign() {
+  const name    = document.getElementById('camp-name').value.trim()
+  const channel = document.getElementById('camp-channel').value
+  const message = document.getElementById('camp-message').value.trim()
+  const intent  = document.getElementById('seg-intent').value
+  const minScore = document.getElementById('seg-score').value
+  const tag     = document.getElementById('seg-tag').value.trim()
+  if (!name)    { showToast('Enter a campaign name', 'error'); return }
+  if (!message) { showToast('Enter a message', 'error'); return }
+  if (message.length > 1024 && channel === 'whatsapp') { showToast('Message too long for WhatsApp (max 1024)', 'error'); return }
+
+  const btn = document.getElementById('createBtn')
+  btn.disabled = true; btn.classList.add('loading')
+  try {
+    const segment_filter = {}
+    if (intent)   segment_filter.intent    = intent
+    if (minScore) segment_filter.min_score = parseInt(minScore)
+    if (tag)      segment_filter.tag       = tag
+
+    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns`, {
+      method: 'POST',
+      body: JSON.stringify({ name, channel, message, segment_filter })
+    })
+    showToast(`Campaign created — ${data.recipient_count} recipients`, 'success')
+    document.getElementById('camp-name').value    = ''
+    document.getElementById('camp-message').value = ''
+    document.getElementById('seg-intent').value   = ''
+    document.getElementById('seg-score').value    = ''
+    document.getElementById('seg-tag').value      = ''
+    document.getElementById('charCount').textContent = '0 / 1024'
+    await loadCampaigns(); previewAudience()
+  } catch (e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.classList.remove('loading') }
+}
+
+// ── Send Campaign
+async function sendCampaign(campaignId, btn) {
+  const c = STATE.campaigns.find(x => x._id === campaignId)
+  const n = c?.recipient_count || 0
+  if (!confirm(`Send to ${n} contact${n===1?'':'s'}? This cannot be undone.`)) return
+  btn.disabled = true; btn.classList.add('loading')
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns/${campaignId}/send`, { method: 'POST' })
+    showToast(`✅ Sent to ${data.sent}/${data.total} contacts`, 'success')
+    await loadCampaigns()
+  } catch (e) { showToast('Send failed: ' + e.message, 'error'); btn.disabled = false; btn.classList.remove('loading') }
+}
+
+// ── Delete Campaign
+async function deleteCampaign(campaignId) {
+  if (!confirm('Delete this campaign?')) return
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/campaigns/${campaignId}`, { method: 'DELETE' })
+    showToast('Deleted', 'info'); await loadCampaigns()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+// ── Helpers
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtDate(d){if(!d) return '—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
+function showToast(msg, type='info', dur=3500) {
+  const wrap = document.getElementById('toastWrap')
+  const el = document.createElement('div'); el.className = `toast-item toast-${type}`
+  el.innerHTML = `<span style="flex:1">${esc(msg)}</span>`
+  el.addEventListener('click', () => rmToast(el)); wrap.appendChild(el)
+  el._t = setTimeout(() => rmToast(el), dur)
+}
+function rmToast(el){clearTimeout(el._t);el.classList.add('removing');setTimeout(()=>el.remove(),220)}
+</script>
+</body>
+</html>
