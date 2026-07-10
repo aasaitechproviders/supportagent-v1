@@ -21,9 +21,10 @@
     .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
     .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
     .page-body{padding:20px 24px 40px;flex:1;max-width:1200px;width:100%;box-sizing:border-box}
-    .page-grid{display:grid;grid-template-columns:420px 1fr;gap:20px;align-items:start}
-    @media(max-width:900px){.page-grid{grid-template-columns:1fr}}
-    /* New campaign card */
+    .page-grid{display:grid;grid-template-columns:440px 1fr;gap:20px;align-items:start}
+    @media(max-width:960px){.page-grid{grid-template-columns:1fr}}
+
+    /* Form card */
     .new-campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;position:sticky;top:80px}
     .card-header{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:10px}
     .card-title{font-size:13.5px;font-weight:700;color:var(--text)}
@@ -34,29 +35,86 @@
     .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
     .sel{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
     .sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-    .textarea{width:100%;min-height:120px;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
+    .textarea{width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
     .textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .char-count{font-size:11px;color:var(--text-3);text-align:right;margin-top:3px}
+
+    /* Channel toggle */
+    .channel-tabs{display:flex;gap:6px;margin-bottom:14px}
+    .ch-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;border-radius:var(--r-sm);border:1.5px solid var(--border-md);background:var(--surface-2);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:border-color .15s,background .15s,color .15s}
+    .ch-tab:hover{border-color:var(--border-lg);color:var(--text)}
+    .ch-tab.active-wa{border-color:#25D366;background:#dcfce7;color:#166534}
+    [data-theme="dark"] .ch-tab.active-wa{background:#052e16;color:#4ade80;border-color:#166534}
+    .ch-tab.active-email{border-color:#EA4335;background:#fee2e2;color:#991b1b}
+    [data-theme="dark"] .ch-tab.active-email{background:#450a0a;color:#f87171;border-color:#991b1b}
+
+    /* WA mode toggle */
+    .wa-mode-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;gap:8px}
+    .wa-mode-label{font-size:12.5px;font-weight:600;color:var(--text-2)}
+    .wa-mode-desc{font-size:11px;color:var(--text-3);margin-top:1px}
+    .toggle-switch{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-slider{position:absolute;inset:0;background:var(--border-md);border-radius:20px;transition:background .25s}
+    .toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+    .toggle-switch input:checked+.toggle-slider{background:#25D366}
+    .toggle-switch input:checked+.toggle-slider::before{transform:translateX(16px)}
+
+    /* Template box */
+    .template-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;display:none}
+    [data-theme="dark"] .template-box{background:linear-gradient(135deg,#052e16,#0a3d1f);border-color:#166534}
+    .template-box.visible{display:block;animation:fadeIn .2s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .template-box-title{font-size:11.5px;font-weight:700;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    [data-theme="dark"] .template-box-title{color:#4ade80}
+    .template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .template-field label{font-size:11px;font-weight:700;color:#166534;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+    [data-theme="dark"] .template-field label{color:#4ade80}
+    .template-inp{width:100%;height:34px;padding:0 10px;border:1px solid #86efac;border-radius:7px;background:rgba(255,255,255,.7);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .2s;box-sizing:border-box}
+    [data-theme="dark"] .template-inp{background:rgba(0,0,0,.3);border-color:#166534}
+    .template-inp:focus{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    .template-vars-title{font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;display:flex;align-items:center;gap:6px}
+    [data-theme="dark"] .template-vars-title{color:#4ade80}
+    .var-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+    .var-label{font-size:12px;font-weight:700;color:#166534;background:#bbf7d0;padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+    [data-theme="dark"] .var-label{background:#166534;color:#4ade80}
+    .var-arrow{color:var(--text-3);flex-shrink:0;font-size:12px}
+    .template-preview{margin-top:10px;background:rgba(255,255,255,.6);border:1px solid #86efac;border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text-2);line-height:1.6;display:none}
+    [data-theme="dark"] .template-preview{background:rgba(0,0,0,.3);border-color:#166534}
+    .template-preview.visible{display:block}
+    .template-preview-label{font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+    [data-theme="dark"] .template-preview-label{color:#4ade80}
+
+    /* Free-form message box */
+    .freeform-box{display:none}
+    .freeform-box.visible{display:block}
+
+    /* Segment */
     .segment-box{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
     .segment-title{font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
     .segment-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .audience-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);margin-bottom:14px;min-height:42px}
-    .audience-num{font-size:20px;font-weight:800;color:var(--accent);min-width:30px}
+    .audience-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);margin-bottom:14px;min-height:44px}
+    .audience-num{font-size:22px;font-weight:800;color:var(--accent);min-width:32px}
     .audience-label{font-size:12px;color:var(--text-3);line-height:1.4}
+
+    /* Buttons */
     .btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:38px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:background .15s,transform .15s,box-shadow .15s;white-space:nowrap;position:relative;overflow:hidden}
     .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
-    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px);box-shadow:0 4px 14px var(--accent-glow)}
+    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
     .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
     .btn-secondary:hover{background:var(--surface-3)}
     .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
     .btn-danger:hover{background:var(--red);color:#fff}
     .btn-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .btn-success:hover{background:var(--green);color:#fff}
+    .btn-wa{background:#25D366;color:#fff;box-shadow:0 2px 8px rgba(37,211,102,.3)}
+    .btn-wa:hover{background:#1da851;transform:translateY(-1px)}
     .btn-sm{height:30px;padding:0 11px;font-size:12px}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
     .btn.loading .btn-text{opacity:0}
     .btn.loading::after{content:'';position:absolute;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .btn-full{width:100%;justify-content:center}
+
     /* Campaigns list */
     .campaigns-list{display:flex;flex-direction:column;gap:12px}
     .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
@@ -71,6 +129,8 @@
     .sp-sending{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
     .sp-sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .sp-failed{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .tpl-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#dcfce7;color:#166534;border:1px solid #86efac;white-space:nowrap}
+    [data-theme="dark"] .tpl-badge{background:#052e16;color:#4ade80;border-color:#166534}
     .campaign-body{padding:14px 16px}
     .campaign-message{font-size:12.5px;color:var(--text-2);line-height:1.6;background:var(--surface-2);padding:10px 12px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent)}
     .campaign-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
@@ -80,15 +140,12 @@
     .campaign-actions{display:flex;gap:8px;flex-wrap:wrap}
     .prog-bar{height:4px;background:var(--border-md);border-radius:4px;overflow:hidden;margin-bottom:10px}
     .prog-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s}
-    /* Empty */
     .empty-campaigns{padding:60px 20px;text-align:center;color:var(--text-3)}
-    /* Modal */
-    .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
-    .modal-overlay.open{display:flex}
-    .confirm-modal{background:var(--surface);border-radius:var(--r-lg);padding:24px;max-width:420px;width:100%;box-shadow:var(--sh-lg)}
-    .confirm-modal h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
-    .confirm-modal p{font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:20px}
-    .confirm-modal .actions{display:flex;gap:10px;justify-content:flex-end}
+
+    /* Info boxes */
+    .info-warn{background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:14px;line-height:1.6}
+    .info-tip{background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--accent);margin-bottom:14px;line-height:1.6}
+
     /* Toast */
     .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
     .toast-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;min-width:220px;box-shadow:var(--sh-lg);cursor:pointer;animation:toast-in .25s cubic-bezier(.34,1.56,.64,1)}
@@ -98,8 +155,8 @@
     .toast-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .toast-error{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
     .toast-info{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
-    .char-count{font-size:11px;color:var(--text-3);text-align:right;margin-top:3px}
-    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.segment-grid{grid-template-columns:1fr}}
+
+    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.segment-grid,.template-grid{grid-template-columns:1fr}}
   </style>
   <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark')})()</script>
 </head>
@@ -119,32 +176,153 @@
       <div class="agent-select-wrap"><select class="agent-select" id="agentSelect"></select></div>
     </div>
   </div>
+
   <div class="page-body">
     <div class="page-grid">
 
-      <!-- New Campaign Form -->
+      <!-- ── New Campaign Form ── -->
       <div class="new-campaign-card">
         <div class="card-header">
           <span style="font-size:18px">📣</span>
           <div class="card-title">New Campaign</div>
         </div>
         <div class="card-body">
+
+          <!-- Campaign name -->
           <div class="field">
             <label>Campaign Name</label>
             <input class="inp" id="camp-name" type="text" placeholder="e.g. Diwali offer 2025">
           </div>
+
+          <!-- Channel selector -->
           <div class="field">
             <label>Channel</label>
-            <select class="sel" id="camp-channel" onchange="previewAudience()">
-              <option value="whatsapp">💬 WhatsApp</option>
-              <option value="gmail">📧 Email</option>
-            </select>
+            <div class="channel-tabs">
+              <button class="ch-tab active-wa" id="ch-tab-wa" onclick="setChannel('whatsapp')">💬 WhatsApp</button>
+              <button class="ch-tab" id="ch-tab-email" onclick="setChannel('gmail')">📧 Email</button>
+            </div>
+            <input type="hidden" id="camp-channel" value="whatsapp">
           </div>
+
+          <!-- WhatsApp: template mode toggle (only shown for WA) -->
+          <div id="wa-mode-section">
+            <div class="wa-mode-row">
+              <div>
+                <div class="wa-mode-label">📋 Use Registered Template</div>
+                <div class="wa-mode-desc">Required for bulk campaigns — bypasses 24h window</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="wa-template-toggle" onchange="onTemplateModeChange()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- Template fields (shown when toggle ON) -->
+            <div class="template-box" id="template-box">
+              <div class="template-box-title">✅ WhatsApp Approved Template</div>
+
+              <div class="template-grid">
+                <div class="template-field">
+                  <label>Template Name *</label>
+                  <input class="template-inp" id="tpl-name" type="text" placeholder="e.g. diwali_offer_2025" oninput="updateTemplatePreview()">
+                </div>
+                <div class="template-field">
+                  <label>Language Code</label>
+                  <select class="template-inp" id="tpl-lang" style="height:34px;cursor:pointer" onchange="updateTemplatePreview()">
+                    <option value="en">en (English)</option>
+                    <option value="en_US">en_US (English US)</option>
+                    <option value="en_GB">en_GB (English UK)</option>
+                    <option value="hi">hi (Hindi)</option>
+                    <option value="ta">ta (Tamil)</option>
+                    <option value="te">te (Telugu)</option>
+                    <option value="kn">kn (Kannada)</option>
+                    <option value="ml">ml (Malayalam)</option>
+                    <option value="mr">mr (Marathi)</option>
+                    <option value="gu">gu (Gujarati)</option>
+                    <option value="bn">bn (Bengali)</option>
+                    <option value="pa">pa (Punjabi)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Variable mapping -->
+              <div class="template-vars-title">
+                📌 Variable Mapping
+                <span style="font-size:10px;font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0">— map template {{variables}} to contact fields</span>
+              </div>
+
+              <div id="var-rows">
+                <!-- Header variable (optional) -->
+                <div class="var-row">
+                  <span class="var-label">Header {{1}}</span>
+                  <span class="var-arrow">→</span>
+                  <select class="template-inp" id="tpl-header-var" style="flex:1;height:30px" onchange="updateTemplatePreview()">
+                    <option value="">(no header variable)</option>
+                    <option value="name">Contact Name</option>
+                    <option value="phone">Phone Number</option>
+                    <option value="email">Email Address</option>
+                    <option value="identifier">Identifier</option>
+                  </select>
+                </div>
+                <!-- Body variables -->
+                <div id="body-var-rows">
+                  <div class="var-row" id="body-var-row-0">
+                    <span class="var-label">Body {{1}}</span>
+                    <span class="var-arrow">→</span>
+                    <select class="template-inp" id="tpl-body-var-0" style="flex:1;height:30px" onchange="updateTemplatePreview()">
+                      <option value="name">Contact Name</option>
+                      <option value="phone">Phone Number</option>
+                      <option value="email">Email Address</option>
+                      <option value="identifier">Identifier</option>
+                      <option value="">(skip this variable)</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:6px;font-size:11px" onclick="addBodyVar()">+ Add Body Variable</button>
+              </div>
+
+              <!-- Preview -->
+              <div class="template-preview" id="template-preview">
+                <div class="template-preview-label">Preview (example contact)</div>
+                <div id="template-preview-text" style="white-space:pre-wrap"></div>
+              </div>
+
+              <div class="info-tip" style="margin-top:10px;margin-bottom:0">
+                💡 The template name must exactly match what's registered in <strong>Meta Business Manager → WhatsApp → Message Templates</strong>. Only <em>Approved</em> templates work.
+              </div>
+            </div>
+
+            <!-- Free-form message (shown when template toggle OFF for WA) -->
+            <div class="freeform-box" id="wa-freeform-box">
+              <div class="info-warn">
+                ⚠️ <strong>Free-form only works within the 24-hour window.</strong> If a contact messaged you within the last 24h this will work. For bulk outreach to all contacts, turn on Template Mode above.
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Message</label>
+                <textarea class="textarea" id="camp-message-wa" placeholder="Hi, we wanted to follow up on your enquiry…" oninput="updateCharCount(this,'charCountWa')"></textarea>
+                <div class="char-count" id="charCountWa">0 / 1024</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email message (only shown for email channel) -->
+          <div id="email-section" style="display:none">
+            <div class="info-tip">
+              💡 Email campaigns go to all matching contacts with an email address. No template approval needed.
+            </div>
+            <div class="field">
+              <label>Message Body</label>
+              <textarea class="textarea" id="camp-message-email" placeholder="Hi, we have an exciting update for you…" style="min-height:140px" oninput="updateCharCount(this,'charCountEmail')"></textarea>
+              <div class="char-count" id="charCountEmail">0 / 5000</div>
+            </div>
+          </div>
+
+          <!-- Segment filters -->
           <div class="segment-box">
             <div class="segment-title">🎯 Target Segment</div>
             <div class="segment-grid">
               <div>
-                <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Intent</label>
+                <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Intent</label>
                 <select class="sel" id="seg-intent" onchange="previewAudience()">
                   <option value="">All intents</option>
                   <option value="order">📦 Order</option>
@@ -154,7 +332,7 @@
                 </select>
               </div>
               <div>
-                <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Min Lead Score</label>
+                <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Min Lead Score</label>
                 <select class="sel" id="seg-score" onchange="previewAudience()">
                   <option value="">Any score</option>
                   <option value="5">≥ 5</option>
@@ -163,30 +341,25 @@
                 </select>
               </div>
             </div>
-            <div style="margin-top:10px">
-              <label style="font-size:11px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Tag filter (optional)</label>
+            <div style="margin-top:8px">
+              <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Tag (optional)</label>
               <input class="inp" id="seg-tag" type="text" placeholder="e.g. vip" oninput="debouncePreview()" style="height:34px">
             </div>
           </div>
+
+          <!-- Audience preview -->
           <div class="audience-preview" id="audiencePreview">
             <div class="audience-num" id="audienceNum">—</div>
-            <div class="audience-label" id="audienceLabel">Select filters to see audience size</div>
+            <div class="audience-label" id="audienceLabel">Select filters to preview audience size</div>
           </div>
-          <div class="field">
-            <label>Message <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-3)">— keep under 1024 chars for WhatsApp</span></label>
-            <textarea class="textarea" id="camp-message" placeholder="Hi {name}, we have an exciting offer for you…" oninput="updateCharCount(this)"></textarea>
-            <div class="char-count" id="charCount">0 / 1024</div>
-          </div>
-          <div style="background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:14px;line-height:1.6">
-            ⚠️ <strong>WhatsApp policy:</strong> You can only message contacts who previously messaged your business. Campaigns go to your existing contact list. Use only pre-approved message templates to avoid account restrictions.
-          </div>
+
           <button class="btn btn-primary btn-full" id="createBtn" onclick="createCampaign()">
             <span class="btn-text">Create Campaign →</span>
           </button>
         </div>
       </div>
 
-      <!-- Campaigns List -->
+      <!-- ── Campaigns List ── -->
       <div>
         <div class="section-label">Past Campaigns</div>
         <div class="campaigns-list" id="campaignsList">
@@ -202,8 +375,14 @@
 <script src="api.js"></script>
 <script src="nav.js"></script>
 <script>
-const STATE = { agents: [], agentId: null, campaigns: [] }
+const STATE = {
+  agents: [], agentId: null, campaigns: [],
+  channel: 'whatsapp',  // current selected channel
+  templateMode: false,  // WA template toggle
+  bodyVarCount: 1,      // how many body vars added
+}
 
+// ── INIT
 ;(async () => {
   const nav = await renderNav('campaigns')
   if (!nav) return
@@ -235,6 +414,201 @@ function buildAgentSelect() {
   })
 }
 
+// ── CHANNEL SWITCHING
+function setChannel(ch) {
+  STATE.channel = ch
+  document.getElementById('camp-channel').value = ch
+
+  // Tab styles
+  document.getElementById('ch-tab-wa').className    = 'ch-tab' + (ch === 'whatsapp' ? ' active-wa' : '')
+  document.getElementById('ch-tab-email').className = 'ch-tab' + (ch === 'gmail'    ? ' active-email' : '')
+
+  // Show/hide sections
+  document.getElementById('wa-mode-section').style.display  = ch === 'whatsapp' ? '' : 'none'
+  document.getElementById('email-section').style.display    = ch === 'gmail'    ? '' : 'none'
+
+  previewAudience()
+}
+
+// ── TEMPLATE MODE TOGGLE
+function onTemplateModeChange() {
+  STATE.templateMode = document.getElementById('wa-template-toggle').checked
+  document.getElementById('template-box').classList.toggle('visible', STATE.templateMode)
+  document.getElementById('wa-freeform-box').classList.toggle('visible', !STATE.templateMode)
+  if (STATE.templateMode) updateTemplatePreview()
+}
+
+// ── ADD BODY VARIABLE ROW
+function addBodyVar() {
+  const n = STATE.bodyVarCount++
+  const row = document.createElement('div')
+  row.className = 'var-row'
+  row.id = `body-var-row-${n}`
+  row.innerHTML = `
+    <span class="var-label">Body {{${n+1}}}</span>
+    <span class="var-arrow">→</span>
+    <select class="template-inp" id="tpl-body-var-${n}" style="flex:1;height:30px" onchange="updateTemplatePreview()">
+      <option value="name">Contact Name</option>
+      <option value="phone">Phone Number</option>
+      <option value="email">Email Address</option>
+      <option value="identifier">Identifier</option>
+      <option value="">(skip)</option>
+    </select>
+    <button onclick="removeBodyVar(${n})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:14px;padding:2px 4px" title="Remove">✕</button>
+  `
+  document.getElementById('body-var-rows').appendChild(row)
+  updateTemplatePreview()
+}
+
+function removeBodyVar(n) {
+  document.getElementById(`body-var-row-${n}`)?.remove()
+  updateTemplatePreview()
+}
+
+// ── TEMPLATE PREVIEW (shows example with "Sample Name")
+function updateTemplatePreview() {
+  const tplName = document.getElementById('tpl-name')?.value.trim()
+  const preview = document.getElementById('template-preview')
+  const previewText = document.getElementById('template-preview-text')
+  if (!tplName) { preview.classList.remove('visible'); return }
+
+  // Build example substitutions
+  const headerField = document.getElementById('tpl-header-var')?.value
+  const bodyFields  = []
+  let i = 0
+  while (document.getElementById(`tpl-body-var-${i}`)) {
+    bodyFields.push(document.getElementById(`tpl-body-var-${i}`).value)
+    i++
+  }
+
+  const exampleContact = { name: 'Priya Kumar', phone: '+91 98765 43210', email: 'priya@example.com', identifier: '+91 98765 43210' }
+  const fieldLabel = f => exampleContact[f] || f || '—'
+
+  let lines = []
+  if (headerField) lines.push(`Header: ${fieldLabel(headerField)}`)
+  lines.push(`Template: ${tplName}`)
+  if (bodyFields.filter(Boolean).length) {
+    lines.push(`Body vars: ${bodyFields.map((f,idx) => `{{${idx+1}}} = ${fieldLabel(f)}`).join(', ')}`)
+  }
+
+  previewText.textContent = lines.join('\n')
+  preview.classList.add('visible')
+}
+
+// ── AUDIENCE PREVIEW
+let _previewTimer = null
+function debouncePreview() { clearTimeout(_previewTimer); _previewTimer = setTimeout(previewAudience, 500) }
+
+async function previewAudience() {
+  if (!STATE.agentId) return
+  const numEl   = document.getElementById('audienceNum')
+  const labelEl = document.getElementById('audienceLabel')
+  numEl.textContent = '…'; labelEl.textContent = 'Counting…'
+  try {
+    const channel  = STATE.channel
+    const intent   = document.getElementById('seg-intent').value
+    const minScore = document.getElementById('seg-score').value
+    const tag      = document.getElementById('seg-tag')?.value.trim() || ''
+    const p = new URLSearchParams({ channel, limit: 1 })
+    if (intent)   p.set('intent', intent)
+    if (minScore) p.set('min_score', minScore)
+    if (tag)      p.set('tag', tag)
+    const data = await apiFetch(`/agents/${STATE.agentId}/contacts?${p}`)
+    const n = data.total || 0
+    numEl.textContent   = n
+    numEl.style.color   = n === 0 ? 'var(--red)' : n < 5 ? 'var(--amber)' : 'var(--accent)'
+    labelEl.textContent = n === 0
+      ? 'No contacts match — try different filters'
+      : `${n} contact${n===1?'':'s'} will receive this ${STATE.channel === 'whatsapp' ? (STATE.templateMode ? 'template' : 'message') : 'email'}`
+  } catch {
+    numEl.textContent = '?'; labelEl.textContent = 'Could not count audience'
+  }
+}
+
+function updateCharCount(ta, counterId) {
+  const el = document.getElementById(counterId)
+  if (!el) return
+  const max = counterId === 'charCountWa' ? 1024 : 5000
+  const n = ta.value.length
+  el.textContent = `${n} / ${max}`
+  el.style.color = n > max ? 'var(--red)' : n > max * 0.8 ? 'var(--amber)' : 'var(--text-3)'
+}
+
+// ── CREATE CAMPAIGN
+async function createCampaign() {
+  const name    = document.getElementById('camp-name').value.trim()
+  const channel = STATE.channel
+  if (!name) { showToast('Enter a campaign name', 'error'); return }
+
+  let message    = ''
+  let wa_template = null
+
+  if (channel === 'whatsapp') {
+    if (STATE.templateMode) {
+      // Template mode
+      const tplName = document.getElementById('tpl-name').value.trim()
+      if (!tplName) { showToast('Enter the template name from Meta Business Manager', 'error'); return }
+      const lang          = document.getElementById('tpl-lang').value
+      const headerVarField = document.getElementById('tpl-header-var').value
+      const bodyVarFields  = []
+      let i = 0
+      while (document.getElementById(`tpl-body-var-${i}`)) {
+        const v = document.getElementById(`tpl-body-var-${i}`).value
+        if (v) bodyVarFields.push(v)
+        i++
+      }
+      wa_template = { name: tplName, lang, header_var: headerVarField, body_vars: bodyVarFields }
+      message = `[Template: ${tplName}]`  // stored for display only
+    } else {
+      // Free-form WA
+      message = document.getElementById('camp-message-wa').value.trim()
+      if (!message) { showToast('Enter a message', 'error'); return }
+      if (message.length > 1024) { showToast('Message too long (max 1024 chars for WhatsApp)', 'error'); return }
+    }
+  } else {
+    // Email
+    message = document.getElementById('camp-message-email').value.trim()
+    if (!message) { showToast('Enter an email message', 'error'); return }
+  }
+
+  const intent   = document.getElementById('seg-intent').value
+  const minScore = document.getElementById('seg-score').value
+  const tag      = document.getElementById('seg-tag').value.trim()
+  const segment_filter = {}
+  if (intent)   segment_filter.intent    = intent
+  if (minScore) segment_filter.min_score = parseInt(minScore)
+  if (tag)      segment_filter.tag       = tag
+
+  const btn = document.getElementById('createBtn')
+  btn.disabled = true; btn.classList.add('loading')
+  try {
+    const payload = { name, channel, message, segment_filter }
+    if (wa_template) payload.wa_template = wa_template
+
+    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+    showToast(`Campaign created — ${data.recipient_count} recipients`, 'success')
+    // Reset form
+    document.getElementById('camp-name').value = ''
+    document.getElementById('tpl-name').value  = ''
+    document.getElementById('camp-message-wa').value    = ''
+    document.getElementById('camp-message-email').value = ''
+    document.getElementById('seg-intent').value = ''
+    document.getElementById('seg-score').value  = ''
+    document.getElementById('seg-tag').value    = ''
+    document.getElementById('wa-template-toggle').checked = false
+    STATE.templateMode = false
+    document.getElementById('template-box').classList.remove('visible')
+    document.getElementById('wa-freeform-box').classList.remove('visible')
+    document.getElementById('template-preview').classList.remove('visible')
+    await loadCampaigns(); previewAudience()
+  } catch (e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.classList.remove('loading') }
+}
+
+// ── LOAD + RENDER CAMPAIGNS
 async function loadCampaigns() {
   const list = document.getElementById('campaignsList')
   list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-3)">Loading…</div>'
@@ -252,23 +626,30 @@ function renderCampaigns() {
     list.innerHTML = `<div class="empty-campaigns">
       <div style="font-size:36px;margin-bottom:12px">📣</div>
       <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">No campaigns yet</div>
-      <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Create your first campaign to bulk-message a segment of your contacts</div>
+      <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Create your first campaign to reach a segment of your contacts</div>
     </div>`
     return
   }
 
   list.innerHTML = STATE.campaigns.map(c => {
-    const chIcon = c.channel === 'whatsapp' ? '💬' : '📧'
-    const chColor = c.channel === 'whatsapp' ? '#25D366' : '#EA4335'
-    const statusCls = { draft:'sp-draft', sending:'sp-sending', sent:'sp-sent', failed:'sp-failed' }[c.status] || 'sp-draft'
+    const isWA      = c.channel === 'whatsapp'
+    const chIcon    = isWA ? '💬' : '📧'
+    const chColor   = isWA ? '#25D366' : '#EA4335'
+    const isTemplate = !!c.wa_template?.name
+    const statusCls  = { draft:'sp-draft', sending:'sp-sending', sent:'sp-sent', failed:'sp-failed' }[c.status] || 'sp-draft'
     const statusLabel = { draft:'Draft', sending:'⏳ Sending…', sent:'✅ Sent', failed:'❌ Failed' }[c.status] || c.status
     const sentPct = c.recipient_count > 0 ? Math.round((c.sent_count||0) / c.recipient_count * 100) : 0
 
-    const segmentParts = []
-    if (c.segment_filter?.intent)    segmentParts.push(`Intent: ${c.segment_filter.intent}`)
-    if (c.segment_filter?.min_score) segmentParts.push(`Score ≥ ${c.segment_filter.min_score}`)
-    if (c.segment_filter?.tag)       segmentParts.push(`Tag: ${c.segment_filter.tag}`)
-    const segLabel = segmentParts.length ? segmentParts.join(' · ') : 'All contacts'
+    const segParts = []
+    if (c.segment_filter?.intent)    segParts.push(`Intent: ${c.segment_filter.intent}`)
+    if (c.segment_filter?.min_score) segParts.push(`Score ≥ ${c.segment_filter.min_score}`)
+    if (c.segment_filter?.tag)       segParts.push(`Tag: ${c.segment_filter.tag}`)
+    const segLabel = segParts.length ? segParts.join(' · ') : 'All contacts'
+
+    // What to show in message box
+    const msgDisplay = isTemplate
+      ? `📋 Template: <strong>${esc(c.wa_template.name)}</strong> (${esc(c.wa_template.lang||'en')})`
+      : esc((c.message||'').slice(0,200)) + ((c.message||'').length > 200 ? '…' : '')
 
     return `<div class="campaign-card">
       <div class="campaign-card-header">
@@ -277,27 +658,33 @@ function renderCampaigns() {
           <div class="campaign-name">${esc(c.name)}</div>
           <div class="campaign-meta">
             <span class="status-pill ${statusCls}">${statusLabel}</span>
+            ${isTemplate ? `<span class="tpl-badge">📋 Template</span>` : ''}
             <span>${esc(segLabel)}</span>
             <span>${fmtDate(c.created_at)}</span>
           </div>
         </div>
       </div>
       <div class="campaign-body">
-        <div class="campaign-message">${esc((c.message||'').slice(0,200))}${(c.message||'').length>200?'…':''}</div>
+        <div class="campaign-message">${msgDisplay}</div>
+        ${isTemplate && c.wa_template?.body_vars?.length ? `
+        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:10px">
+          Variables: ${c.wa_template.body_vars.map((v,i) => `{{${i+1}}} → ${v}`).join(', ')}
+          ${c.wa_template.header_var ? ` · Header {{1}} → ${c.wa_template.header_var}` : ''}
+        </div>` : ''}
         ${c.status === 'sent' || c.status === 'sending' ? `
-        <div class="prog-bar"><div class="prog-fill" style="width:${sentPct}%"></div></div>
-        <div class="campaign-stats">
-          <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
-          <div class="cstat"><div class="cstat-val" style="color:var(--green)">${c.sent_count||0}</div><div class="cstat-lbl">Sent</div></div>
-          <div class="cstat"><div class="cstat-val" style="color:var(--red)">${c.failed_count||0}</div><div class="cstat-lbl">Failed</div></div>
-          <div class="cstat"><div class="cstat-val">${sentPct}%</div><div class="cstat-lbl">Success</div></div>
-        </div>` : `
-        <div class="campaign-stats">
-          <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
-        </div>`}
+          <div class="prog-bar"><div class="prog-fill" style="width:${sentPct}%"></div></div>
+          <div class="campaign-stats">
+            <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
+            <div class="cstat"><div class="cstat-val" style="color:var(--green)">${c.sent_count||0}</div><div class="cstat-lbl">Sent</div></div>
+            <div class="cstat"><div class="cstat-val" style="color:var(--red)">${c.failed_count||0}</div><div class="cstat-lbl">Failed</div></div>
+            <div class="cstat"><div class="cstat-val">${sentPct}%</div><div class="cstat-lbl">Success Rate</div></div>
+          </div>` : `
+          <div class="campaign-stats">
+            <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
+          </div>`}
         <div class="campaign-actions">
-          ${c.status === 'draft' ? `<button class="btn btn-success btn-sm" onclick="sendCampaign('${esc(c._id)}', this)">🚀 <span class="btn-text">Send Now</span></button>` : ''}
-          ${c.status === 'failed' ? `<button class="btn btn-primary btn-sm" onclick="sendCampaign('${esc(c._id)}', this)">🔄 <span class="btn-text">Retry</span></button>` : ''}
+          ${c.status === 'draft'  ? `<button class="btn ${isWA&&isTemplate?'btn-wa':'btn-success'} btn-sm" onclick="sendCampaign('${esc(c._id)}',this)">🚀 <span class="btn-text">Send Now</span></button>` : ''}
+          ${c.status === 'failed' ? `<button class="btn btn-primary btn-sm" onclick="sendCampaign('${esc(c._id)}',this)">🔄 <span class="btn-text">Retry</span></button>` : ''}
           <button class="btn btn-secondary btn-sm" onclick="deleteCampaign('${esc(c._id)}')">🗑 Delete</button>
           ${c.status === 'sent' ? `<span style="font-size:12px;color:var(--text-3);align-self:center">Sent ${fmtDate(c.sent_at)}</span>` : ''}
         </div>
@@ -307,95 +694,27 @@ function renderCampaigns() {
   }).join('')
 }
 
-// ── Audience Preview
-let _previewTimer = null
-function debouncePreview() { clearTimeout(_previewTimer); _previewTimer = setTimeout(previewAudience, 500) }
-
-async function previewAudience() {
-  if (!STATE.agentId) return
-  const numEl   = document.getElementById('audienceNum')
-  const labelEl = document.getElementById('audienceLabel')
-  numEl.textContent = '…'; labelEl.textContent = 'Counting audience…'
-  try {
-    const channel  = document.getElementById('camp-channel').value
-    const intent   = document.getElementById('seg-intent').value
-    const minScore = document.getElementById('seg-score').value
-    const tag      = document.getElementById('seg-tag').value.trim()
-    const p = new URLSearchParams({ channel, limit: 1 })
-    if (intent)   p.set('intent', intent)
-    if (minScore) p.set('min_score', minScore)
-    if (tag)      p.set('tag', tag)
-    const data = await apiFetch(`/agents/${STATE.agentId}/contacts?${p}`)
-    const n = data.total || 0
-    numEl.textContent   = n
-    numEl.style.color   = n === 0 ? 'var(--red)' : n < 10 ? 'var(--amber)' : 'var(--accent)'
-    labelEl.textContent = n === 0
-      ? 'No contacts match this segment'
-      : `${n} contact${n===1?'':'s'} will receive this message`
-  } catch {
-    numEl.textContent = '?'; labelEl.textContent = 'Could not load audience'
-  }
-}
-
-function updateCharCount(ta) {
-  const el = document.getElementById('charCount')
-  if (el) {
-    const n = ta.value.length
-    el.textContent = `${n} / 1024`
-    el.style.color = n > 1024 ? 'var(--red)' : n > 800 ? 'var(--amber)' : 'var(--text-3)'
-  }
-}
-
-// ── Create Campaign
-async function createCampaign() {
-  const name    = document.getElementById('camp-name').value.trim()
-  const channel = document.getElementById('camp-channel').value
-  const message = document.getElementById('camp-message').value.trim()
-  const intent  = document.getElementById('seg-intent').value
-  const minScore = document.getElementById('seg-score').value
-  const tag     = document.getElementById('seg-tag').value.trim()
-  if (!name)    { showToast('Enter a campaign name', 'error'); return }
-  if (!message) { showToast('Enter a message', 'error'); return }
-  if (message.length > 1024 && channel === 'whatsapp') { showToast('Message too long for WhatsApp (max 1024)', 'error'); return }
-
-  const btn = document.getElementById('createBtn')
-  btn.disabled = true; btn.classList.add('loading')
-  try {
-    const segment_filter = {}
-    if (intent)   segment_filter.intent    = intent
-    if (minScore) segment_filter.min_score = parseInt(minScore)
-    if (tag)      segment_filter.tag       = tag
-
-    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns`, {
-      method: 'POST',
-      body: JSON.stringify({ name, channel, message, segment_filter })
-    })
-    showToast(`Campaign created — ${data.recipient_count} recipients`, 'success')
-    document.getElementById('camp-name').value    = ''
-    document.getElementById('camp-message').value = ''
-    document.getElementById('seg-intent').value   = ''
-    document.getElementById('seg-score').value    = ''
-    document.getElementById('seg-tag').value      = ''
-    document.getElementById('charCount').textContent = '0 / 1024'
-    await loadCampaigns(); previewAudience()
-  } catch (e) { showToast(e.message, 'error') }
-  finally { btn.disabled = false; btn.classList.remove('loading') }
-}
-
-// ── Send Campaign
+// ── SEND CAMPAIGN
 async function sendCampaign(campaignId, btn) {
   const c = STATE.campaigns.find(x => x._id === campaignId)
   const n = c?.recipient_count || 0
-  if (!confirm(`Send to ${n} contact${n===1?'':'s'}? This cannot be undone.`)) return
+  const isTemplate = !!c?.wa_template?.name
+  const msg = isTemplate
+    ? `Send template "${c.wa_template.name}" to ${n} contact${n===1?'':'s'}? This cannot be undone.`
+    : `Send to ${n} contact${n===1?'':'s'}? This cannot be undone.`
+  if (!confirm(msg)) return
   btn.disabled = true; btn.classList.add('loading')
   try {
     const data = await apiFetch(`/agents/${STATE.agentId}/campaigns/${campaignId}/send`, { method: 'POST' })
-    showToast(`✅ Sent to ${data.sent}/${data.total} contacts`, 'success')
+    showToast(`✅ Sent to ${data.sent}/${data.total} contacts${data.failed>0?' ('+data.failed+' failed)':''}`, 'success')
     await loadCampaigns()
-  } catch (e) { showToast('Send failed: ' + e.message, 'error'); btn.disabled = false; btn.classList.remove('loading') }
+  } catch (e) {
+    showToast('Send failed: ' + e.message, 'error')
+    btn.disabled = false; btn.classList.remove('loading')
+  }
 }
 
-// ── Delete Campaign
+// ── DELETE CAMPAIGN
 async function deleteCampaign(campaignId) {
   if (!confirm('Delete this campaign?')) return
   try {
@@ -404,10 +723,10 @@ async function deleteCampaign(campaignId) {
   } catch (e) { showToast(e.message, 'error') }
 }
 
-// ── Helpers
+// ── HELPERS
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function fmtDate(d){if(!d) return '—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
-function showToast(msg, type='info', dur=3500) {
+function showToast(msg, type='info', dur=4000) {
   const wrap = document.getElementById('toastWrap')
   const el = document.createElement('div'); el.className = `toast-item toast-${type}`
   el.innerHTML = `<span style="flex:1">${esc(msg)}</span>`
