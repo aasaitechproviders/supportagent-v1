@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Contacts — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.02em}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background .2s,transform .2s}
+    .theme-toggle:hover{background:var(--surface-2);transform:rotate(20deg)}
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1400px;width:100%;box-sizing:border-box}
+    /* Stats bar */
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s,transform .2s}
+    .stat-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+    .sc-total::before{background:linear-gradient(90deg,var(--accent),#7c3aed)}
+    .sc-high::before{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+    .sc-wa::before{background:linear-gradient(90deg,#25D366,#128C7E)}
+    .sc-email::before{background:linear-gradient(90deg,#EA4335,#FBBC05)}
+    .stat-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+    .stat-value{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
+    .stat-sub{font-size:11px;color:var(--text-3);margin-top:3px}
+    /* Toolbar */
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .search-wrap{position:relative;flex:1;min-width:200px;max-width:320px}
+    .search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+    .search-inp{width:100%;height:36px;padding:0 12px 0 34px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s}
+    .search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .filter-sel{height:36px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:0 14px;height:36px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:background .15s,transform .15s,box-shadow .15s;white-space:nowrap}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
+    .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
+    .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-secondary:hover{background:var(--surface-3);transform:translateY(-1px)}
+    .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .btn-danger:hover{background:var(--red);color:#fff}
+    .btn-sm{height:30px;padding:0 11px;font-size:12px}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+    /* Table */
+    .contacts-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .contacts-table{width:100%;border-collapse:collapse}
+    .contacts-table th{padding:10px 14px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;text-align:left;background:var(--surface-2);border-bottom:1px solid var(--border);white-space:nowrap}
+    .contacts-table td{padding:12px 14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:middle}
+    .contacts-table tr:last-child td{border-bottom:none}
+    .contacts-table tr:hover td{background:var(--surface-2)}
+    .contact-name{font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+    .contact-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+    .contact-identifier{font-size:12px;color:var(--text-3);margin-top:1px}
+    .ch-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+    .ch-wa{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+    .ch-gmail{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    .ch-instagram{background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8}
+    .ch-messenger{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}
+    [data-theme="dark"] .ch-wa{background:#052e16;color:#4ade80;border-color:#166534}
+    [data-theme="dark"] .ch-gmail{background:#450a0a;color:#f87171;border-color:#991b1b}
+    [data-theme="dark"] .ch-instagram{background:#500724;color:#f0abfc;border-color:#a21caf}
+    [data-theme="dark"] .ch-messenger{background:#0f172a;color:#60a5fa;border-color:#1e40af}
+    .intent-badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap}
+    .ib-order{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd}
+    .ib-enquiry{background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe}
+    .ib-complaint{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .ib-refund{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+    .ib-other{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
+    .score-bar{display:flex;align-items:center;gap:7px}
+    .score-track{width:60px;height:5px;background:var(--border-md);border-radius:5px;overflow:hidden;flex-shrink:0}
+    .score-fill{height:100%;border-radius:5px}
+    .score-num{font-size:11px;font-weight:700;color:var(--text);min-width:24px}
+    .tag-wrap{display:flex;flex-wrap:wrap;gap:3px}
+    .tag{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    /* Pagination */
+    .pagination-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface-2)}
+    .pagination-info{font-size:12px;color:var(--text-3)}
+    .pagination-btns{display:flex;gap:3px}
+    .pg-btn{height:28px;min-width:28px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-md);background:var(--surface);color:var(--text-2);font-family:var(--font);transition:background .15s,color .15s}
+    .pg-btn:hover:not(:disabled){background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+    .pg-btn:disabled{opacity:.4;cursor:not-allowed}
+    .pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    /* Empty */
+    .empty-state{padding:60px 20px;text-align:center;color:var(--text-3)}
+    .empty-icon{font-size:36px;margin-bottom:12px}
+    .empty-title{font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px}
+    .empty-sub{font-size:13px;max-width:320px;margin:0 auto;line-height:1.6}
+    /* Skeleton */
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skel-row td{background:transparent!important}
+    .skel-line{height:12px;border-radius:4px;background:linear-gradient(90deg,var(--border) 25%,var(--border-md) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.5s linear infinite}
+    /* Contact drawer */
+    .drawer-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.4);display:none;align-items:flex-end;justify-content:flex-end}
+    .drawer-overlay.open{display:flex}
+    .drawer{width:420px;height:100vh;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;box-shadow:var(--sh-lg);animation:drawer-in .25s cubic-bezier(.4,0,.2,1)}
+    @keyframes drawer-in{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .drawer-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+    .drawer-close{margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-3);padding:4px;border-radius:6px}
+    .drawer-close:hover{background:var(--surface-2);color:var(--text)}
+    .drawer-body{flex:1;overflow-y:auto;padding:20px}
+    .drawer-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+    .drawer-section{margin-bottom:20px}
+    .drawer-section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+    .drawer-field{margin-bottom:12px}
+    .drawer-field label{display:block;font-size:11.5px;font-weight:600;color:var(--text-3);margin-bottom:4px}
+    .drawer-inp{width:100%;height:34px;padding:0 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box}
+    .drawer-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .drawer-textarea{width:100%;min-height:72px;padding:8px 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
+    .drawer-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .msg-preview{padding:10px 12px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--accent);margin-bottom:8px;font-size:12.5px;color:var(--text-2);line-height:1.6}
+    .msg-preview-meta{font-size:10.5px;color:var(--text-3);margin-top:4px}
+    /* Toast */
+    .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .toast-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;min-width:220px;max-width:360px;box-shadow:var(--sh-lg);cursor:pointer;animation:toast-in .25s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes toast-in{from{opacity:0;transform:translateX(20px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+    .toast-item.removing{animation:toast-out .2s ease both}
+    @keyframes toast-out{to{opacity:0;transform:translateX(20px) scale(.9)}}
+    .toast-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .toast-error{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .toast-info{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
+    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.stats-bar{grid-template-columns:repeat(2,1fr)}.drawer{width:100vw}.contacts-table th:nth-child(4),.contacts-table td:nth-child(4),.contacts-table th:nth-child(5),.contacts-table td:nth-child(5){display:none}}
+  </style>
+  <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark')})()</script>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<nav class="sidebar" id="sidebar"></nav>
+
+<!-- Contact Drawer -->
+<div class="drawer-overlay" id="drawerOverlay">
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="contact-avatar" id="drawer-avatar" style="width:40px;height:40px;font-size:16px"></div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)" id="drawer-name-display"></div>
+        <div style="font-size:12px;color:var(--text-3)" id="drawer-identifier-display"></div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody">Loading…</div>
+    <div class="drawer-footer">
+      <button class="btn btn-primary btn-sm" onclick="saveContact()">💾 Save</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteContact()">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mob-menu-btn" id="mobMenuBtn">☰</button>
+      <span class="topbar-title">👥 Contacts</span>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <div class="agent-select-wrap"><select class="agent-select" id="agentSelect"></select></div>
+    </div>
+  </div>
+  <div class="page-body">
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card sc-total"><div class="stat-label">👥 Total Contacts</div><div class="stat-value" id="stat-total">—</div><div class="stat-sub">all channels</div></div>
+      <div class="stat-card sc-high"><div class="stat-label">🔥 High-Value Leads</div><div class="stat-value" id="stat-highvalue">—</div><div class="stat-sub">score ≥ 20</div></div>
+      <div class="stat-card sc-wa"><div class="stat-label">💬 WhatsApp</div><div class="stat-value" id="stat-wa">—</div><div class="stat-sub">contacts</div></div>
+      <div class="stat-card sc-email"><div class="stat-label">📧 Email</div><div class="stat-value" id="stat-email">—</div><div class="stat-sub">contacts</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input class="search-inp" id="searchInp" type="text" placeholder="Search name, phone, email…" oninput="handleSearch(this.value)">
+      </div>
+      <select class="filter-sel" id="filterChannel" onchange="applyFilters()">
+        <option value="">All Channels</option>
+        <option value="whatsapp">💬 WhatsApp</option>
+        <option value="gmail">📧 Email</option>
+        <option value="instagram">📸 Instagram</option>
+        <option value="messenger">💙 Messenger</option>
+      </select>
+      <select class="filter-sel" id="filterIntent" onchange="applyFilters()">
+        <option value="">All Intents</option>
+        <option value="order">📦 Order</option>
+        <option value="enquiry">❓ Enquiry</option>
+        <option value="complaint">😤 Complaint</option>
+        <option value="refund">💸 Refund</option>
+        <option value="other">• Other</option>
+      </select>
+      <select class="filter-sel" id="filterScore" onchange="applyFilters()">
+        <option value="">Any Score</option>
+        <option value="20">🔥 High value (≥20)</option>
+        <option value="10">⭐ Medium (≥10)</option>
+        <option value="5">Low (≥5)</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="location.href='campaigns.html'">📣 New Campaign</button>
+    </div>
+    <div class="contacts-table-wrap">
+      <table class="contacts-table">
+        <thead>
+          <tr>
+            <th>Contact</th>
+            <th>Channel</th>
+            <th>Last Intent</th>
+            <th>Lead Score</th>
+            <th>Messages</th>
+            <th>Tags</th>
+            <th>Last Seen</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="contactsTbody">
+          <tr class="skel-row"><td colspan="8"><div class="skel-line" style="width:80%"></div></td></tr>
+        </tbody>
+      </table>
+      <div class="pagination-bar" id="paginationBar" style="display:none">
+        <span class="pagination-info" id="pageInfo"></span>
+        <div class="pagination-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
+<script>
+const STATE = {
+  agents: [], agentId: null,
+  contacts: [], total: 0, page: 1,
+  search: '', channel: '', intent: '', minScore: '',
+  selectedContact: null,
+}
+const PAGE_SIZE = 40
+
+;(async () => {
+  const nav = await renderNav('contacts')
+  if (!nav) return
+  document.getElementById('themeToggle').addEventListener('click', () => { toggleTheme() })
+  document.getElementById('mobMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open')
+    document.getElementById('sidebarBackdrop').classList.toggle('open')
+  })
+  document.getElementById('sidebarBackdrop').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.remove('open')
+    document.getElementById('sidebarBackdrop').classList.remove('open')
+  })
+  document.getElementById('drawerOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('drawerOverlay')) closeDrawer()
+  })
+  try {
+    STATE.agents = await apiFetch('/agents')
+    buildAgentSelect()
+    if (STATE.agents.length) { await loadStats(); await loadContacts() }
+    else renderEmptyState('No agents yet — create one first')
+  } catch (e) { showToast('Failed to load', 'error') }
+})()
+
+function buildAgentSelect() {
+  const sel = document.getElementById('agentSelect')
+  if (!STATE.agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
+  sel.innerHTML = STATE.agents.map(a => `<option value="${esc(a._id)}">${esc(a.name)}</option>`).join('')
+  STATE.agentId = STATE.agents[0]._id
+  sel.value = STATE.agentId
+  sel.addEventListener('change', async e => {
+    STATE.agentId = e.target.value; STATE.page = 1
+    await loadStats(); await loadContacts()
+  })
+}
+
+async function loadStats() {
+  try {
+    const d = await apiFetch(`/agents/${STATE.agentId}/contacts/stats/summary`)
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v }
+    set('stat-total', d.total ?? '—')
+    set('stat-highvalue', d.highValue ?? '—')
+    const wa    = d.byChannel?.find(c => c._id === 'whatsapp')?.count ?? 0
+    const email = d.byChannel?.find(c => c._id === 'gmail')?.count ?? 0
+    set('stat-wa', wa)
+    set('stat-email', email)
+  } catch {}
+}
+
+async function loadContacts() {
+  const tbody = document.getElementById('contactsTbody')
+  tbody.innerHTML = Array.from({length:8}).map(()=>`<tr class="skel-row">${Array.from({length:8}).map(()=>`<td><div class="skel-line" style="width:${50+Math.random()*40|0}%"></div></td>`).join('')}</tr>`).join('')
+
+  try {
+    const p = new URLSearchParams({ page: STATE.page, limit: PAGE_SIZE })
+    if (STATE.search)   p.set('search', STATE.search)
+    if (STATE.channel)  p.set('channel', STATE.channel)
+    if (STATE.intent)   p.set('intent', STATE.intent)
+    if (STATE.minScore) p.set('min_score', STATE.minScore)
+    const data = await apiFetch(`/agents/${STATE.agentId}/contacts?${p}`)
+    STATE.contacts = data.contacts || []
+    STATE.total    = data.total    || 0
+    renderTable()
+    renderPagination()
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--red)">${esc(e.message)}</td></tr>`
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('contactsTbody')
+  if (!STATE.contacts.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No contacts yet</div><div class="empty-sub">Contacts are saved automatically whenever someone messages through any connected channel</div></div></td></tr>`
+    return
+  }
+  tbody.innerHTML = STATE.contacts.map(c => {
+    const displayName = c.name && c.name !== c.identifier ? c.name : (c.identifier || '?')
+    const identifier  = c.email || c.phone || c.identifier || ''
+    const bg = avatarColor(displayName)
+    const chBadge = chBadgeHtml(c.channel)
+    const intentBadge = intentBadgeHtml(c.last_intent)
+    const scoreColor = (c.lead_score||0) >= 20 ? '#ef4444' : (c.lead_score||0) >= 10 ? '#f59e0b' : 'var(--accent)'
+    const scoreWidth = Math.min(100, ((c.lead_score||0)/50)*100)
+    const tags = (c.tags||[]).filter(Boolean)
+    const sentiment = c.last_sentiment === 'positive' ? '😊' : c.last_sentiment === 'negative' ? '😤' : ''
+    return `<tr onclick="openDrawer('${esc(c._id)}')" style="cursor:pointer">
+      <td>
+        <div class="contact-name">
+          <div class="contact-avatar" style="background:${bg}">${(displayName[0]||'?').toUpperCase()}</div>
+          <div>
+            <div>${esc(displayName)} ${sentiment}</div>
+            <div class="contact-identifier">${esc(identifier !== displayName ? identifier : '')}</div>
+          </div>
+        </div>
+      </td>
+      <td>${chBadge}</td>
+      <td>${intentBadge}</td>
+      <td>
+        <div class="score-bar">
+          <div class="score-track"><div class="score-fill" style="width:${scoreWidth}%;background:${scoreColor}"></div></div>
+          <span class="score-num">${c.lead_score||0}</span>
+        </div>
+      </td>
+      <td style="font-weight:600">${c.message_count||0}</td>
+      <td><div class="tag-wrap">${tags.slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></td>
+      <td style="font-size:12px;color:var(--text-3)">${timeAgo(c.updated_at)}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn-secondary btn-sm" onclick="openDrawer('${esc(c._id)}')">View</button>
+      </td>
+    </tr>`
+  }).join('')
+}
+
+function renderPagination() {
+  const bar = document.getElementById('paginationBar')
+  const info = document.getElementById('pageInfo')
+  const btns = document.getElementById('pageBtns')
+  const tp   = Math.ceil(STATE.total / PAGE_SIZE)
+  if (STATE.total <= PAGE_SIZE) { bar.style.display='none'; return }
+  bar.style.display = 'flex'
+  const start = (STATE.page-1)*PAGE_SIZE+1, end = Math.min(STATE.page*PAGE_SIZE, STATE.total)
+  info.textContent = `${start}–${end} of ${STATE.total}`
+  let html = `<button class="pg-btn" onclick="gotoPage(${STATE.page-1})" ${STATE.page<=1?'disabled':''}>←</button>`
+  let lo = Math.max(1,STATE.page-2), hi = Math.min(tp, lo+4); lo = Math.max(1,hi-4)
+  for (let i=lo;i<=hi;i++) html += `<button class="pg-btn ${i===STATE.page?'active':''}" onclick="gotoPage(${i})">${i}</button>`
+  html += `<button class="pg-btn" onclick="gotoPage(${STATE.page+1})" ${STATE.page>=tp?'disabled':''}>→</button>`
+  btns.innerHTML = html
+}
+
+function gotoPage(p) { if(p<1) return; STATE.page=p; loadContacts() }
+
+// ── Filters
+let _searchTimer = null
+function handleSearch(val) {
+  clearTimeout(_searchTimer)
+  _searchTimer = setTimeout(() => { STATE.search=val; STATE.page=1; loadContacts() }, 350)
+}
+function applyFilters() {
+  STATE.channel  = document.getElementById('filterChannel').value
+  STATE.intent   = document.getElementById('filterIntent').value
+  STATE.minScore = document.getElementById('filterScore').value
+  STATE.page = 1; loadContacts()
+}
+
+async function exportCSV() {
+  const p = new URLSearchParams()
+  if (STATE.channel)  p.set('channel', STATE.channel)
+  if (STATE.intent)   p.set('intent', STATE.intent)
+  if (STATE.minScore) p.set('min_score', STATE.minScore)
+  const url = `${API}/agents/${STATE.agentId}/contacts/export?${p}`
+  const token = getToken()
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token } })
+  if (!res.ok) { showToast('Export failed', 'error'); return }
+  const blob = await res.blob()
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'contacts.csv'; a.click()
+  showToast('CSV downloaded!', 'success')
+}
+
+// ── Drawer
+let _drawerContactId = null
+async function openDrawer(contactId) {
+  _drawerContactId = contactId
+  document.getElementById('drawerOverlay').classList.add('open')
+  document.getElementById('drawerBody').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-3)">Loading…</div>'
+  try {
+    const c = await apiFetch(`/agents/${STATE.agentId}/contacts/${contactId}`)
+    STATE.selectedContact = c
+    const displayName = c.name && c.name !== c.identifier ? c.name : (c.identifier || '?')
+    const bg = avatarColor(displayName)
+    document.getElementById('drawer-avatar').style.background = bg
+    document.getElementById('drawer-avatar').textContent = (displayName[0]||'?').toUpperCase()
+    document.getElementById('drawer-name-display').textContent = displayName
+    document.getElementById('drawer-identifier-display').textContent = c.email || c.phone || c.identifier || ''
+
+    const scoreColor = (c.lead_score||0) >= 20 ? '#ef4444' : (c.lead_score||0) >= 10 ? '#f59e0b' : 'var(--accent)'
+    const msgs = (c.messages||[]).slice(0,5)
+    document.getElementById('drawerBody').innerHTML = `
+      <div class="drawer-section">
+        <div class="drawer-section-label">Contact Info</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          ${chBadgeHtml(c.channel)}
+          ${intentBadgeHtml(c.last_intent)}
+          ${c.last_sentiment==='positive'?'<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">😊 Positive</span>':c.last_sentiment==='negative'?'<span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)">😤 Negative</span>':''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div style="background:var(--surface-2);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:20px;font-weight:800;color:${scoreColor}">${c.lead_score||0}</div>
+            <div style="font-size:10px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Lead Score</div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:8px;padding:10px;text-align:center">
+            <div style="font-size:20px;font-weight:800;color:var(--accent)">${c.message_count||0}</div>
+            <div style="font-size:10px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Messages</div>
+          </div>
+        </div>
+        ${c.email?`<div style="font-size:12px;color:var(--text-3);margin-bottom:4px">📧 ${esc(c.email)}</div>`:''}
+        ${c.phone?`<div style="font-size:12px;color:var(--text-3);margin-bottom:4px">📱 ${esc(c.phone)}</div>`:''}
+        <div style="font-size:12px;color:var(--text-3)">First seen: ${fmtDate(c.created_at)} · Last: ${fmtDate(c.updated_at)}</div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-label">Edit Contact</div>
+        <div class="drawer-field">
+          <label>Display Name</label>
+          <input class="drawer-inp" id="edit-name" type="text" value="${esc(c.name||'')}">
+        </div>
+        <div class="drawer-field">
+          <label>Notes</label>
+          <textarea class="drawer-textarea" id="edit-notes">${esc(c.notes||'')}</textarea>
+        </div>
+        <div class="drawer-field">
+          <label>Tags (comma separated)</label>
+          <input class="drawer-inp" id="edit-tags" type="text" value="${esc((c.tags||[]).join(', '))}">
+        </div>
+      </div>
+      ${msgs.length?`<div class="drawer-section">
+        <div class="drawer-section-label">Recent Messages</div>
+        ${msgs.map(m=>`<div class="msg-preview">${esc((m.body||'').slice(0,180))}<div class="msg-preview-meta">${timeAgo(m.created_at)} · ${m.status==='replied'?(m.auto_replied?'✦ AI replied':'✅ Replied'):'📬 Inbox'}</div></div>`).join('')}
+      </div>`:''}
+    `
+  } catch (e) {
+    document.getElementById('drawerBody').innerHTML = `<div style="padding:20px;color:var(--red)">${esc(e.message)}</div>`
+  }
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open')
+  _drawerContactId = null
+}
+
+async function saveContact() {
+  if (!_drawerContactId) return
+  const name  = document.getElementById('edit-name')?.value.trim()
+  const notes = document.getElementById('edit-notes')?.value.trim()
+  const tags  = (document.getElementById('edit-tags')?.value||'').split(',').map(t=>t.trim()).filter(Boolean)
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/contacts/${_drawerContactId}`, { method: 'PUT', body: JSON.stringify({ name, notes, tags }) })
+    showToast('Contact saved!', 'success')
+    closeDrawer(); loadContacts()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+async function deleteContact() {
+  if (!_drawerContactId) return
+  const ok = await confirmModal({ title: 'Delete contact?', message: 'This cannot be undone.', confirmText: 'Delete', danger: true })
+  if (!ok) return
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/contacts/${_drawerContactId}`, { method: 'DELETE' })
+    showToast('Deleted', 'info')
+    closeDrawer(); loadStats(); loadContacts()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+// ── Helpers
+const AVATAR_COLORS=['linear-gradient(135deg,#6366f1,#8b5cf6)','linear-gradient(135deg,#0ea5e9,#6366f1)','linear-gradient(135deg,#f59e0b,#ef4444)','linear-gradient(135deg,#10b981,#0ea5e9)','linear-gradient(135deg,#ec4899,#8b5cf6)','linear-gradient(135deg,#14b8a6,#6366f1)','linear-gradient(135deg,#f97316,#ec4899)']
+function avatarColor(str){let h=0;for(const c of String(str||'')) h=(h*31+c.charCodeAt(0))&0xffffffff;return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length]}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function chBadgeHtml(ch) {
+  const map = { whatsapp:['ch-wa','💬 WhatsApp'], gmail:['ch-gmail','📧 Email'], instagram:['ch-instagram','📸 Instagram'], messenger:['ch-messenger','💙 Messenger'] }
+  const [cls, label] = map[ch] || ['', ch||'—']
+  return `<span class="ch-badge ${cls}">${label}</span>`
+}
+function intentBadgeHtml(intent) {
+  if (!intent || intent === 'other') return '<span class="intent-badge ib-other">• Other</span>'
+  const map = { order:['ib-order','📦 Order'], enquiry:['ib-enquiry','❓ Enquiry'], complaint:['ib-complaint','😤 Complaint'], refund:['ib-refund','💸 Refund'] }
+  const [cls,label] = map[intent] || ['ib-other', intent]
+  return `<span class="intent-badge ${cls}">${label}</span>`
+}
+function renderEmptyState(msg) {
+  document.getElementById('contactsTbody').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">${esc(msg)}</div></div></td></tr>`
+}
+function showToast(msg, type='info', dur=3500) {
+  const wrap = document.getElementById('toastWrap')
+  const el = document.createElement('div'); el.className = `toast-item toast-${type}`
+  el.innerHTML = `<span style="flex:1">${esc(msg)}</span>`
+  el.addEventListener('click', () => rmToast(el)); wrap.appendChild(el)
+  el._t = setTimeout(() => rmToast(el), dur)
+}
+function rmToast(el){clearTimeout(el._t);el.classList.add('removing');setTimeout(()=>el.remove(),220)}
+</script>
+</body>
+</html>
