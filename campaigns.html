@@ -20,84 +20,90 @@
     .agent-select-wrap{position:relative;display:flex;align-items:center}
     .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
     .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-    .page-body{padding:20px 24px 40px;flex:1;max-width:1200px;width:100%;box-sizing:border-box}
-    .page-grid{display:grid;grid-template-columns:440px 1fr;gap:20px;align-items:start}
-    @media(max-width:960px){.page-grid{grid-template-columns:1fr}}
+    .page-body{padding:20px 24px 40px;flex:1;max-width:1400px;width:100%;box-sizing:border-box}
+    /* 3-col layout: form | contact picker | past campaigns */
+    .page-grid{display:grid;grid-template-columns:380px 300px 1fr;gap:16px;align-items:start}
+    @media(max-width:1100px){.page-grid{grid-template-columns:360px 1fr}}
+    @media(max-width:760px){.page-grid{grid-template-columns:1fr}}
 
-    /* Form card */
-    .new-campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;position:sticky;top:80px}
-    .card-header{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:10px}
-    .card-title{font-size:13.5px;font-weight:700;color:var(--text)}
-    .card-body{padding:18px}
-    .field{margin-bottom:14px}
-    .field label{display:block;font-size:11.5px;font-weight:700;color:var(--text-3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-    .inp{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box}
+    /* ── Cards ── */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;position:sticky;top:80px}
+    .card-header{padding:13px 16px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .card-title{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+    .card-body{padding:16px}
+
+    /* ── Fields ── */
+    .field{margin-bottom:13px}
+    .field label,.flabel{display:block;font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+    .inp{width:100%;height:36px;padding:0 11px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;box-sizing:border-box}
     .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
-    .sel{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+    .sel{width:100%;height:36px;padding:0 11px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
     .sel:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-    .textarea{width:100%;min-height:100px;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
+    .textarea{width:100%;min-height:90px;padding:9px 11px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.65;resize:vertical;outline:none;transition:border-color .2s;box-sizing:border-box}
     .textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
-    .char-count{font-size:11px;color:var(--text-3);text-align:right;margin-top:3px}
+    .char-count{font-size:10.5px;color:var(--text-3);text-align:right;margin-top:2px}
 
-    /* Channel toggle */
-    .channel-tabs{display:flex;gap:6px;margin-bottom:14px}
-    .ch-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:40px;border-radius:var(--r-sm);border:1.5px solid var(--border-md);background:var(--surface-2);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);transition:border-color .15s,background .15s,color .15s}
-    .ch-tab:hover{border-color:var(--border-lg);color:var(--text)}
-    .ch-tab.active-wa{border-color:#25D366;background:#dcfce7;color:#166534}
-    [data-theme="dark"] .ch-tab.active-wa{background:#052e16;color:#4ade80;border-color:#166534}
-    .ch-tab.active-email{border-color:#EA4335;background:#fee2e2;color:#991b1b}
-    [data-theme="dark"] .ch-tab.active-email{background:#450a0a;color:#f87171;border-color:#991b1b}
+    /* ── Channel pills ── */
+    .ch-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
+    .ch-pill{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 12px;border-radius:20px;border:1.5px solid var(--border-md);background:var(--surface-2);color:var(--text-2);font-size:12.5px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap}
+    .ch-pill:hover{border-color:var(--border-lg);color:var(--text)}
+    .ch-pill.p-wa.active{border-color:#25D366;background:#dcfce7;color:#166534}
+    .ch-pill.p-email.active{border-color:#EA4335;background:#fee2e2;color:#991b1b}
+    .ch-pill.p-ig.active{border-color:#E1306C;background:#fce7f3;color:#9d174d}
+    .ch-pill.p-fb.active{border-color:#0084FF;background:#dbeafe;color:#1e40af}
+    [data-theme="dark"] .ch-pill.p-wa.active{background:#052e16;color:#4ade80;border-color:#166534}
+    [data-theme="dark"] .ch-pill.p-email.active{background:#450a0a;color:#f87171;border-color:#991b1b}
+    [data-theme="dark"] .ch-pill.p-ig.active{background:#500724;color:#f0abfc;border-color:#a21caf}
+    [data-theme="dark"] .ch-pill.p-fb.active{background:#0f172a;color:#60a5fa;border-color:#1e40af}
 
-    /* WA mode toggle */
-    .wa-mode-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;gap:8px}
-    .wa-mode-label{font-size:12.5px;font-weight:600;color:var(--text-2)}
-    .wa-mode-desc{font-size:11px;color:var(--text-3);margin-top:1px}
-    .toggle-switch{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
-    .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
-    .toggle-slider{position:absolute;inset:0;background:var(--border-md);border-radius:20px;transition:background .25s}
-    .toggle-slider::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-    .toggle-switch input:checked+.toggle-slider{background:#25D366}
-    .toggle-switch input:checked+.toggle-slider::before{transform:translateX(16px)}
+    /* ── WA template toggle ── */
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;gap:8px}
+    .toggle-row-label{font-size:12px;font-weight:700;color:var(--text-2)}
+    .toggle-row-sub{font-size:10.5px;color:var(--text-3);margin-top:1px}
+    .tog{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+    .tog input{opacity:0;width:0;height:0;position:absolute}
+    .tog-sl{position:absolute;inset:0;background:var(--border-md);border-radius:20px;transition:background .22s}
+    .tog-sl::before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .22s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+    .tog input:checked+.tog-sl{background:#25D366}
+    .tog input:checked+.tog-sl::before{transform:translateX(16px)}
 
-    /* Template box */
-    .template-box{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:10px;padding:14px;margin-bottom:14px;display:none}
-    [data-theme="dark"] .template-box{background:linear-gradient(135deg,#052e16,#0a3d1f);border-color:#166534}
-    .template-box.visible{display:block;animation:fadeIn .2s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-    .template-box-title{font-size:11.5px;font-weight:700;color:#166534;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    [data-theme="dark"] .template-box-title{color:#4ade80}
-    .template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .template-field label{font-size:11px;font-weight:700;color:#166534;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
-    [data-theme="dark"] .template-field label{color:#4ade80}
-    .template-inp{width:100%;height:34px;padding:0 10px;border:1px solid #86efac;border-radius:7px;background:rgba(255,255,255,.7);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .2s;box-sizing:border-box}
-    [data-theme="dark"] .template-inp{background:rgba(0,0,0,.3);border-color:#166534}
-    .template-inp:focus{border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
-    .template-vars-title{font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;display:flex;align-items:center;gap:6px}
-    [data-theme="dark"] .template-vars-title{color:#4ade80}
-    .var-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-    .var-label{font-size:12px;font-weight:700;color:#166534;background:#bbf7d0;padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
-    [data-theme="dark"] .var-label{background:#166534;color:#4ade80}
-    .var-arrow{color:var(--text-3);flex-shrink:0;font-size:12px}
-    .template-preview{margin-top:10px;background:rgba(255,255,255,.6);border:1px solid #86efac;border-radius:8px;padding:10px 12px;font-size:12.5px;color:var(--text-2);line-height:1.6;display:none}
-    [data-theme="dark"] .template-preview{background:rgba(0,0,0,.3);border-color:#166534}
-    .template-preview.visible{display:block}
-    .template-preview-label{font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-    [data-theme="dark"] .template-preview-label{color:#4ade80}
-
-    /* Free-form message box */
+    /* ── Template box ── */
+    .tpl-box{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:13px;margin-bottom:13px;display:none}
+    [data-theme="dark"] .tpl-box{background:#052e16;border-color:#166534}
+    .tpl-box.open{display:block;animation:sld .2s ease}
+    @keyframes sld{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+    .tpl-label{font-size:11px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    [data-theme="dark"] .tpl-label{color:#4ade80}
+    .tpl-inp{width:100%;height:32px;padding:0 9px;border:1px solid #86efac;border-radius:7px;background:rgba(255,255,255,.75);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .2s;box-sizing:border-box}
+    [data-theme="dark"] .tpl-inp{background:rgba(0,0,0,.3);border-color:#166534}
+    .tpl-inp:focus{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.15)}
+    .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+    .var-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+    .var-lbl{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:#bbf7d0;color:#166534;white-space:nowrap;flex-shrink:0}
+    [data-theme="dark"] .var-lbl{background:#166534;color:#4ade80}
+    .var-arrow{color:var(--text-3);font-size:11px;flex-shrink:0}
+    .tpl-var-sel{flex:1;height:28px;padding:0 7px;border:1px solid #86efac;border-radius:6px;background:rgba(255,255,255,.75);color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer}
+    [data-theme="dark"] .tpl-var-sel{background:rgba(0,0,0,.3);border-color:#166534}
+    .tpl-preview{margin-top:9px;background:rgba(255,255,255,.65);border:1px solid #86efac;border-radius:7px;padding:9px 11px;font-size:12px;color:var(--text-2);line-height:1.6;display:none}
+    [data-theme="dark"] .tpl-preview{background:rgba(0,0,0,.25);border-color:#166534}
+    .tpl-preview.open{display:block}
+    .tpl-preview-lbl{font-size:9.5px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+    [data-theme="dark"] .tpl-preview-lbl{color:#4ade80}
     .freeform-box{display:none}
-    .freeform-box.visible{display:block}
+    .freeform-box.open{display:block}
 
-    /* Segment */
-    .segment-box{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
-    .segment-title{font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-    .segment-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .audience-preview{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);margin-bottom:14px;min-height:44px}
-    .audience-num{font-size:22px;font-weight:800;color:var(--accent);min-width:32px}
-    .audience-label{font-size:12px;color:var(--text-3);line-height:1.4}
+    /* ── Segment box ── */
+    .seg-box{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:12px;margin-bottom:12px}
+    .seg-title{font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:9px}
+    .seg-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 
-    /* Buttons */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:0 16px;height:38px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:background .15s,transform .15s,box-shadow .15s;white-space:nowrap;position:relative;overflow:hidden}
+    /* ── Audience preview ── */
+    .aud-prev{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface);margin-bottom:12px;min-height:42px}
+    .aud-num{font-size:20px;font-weight:800;color:var(--accent);min-width:28px}
+    .aud-lbl{font-size:11.5px;color:var(--text-3);line-height:1.4}
+
+    /* ── Buttons ── */
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:0 14px;height:36px;border-radius:var(--r-sm);font-size:12.5px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);transition:background .14s,transform .14s,box-shadow .14s;white-space:nowrap;position:relative;overflow:hidden}
     .btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
     .btn-primary:hover{background:var(--accent-2);transform:translateY(-1px)}
     .btn-secondary{background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md)}
@@ -106,57 +112,84 @@
     .btn-danger:hover{background:var(--red);color:#fff}
     .btn-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .btn-success:hover{background:var(--green);color:#fff}
-    .btn-wa{background:#25D366;color:#fff;box-shadow:0 2px 8px rgba(37,211,102,.3)}
+    .btn-wa{background:#25D366;color:#fff}
     .btn-wa:hover{background:#1da851;transform:translateY(-1px)}
-    .btn-sm{height:30px;padding:0 11px;font-size:12px}
+    .btn-sm{height:28px;padding:0 10px;font-size:11.5px}
     .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
     .btn.loading .btn-text{opacity:0}
-    .btn.loading::after{content:'';position:absolute;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
+    .btn.loading::after{content:'';position:absolute;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .btn-full{width:100%;justify-content:center}
 
-    /* Campaigns list */
-    .campaigns-list{display:flex;flex-direction:column;gap:12px}
-    .section-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
-    .campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
-    .campaign-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
-    .campaign-card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;border-bottom:1px solid var(--border)}
-    .campaign-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-    .campaign-name{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px}
-    .campaign-meta{font-size:11.5px;color:var(--text-3);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .status-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+    /* ── Contact picker panel ── */
+    .picker-search{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .picker-search-inp{width:100%;height:32px;padding:0 10px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color .2s;box-sizing:border-box;position:relative}
+    .picker-search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-dim)}
+    .picker-search-wrap{position:relative}
+    .picker-search-wrap::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;z-index:1}
+    .picker-list{max-height:340px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border-md) transparent}
+    .picker-list::-webkit-scrollbar{width:3px}
+    .picker-list::-webkit-scrollbar-thumb{background:var(--border-md);border-radius:3px}
+    .picker-row{display:flex;align-items:center;gap:9px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;user-select:none}
+    .picker-row:last-child{border-bottom:none}
+    .picker-row:hover{background:var(--surface-2)}
+    .picker-row.selected{background:var(--accent-dim)}
+    .picker-check{width:16px;height:16px;border:1.5px solid var(--border-md);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;transition:background .1s,border-color .1s}
+    .picker-row.selected .picker-check{background:var(--accent);border-color:var(--accent)}
+    .picker-check::after{content:''}
+    .picker-row.selected .picker-check::after{content:'✓'}
+    .picker-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+    .picker-info{flex:1;min-width:0}
+    .picker-name{font-size:12.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .picker-id{font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .picker-score{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--surface-3);color:var(--text-3);flex-shrink:0}
+    .picker-footer{padding:9px 12px;border-top:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0}
+    .picker-sel-count{font-size:12px;font-weight:700;color:var(--accent)}
+    .picker-empty{padding:30px 16px;text-align:center;color:var(--text-3);font-size:12px}
+
+    /* ── Campaigns list ── */
+    .section-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+    .campaigns-list{display:flex;flex-direction:column;gap:10px}
+    .camp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+    .camp-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm)}
+    .camp-card-hdr{padding:12px 14px;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border)}
+    .camp-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .camp-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .camp-meta{font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .sp{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
     .sp-draft{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .sp-sending{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
     .sp-sent{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .sp-failed{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
-    .tpl-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#dcfce7;color:#166534;border:1px solid #86efac;white-space:nowrap}
+    .tpl-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:#dcfce7;color:#166534;border:1px solid #86efac}
     [data-theme="dark"] .tpl-badge{background:#052e16;color:#4ade80;border-color:#166534}
-    .campaign-body{padding:14px 16px}
-    .campaign-message{font-size:12.5px;color:var(--text-2);line-height:1.6;background:var(--surface-2);padding:10px 12px;border-radius:8px;margin-bottom:12px;border-left:3px solid var(--accent)}
-    .campaign-stats{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
-    .cstat{display:flex;flex-direction:column;gap:2px}
-    .cstat-val{font-size:16px;font-weight:800;color:var(--text)}
-    .cstat-lbl{font-size:10.5px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-    .campaign-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .prog-bar{height:4px;background:var(--border-md);border-radius:4px;overflow:hidden;margin-bottom:10px}
-    .prog-fill{height:100%;border-radius:4px;background:var(--green);transition:width .5s}
-    .empty-campaigns{padding:60px 20px;text-align:center;color:var(--text-3)}
+    .camp-body{padding:12px 14px}
+    .camp-msg{font-size:12px;color:var(--text-2);line-height:1.55;background:var(--surface-2);padding:9px 11px;border-radius:7px;margin-bottom:10px;border-left:3px solid var(--accent)}
+    .camp-stats{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+    .cstat-v{font-size:15px;font-weight:800;color:var(--text)}
+    .cstat-l{font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .camp-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+    .prog-bar{height:3px;background:var(--border-md);border-radius:3px;overflow:hidden;margin-bottom:9px}
+    .prog-fill{height:100%;border-radius:3px;background:var(--green);transition:width .5s}
+    .empty-camps{padding:50px 20px;text-align:center;color:var(--text-3)}
 
-    /* Info boxes */
-    .info-warn{background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--amber);margin-bottom:14px;line-height:1.6}
-    .info-tip{background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--accent);margin-bottom:14px;line-height:1.6}
+    /* ── Info boxes ── */
+    .info-warn{background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;padding:9px 11px;font-size:11.5px;color:var(--amber);margin-bottom:12px;line-height:1.6}
+    .info-tip{background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:8px;padding:9px 11px;font-size:11.5px;color:var(--accent);margin-bottom:12px;line-height:1.6}
+    .info-green{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:9px 11px;font-size:11.5px;color:#166534;margin-bottom:12px;line-height:1.6}
+    [data-theme="dark"] .info-green{background:#052e16;border-color:#166534;color:#4ade80}
 
-    /* Toast */
+    /* ── Toast ── */
     .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
-    .toast-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;font-size:13px;font-weight:600;min-width:220px;box-shadow:var(--sh-lg);cursor:pointer;animation:toast-in .25s cubic-bezier(.34,1.56,.64,1)}
-    @keyframes toast-in{from{opacity:0;transform:translateX(20px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
-    .toast-item.removing{animation:toast-out .2s ease both}
-    @keyframes toast-out{to{opacity:0;transform:translateX(20px) scale(.9)}}
+    .toast-item{display:flex;align-items:center;gap:9px;padding:10px 13px;border-radius:10px;font-size:13px;font-weight:600;min-width:200px;box-shadow:var(--sh-lg);cursor:pointer;animation:ti .22s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes ti{from{opacity:0;transform:translateX(16px) scale(.95)}to{opacity:1;transform:translateX(0) scale(1)}}
+    .toast-item.rm{animation:to .18s ease both}
+    @keyframes to{to{opacity:0;transform:translateX(16px) scale(.9)}}
     .toast-success{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
     .toast-error{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
     .toast-info{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
 
-    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.segment-grid,.template-grid{grid-template-columns:1fr}}
+    @media(max-width:768px){.mob-menu-btn{display:flex}.main-wrap{margin-left:0}.seg-grid,.tpl-grid{grid-template-columns:1fr}.ch-pills{gap:4px}}
   </style>
   <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark')})()</script>
 </head>
@@ -180,150 +213,148 @@
   <div class="page-body">
     <div class="page-grid">
 
-      <!-- ── New Campaign Form ── -->
-      <div class="new-campaign-card">
+      <!-- ══ COL 1: NEW CAMPAIGN FORM ══ -->
+      <div class="card" style="position:sticky;top:80px">
         <div class="card-header">
-          <span style="font-size:18px">📣</span>
-          <div class="card-title">New Campaign</div>
+          <div class="card-title">📣 New Campaign</div>
         </div>
         <div class="card-body">
 
-          <!-- Campaign name -->
+          <!-- Name -->
           <div class="field">
             <label>Campaign Name</label>
             <input class="inp" id="camp-name" type="text" placeholder="e.g. Diwali offer 2025">
           </div>
 
-          <!-- Channel selector -->
-          <div class="field">
+          <!-- Channel pills — all 4 -->
+          <div class="field" style="margin-bottom:10px">
             <label>Channel</label>
-            <div class="channel-tabs">
-              <button class="ch-tab active-wa" id="ch-tab-wa" onclick="setChannel('whatsapp')">💬 WhatsApp</button>
-              <button class="ch-tab" id="ch-tab-email" onclick="setChannel('gmail')">📧 Email</button>
+            <div class="ch-pills" id="chPills">
+              <button class="ch-pill p-wa active" onclick="setChannel('whatsapp')">💬 WhatsApp</button>
+              <button class="ch-pill p-email"     onclick="setChannel('gmail')">📧 Email</button>
+              <button class="ch-pill p-ig"        onclick="setChannel('instagram')">📸 Instagram</button>
+              <button class="ch-pill p-fb"        onclick="setChannel('messenger')">💙 Messenger</button>
             </div>
             <input type="hidden" id="camp-channel" value="whatsapp">
           </div>
 
-          <!-- WhatsApp: template mode toggle (only shown for WA) -->
-          <div id="wa-mode-section">
-            <div class="wa-mode-row">
+          <!-- WA-only section -->
+          <div id="wa-section">
+            <!-- Template mode toggle -->
+            <div class="toggle-row">
               <div>
-                <div class="wa-mode-label">📋 Use Registered Template</div>
-                <div class="wa-mode-desc">Required for bulk campaigns — bypasses 24h window</div>
+                <div class="toggle-row-label">📋 Use Registered Template</div>
+                <div class="toggle-row-sub">Required for bulk outreach — bypasses 24h window</div>
               </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="wa-template-toggle" onchange="onTemplateModeChange()">
-                <span class="toggle-slider"></span>
+              <label class="tog">
+                <input type="checkbox" id="wa-tpl-toggle" onchange="onTplToggle()">
+                <span class="tog-sl"></span>
               </label>
             </div>
 
-            <!-- Template fields (shown when toggle ON) -->
-            <div class="template-box" id="template-box">
-              <div class="template-box-title">✅ WhatsApp Approved Template</div>
-
-              <div class="template-grid">
-                <div class="template-field">
-                  <label>Template Name *</label>
-                  <input class="template-inp" id="tpl-name" type="text" placeholder="e.g. diwali_offer_2025" oninput="updateTemplatePreview()">
+            <!-- Template fields -->
+            <div class="tpl-box" id="tpl-box">
+              <div class="tpl-label">✅ WhatsApp Approved Template</div>
+              <div class="tpl-grid">
+                <div>
+                  <div class="flabel">Template Name *</div>
+                  <input class="tpl-inp" id="tpl-name" type="text" placeholder="e.g. diwali_offer" oninput="updateTplPreview()">
                 </div>
-                <div class="template-field">
-                  <label>Language Code</label>
-                  <select class="template-inp" id="tpl-lang" style="height:34px;cursor:pointer" onchange="updateTemplatePreview()">
-                    <option value="en">en (English)</option>
-                    <option value="en_US">en_US (English US)</option>
-                    <option value="en_GB">en_GB (English UK)</option>
-                    <option value="hi">hi (Hindi)</option>
-                    <option value="ta">ta (Tamil)</option>
-                    <option value="te">te (Telugu)</option>
-                    <option value="kn">kn (Kannada)</option>
-                    <option value="ml">ml (Malayalam)</option>
-                    <option value="mr">mr (Marathi)</option>
-                    <option value="gu">gu (Gujarati)</option>
-                    <option value="bn">bn (Bengali)</option>
-                    <option value="pa">pa (Punjabi)</option>
+                <div>
+                  <div class="flabel">Language</div>
+                  <select class="tpl-inp" id="tpl-lang" style="height:32px;cursor:pointer" onchange="updateTplPreview()">
+                    <option value="en">en — English</option>
+                    <option value="en_US">en_US — English US</option>
+                    <option value="hi">hi — Hindi</option>
+                    <option value="ta">ta — Tamil</option>
+                    <option value="te">te — Telugu</option>
+                    <option value="kn">kn — Kannada</option>
+                    <option value="ml">ml — Malayalam</option>
+                    <option value="mr">mr — Marathi</option>
+                    <option value="gu">gu — Gujarati</option>
+                    <option value="bn">bn — Bengali</option>
+                    <option value="pa">pa — Punjabi</option>
                   </select>
                 </div>
               </div>
-
               <!-- Variable mapping -->
-              <div class="template-vars-title">
-                📌 Variable Mapping
-                <span style="font-size:10px;font-weight:400;color:var(--text-3);text-transform:none;letter-spacing:0">— map template {{variables}} to contact fields</span>
-              </div>
-
-              <div id="var-rows">
-                <!-- Header variable (optional) -->
+              <div style="font-size:10.5px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📌 Variable Mapping</div>
+              <div id="tpl-var-rows">
                 <div class="var-row">
-                  <span class="var-label">Header {{1}}</span>
+                  <span class="var-lbl">Header {{1}}</span>
                   <span class="var-arrow">→</span>
-                  <select class="template-inp" id="tpl-header-var" style="flex:1;height:30px" onchange="updateTemplatePreview()">
-                    <option value="">(no header variable)</option>
-                    <option value="name">Contact Name</option>
-                    <option value="phone">Phone Number</option>
-                    <option value="email">Email Address</option>
+                  <select class="tpl-var-sel" id="tpl-hvar" onchange="updateTplPreview()">
+                    <option value="">(none)</option>
+                    <option value="name">Name</option>
+                    <option value="phone">Phone</option>
                     <option value="identifier">Identifier</option>
                   </select>
                 </div>
-                <!-- Body variables -->
-                <div id="body-var-rows">
-                  <div class="var-row" id="body-var-row-0">
-                    <span class="var-label">Body {{1}}</span>
+                <div id="tpl-bvar-rows">
+                  <div class="var-row" id="tpl-bvar-row-0">
+                    <span class="var-lbl">Body {{1}}</span>
                     <span class="var-arrow">→</span>
-                    <select class="template-inp" id="tpl-body-var-0" style="flex:1;height:30px" onchange="updateTemplatePreview()">
-                      <option value="name">Contact Name</option>
-                      <option value="phone">Phone Number</option>
-                      <option value="email">Email Address</option>
+                    <select class="tpl-var-sel" id="tpl-bvar-0" onchange="updateTplPreview()">
+                      <option value="name">Name</option>
+                      <option value="phone">Phone</option>
                       <option value="identifier">Identifier</option>
-                      <option value="">(skip this variable)</option>
+                      <option value="">(skip)</option>
                     </select>
                   </div>
                 </div>
-                <button class="btn btn-secondary btn-sm" style="margin-top:6px;font-size:11px" onclick="addBodyVar()">+ Add Body Variable</button>
+                <button class="btn btn-secondary btn-sm" style="margin-top:5px;font-size:11px;border-color:#86efac;color:#166534" onclick="addBVar()">+ Add Variable</button>
               </div>
-
-              <!-- Preview -->
-              <div class="template-preview" id="template-preview">
-                <div class="template-preview-label">Preview (example contact)</div>
-                <div id="template-preview-text" style="white-space:pre-wrap"></div>
+              <div class="tpl-preview" id="tpl-preview">
+                <div class="tpl-preview-lbl">Preview (sample contact)</div>
+                <div id="tpl-preview-txt"></div>
               </div>
-
-              <div class="info-tip" style="margin-top:10px;margin-bottom:0">
-                💡 The template name must exactly match what's registered in <strong>Meta Business Manager → WhatsApp → Message Templates</strong>. Only <em>Approved</em> templates work.
+              <div class="info-green" style="margin-top:9px;margin-bottom:0;font-size:11px">
+                💡 Template name must exactly match <strong>Meta Business Manager → WhatsApp → Message Templates</strong>. Only <em>Approved</em> templates work.
               </div>
             </div>
 
-            <!-- Free-form message (shown when template toggle OFF for WA) -->
-            <div class="freeform-box" id="wa-freeform-box">
-              <div class="info-warn">
-                ⚠️ <strong>Free-form only works within the 24-hour window.</strong> If a contact messaged you within the last 24h this will work. For bulk outreach to all contacts, turn on Template Mode above.
+            <!-- Free-form WA message -->
+            <div class="freeform-box" id="wa-freeform">
+              <div class="info-warn" style="font-size:11px">
+                ⚠️ <strong>Free-form only works within 24h window.</strong> For bulk campaigns to all contacts use Template Mode above.
               </div>
               <div class="field" style="margin-bottom:0">
                 <label>Message</label>
-                <textarea class="textarea" id="camp-message-wa" placeholder="Hi, we wanted to follow up on your enquiry…" oninput="updateCharCount(this,'charCountWa')"></textarea>
-                <div class="char-count" id="charCountWa">0 / 1024</div>
+                <textarea class="textarea" id="msg-wa" placeholder="Follow-up message…" oninput="updateCC(this,'cc-wa')"></textarea>
+                <div class="char-count" id="cc-wa">0 / 1024</div>
               </div>
             </div>
           </div>
 
-          <!-- Email message (only shown for email channel) -->
+          <!-- Email section -->
           <div id="email-section" style="display:none">
-            <div class="info-tip">
-              💡 Email campaigns go to all matching contacts with an email address. No template approval needed.
-            </div>
-            <div class="field">
+            <div class="info-tip" style="font-size:11px">💡 Email campaigns go directly — no template approval needed.</div>
+            <div class="field" style="margin-bottom:0">
               <label>Message Body</label>
-              <textarea class="textarea" id="camp-message-email" placeholder="Hi, we have an exciting update for you…" style="min-height:140px" oninput="updateCharCount(this,'charCountEmail')"></textarea>
-              <div class="char-count" id="charCountEmail">0 / 5000</div>
+              <textarea class="textarea" id="msg-email" placeholder="Hi, we have an update for you…" style="min-height:110px" oninput="updateCC(this,'cc-email')"></textarea>
+              <div class="char-count" id="cc-email">0 / 5000</div>
+            </div>
+          </div>
+
+          <!-- Instagram / Messenger section -->
+          <div id="ig-fb-section" style="display:none">
+            <div class="info-warn" style="font-size:11px">
+              ⚠️ Instagram and Messenger only allow messages <strong>within 24h</strong> of the last customer message. Meta blocks cold outreach on these channels.
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Message</label>
+              <textarea class="textarea" id="msg-igfb" placeholder="Follow-up message (within 24h window only)…" oninput="updateCC(this,'cc-igfb')"></textarea>
+              <div class="char-count" id="cc-igfb">0 / 1000</div>
             </div>
           </div>
 
           <!-- Segment filters -->
-          <div class="segment-box">
-            <div class="segment-title">🎯 Target Segment</div>
-            <div class="segment-grid">
+          <div class="seg-box" style="margin-top:13px">
+            <div class="seg-title">🎯 Segment Filters <span style="font-size:10.5px;font-weight:400;color:var(--text-3)">(optional — stacks with manual picks)</span></div>
+            <div class="seg-grid">
               <div>
-                <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Intent</label>
-                <select class="sel" id="seg-intent" onchange="previewAudience()">
+                <div class="flabel">Intent</div>
+                <select class="sel" id="seg-intent" onchange="previewAud()">
                   <option value="">All intents</option>
                   <option value="order">📦 Order</option>
                   <option value="enquiry">❓ Enquiry</option>
@@ -332,25 +363,25 @@
                 </select>
               </div>
               <div>
-                <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Min Lead Score</label>
-                <select class="sel" id="seg-score" onchange="previewAudience()">
-                  <option value="">Any score</option>
+                <div class="flabel">Min Lead Score</div>
+                <select class="sel" id="seg-score" onchange="previewAud()">
+                  <option value="">Any</option>
                   <option value="5">≥ 5</option>
                   <option value="10">≥ 10</option>
-                  <option value="20">≥ 20 (high value)</option>
+                  <option value="20">≥ 20</option>
                 </select>
               </div>
             </div>
-            <div style="margin-top:8px">
-              <label style="font-size:11px;font-weight:700;color:var(--text-3);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Tag (optional)</label>
-              <input class="inp" id="seg-tag" type="text" placeholder="e.g. vip" oninput="debouncePreview()" style="height:34px">
+            <div style="margin-top:7px">
+              <div class="flabel">Tag</div>
+              <input class="inp" id="seg-tag" type="text" placeholder="e.g. vip" style="height:32px" oninput="debPrev()">
             </div>
           </div>
 
-          <!-- Audience preview -->
-          <div class="audience-preview" id="audiencePreview">
-            <div class="audience-num" id="audienceNum">—</div>
-            <div class="audience-label" id="audienceLabel">Select filters to preview audience size</div>
+          <!-- Audience preview (shows segment + manually selected) -->
+          <div class="aud-prev" id="audPrev">
+            <div class="aud-num" id="audNum">—</div>
+            <div class="aud-lbl" id="audLbl">Select channel to preview audience</div>
           </div>
 
           <button class="btn btn-primary btn-full" id="createBtn" onclick="createCampaign()">
@@ -359,10 +390,30 @@
         </div>
       </div>
 
-      <!-- ── Campaigns List ── -->
+      <!-- ══ COL 2: CONTACT PICKER ══ -->
+      <div class="card" id="pickerCard" style="position:sticky;top:80px;display:flex;flex-direction:column">
+        <div class="card-header">
+          <div class="card-title">👥 Pick Recipients</div>
+          <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear</button>
+        </div>
+        <div class="picker-search">
+          <div class="picker-search-wrap">
+            <input class="picker-search-inp" id="pickerSearch" type="text" placeholder="Search contacts…" oninput="handlePickerSearch(this.value)">
+          </div>
+        </div>
+        <div class="picker-list" id="pickerList">
+          <div class="picker-empty">Select a channel first</div>
+        </div>
+        <div class="picker-footer">
+          <span class="picker-sel-count" id="selCount">0 selected</span>
+          <button class="btn btn-secondary btn-sm" onclick="selectAllVisible()">Select All</button>
+        </div>
+      </div>
+
+      <!-- ══ COL 3: PAST CAMPAIGNS ══ -->
       <div>
         <div class="section-label">Past Campaigns</div>
-        <div class="campaigns-list" id="campaignsList">
+        <div class="campaigns-list" id="campList">
           <div style="text-align:center;padding:40px;color:var(--text-3)">Loading…</div>
         </div>
       </div>
@@ -375,14 +426,21 @@
 <script src="api.js"></script>
 <script src="nav.js"></script>
 <script>
-const STATE = {
+// ══ STATE
+const S = {
   agents: [], agentId: null, campaigns: [],
-  channel: 'whatsapp',  // current selected channel
-  templateMode: false,  // WA template toggle
-  bodyVarCount: 1,      // how many body vars added
+  channel: 'whatsapp',
+  tplMode: false,
+  bvarCount: 1,
+  // Picker
+  pickerContacts: [], pickerTotal: 0,
+  pickerSearch: '', pickerPage: 1,
+  selected: new Map(),   // id → contact object
+  pickerLoading: false,
 }
+const PICKER_LIMIT = 50
 
-// ── INIT
+// ══ INIT
 ;(async () => {
   const nav = await renderNav('campaigns')
   if (!nav) return
@@ -396,179 +454,246 @@ const STATE = {
     document.getElementById('sidebarBackdrop').classList.remove('open')
   })
   try {
-    STATE.agents = await apiFetch('/agents')
+    S.agents = await apiFetch('/agents')
     buildAgentSelect()
-    if (STATE.agents.length) { await loadCampaigns(); previewAudience() }
+    if (S.agents.length) { await loadCampaigns(); await loadPicker(); previewAud() }
   } catch (e) { showToast('Failed to load', 'error') }
 })()
 
 function buildAgentSelect() {
   const sel = document.getElementById('agentSelect')
-  if (!STATE.agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
-  sel.innerHTML = STATE.agents.map(a => `<option value="${esc(a._id)}">${esc(a.name)}</option>`).join('')
-  STATE.agentId = STATE.agents[0]._id
-  sel.value = STATE.agentId
+  if (!S.agents.length) { sel.innerHTML = '<option>No agents</option>'; return }
+  sel.innerHTML = S.agents.map(a => `<option value="${esc(a._id)}">${esc(a.name)}</option>`).join('')
+  S.agentId = S.agents[0]._id; sel.value = S.agentId
   sel.addEventListener('change', async e => {
-    STATE.agentId = e.target.value
-    await loadCampaigns(); previewAudience()
+    S.agentId = e.target.value; S.selected.clear()
+    await loadCampaigns(); await loadPicker(); previewAud()
   })
 }
 
-// ── CHANNEL SWITCHING
+// ══ CHANNEL SWITCHING
+const CH_META = {
+  whatsapp:  { cls:'p-wa',    icon:'💬', label:'WhatsApp' },
+  gmail:     { cls:'p-email', icon:'📧', label:'Email' },
+  instagram: { cls:'p-ig',   icon:'📸', label:'Instagram' },
+  messenger: { cls:'p-fb',   icon:'💙', label:'Messenger' },
+}
 function setChannel(ch) {
-  STATE.channel = ch
+  S.channel = ch
   document.getElementById('camp-channel').value = ch
-
-  // Tab styles
-  document.getElementById('ch-tab-wa').className    = 'ch-tab' + (ch === 'whatsapp' ? ' active-wa' : '')
-  document.getElementById('ch-tab-email').className = 'ch-tab' + (ch === 'gmail'    ? ' active-email' : '')
-
-  // Show/hide sections
-  document.getElementById('wa-mode-section').style.display  = ch === 'whatsapp' ? '' : 'none'
-  document.getElementById('email-section').style.display    = ch === 'gmail'    ? '' : 'none'
-
-  previewAudience()
+  document.querySelectorAll('.ch-pill').forEach(p => {
+    const key = Object.keys(CH_META).find(k => CH_META[k].cls === p.classList[1])
+    p.classList.toggle('active', key === ch)
+  })
+  document.getElementById('wa-section').style.display     = ch === 'whatsapp'  ? '' : 'none'
+  document.getElementById('email-section').style.display  = ch === 'gmail'     ? '' : 'none'
+  document.getElementById('ig-fb-section').style.display  = (ch === 'instagram' || ch === 'messenger') ? '' : 'none'
+  S.selected.clear(); S.pickerPage = 1
+  loadPicker(); previewAud()
 }
 
-// ── TEMPLATE MODE TOGGLE
-function onTemplateModeChange() {
-  STATE.templateMode = document.getElementById('wa-template-toggle').checked
-  document.getElementById('template-box').classList.toggle('visible', STATE.templateMode)
-  document.getElementById('wa-freeform-box').classList.toggle('visible', !STATE.templateMode)
-  if (STATE.templateMode) updateTemplatePreview()
+// ══ TEMPLATE TOGGLE
+function onTplToggle() {
+  S.tplMode = document.getElementById('wa-tpl-toggle').checked
+  document.getElementById('tpl-box').classList.toggle('open', S.tplMode)
+  document.getElementById('wa-freeform').classList.toggle('open', !S.tplMode)
+  if (S.tplMode) updateTplPreview()
 }
 
-// ── ADD BODY VARIABLE ROW
-function addBodyVar() {
-  const n = STATE.bodyVarCount++
+// ══ TEMPLATE VARS
+function addBVar() {
+  const n = S.bvarCount++
   const row = document.createElement('div')
-  row.className = 'var-row'
-  row.id = `body-var-row-${n}`
-  row.innerHTML = `
-    <span class="var-label">Body {{${n+1}}}</span>
-    <span class="var-arrow">→</span>
-    <select class="template-inp" id="tpl-body-var-${n}" style="flex:1;height:30px" onchange="updateTemplatePreview()">
-      <option value="name">Contact Name</option>
-      <option value="phone">Phone Number</option>
-      <option value="email">Email Address</option>
-      <option value="identifier">Identifier</option>
-      <option value="">(skip)</option>
+  row.className = 'var-row'; row.id = `tpl-bvar-row-${n}`
+  row.innerHTML = `<span class="var-lbl">Body {{${n+1}}}</span><span class="var-arrow">→</span>
+    <select class="tpl-var-sel" id="tpl-bvar-${n}" onchange="updateTplPreview()">
+      <option value="name">Name</option><option value="phone">Phone</option>
+      <option value="identifier">Identifier</option><option value="">(skip)</option>
     </select>
-    <button onclick="removeBodyVar(${n})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:14px;padding:2px 4px" title="Remove">✕</button>
-  `
-  document.getElementById('body-var-rows').appendChild(row)
-  updateTemplatePreview()
+    <button onclick="rmBVar(${n})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:13px;padding:0 3px">✕</button>`
+  document.getElementById('tpl-bvar-rows').appendChild(row)
+  updateTplPreview()
+}
+function rmBVar(n) { document.getElementById(`tpl-bvar-row-${n}`)?.remove(); updateTplPreview() }
+function updateTplPreview() {
+  const name = document.getElementById('tpl-name')?.value.trim()
+  const prev = document.getElementById('tpl-preview')
+  const txt  = document.getElementById('tpl-preview-txt')
+  if (!name) { prev.classList.remove('open'); return }
+  const ex   = { name:'Priya Kumar', phone:'+91 98765 43210', identifier:'+91 98765 43210' }
+  const hvar = document.getElementById('tpl-hvar')?.value
+  const bvars = []; let i = 0
+  while (document.getElementById(`tpl-bvar-${i}`)) { bvars.push(document.getElementById(`tpl-bvar-${i}`).value); i++ }
+  const lines = [`Template: ${name}`]
+  if (hvar) lines.push(`Header {{1}} → ${ex[hvar]||hvar}`)
+  if (bvars.filter(Boolean).length) lines.push(`Body: ${bvars.map((v,i)=>`{{${i+1}}}=${ex[v]||v||'—'}`).join(', ')}`)
+  txt.textContent = lines.join('\n'); prev.classList.add('open')
 }
 
-function removeBodyVar(n) {
-  document.getElementById(`body-var-row-${n}`)?.remove()
-  updateTemplatePreview()
+// ══ CONTACT PICKER
+let _pickerTimer = null
+function handlePickerSearch(v) {
+  clearTimeout(_pickerTimer)
+  _pickerTimer = setTimeout(() => { S.pickerSearch = v; S.pickerPage = 1; loadPicker() }, 320)
 }
 
-// ── TEMPLATE PREVIEW (shows example with "Sample Name")
-function updateTemplatePreview() {
-  const tplName = document.getElementById('tpl-name')?.value.trim()
-  const preview = document.getElementById('template-preview')
-  const previewText = document.getElementById('template-preview-text')
-  if (!tplName) { preview.classList.remove('visible'); return }
-
-  // Build example substitutions
-  const headerField = document.getElementById('tpl-header-var')?.value
-  const bodyFields  = []
-  let i = 0
-  while (document.getElementById(`tpl-body-var-${i}`)) {
-    bodyFields.push(document.getElementById(`tpl-body-var-${i}`).value)
-    i++
-  }
-
-  const exampleContact = { name: 'Priya Kumar', phone: '+91 98765 43210', email: 'priya@example.com', identifier: '+91 98765 43210' }
-  const fieldLabel = f => exampleContact[f] || f || '—'
-
-  let lines = []
-  if (headerField) lines.push(`Header: ${fieldLabel(headerField)}`)
-  lines.push(`Template: ${tplName}`)
-  if (bodyFields.filter(Boolean).length) {
-    lines.push(`Body vars: ${bodyFields.map((f,idx) => `{{${idx+1}}} = ${fieldLabel(f)}`).join(', ')}`)
-  }
-
-  previewText.textContent = lines.join('\n')
-  preview.classList.add('visible')
-}
-
-// ── AUDIENCE PREVIEW
-let _previewTimer = null
-function debouncePreview() { clearTimeout(_previewTimer); _previewTimer = setTimeout(previewAudience, 500) }
-
-async function previewAudience() {
-  if (!STATE.agentId) return
-  const numEl   = document.getElementById('audienceNum')
-  const labelEl = document.getElementById('audienceLabel')
-  numEl.textContent = '…'; labelEl.textContent = 'Counting…'
+async function loadPicker() {
+  if (!S.agentId) return
+  S.pickerLoading = true
+  const list = document.getElementById('pickerList')
+  list.innerHTML = `<div class="picker-empty">Loading…</div>`
   try {
-    const channel  = STATE.channel
-    const intent   = document.getElementById('seg-intent').value
-    const minScore = document.getElementById('seg-score').value
-    const tag      = document.getElementById('seg-tag')?.value.trim() || ''
-    const p = new URLSearchParams({ channel, limit: 1 })
-    if (intent)   p.set('intent', intent)
-    if (minScore) p.set('min_score', minScore)
-    if (tag)      p.set('tag', tag)
-    const data = await apiFetch(`/agents/${STATE.agentId}/contacts?${p}`)
-    const n = data.total || 0
-    numEl.textContent   = n
-    numEl.style.color   = n === 0 ? 'var(--red)' : n < 5 ? 'var(--amber)' : 'var(--accent)'
-    labelEl.textContent = n === 0
-      ? 'No contacts match — try different filters'
-      : `${n} contact${n===1?'':'s'} will receive this ${STATE.channel === 'whatsapp' ? (STATE.templateMode ? 'template' : 'message') : 'email'}`
+    const p = new URLSearchParams({ channel: S.channel, page: S.pickerPage, limit: PICKER_LIMIT })
+    if (S.pickerSearch) p.set('search', S.pickerSearch)
+    const data = await apiFetch(`/agents/${S.agentId}/contacts?${p}`)
+    S.pickerContacts = data.contacts || []
+    S.pickerTotal    = data.total || 0
+    renderPicker()
+  } catch (e) {
+    list.innerHTML = `<div class="picker-empty" style="color:var(--red)">${esc(e.message)}</div>`
+  } finally { S.pickerLoading = false }
+}
+
+function renderPicker() {
+  const list = document.getElementById('pickerList')
+  if (!S.pickerContacts.length) {
+    list.innerHTML = `<div class="picker-empty">No contacts on ${CH_META[S.channel]?.label||S.channel}<br><span style="font-size:10.5px">Contacts are saved when customers message you</span></div>`
+    updateSelCount(); return
+  }
+  list.innerHTML = S.pickerContacts.map(c => {
+    const displayName = (c.name && c.name !== c.identifier) ? c.name : (c.identifier || '?')
+    const identifier  = c.email || c.phone || c.identifier || ''
+    const bg = avatarColor(displayName)
+    const sel = S.selected.has(c._id)
+    const sc = c.lead_score || 0
+    const scColor = sc >= 20 ? '#ef4444' : sc >= 10 ? '#f59e0b' : 'var(--text-3)'
+    return `<div class="picker-row ${sel?'selected':''}" data-id="${esc(c._id)}" onclick="toggleContact('${esc(c._id)}')">
+      <div class="picker-check"></div>
+      <div class="picker-avatar" style="background:${bg}">${(displayName[0]||'?').toUpperCase()}</div>
+      <div class="picker-info">
+        <div class="picker-name">${esc(displayName)}</div>
+        <div class="picker-id">${esc(identifier !== displayName ? identifier : '')}</div>
+      </div>
+      <span class="picker-score" style="color:${scColor}">${sc}</span>
+    </div>`
+  }).join('')
+
+  // Infinite scroll pagination
+  if (S.pickerTotal > S.pickerPage * PICKER_LIMIT) {
+    const loadMore = document.createElement('div')
+    loadMore.style.cssText = 'text-align:center;padding:10px;font-size:12px;color:var(--accent);cursor:pointer;font-weight:600'
+    loadMore.textContent = `Load more (${S.pickerTotal - S.pickerPage * PICKER_LIMIT} remaining)`
+    loadMore.onclick = () => { S.pickerPage++; appendPicker() }
+    list.appendChild(loadMore)
+  }
+  updateSelCount()
+}
+
+async function appendPicker() {
+  try {
+    const p = new URLSearchParams({ channel: S.channel, page: S.pickerPage, limit: PICKER_LIMIT })
+    if (S.pickerSearch) p.set('search', S.pickerSearch)
+    const data = await apiFetch(`/agents/${S.agentId}/contacts?${p}`)
+    S.pickerContacts = [...S.pickerContacts, ...(data.contacts||[])]
+    renderPicker()
+  } catch {}
+}
+
+function toggleContact(id) {
+  const c = S.pickerContacts.find(x => x._id === id)
+  if (!c) return
+  if (S.selected.has(id)) S.selected.delete(id)
+  else S.selected.set(id, c)
+  // Update row visually
+  const row = document.querySelector(`.picker-row[data-id="${id}"]`)
+  if (row) row.classList.toggle('selected', S.selected.has(id))
+  updateSelCount(); previewAud()
+}
+
+function clearSelection() { S.selected.clear(); renderPicker(); previewAud() }
+function selectAllVisible() {
+  S.pickerContacts.forEach(c => S.selected.set(c._id, c))
+  renderPicker(); previewAud()
+}
+function updateSelCount() {
+  const el = document.getElementById('selCount')
+  if (el) el.textContent = `${S.selected.size} selected`
+}
+
+// ══ AUDIENCE PREVIEW
+let _prevTimer = null
+function debPrev() { clearTimeout(_prevTimer); _prevTimer = setTimeout(previewAud, 400) }
+async function previewAud() {
+  if (!S.agentId) return
+  const numEl = document.getElementById('audNum')
+  const lblEl = document.getElementById('audLbl')
+  numEl.textContent = '…'
+  try {
+    const ch  = S.channel
+    const p   = new URLSearchParams({ channel: ch, limit: 1 })
+    const int = document.getElementById('seg-intent').value
+    const sc  = document.getElementById('seg-score').value
+    const tag = document.getElementById('seg-tag').value.trim()
+    if (int) p.set('intent', int)
+    if (sc)  p.set('min_score', sc)
+    if (tag) p.set('tag', tag)
+    const data = await apiFetch(`/agents/${S.agentId}/contacts?${p}`)
+    const segCount = data.total || 0
+    const manCount = S.selected.size
+    // Rough total — backend dedupes on send but for display show sum
+    const total = segCount + manCount
+    numEl.textContent = total
+    numEl.style.color = total === 0 ? 'var(--red)' : total < 5 ? 'var(--amber)' : 'var(--accent)'
+    const parts = []
+    if (segCount) parts.push(`${segCount} from filters`)
+    if (manCount) parts.push(`${manCount} manually selected`)
+    lblEl.textContent = total === 0 ? 'No recipients — adjust filters or pick contacts' : parts.join(' + ')
   } catch {
-    numEl.textContent = '?'; labelEl.textContent = 'Could not count audience'
+    numEl.textContent = '?'
+    lblEl.textContent = 'Could not count'
   }
 }
 
-function updateCharCount(ta, counterId) {
-  const el = document.getElementById(counterId)
-  if (!el) return
-  const max = counterId === 'charCountWa' ? 1024 : 5000
+// ══ CHAR COUNT
+function updateCC(ta, id) {
+  const el = document.getElementById(id); if (!el) return
+  const max = id === 'cc-email' ? 5000 : 1024
   const n = ta.value.length
   el.textContent = `${n} / ${max}`
-  el.style.color = n > max ? 'var(--red)' : n > max * 0.8 ? 'var(--amber)' : 'var(--text-3)'
+  el.style.color = n > max ? 'var(--red)' : n > max * .8 ? 'var(--amber)' : 'var(--text-3)'
 }
 
-// ── CREATE CAMPAIGN
+// ══ CREATE CAMPAIGN
 async function createCampaign() {
-  const name    = document.getElementById('camp-name').value.trim()
-  const channel = STATE.channel
+  const name = document.getElementById('camp-name').value.trim()
+  const ch   = S.channel
   if (!name) { showToast('Enter a campaign name', 'error'); return }
 
-  let message    = ''
-  let wa_template = null
+  let message = '', wa_template = null
 
-  if (channel === 'whatsapp') {
-    if (STATE.templateMode) {
-      // Template mode
+  if (ch === 'whatsapp') {
+    if (S.tplMode) {
       const tplName = document.getElementById('tpl-name').value.trim()
       if (!tplName) { showToast('Enter the template name from Meta Business Manager', 'error'); return }
-      const lang          = document.getElementById('tpl-lang').value
-      const headerVarField = document.getElementById('tpl-header-var').value
-      const bodyVarFields  = []
-      let i = 0
-      while (document.getElementById(`tpl-body-var-${i}`)) {
-        const v = document.getElementById(`tpl-body-var-${i}`).value
-        if (v) bodyVarFields.push(v)
-        i++
+      const lang  = document.getElementById('tpl-lang').value
+      const hvar  = document.getElementById('tpl-hvar').value
+      const bvars = []; let i = 0
+      while (document.getElementById(`tpl-bvar-${i}`)) {
+        const v = document.getElementById(`tpl-bvar-${i}`).value; if (v) bvars.push(v); i++
       }
-      wa_template = { name: tplName, lang, header_var: headerVarField, body_vars: bodyVarFields }
-      message = `[Template: ${tplName}]`  // stored for display only
+      wa_template = { name: tplName, lang, header_var: hvar, body_vars: bvars }
+      message = `[Template: ${tplName}]`
     } else {
-      // Free-form WA
-      message = document.getElementById('camp-message-wa').value.trim()
+      message = document.getElementById('msg-wa').value.trim()
       if (!message) { showToast('Enter a message', 'error'); return }
-      if (message.length > 1024) { showToast('Message too long (max 1024 chars for WhatsApp)', 'error'); return }
+      if (message.length > 1024) { showToast('Message too long (max 1024 chars)', 'error'); return }
     }
+  } else if (ch === 'gmail') {
+    message = document.getElementById('msg-email').value.trim()
+    if (!message) { showToast('Enter a message', 'error'); return }
   } else {
-    // Email
-    message = document.getElementById('camp-message-email').value.trim()
-    if (!message) { showToast('Enter an email message', 'error'); return }
+    message = document.getElementById('msg-igfb').value.trim()
+    if (!message) { showToast('Enter a message', 'error'); return }
   }
 
   const intent   = document.getElementById('seg-intent').value
@@ -579,161 +704,142 @@ async function createCampaign() {
   if (minScore) segment_filter.min_score = parseInt(minScore)
   if (tag)      segment_filter.tag       = tag
 
+  const pinned_ids = [...S.selected.keys()]
+
   const btn = document.getElementById('createBtn')
   btn.disabled = true; btn.classList.add('loading')
   try {
-    const payload = { name, channel, message, segment_filter }
+    const payload = { name, channel: ch, message, segment_filter, pinned_ids }
     if (wa_template) payload.wa_template = wa_template
-
-    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
-    showToast(`Campaign created — ${data.recipient_count} recipients`, 'success')
-    // Reset form
+    const data = await apiFetch(`/agents/${S.agentId}/campaigns`, { method:'POST', body:JSON.stringify(payload) })
+    showToast(`Campaign created — ${data.recipient_count} recipient${data.recipient_count===1?'':'s'}`, 'success')
+    // Reset
     document.getElementById('camp-name').value = ''
-    document.getElementById('tpl-name').value  = ''
-    document.getElementById('camp-message-wa').value    = ''
-    document.getElementById('camp-message-email').value = ''
+    ;['msg-wa','msg-email','msg-igfb','tpl-name','seg-tag'].forEach(id => { const el=document.getElementById(id); if(el) el.value='' })
     document.getElementById('seg-intent').value = ''
     document.getElementById('seg-score').value  = ''
-    document.getElementById('seg-tag').value    = ''
-    document.getElementById('wa-template-toggle').checked = false
-    STATE.templateMode = false
-    document.getElementById('template-box').classList.remove('visible')
-    document.getElementById('wa-freeform-box').classList.remove('visible')
-    document.getElementById('template-preview').classList.remove('visible')
-    await loadCampaigns(); previewAudience()
+    document.getElementById('wa-tpl-toggle').checked = false
+    S.tplMode = false; S.selected.clear()
+    document.getElementById('tpl-box').classList.remove('open')
+    document.getElementById('wa-freeform').classList.remove('open')
+    document.getElementById('tpl-preview').classList.remove('open')
+    renderPicker(); await loadCampaigns(); previewAud()
   } catch (e) { showToast(e.message, 'error') }
   finally { btn.disabled = false; btn.classList.remove('loading') }
 }
 
-// ── LOAD + RENDER CAMPAIGNS
+// ══ LOAD + RENDER CAMPAIGNS
 async function loadCampaigns() {
-  const list = document.getElementById('campaignsList')
+  const list = document.getElementById('campList')
   list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-3)">Loading…</div>'
   try {
-    STATE.campaigns = await apiFetch(`/agents/${STATE.agentId}/campaigns`)
+    S.campaigns = await apiFetch(`/agents/${S.agentId}/campaigns`)
     renderCampaigns()
   } catch (e) {
-    list.innerHTML = `<div style="padding:20px;color:var(--red);text-align:center">${esc(e.message)}</div>`
+    list.innerHTML = `<div style="padding:16px;color:var(--red);text-align:center">${esc(e.message)}</div>`
   }
 }
 
 function renderCampaigns() {
-  const list = document.getElementById('campaignsList')
-  if (!STATE.campaigns.length) {
-    list.innerHTML = `<div class="empty-campaigns">
-      <div style="font-size:36px;margin-bottom:12px">📣</div>
-      <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">No campaigns yet</div>
-      <div style="font-size:13px;max-width:280px;margin:0 auto;line-height:1.6">Create your first campaign to reach a segment of your contacts</div>
+  const list = document.getElementById('campList')
+  if (!S.campaigns.length) {
+    list.innerHTML = `<div class="empty-camps">
+      <div style="font-size:34px;margin-bottom:10px">📣</div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:5px">No campaigns yet</div>
+      <div style="font-size:12px;max-width:240px;margin:0 auto;line-height:1.6">Create your first campaign to reach your contacts</div>
     </div>`
     return
   }
-
-  list.innerHTML = STATE.campaigns.map(c => {
-    const isWA      = c.channel === 'whatsapp'
-    const chIcon    = isWA ? '💬' : '📧'
-    const chColor   = isWA ? '#25D366' : '#EA4335'
-    const isTemplate = !!c.wa_template?.name
-    const statusCls  = { draft:'sp-draft', sending:'sp-sending', sent:'sp-sent', failed:'sp-failed' }[c.status] || 'sp-draft'
-    const statusLabel = { draft:'Draft', sending:'⏳ Sending…', sent:'✅ Sent', failed:'❌ Failed' }[c.status] || c.status
-    const sentPct = c.recipient_count > 0 ? Math.round((c.sent_count||0) / c.recipient_count * 100) : 0
-
-    const segParts = []
-    if (c.segment_filter?.intent)    segParts.push(`Intent: ${c.segment_filter.intent}`)
-    if (c.segment_filter?.min_score) segParts.push(`Score ≥ ${c.segment_filter.min_score}`)
-    if (c.segment_filter?.tag)       segParts.push(`Tag: ${c.segment_filter.tag}`)
-    const segLabel = segParts.length ? segParts.join(' · ') : 'All contacts'
-
-    // What to show in message box
-    const msgDisplay = isTemplate
+  list.innerHTML = S.campaigns.map(c => {
+    const m   = CH_META[c.channel] || { icon:'📨', label: c.channel }
+    const isT = !!c.wa_template?.name
+    const stCls   = {draft:'sp-draft',sending:'sp-sending',sent:'sp-sent',failed:'sp-failed'}[c.status]||'sp-draft'
+    const stLabel = {draft:'Draft',sending:'⏳ Sending…',sent:'✅ Sent',failed:'❌ Failed'}[c.status]||c.status
+    const pct  = c.recipient_count > 0 ? Math.round((c.sent_count||0)/c.recipient_count*100) : 0
+    const chColor = {whatsapp:'#25D366',gmail:'#EA4335',instagram:'#E1306C',messenger:'#0084FF'}[c.channel]||'var(--accent)'
+    const parts = []
+    if (c.segment_filter?.intent)    parts.push(`Intent: ${c.segment_filter.intent}`)
+    if (c.segment_filter?.min_score) parts.push(`Score ≥ ${c.segment_filter.min_score}`)
+    if (c.segment_filter?.tag)       parts.push(`Tag: ${c.segment_filter.tag}`)
+    if ((c.pinned_ids||[]).length)   parts.push(`+${c.pinned_ids.length} manual`)
+    const segLabel = parts.length ? parts.join(' · ') : 'All contacts'
+    const msgTxt = isT
       ? `📋 Template: <strong>${esc(c.wa_template.name)}</strong> (${esc(c.wa_template.lang||'en')})`
-      : esc((c.message||'').slice(0,200)) + ((c.message||'').length > 200 ? '…' : '')
-
-    return `<div class="campaign-card">
-      <div class="campaign-card-header">
-        <div class="campaign-icon" style="background:${chColor}22;border:1px solid ${chColor}44">${chIcon}</div>
+      : esc((c.message||'').slice(0,180)) + ((c.message||'').length>180?'…':'')
+    const canSend = c.status === 'draft' || c.status === 'failed'
+    const btnLabel = c.status === 'failed' ? '🔄 Retry' : '🚀 Send Now'
+    const btnCls   = isT && c.channel === 'whatsapp' ? 'btn-wa' : 'btn-success'
+    return `<div class="camp-card">
+      <div class="camp-card-hdr">
+        <div class="camp-icon" style="background:${chColor}22;border:1px solid ${chColor}44">${m.icon}</div>
         <div style="flex:1;min-width:0">
-          <div class="campaign-name">${esc(c.name)}</div>
-          <div class="campaign-meta">
-            <span class="status-pill ${statusCls}">${statusLabel}</span>
-            ${isTemplate ? `<span class="tpl-badge">📋 Template</span>` : ''}
+          <div class="camp-name">${esc(c.name)}</div>
+          <div class="camp-meta">
+            <span class="sp ${stCls}">${stLabel}</span>
+            ${isT?`<span class="tpl-badge">📋 Template</span>`:''}
+            <span>${m.label}</span>
             <span>${esc(segLabel)}</span>
             <span>${fmtDate(c.created_at)}</span>
           </div>
         </div>
       </div>
-      <div class="campaign-body">
-        <div class="campaign-message">${msgDisplay}</div>
-        ${isTemplate && c.wa_template?.body_vars?.length ? `
-        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:10px">
-          Variables: ${c.wa_template.body_vars.map((v,i) => `{{${i+1}}} → ${v}`).join(', ')}
-          ${c.wa_template.header_var ? ` · Header {{1}} → ${c.wa_template.header_var}` : ''}
-        </div>` : ''}
-        ${c.status === 'sent' || c.status === 'sending' ? `
-          <div class="prog-bar"><div class="prog-fill" style="width:${sentPct}%"></div></div>
-          <div class="campaign-stats">
-            <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
-            <div class="cstat"><div class="cstat-val" style="color:var(--green)">${c.sent_count||0}</div><div class="cstat-lbl">Sent</div></div>
-            <div class="cstat"><div class="cstat-val" style="color:var(--red)">${c.failed_count||0}</div><div class="cstat-lbl">Failed</div></div>
-            <div class="cstat"><div class="cstat-val">${sentPct}%</div><div class="cstat-lbl">Success Rate</div></div>
-          </div>` : `
-          <div class="campaign-stats">
-            <div class="cstat"><div class="cstat-val">${c.recipient_count||0}</div><div class="cstat-lbl">Recipients</div></div>
-          </div>`}
-        <div class="campaign-actions">
-          ${c.status === 'draft'  ? `<button class="btn ${isWA&&isTemplate?'btn-wa':'btn-success'} btn-sm" onclick="sendCampaign('${esc(c._id)}',this)">🚀 <span class="btn-text">Send Now</span></button>` : ''}
-          ${c.status === 'failed' ? `<button class="btn btn-primary btn-sm" onclick="sendCampaign('${esc(c._id)}',this)">🔄 <span class="btn-text">Retry</span></button>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="deleteCampaign('${esc(c._id)}')">🗑 Delete</button>
-          ${c.status === 'sent' ? `<span style="font-size:12px;color:var(--text-3);align-self:center">Sent ${fmtDate(c.sent_at)}</span>` : ''}
+      <div class="camp-body">
+        <div class="camp-msg">${msgTxt}</div>
+        ${isT && c.wa_template?.body_vars?.length ? `<div style="font-size:11px;color:var(--text-3);margin-bottom:9px">Vars: ${c.wa_template.body_vars.map((v,i)=>`{{${i+1}}}→${v}`).join(', ')}${c.wa_template.header_var?` · Header→${c.wa_template.header_var}`:''}</div>` : ''}
+        ${c.status==='sent'||c.status==='sending' ? `
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+          <div class="camp-stats">
+            <div><div class="cstat-v">${c.recipient_count||0}</div><div class="cstat-l">Recipients</div></div>
+            <div><div class="cstat-v" style="color:var(--green)">${c.sent_count||0}</div><div class="cstat-l">Sent</div></div>
+            <div><div class="cstat-v" style="color:var(--red)">${c.failed_count||0}</div><div class="cstat-l">Failed</div></div>
+            <div><div class="cstat-v">${pct}%</div><div class="cstat-l">Success</div></div>
+          </div>` : `<div class="camp-stats"><div><div class="cstat-v">${c.recipient_count||0}</div><div class="cstat-l">Recipients</div></div></div>`}
+        <div class="camp-actions">
+          ${canSend?`<button class="btn ${btnCls} btn-sm" onclick="sendCamp('${esc(c._id)}',this)">${btnLabel}</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="delCamp('${esc(c._id)}')">🗑</button>
+          ${c.status==='sent'?`<span style="font-size:11px;color:var(--text-3);align-self:center">Sent ${fmtDate(c.sent_at)}</span>`:''}
         </div>
-        ${c.errors?.length ? `<div style="margin-top:8px;padding:8px 10px;background:var(--red-dim);border-radius:6px;font-size:11.5px;color:var(--red)">${esc(c.errors.slice(0,3).join(' | '))}</div>` : ''}
+        ${c.errors?.length?`<div style="margin-top:7px;padding:7px 9px;background:var(--red-dim);border-radius:6px;font-size:11px;color:var(--red)">${esc(c.errors.slice(0,3).join(' | '))}</div>`:'' }
       </div>
     </div>`
   }).join('')
 }
 
-// ── SEND CAMPAIGN
-async function sendCampaign(campaignId, btn) {
-  const c = STATE.campaigns.find(x => x._id === campaignId)
+// ══ SEND / DELETE
+async function sendCamp(id, btn) {
+  const c = S.campaigns.find(x => x._id === id)
   const n = c?.recipient_count || 0
-  const isTemplate = !!c?.wa_template?.name
-  const msg = isTemplate
-    ? `Send template "${c.wa_template.name}" to ${n} contact${n===1?'':'s'}? This cannot be undone.`
-    : `Send to ${n} contact${n===1?'':'s'}? This cannot be undone.`
-  if (!confirm(msg)) return
+  const isT = !!c?.wa_template?.name
+  if (!confirm(`${isT?`Send template "${c.wa_template.name}"`:'Send'} to ${n} contact${n===1?'':'s'}? Cannot be undone.`)) return
   btn.disabled = true; btn.classList.add('loading')
   try {
-    const data = await apiFetch(`/agents/${STATE.agentId}/campaigns/${campaignId}/send`, { method: 'POST' })
-    showToast(`✅ Sent to ${data.sent}/${data.total} contacts${data.failed>0?' ('+data.failed+' failed)':''}`, 'success')
+    const data = await apiFetch(`/agents/${S.agentId}/campaigns/${id}/send`, { method:'POST' })
+    showToast(`✅ Sent to ${data.sent}/${data.total}${data.failed>0?' ('+data.failed+' failed)':''}`, 'success')
     await loadCampaigns()
-  } catch (e) {
-    showToast('Send failed: ' + e.message, 'error')
-    btn.disabled = false; btn.classList.remove('loading')
-  }
+  } catch (e) { showToast('Send failed: '+e.message,'error'); btn.disabled=false; btn.classList.remove('loading') }
 }
 
-// ── DELETE CAMPAIGN
-async function deleteCampaign(campaignId) {
+async function delCamp(id) {
   if (!confirm('Delete this campaign?')) return
   try {
-    await apiFetch(`/agents/${STATE.agentId}/campaigns/${campaignId}`, { method: 'DELETE' })
-    showToast('Deleted', 'info'); await loadCampaigns()
-  } catch (e) { showToast(e.message, 'error') }
+    await apiFetch(`/agents/${S.agentId}/campaigns/${id}`, { method:'DELETE' })
+    showToast('Deleted','info'); await loadCampaigns()
+  } catch (e) { showToast(e.message,'error') }
 }
 
-// ── HELPERS
+// ══ HELPERS
+const AV_COLORS=['linear-gradient(135deg,#6366f1,#8b5cf6)','linear-gradient(135deg,#0ea5e9,#6366f1)','linear-gradient(135deg,#f59e0b,#ef4444)','linear-gradient(135deg,#10b981,#0ea5e9)','linear-gradient(135deg,#ec4899,#8b5cf6)','linear-gradient(135deg,#14b8a6,#6366f1)','linear-gradient(135deg,#f97316,#ec4899)']
+function avatarColor(s){let h=0;for(const c of String(s||'')) h=(h*31+c.charCodeAt(0))&0xffffffff;return AV_COLORS[Math.abs(h)%AV_COLORS.length]}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function fmtDate(d){if(!d) return '—';return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
-function showToast(msg, type='info', dur=4000) {
-  const wrap = document.getElementById('toastWrap')
-  const el = document.createElement('div'); el.className = `toast-item toast-${type}`
-  el.innerHTML = `<span style="flex:1">${esc(msg)}</span>`
-  el.addEventListener('click', () => rmToast(el)); wrap.appendChild(el)
-  el._t = setTimeout(() => rmToast(el), dur)
+function showToast(msg,type='info',dur=3800){
+  const wrap=document.getElementById('toastWrap')
+  const el=document.createElement('div');el.className=`toast-item toast-${type}`
+  el.innerHTML=`<span style="flex:1">${esc(msg)}</span>`
+  el.addEventListener('click',()=>rmT(el));wrap.appendChild(el)
+  el._t=setTimeout(()=>rmT(el),dur)
 }
-function rmToast(el){clearTimeout(el._t);el.classList.add('removing');setTimeout(()=>el.remove(),220)}
+function rmT(el){clearTimeout(el._t);el.classList.add('rm');setTimeout(()=>el.remove(),200)}
 </script>
 </body>
 </html>
