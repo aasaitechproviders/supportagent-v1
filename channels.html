@@ -601,6 +601,7 @@ async function loadPage() {
     // Load settings quietly in background
     loadFilterSettings().catch(()=>{})
     loadQuickReplies().catch(()=>{})
+    setTimeout(() => loadFollowupQueue().catch(()=>{}), 1500)
   } catch (e) {
     document.getElementById('pageBody').innerHTML = `<div style="padding:60px;text-align:center;color:var(--text-3)">😵 ${esc(e.message)}</div>`
   }
@@ -954,6 +955,9 @@ function renderMsgList(platform) {
           ${msg.status==='noise'?`<span class="badge-pill bp-transactional">🔕 Filtered</span>`:''}
           ${msg.status==='dismissed'?`<span class="badge-pill bp-other">🗑 Dismissed</span>`:''}
           ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed</span>`:''}
+          ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated</span>`:''}
+          ${msg.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd">🤝 Human Handling</span>`:''}
+          ${msg.confidence_score!=null&&msg.status!=='replied'?`<span class="badge-pill" style="background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">🎯 ${msg.confidence_score}%</span>`:''}
           ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative</span>`:''}
         </div>
       </div>
@@ -997,7 +1001,7 @@ function renderReadPane(platform, msg) {
   const {name:pName,email:pEmail}=parseFrom(msg.from||'')
   const name=pName||(isEmail?pEmail:msg.from)||'Unknown'
   const bg=avatarColor(name), cfg=INTENT_CFG[msg.intent]||INTENT_CFG.other
-  const canReply=msg.status==='inbox', isNoise=msg.status==='noise', isFailed=msg.status==='failed'
+  const canReply=(msg.status==='inbox'||msg.status==='escalated')&&!msg.human_handling, isNoise=msg.status==='noise', isFailed=msg.status==='failed', isEscalated=msg.status==='escalated', isHumanHandling=msg.human_handling
   const waExpired=isWA&&(Date.now()-new Date(msg.created_at).getTime())>86400000
   const chanBadge=isWA?`<span class="badge-pill bp-wa">💬 WhatsApp</span>`:platform==='instagram'?`<span class="badge-pill bp-ig">📸 Instagram</span>`:''
 
@@ -1019,6 +1023,8 @@ function renderReadPane(platform, msg) {
       ${msg.intent_source==='ai_classify'||msg.intent_source==='ai_draft'?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ AI classified</span>`:''}
       ${msg.auto_replied?`<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>`:''}
       ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed — ${esc(msg.error_message||'Send error')}</span>`:''}
+      ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated — AI confidence ${msg.confidence_score??'?'}% below threshold</span>`:''}
+      ${msg.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd">🤝 Human Handling — AI paused</span>`:''}
       ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive sentiment</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative sentiment</span>`:msg.sentiment==='neutral'?`<span class="sent-neu">😐 Neutral</span>`:''}
       ${msg.draft_tokens_used?`<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>`:''}
     </div>
@@ -1026,7 +1032,7 @@ function renderReadPane(platform, msg) {
   <div class="conversation-panel" id="conv-${platform}">${renderConversation(platform,msg)}</div>
   <div class="email-reply-composer">
     <div class="reply-composer-inner" id="composer-${platform}">
-      ${(canReply)?renderComposer(platform,msg,waExpired):renderNonActionable(msg,isNoise,isFailed,platform)}
+      ${canReply?renderComposer(platform,msg,waExpired,isEscalated):renderNonActionable(msg,isNoise,isFailed,isHumanHandling,platform)}
     </div>
   </div>`
 
@@ -1074,7 +1080,14 @@ function renderConversation(platform, msg) {
     </div>`).join('')
 }
 
-function renderComposer(platform, msg, waExpired) {
+function renderComposer(platform, msg, waExpired, isEscalated) {
+  if (isEscalated) {
+    const note = `<div style="padding:10px 12px;background:#fff3cd;border:1px solid #ffd700;border-radius:8px;font-size:12px;color:#856404;margin-bottom:10px">
+      ⚠️ This message was escalated because AI confidence (<strong>${msg.confidence_score ?? '?'}%</strong>) was below your threshold.
+      Reply manually below or <button onclick="resolveHandoff('${platform}','${esc(msg.thread_id||msg.from)}')" class="btn btn-secondary btn-sm" style="margin-left:6px;height:24px">✅ Mark Resolved</button>
+    </div>`
+    return note + renderManualComposerHTML(platform, msg)
+  }
   if (waExpired) return `
     <div class="wa-window-warning">⚠️ The 24-hour WhatsApp messaging window has expired. Reply using a template in WhatsApp Business Manager.</div>
     <div style="display:flex;gap:8px"><button class="btn btn-danger btn-sm" id="btn-dismiss-exp"><span class="btn-text">🗑 Dismiss</span></button></div>`
@@ -1101,7 +1114,15 @@ function renderComposer(platform, msg, waExpired) {
     </div>`
 }
 
-function renderNonActionable(msg, isNoise, isFailed, platform) {
+function renderNonActionable(msg, isNoise, isFailed, isHumanHandling, platform) {
+  if (isHumanHandling) return `
+    <div style="padding:10px 12px;background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;font-size:12px;color:#1d4ed8;margin-bottom:10px">
+      🤝 You are handling this conversation. AI auto-reply is paused.
+    </div>
+    <div style="display:flex;gap:8px">
+      ${renderManualComposerHTML(platform, msg)}
+    </div>
+    <div style="margin-top:8px"><button class="btn btn-secondary btn-sm" onclick="resolveHandoff('${platform}','${esc(msg.thread_id||msg.from)}')">✅ Mark Resolved — Resume AI</button></div>`
   if (msg.status === 'failed') return `
     <div style="padding:10px 12px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:8px;font-size:12px;color:var(--red);margin-bottom:8px">
       ❌ Send failed: ${esc(msg.error_message||'Unknown error')}
@@ -1783,6 +1804,90 @@ function renderConvSkeletons() {
       <div class="skeleton" style="height:11px;width:80%;border-radius:4px"></div>
     </div>
   </div>`).join('')
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HUMAN HANDOFF HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+
+function renderManualComposerHTML(platform, msg) {
+  return `<div style="width:100%">
+    <div class="reply-ai-label" style="color:var(--text-2)">✏️ Manual Reply</div>
+    <textarea class="reply-textarea" id="reply-text" style="min-height:80px" placeholder="Type your reply…">${msg.ai_draft ? esc(msg.ai_draft) : ''}</textarea>
+    <div class="reply-composer-actions">
+      <div class="reply-action-left">
+        <button class="btn btn-primary" onclick="sendReply('${platform}','${esc(msg._id)}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span class="btn-text">Send Reply</span>
+        </button>
+        <button class="btn btn-ai btn-sm" onclick="generateDraft('${platform}','${esc(msg._id)}')">✦ AI Draft</button>
+      </div>
+      <span style="font-size:11.5px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${esc(msg.from)}</strong></span>
+    </div>
+  </div>`
+}
+
+async function takeOverThread(platform, threadId) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(threadId)}/handoff`, { method: 'PUT' })
+    showToast('🤝 You have taken over this conversation. AI is paused.', 'info')
+    await loadInbox(platform)
+  } catch (e) { showToast('Handoff failed: ' + e.message, 'error') }
+}
+
+async function resolveHandoff(platform, threadId) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(threadId)}/resolve`, { method: 'PUT' })
+    showToast('✅ Marked resolved — AI will resume on next message.', 'success')
+    STATE.selId[platform] = null
+    const rp = document.getElementById(`read-${platform}`); if (rp) rp.innerHTML = renderReadEmpty(platform)
+    await loadInbox(platform)
+  } catch (e) { showToast('Resolve failed: ' + e.message, 'error') }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// FOLLOWUP QUEUE PANEL
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadFollowupQueue() {
+  const el = document.getElementById('followup-queue-list'); if (!el) return
+  try {
+    const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue`)
+    if (!items.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:12px">No pending followups 🎉</div>'
+      return
+    }
+    el.innerHTML = items.map(item => `
+      <div class="qr-item" style="flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(item.from)} · <span style="text-transform:capitalize;color:var(--text-3)">${item.channel}</span></div>
+          <div style="font-size:10.5px;color:var(--text-3)">${fmtRelTime(item.scheduled_for)}</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-3)">${esc((item.last_body||'').slice(0, 80))}</div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button class="btn btn-secondary btn-sm" onclick="markFollowupDone('${esc(item._id)}')">✅ Done</button>
+          <button class="btn btn-danger btn-sm" onclick="dismissFollowup('${esc(item._id)}')">🗑 Dismiss</button>
+        </div>
+      </div>`).join('')
+  } catch (e) {
+    el.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">${esc(e.message)}</div>`
+  }
+}
+
+async function markFollowupDone(id) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}/done`, { method: 'PUT' })
+    showToast('Followup marked done!', 'success')
+    loadFollowupQueue()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+async function dismissFollowup(id) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}`, { method: 'DELETE' })
+    showToast('Dismissed', 'info')
+    loadFollowupQueue()
+  } catch (e) { showToast(e.message, 'error') }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
