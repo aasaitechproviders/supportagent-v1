@@ -11,6 +11,8 @@ const _NAV_SECTIONS = [
       { page:'dashboard',     href:'home.html',          labelKey:'navDashboard',     icon:'🏠' },
       { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
       { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
+      { page:'contacts',      href:'contacts.html',      label:'Contacts',            icon:'👥' },
+      { page:'campaigns',     href:'campaigns.html',     label:'Campaigns',           icon:'📣' },
       { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
   },
