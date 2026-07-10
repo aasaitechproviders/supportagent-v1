@@ -365,6 +365,46 @@
     .chat-ai-btn:hover{opacity:.9;transform:scale(1.04)}
     .chat-expired-warn{padding:8px 12px;background:var(--amber-dim);border:1px solid var(--amber-border);border-radius:8px;font-size:12px;color:var(--amber);margin-bottom:8px}
     .chat-replied-notice{padding:8px 12px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:8px;font-size:12px;color:var(--green);text-align:center}
+
+    /* ── Sentiment badges ── */
+    .sent-pos{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;white-space:nowrap}
+    .sent-neg{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;white-space:nowrap}
+    .sent-neu{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;white-space:nowrap}
+    /* ── Failed message ── */
+    .bp-failed{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+    .failed-row{border-left:3px solid var(--red)!important}
+    /* ── Settings panel ── */
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+    @media(max-width:768px){.settings-grid{grid-template-columns:1fr}}
+    .settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .settings-card-header{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface-2)}
+    .settings-card-title{font-size:13px;font-weight:700;color:var(--text)}
+    .settings-card-body{padding:16px}
+    .filter-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+    .filter-row:last-child{border-bottom:none}
+    .filter-label-wrap{flex:1;min-width:0}
+    .filter-label-title{font-size:12.5px;font-weight:600;color:var(--text)}
+    .filter-label-desc{font-size:11px;color:var(--text-3);margin-top:1px}
+    .domain-tag{display:inline-flex;align-items:center;gap:4px;background:var(--surface-3);border:1px solid var(--border-md);color:var(--text-2);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;margin:3px}
+    .domain-tag-x{cursor:pointer;color:var(--text-3);font-size:10px;padding:0 2px}
+    .domain-tag-x:hover{color:var(--red)}
+    /* ── Quick replies ── */
+    .qr-item{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .qr-item:last-child{border-bottom:none}
+    .qr-title{font-size:12px;font-weight:700;color:var(--text)}
+    .qr-body{font-size:11.5px;color:var(--text-3);margin-top:2px;line-height:1.5;word-break:break-word}
+    .qr-channels{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+    .qr-ch-badge{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    /* ── Quick reply dropdown in composer ── */
+    .qr-dropdown{position:absolute;bottom:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border-md);border-radius:10px;box-shadow:var(--sh-lg);z-index:100;max-height:220px;overflow-y:auto;margin-bottom:6px;display:none}
+    .qr-dropdown.open{display:block;animation:panel-enter .15s var(--ease-out)}
+    .qr-option{padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--border);transition:background var(--dur-fast)}
+    .qr-option:last-child{border-bottom:none}
+    .qr-option:hover{background:var(--accent-dim)}
+    .qr-option-title{font-size:12px;font-weight:700;color:var(--text)}
+    .qr-option-preview{font-size:11.5px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* ── Polling indicator ── */
+    .poll-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease-in-out infinite;display:inline-block;margin-right:4px}
     /* Responsive */
     @media(max-width:768px){
       .mob-menu-btn{display:flex}.main-wrap{margin-left:0}
@@ -418,7 +458,7 @@ const STATE = {
   search:       {email:'',    whatsapp:'',     instagram:'',    messenger:''},
   loading:      {email:false, whatsapp:false,  instagram:false, messenger:false},
   msgMap:       {email:{},    whatsapp:{},     instagram:{},    messenger:{}},
-  counts:       {email:{inbox:0,replied:0,filtered:0},whatsapp:{inbox:0,replied:0,filtered:0},instagram:{inbox:0,replied:0,filtered:0},messenger:{inbox:0,replied:0,filtered:0}},
+  counts:       {email:{inbox:0,replied:0,filtered:0,failed:0},whatsapp:{inbox:0,replied:0,filtered:0,failed:0},instagram:{inbox:0,replied:0,filtered:0,failed:0},messenger:{inbox:0,replied:0,filtered:0,failed:0}},
   tokenUsage:{},
   // Conversation state for WhatsApp/Instagram/Messenger
   convs:        {whatsapp:[], instagram:[], messenger:[]},
@@ -429,6 +469,9 @@ const STATE = {
   selThread:    {whatsapp:null, instagram:null, messenger:null},
   threadData:   {whatsapp:null, instagram:null, messenger:null},
   convLoading:  {whatsapp:false, instagram:false, messenger:false},
+  filterSettings: null,
+  quickReplies:   [],
+  pollingTimer:   null,
 }
 const PAGE_SIZE = 20
 const INTENT_CFG = {
@@ -508,7 +551,7 @@ const platCh = p => p === 'email' ? 'gmail' : p
     }
 
     buildAgentSelect(STATE.agents, agentFromUrl, preferredAgentId)
-    if (STATE.agents.length) await loadPage()
+    if (STATE.agents.length) { await loadPage(); startPolling() }
     else renderNoAgents()
   } catch (e) { showToast('Failed to load agents', 'error') }
   finally {
@@ -555,6 +598,9 @@ async function loadPage() {
     })
     STATE.autoReplySettings = (arData.value || {}).settings || {}
     renderPage()
+    // Load settings quietly in background
+    loadFilterSettings().catch(()=>{})
+    loadQuickReplies().catch(()=>{})
   } catch (e) {
     document.getElementById('pageBody').innerHTML = `<div style="padding:60px;text-align:center;color:var(--text-3)">😵 ${esc(e.message)}</div>`
   }
@@ -571,12 +617,12 @@ function renderPage() {
   const inboxCnt = gmail?.inbox_count||0, waCnt = wa?.inbox_count||0, igCnt = ig?.inbox_count||0, fbCnt = fb?.inbox_count||0
 
   document.getElementById('pageBody').innerHTML = `
-  <div class="metrics-bar">
-    <div class="metric-card mc-inbox reveal"><div class="metric-label">📬 Open Inbox</div><div class="metric-value" id="m-inbox">${inboxCnt||'—'}</div><div class="metric-sub">Need your attention</div></div>
+  <div class="metrics-bar" style="grid-template-columns:repeat(5,1fr)">
+    <div class="metric-card mc-inbox reveal"><div class="metric-label">📬 Open Inbox</div><div class="metric-value" id="m-inbox">${inboxCnt||'—'}</div><div class="metric-sub" style="display:flex;align-items:center;gap:4px"><span class="poll-dot"></span>Live polling</div></div>
     <div class="metric-card mc-noise reveal reveal-delay-1"><div class="metric-label">🔕 Auto-Filtered</div><div class="metric-value" id="m-noise"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">0 tokens used</div></div>
     <div class="metric-card mc-replied reveal reveal-delay-2"><div class="metric-label">✅ Replied (30d)</div><div class="metric-value" id="m-replied"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub" id="m-auto-sub">Including AI auto-replies</div></div>
     <div class="metric-card mc-time reveal reveal-delay-3"><div class="metric-label">⏱ Avg Response</div><div class="metric-value" id="m-time"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">hrs to first reply</div></div>
-    <div class="metric-card mc-rate reveal reveal-delay-4"><div class="metric-label">📈 Reply Rate</div><div class="metric-value" id="m-rate"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">of inbox emails replied</div></div>
+    <div class="metric-card mc-rate reveal reveal-delay-4"><div class="metric-label">😊 CSAT Score</div><div class="metric-value" id="m-csat"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub" id="m-csat-sub">customer satisfaction</div></div>
   </div>
   <div class="section-label reveal">Connected Channels</div>
   ${!waOn&&!igOn&&!fbOn?`<div class="meta-connect-banner reveal"><div class="meta-connect-banner-left"><div class="meta-connect-banner-icons">💬&nbsp;📸</div><div class="meta-connect-banner-text"><strong>Connect WhatsApp, Instagram &amp; Messenger</strong><p>One tap — Meta Embedded Signup connects all three channels simultaneously.</p></div></div><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`:''}
@@ -631,9 +677,81 @@ function renderPage() {
   </div>
   <div class="platform-panel ${STATE.platform==='messenger'?'active':''}" id="panel-messenger">
     ${fbOn?renderConvPanel('messenger'):renderComingSoonPanel('Facebook Messenger','💙','Connect via Meta Embedded Signup to automate Messenger conversations with AI.')}
-  </div>`
+  </div>
+  <div class="section-label reveal" style="margin-top:24px">⚙️ Channel Settings</div>
+  <div class="settings-grid reveal">
+    <!-- Smart Filters -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">🔕 Smart Filters</div>
+        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">Zero AI tokens</span>
+      </div>
+      <div class="settings-card-body" id="filter-settings-body">
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Block company/B2B domains</div><div class="filter-label-desc">Auto-filter emails from business domains (info@, no-reply@, noreply@, newsletter@…)</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="flt-company" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Block no-value messages</div><div class="filter-label-desc">Filter OTPs, order alerts, promotional blasts and other automated non-customer messages</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="flt-novalue" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Smart business reply filter</div><div class="filter-label-desc">Only auto-reply to real customer messages needing support — skip non-business messages</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="flt-smart" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Blocked Domains</div>
+          <div id="flt-domains-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
+          <div style="display:flex;gap:6px">
+            <input class="search-input" type="text" id="flt-domain-inp" placeholder="e.g. amazon.com" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedDomain();event.preventDefault()}"/>
+            <button class="btn btn-secondary btn-sm" onclick="addBlockedDomain()">+ Add</button>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Blocked Keywords</div>
+          <div id="flt-keywords-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
+          <div style="display:flex;gap:6px">
+            <input class="search-input" type="text" id="flt-kw-inp" placeholder="e.g. unsubscribe" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedKeyword();event.preventDefault()}"/>
+            <button class="btn btn-secondary btn-sm" onclick="addBlockedKeyword()">+ Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Quick Reply Templates -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">⚡ Quick Reply Templates</div>
+        <span style="font-size:11px;color:var(--text-3)">WhatsApp • IG • Email • Messenger</span>
+      </div>
+      <div class="settings-card-body">
+        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:12px;padding:8px 10px;background:var(--surface-2);border-radius:8px">
+          💡 Templates appear as one-tap inserts in the chat composer. For WhatsApp approved templates, paste the approved text here.
+        </div>
+        <!-- Add template form -->
+        <div style="background:var(--surface-2);border-radius:10px;padding:12px;margin-bottom:14px">
+          <input class="search-input" type="text" id="qr-title-inp" placeholder="Template name (e.g. Greeting)" style="height:32px;width:100%;margin-bottom:8px;box-sizing:border-box"/>
+          <textarea id="qr-body-inp" style="width:100%;min-height:60px;padding:8px 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:12.5px;resize:vertical;outline:none;box-sizing:border-box" placeholder="Template message body…"></textarea>
+          <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
+            <select id="qr-channels-inp" style="height:30px;padding:0 8px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;outline:none">
+              <option value="all">All channels</option>
+              <option value="whatsapp">WhatsApp only</option>
+              <option value="instagram">Instagram only</option>
+              <option value="messenger">Messenger only</option>
+              <option value="email">Email only</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="addQuickReply()" style="margin-left:auto">Add Template</button>
+          </div>
+        </div>
+        <!-- Templates list -->
+        <div id="quick-replies-list" style="max-height:280px;overflow-y:auto">
+          <div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Loading templates…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+\`
+`
 
-  // Single platform tab listener — never duplicated
   document.getElementById('platformTabsBar').addEventListener('click', e => {
     const tab = e.target.closest('.platform-tab')
     if (!tab || tab.classList.contains('disabled')) return
@@ -643,6 +761,7 @@ function renderPage() {
   if (gmailOn)  { loadInbox('email'); loadBucketCounts('email'); loadTokenUsage(); loadMetrics() }
   if (waOn)     { loadConversations('whatsapp') }
   if (igOn)     { loadConversations('instagram') }
+  if (fbOn)     { loadConversations('messenger') }
 }
 
 // ── RENDER INBOX PANEL (unified) ──────────────────────────────────────────────
@@ -665,6 +784,7 @@ function renderInboxPanel(platform) {
       <button class="subnav-tab ${bucket==='inbox'?'active':''}" data-bucket="inbox"><span>${icon} Inbox</span><span class="snt-count" id="cnt-inbox-${platform}">${cnts.inbox||'—'}</span></button>
       <button class="subnav-tab ${bucket==='replied'?'active':''}" data-bucket="replied"><span>✅ AI Replied</span><span class="snt-count" id="cnt-replied-${platform}">${cnts.replied||'0'}</span></button>
       <button class="subnav-tab ${bucket==='filtered'?'active':''}" data-bucket="filtered"><span>🔕 Filtered</span><span class="snt-count" id="cnt-filtered-${platform}">${cnts.filtered||'0'}</span></button>
+      <button class="subnav-tab ${bucket==='failed'?'active':''}" data-bucket="failed"><span>❌ Failed</span><span class="snt-count" id="cnt-failed-${platform}">${cnts.failed||'0'}</span></button>
     </div>
     <div class="subnav-right">
       <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="search-${platform}" type="text" placeholder="Search…" value="${esc(STATE.search[platform])}" oninput="handleSearch('${platform}',this.value)"></div>
@@ -759,6 +879,9 @@ async function loadInbox(platform) {
       for (const r of results) msgs = [...msgs, ...(r.value?.messages||[])]
       msgs.sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
       total = msgs.length
+    } else if (bucket === 'failed') {
+      const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=failed&page=${STATE.page[platform]||1}&limit=${PAGE_SIZE}${sp}`)
+      msgs=data.messages||[]; total=data.total||msgs.length
     } else {
       const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=${bucket}&page=${page}&limit=${PAGE_SIZE}${sp}${ip}`)
       msgs=data.messages||[]; total=data.total||msgs.length; intentCounts=data.intent_counts||{}
@@ -817,7 +940,7 @@ function renderMsgList(platform) {
     const {name:pName,email:pEmail}=parseFrom(msg.from||'')
     const name=pName||(isEmail?pEmail:msg.from)||'Unknown'
     const bg=avatarColor(name), sel=STATE.selId[platform]===msg._id, cfg=INTENT_CFG[msg.intent]||INTENT_CFG.other
-    return `<div class="msg-row ${sel?'selected':''} ${msg.status==='noise'?'noise-row':''}" data-msgid="${esc(msg._id)}" style="animation-delay:${idx*25}ms">
+    return `<div class="msg-row ${sel?'selected':''} ${msg.status==='noise'?'noise-row':''} ${msg.status==='failed'?'failed-row':''}" data-msgid="${esc(msg._id)}" style="animation-delay:${idx*25}ms">
       <div class="msg-avatar" style="background:${bg}">${(name[0]||'?').toUpperCase()}</div>
       <div class="msg-right">
         <div class="msg-row-top"><div class="msg-from-name">${esc(name)}</div><div class="msg-time">${fmtRelTime(msg.created_at)}</div></div>
@@ -830,6 +953,8 @@ function renderMsgList(platform) {
           ${msg.status==='replied'&&!msg.auto_replied?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Replied</span>`:''}
           ${msg.status==='noise'?`<span class="badge-pill bp-transactional">🔕 Filtered</span>`:''}
           ${msg.status==='dismissed'?`<span class="badge-pill bp-other">🗑 Dismissed</span>`:''}
+          ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed</span>`:''}
+          ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative</span>`:''}
         </div>
       </div>
     </div>`
@@ -872,7 +997,7 @@ function renderReadPane(platform, msg) {
   const {name:pName,email:pEmail}=parseFrom(msg.from||'')
   const name=pName||(isEmail?pEmail:msg.from)||'Unknown'
   const bg=avatarColor(name), cfg=INTENT_CFG[msg.intent]||INTENT_CFG.other
-  const canReply=msg.status==='inbox', isNoise=msg.status==='noise'
+  const canReply=msg.status==='inbox', isNoise=msg.status==='noise', isFailed=msg.status==='failed'
   const waExpired=isWA&&(Date.now()-new Date(msg.created_at).getTime())>86400000
   const chanBadge=isWA?`<span class="badge-pill bp-wa">💬 WhatsApp</span>`:platform==='instagram'?`<span class="badge-pill bp-ig">📸 Instagram</span>`:''
 
@@ -893,13 +1018,15 @@ function renderReadPane(platform, msg) {
       ${msg.intent_source==='pre_filter'?`<span class="badge-pill bp-other">🔕 auto-filtered</span>`:''}
       ${msg.intent_source==='ai_classify'||msg.intent_source==='ai_draft'?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ AI classified</span>`:''}
       ${msg.auto_replied?`<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>`:''}
+      ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed — ${esc(msg.error_message||'Send error')}</span>`:''}
+      ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive sentiment</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative sentiment</span>`:msg.sentiment==='neutral'?`<span class="sent-neu">😐 Neutral</span>`:''}
       ${msg.draft_tokens_used?`<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>`:''}
     </div>
   </div>
   <div class="conversation-panel" id="conv-${platform}">${renderConversation(platform,msg)}</div>
   <div class="email-reply-composer">
     <div class="reply-composer-inner" id="composer-${platform}">
-      ${canReply?renderComposer(platform,msg,waExpired):renderNonActionable(msg,isNoise)}
+      ${(canReply)?renderComposer(platform,msg,waExpired):renderNonActionable(msg,isNoise,isFailed,platform)}
     </div>
   </div>`
 
@@ -974,7 +1101,15 @@ function renderComposer(platform, msg, waExpired) {
     </div>`
 }
 
-function renderNonActionable(msg, isNoise) {
+function renderNonActionable(msg, isNoise, isFailed, platform) {
+  if (msg.status === 'failed') return `
+    <div style="padding:10px 12px;background:var(--red-dim);border:1px solid var(--red-border);border-radius:8px;font-size:12px;color:var(--red);margin-bottom:8px">
+      ❌ Send failed: ${esc(msg.error_message||'Unknown error')}
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-sm" onclick="retryFailed('${platform}','${esc(msg._id)}')"><span class="btn-text">🔄 Retry Send</span></button>
+      <button class="btn btn-danger btn-sm" onclick="dismissMsg('${platform}','${esc(msg._id)}')"><span class="btn-text">🗑 Dismiss</span></button>
+    </div>`
   if (isNoise) return `
     <div class="replied-notice">🔕 Auto-filtered as ${esc(msg.intent||'noise')} — 0 tokens used
       <button class="btn btn-secondary btn-sm" id="btn-rescue" style="margin-left:8px"><span class="btn-text">↑ Move to Inbox</span></button>
@@ -1381,6 +1516,7 @@ function renderConvPanel(platform) {
         <button class="conv-bucket-tab active" data-bucket="all">All</button>
         <button class="conv-bucket-tab" data-bucket="inbox">📬 Unread</button>
         <button class="conv-bucket-tab" data-bucket="replied">✅ Replied</button>
+        <button class="conv-bucket-tab" data-bucket="failed">❌ Failed</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         <div class="search-wrap" style="max-width:200px">
@@ -1487,6 +1623,7 @@ function renderConvList(platform) {
           <div class="conv-row-time">${fmtRelTime(c.created_at)}</div>
         </div>
         <div class="conv-row-preview ${c.reply_sent && !hasUnread ? 'sent-preview' : ''}">${esc(preview)}</div>
+        ${c.sentiment==='positive'?`<span class="sent-pos" style="font-size:9.5px;margin-top:3px;display:inline-block">😊</span>`:c.sentiment==='negative'?`<span class="sent-neg" style="font-size:9.5px;margin-top:3px;display:inline-block">😤</span>`:''}
       </div>
     </div>`
   }).join('')
@@ -1556,12 +1693,16 @@ function renderChatPane(platform, data) {
       composerHTML = `<div class="chat-expired-warn">⚠️ 24-hour window expired. Use a template to re-engage.</div>`
     } else {
       composerHTML = `
-      <div class="chat-composer-inner">
-        <button class="chat-ai-btn" onclick="genChatDraft('${platform}','${latest._id}')">✦ AI Draft</button>
-        <textarea class="chat-textarea" id="chat-reply-${platform}" placeholder="Type a message…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-        <button class="chat-send-btn" id="chat-send-${platform}" onclick="sendChatReply('${platform}','${latest._id}')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
+      <div style="position:relative">
+        <div class="qr-dropdown" id="qr-drop-${platform}">${renderQROptions(platform)}</div>
+        <div class="chat-composer-inner">
+          <button class="chat-ai-btn" onclick="genChatDraft('${platform}','${latest._id}')">✦ AI Draft</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleQRDropdown('${platform}')" title="Quick replies" style="height:36px;padding:0 10px;border-radius:20px;font-size:11px">⚡ Quick</button>
+          <textarea class="chat-textarea" id="chat-reply-${platform}" placeholder="Type a message…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+          <button class="chat-send-btn" id="chat-send-${platform}" onclick="sendChatReply('${platform}','${latest._id}')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
       </div>`
     }
   } else {
@@ -1643,6 +1784,269 @@ function renderConvSkeletons() {
     </div>
   </div>`).join('')
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// POLLING — 30-second background refresh
+// ══════════════════════════════════════════════════════════════════════════════
+
+function startPolling() {
+  stopPolling()
+  STATE.pollingTimer = setInterval(async () => {
+    if (!STATE.agentId) return
+    await refreshBadgeCounts()
+  }, 30000)
+}
+
+function stopPolling() {
+  if (STATE.pollingTimer) { clearInterval(STATE.pollingTimer); STATE.pollingTimer = null }
+}
+
+async function refreshBadgeCounts() {
+  try {
+    // Refresh channel cards' inbox counts silently
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels`)
+    const channels = (data.channels || [])
+    channels.forEach(ch => {
+      const cnt = ch.inbox_count || 0
+      const ptBadge = document.getElementById(`pt-badge-${ch.type === 'gmail' ? 'email' : ch.type}`)
+      if (ptBadge) ptBadge.textContent = cnt || '0'
+      const el = document.getElementById(`m-inbox`)
+      if (ch.type === 'gmail' && el) el.textContent = cnt || '—'
+    })
+    // If current platform is active, silently refresh conversation counts
+    const p = STATE.platform
+    if (p !== 'email' && STATE.convs[p]?.length) {
+      const totalUnread = STATE.convs[p].reduce((s, c) => s + (c.unread || 0), 0)
+      const ptBadge = document.getElementById(`pt-badge-${p}`)
+      if (ptBadge) ptBadge.textContent = totalUnread || STATE.convTotal[p] || '0'
+    }
+  } catch {}
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RETRY FAILED MESSAGE
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function retryFailed(platform, msgId) {
+  showToast('Retrying send…', 'info')
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/messages/${msgId}/retry`, { method: 'POST' })
+    showToast('Retried — message sent!', 'success')
+    STATE.selId[platform] = null
+    STATE.msgs[platform] = STATE.msgs[platform].filter(m => m._id !== msgId)
+    delete STATE.msgMap[platform][msgId]
+    const rp = document.getElementById(`read-${platform}`); if (rp) rp.innerHTML = renderReadEmpty(platform)
+    renderMsgList(platform); loadBucketCounts(platform)
+  } catch (e) { showToast('Retry failed: ' + e.message, 'error') }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SMART FILTER SETTINGS
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadFilterSettings() {
+  try {
+    const d = await apiFetch(`/agents/${STATE.agentId}/channels/filter-settings`)
+    STATE.filterSettings = d
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val }
+    set('flt-company', d.block_company_domains)
+    set('flt-novalue', d.block_no_value)
+    set('flt-smart',   d.smart_reply_filter)
+    renderDomainTags(d.blocked_domains || [])
+    renderKeywordTags(d.blocked_keywords || [])
+  } catch {}
+}
+
+async function saveFilterSettings() {
+  try {
+    const blocked_domains  = (STATE.filterSettings?.blocked_domains  || [])
+    const blocked_keywords = (STATE.filterSettings?.blocked_keywords || [])
+    const body = {
+      block_company_domains: document.getElementById('flt-company')?.checked || false,
+      block_no_value:        document.getElementById('flt-novalue')?.checked || false,
+      smart_reply_filter:    document.getElementById('flt-smart')?.checked   || false,
+      blocked_domains, blocked_keywords,
+    }
+    await apiFetch(`/agents/${STATE.agentId}/channels/filter-settings`, { method: 'PUT', body: JSON.stringify(body) })
+    STATE.filterSettings = body
+    showToast('Filter settings saved!', 'success')
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+function renderDomainTags(domains) {
+  const wrap = document.getElementById('flt-domains-wrap'); if (!wrap) return
+  wrap.innerHTML = (domains || []).map(d => `
+    <span class="domain-tag">${esc(d)}<span class="domain-tag-x" onclick="removeFilterItem('domain','${esc(d)}')">✕</span></span>`).join('')
+}
+
+function renderKeywordTags(kws) {
+  const wrap = document.getElementById('flt-keywords-wrap'); if (!wrap) return
+  wrap.innerHTML = (kws || []).map(k => `
+    <span class="domain-tag">${esc(k)}<span class="domain-tag-x" onclick="removeFilterItem('keyword','${esc(k)}')">✕</span></span>`).join('')
+}
+
+function addBlockedDomain() {
+  const inp = document.getElementById('flt-domain-inp'); if (!inp) return
+  const val = inp.value.trim().toLowerCase(); if (!val) return
+  if (!STATE.filterSettings) STATE.filterSettings = {}
+  STATE.filterSettings.blocked_domains = [...new Set([...(STATE.filterSettings.blocked_domains||[]), val])]
+  inp.value = ''
+  renderDomainTags(STATE.filterSettings.blocked_domains)
+  saveFilterSettings()
+}
+
+function addBlockedKeyword() {
+  const inp = document.getElementById('flt-kw-inp'); if (!inp) return
+  const val = inp.value.trim().toLowerCase(); if (!val) return
+  if (!STATE.filterSettings) STATE.filterSettings = {}
+  STATE.filterSettings.blocked_keywords = [...new Set([...(STATE.filterSettings.blocked_keywords||[]), val])]
+  inp.value = ''
+  renderKeywordTags(STATE.filterSettings.blocked_keywords)
+  saveFilterSettings()
+}
+
+function removeFilterItem(type, val) {
+  if (!STATE.filterSettings) return
+  if (type === 'domain')  STATE.filterSettings.blocked_domains  = (STATE.filterSettings.blocked_domains||[]).filter(d => d !== val)
+  if (type === 'keyword') STATE.filterSettings.blocked_keywords = (STATE.filterSettings.blocked_keywords||[]).filter(k => k !== val)
+  renderDomainTags(STATE.filterSettings.blocked_domains || [])
+  renderKeywordTags(STATE.filterSettings.blocked_keywords || [])
+  saveFilterSettings()
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// QUICK REPLY TEMPLATES
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadQuickReplies() {
+  try {
+    const qrs = await apiFetch(`/agents/${STATE.agentId}/quick-replies`)
+    STATE.quickReplies = qrs || []
+    renderQuickRepliesList()
+  } catch {}
+}
+
+function renderQuickRepliesList() {
+  const list = document.getElementById('quick-replies-list'); if (!list) return
+  if (!STATE.quickReplies.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">No templates yet. Add one above.</div>'
+    return
+  }
+  list.innerHTML = STATE.quickReplies.map(qr => `
+    <div class="qr-item">
+      <div style="flex:1;min-width:0">
+        <div class="qr-title">${esc(qr.title)}</div>
+        <div class="qr-body">${esc(qr.body)}</div>
+        <div class="qr-channels">
+          ${(qr.channels||['all']).map(c => `<span class="qr-ch-badge">${c === 'all' ? '🌐 All' : c}</span>`).join('')}
+        </div>
+      </div>
+      <button class="btn btn-danger btn-sm" style="flex-shrink:0;height:26px" onclick="deleteQuickReply('${esc(qr._id)}')">🗑</button>
+    </div>`).join('')
+}
+
+function renderQROptions(platform) {
+  const relevant = STATE.quickReplies.filter(qr => !qr.channels || qr.channels.includes('all') || qr.channels.includes(platform))
+  if (!relevant.length) return '<div style="padding:12px;font-size:12px;color:var(--text-3)">No quick replies. Add some in settings below.</div>'
+  return relevant.map(qr => `
+    <div class="qr-option" onclick="insertQR('${platform}','${esc(qr.body.replace(/'/g,"\'"))}')">
+      <div class="qr-option-title">${esc(qr.title)}</div>
+      <div class="qr-option-preview">${esc(qr.body.slice(0, 80))}</div>
+    </div>`).join('')
+}
+
+function toggleQRDropdown(platform) {
+  const drop = document.getElementById(`qr-drop-${platform}`); if (!drop) return
+  // Refresh options in case new templates were added
+  drop.innerHTML = renderQROptions(platform)
+  drop.classList.toggle('open')
+}
+
+function insertQR(platform, text) {
+  const ta = document.getElementById(`chat-reply-${platform}`)
+  if (ta) { ta.value = text; ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; ta.focus() }
+  const drop = document.getElementById(`qr-drop-${platform}`); if (drop) drop.classList.remove('open')
+}
+
+async function addQuickReply() {
+  const title = document.getElementById('qr-title-inp')?.value.trim()
+  const body  = document.getElementById('qr-body-inp')?.value.trim()
+  const ch    = document.getElementById('qr-channels-inp')?.value || 'all'
+  if (!title || !body) return showToast('Title and body required', 'warning')
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/quick-replies`, {
+      method: 'POST',
+      body: JSON.stringify({ title, body, channels: [ch] })
+    })
+    document.getElementById('qr-title-inp').value = ''
+    document.getElementById('qr-body-inp').value  = ''
+    showToast('Template added!', 'success')
+    await loadQuickReplies()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+async function deleteQuickReply(id) {
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/quick-replies/${id}`, { method: 'DELETE' })
+    showToast('Template deleted', 'info')
+    await loadQuickReplies()
+  } catch (e) { showToast(e.message, 'error') }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CSAT METRIC — from metrics endpoint
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Patched into loadMetrics:
+const _origLoadMetrics = loadMetrics
+async function loadMetrics() {
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/metrics`).catch(() => null)
+    if (!data) return
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v }
+    set('m-noise',   data.noise_count   ?? '—')
+    set('m-replied', data.replied_count ?? '—')
+    if (data.avg_response_hrs != null) set('m-time', data.avg_response_hrs < 1 ? Math.round(data.avg_response_hrs * 60) + 'm' : data.avg_response_hrs.toFixed(1) + 'h')
+    if (data.auto_replied_count) { const el = document.getElementById('m-auto-sub'); if (el) el.textContent = `${data.auto_replied_count} AI auto-replied` }
+    // CSAT
+    if (data.csat_score != null) {
+      set('m-csat', Math.round(data.csat_score) + '%')
+      const sub = document.getElementById('m-csat-sub')
+      if (sub) sub.textContent = data.positive_msgs + ' positive / ' + data.negative_msgs + ' negative'
+    }
+  } catch {}
+}
+
+// Close QR dropdown when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.qr-dropdown') && !e.target.closest('[onclick*="toggleQRDropdown"]')) {
+    document.querySelectorAll('.qr-dropdown.open').forEach(d => d.classList.remove('open'))
+  }
+})
+
+// ══════════════════════════════════════════════════════════════════════════════
+// loadBucketCounts — extended to include failed
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadBucketCounts(platform) {
+  const ch = platCh(platform), isChat = platform !== 'email'
+  await Promise.allSettled(['inbox','replied'].map(async b => {
+    try { const d = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=${b}&page=1&limit=1`); updateBucketCount(platform, b, d.total||0) } catch {}
+  }))
+  try {
+    const tasks = isChat
+      ? [apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=dismissed&page=1&limit=1`)]
+      : [apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=noise&page=1&limit=1`),
+         apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=dismissed&page=1&limit=1`)]
+    const rs = await Promise.allSettled(tasks)
+    updateBucketCount(platform, 'filtered', rs.reduce((s,r) => s + (r.value?.total||0), 0))
+  } catch {}
+  try {
+    const fd = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=failed&page=1&limit=1`)
+    updateBucketCount(platform, 'failed', fd.total || 0)
+  } catch {}
+}
+
 </script>
 </body>
 </html>
