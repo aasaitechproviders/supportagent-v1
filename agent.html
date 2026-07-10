@@ -106,6 +106,19 @@
   .spin-anim{display:inline-block;animation:spin .6s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
+  /* Personality pills */
+  .pill-btn{background:var(--surface-2);border:1px solid var(--border-md);color:var(--text-2);font-size:12.5px;font-weight:600;padding:9px 18px;border-radius:100px;cursor:pointer;transition:.15s;font-family:var(--font)}
+  .pill-btn:hover{background:var(--surface-3)}
+  .pill-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+  /* Rule item */
+  .rule-item{background:var(--surface-2);border:1px solid var(--border-md);border-radius:12px;padding:13px 15px;margin-bottom:10px;position:relative}
+  .rule-item:last-child{margin-bottom:0}
+  .rule-keywords{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .rule-kw-chip{font-size:11px;font-weight:700;background:var(--accent-dim);color:var(--accent);padding:3px 9px;border-radius:20px}
+  .rule-answer-text{font-size:13px;color:var(--text-2);line-height:1.55}
+  .rule-actions{position:absolute;top:10px;right:12px;display:flex;gap:4px}
+
   /* FIX F1: Text source input layout — clear separation of content and title */
   .src-field-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
   .src-add-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}
@@ -225,6 +238,7 @@
           <!-- Tab bar -->
           <div class="tab-bar">
             <button class="tab-btn active"  data-tab="general"   onclick="switchTab('general',this)"   data-i18n-tab="tabGeneral">⚙️ General</button>
+            <button class="tab-btn"         data-tab="behaviour" onclick="switchTab('behaviour',this)">🎯 Behaviour</button>
             <button class="tab-btn"         data-tab="knowledge" onclick="switchTab('knowledge',this)" data-i18n-tab="tabKnowledge">📚 Knowledge</button>
             <button class="tab-btn"         data-tab="shopping"  onclick="switchTab('shopping',this)"  data-i18n-tab="tabShopping">🛒 Shopping</button>
             <button class="tab-btn"         data-tab="publish"   onclick="switchTab('publish',this)"   data-i18n-tab="tabPublish">🚀 Publish</button>
@@ -293,6 +307,102 @@
               </div>
               <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="handleLogo(this)"/>
             </div>
+          </div>
+
+
+          <!-- ══ BEHAVIOUR TAB ════════════════════════════════════════ -->
+          <div id="tab-behaviour" class="tab-panel" style="padding:22px">
+
+            <!-- Personality -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">🧠 Agent Personality</div>
+                <span class="badge badge-gray">Affects all AI replies</span>
+              </div>
+              <div class="card-body">
+                <div class="field-hint" style="margin-bottom:14px">Choose how your agent communicates with customers. This shapes the tone of every AI-generated reply across all channels.</div>
+                <div id="personality-pills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+                  <button class="pill-btn active" data-val="friendly"      onclick="pickPersonality('friendly',this)">😊 Friendly</button>
+                  <button class="pill-btn"        data-val="professional"  onclick="pickPersonality('professional',this)">💼 Professional</button>
+                  <button class="pill-btn"        data-val="assistant"     onclick="pickPersonality('assistant',this)">🤖 Assistant</button>
+                  <button class="pill-btn"        data-val="formal"        onclick="pickPersonality('formal',this)">🎩 Formal</button>
+                </div>
+                <div id="personality-desc" style="font-size:12px;color:var(--text-3);padding:10px 12px;background:var(--surface-2);border-radius:10px;min-height:36px"></div>
+              </div>
+            </div>
+
+            <!-- Escalation -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">📧 Escalation Email</div>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label>Email to notify when AI is unsure</label>
+                  <input class="inp" type="email" id="b-escalation-email" placeholder="support@yourcompany.com"/>
+                  <div class="field-hint">When the AI confidence falls below the threshold (below), an alert is sent here instead of auto-replying.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confidence threshold -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">🎯 AI Confidence Threshold</div>
+              </div>
+              <div class="card-body">
+                <div class="field">
+                  <label>Minimum confidence to auto-reply <span id="thresh-val-display" style="font-weight:800;color:var(--accent)">80%</span></label>
+                  <input type="range" id="b-confidence-threshold" min="0" max="100" value="80" step="5"
+                    style="width:100%;accent-color:var(--accent);cursor:pointer"
+                    oninput="document.getElementById('thresh-val-display').textContent=this.value+'%'"/>
+                  <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px">
+                    <span>0% — always reply</span><span>100% — never auto-reply</span>
+                  </div>
+                  <div class="field-hint" style="margin-top:8px">If the AI's confidence is below this score, the message is escalated to your email instead of being auto-replied. Default: 80%.</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;margin-bottom:24px">
+              <button class="btn btn-primary" onclick="saveBehaviour()">Save Behaviour Settings</button>
+            </div>
+
+            <!-- Rule-based Q&A -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">⚡ Rule-Based Answers</div>
+                <span class="badge badge-green">Zero AI tokens</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--green-dim);border:1px solid var(--green-border);border-radius:10px">
+                  Rules run <strong>before AI</strong> — if a customer's message contains any of your keywords, the rule answer fires instantly with zero token cost. Perfect for FAQs, greetings, and hours.
+                </div>
+
+                <!-- Add rule form -->
+                <div style="background:var(--surface-2);border:1px solid var(--border-md);border-radius:14px;padding:16px;margin-bottom:20px">
+                  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">➕ Add New Rule</div>
+                  <div class="field">
+                    <label>Trigger Keywords <span style="font-size:11px;font-weight:400;color:var(--text-3)">(comma-separated)</span></label>
+                    <input class="inp" type="text" id="rule-keywords" placeholder="e.g. hours, open, timing, when are you open"/>
+                    <div class="field-hint">If the customer's message contains ANY of these words, this rule fires.</div>
+                  </div>
+                  <div class="field">
+                    <label>Answer</label>
+                    <textarea class="ta" id="rule-answer" rows="3" placeholder="We are open Monday–Saturday, 9 AM to 6 PM IST."></textarea>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end">
+                    <button class="btn btn-primary btn-sm" onclick="addRule()">Add Rule</button>
+                  </div>
+                </div>
+
+                <!-- Rules list -->
+                <div id="rules-list">
+                  <div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Loading rules...</div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- ══ KNOWLEDGE TAB ════════════════════════════════════════ -->
@@ -771,6 +881,7 @@ function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
   document.getElementById('tab-' + tab).classList.add('active')
   btn.classList.add('active')
+  if (tab === 'behaviour')     loadBehaviour()
   if (tab === 'knowledge')     loadSources()
   if (tab === 'shopping')      { loadProducts(); loadPaymentSettings() }
   if (tab === 'publish')       updatePublishUI(agent)
@@ -839,6 +950,147 @@ async function saveGeneral() {
     document.getElementById('page-agent-name').textContent = document.getElementById('f-name').value
   } catch(e) { toast(e.message, 'error') }
   finally { btn.disabled = false; btn.textContent = t('save') }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BEHAVIOUR TAB — Personality, Escalation, Threshold, Rules
+══════════════════════════════════════════════════════════════════ */
+const PERSONALITY_DESC = {
+  friendly:     '😊 Warm, casual, and approachable. Uses simple everyday language and emojis. Great for lifestyle brands and consumer products.',
+  professional: '💼 Crisp, confident, and polished. Suitable for B2B, finance, legal, and enterprise.',
+  assistant:    '🤖 Clear, helpful, and task-focused. Sounds like a dedicated assistant. Great default for most support use cases.',
+  formal:       '🎩 Very formal and respectful. Avoids contractions and casual expressions. Ideal for government, healthcare, and banking.',
+}
+let _personality = 'friendly'
+
+function pickPersonality(val, el) {
+  _personality = val
+  document.querySelectorAll('#personality-pills .pill-btn').forEach(b => b.classList.remove('active'))
+  el.classList.add('active')
+  document.getElementById('personality-desc').textContent = PERSONALITY_DESC[val] || ''
+}
+
+async function loadBehaviour() {
+  try {
+    const d = await apiFetch(`/agents/${AGENT_ID}/behaviour`)
+    // personality
+    _personality = d.personality || 'friendly'
+    document.querySelectorAll('#personality-pills .pill-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.val === _personality)
+    })
+    document.getElementById('personality-desc').textContent = PERSONALITY_DESC[_personality] || ''
+    // escalation email
+    document.getElementById('b-escalation-email').value = d.escalation_email || ''
+    // threshold
+    const thr = d.confidence_threshold ?? 80
+    document.getElementById('b-confidence-threshold').value = thr
+    document.getElementById('thresh-val-display').textContent = thr + '%'
+    // rules
+    await loadRules()
+  } catch(e) {
+    // fallback — just load rules and init personality desc
+    document.getElementById('personality-desc').textContent = PERSONALITY_DESC[_personality] || ''
+    await loadRules()
+  }
+}
+
+async function saveBehaviour() {
+  const btn = event?.target
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...' }
+  try {
+    await apiFetch(`/agents/${AGENT_ID}/behaviour`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        personality:           _personality,
+        escalation_email:      document.getElementById('b-escalation-email').value.trim(),
+        confidence_threshold:  parseInt(document.getElementById('b-confidence-threshold').value),
+      })
+    })
+    toast('Behaviour settings saved!', 'success')
+  } catch(e) { toast(e.message, 'error') }
+  finally { if (btn) { btn.disabled = false; btn.textContent = 'Save Behaviour Settings' } }
+}
+
+/* ── Rules ─────────────────────────────────────────────────────── */
+let _rulesMap = {}
+
+async function loadRules() {
+  const list = document.getElementById('rules-list')
+  try {
+    const rules = await apiFetch(`/agents/${AGENT_ID}/rules`)
+    _rulesMap = {}
+    rules.forEach(r => { _rulesMap[r._id] = r })
+
+    if (!rules.length) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">No rules yet. Add your first rule above — e.g. for greetings, hours, pricing FAQs.</div>'
+      return
+    }
+    list.innerHTML = rules.map((r, i) => `
+      <div class="rule-item">
+        <div class="rule-actions">
+          <button class="btn-icon" data-rule-edit="${escAttr(r._id)}" title="Edit">✏️</button>
+          <button class="btn-icon" data-rule-del="${escAttr(r._id)}" title="Delete">🗑️</button>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Rule #${i+1}</div>
+        <div class="rule-keywords">
+          ${(r.keywords||[]).map(k => `<span class="rule-kw-chip">${esc(k)}</span>`).join('')}
+        </div>
+        <div class="rule-answer-text">${esc(r.answer)}</div>
+      </div>`).join('')
+
+    list.querySelectorAll('[data-rule-edit]').forEach(b => {
+      b.addEventListener('click', () => editRule(_rulesMap[b.dataset.ruleEdit]))
+    })
+    list.querySelectorAll('[data-rule-del]').forEach(b => {
+      b.addEventListener('click', () => deleteRule(b.dataset.ruleDel))
+    })
+  } catch(e) {
+    list.innerHTML = '<div style="padding:16px;color:var(--red);font-size:12px">Failed to load rules: ' + esc(e.message) + '</div>'
+  }
+}
+
+async function addRule() {
+  const rawKw  = document.getElementById('rule-keywords').value.trim()
+  const answer = document.getElementById('rule-answer').value.trim()
+  if (!rawKw)  return toast('Enter at least one keyword', 'warning')
+  if (!answer) return toast('Enter an answer for this rule', 'warning')
+  const keywords = rawKw.split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
+  if (!keywords.length) return toast('Enter valid keywords', 'warning')
+  try {
+    await apiFetch(`/agents/${AGENT_ID}/rules`, {
+      method: 'POST',
+      body: JSON.stringify({ keywords, answer })
+    })
+    document.getElementById('rule-keywords').value = ''
+    document.getElementById('rule-answer').value   = ''
+    toast('Rule added!', 'success')
+    await loadRules()
+  } catch(e) { toast(e.message, 'error') }
+}
+
+function editRule(r) {
+  if (!r) return
+  const newKw  = prompt('Edit keywords (comma-separated):', (r.keywords||[]).join(', '))
+  if (newKw === null) return
+  const newAns = prompt('Edit answer:', r.answer)
+  if (newAns === null) return
+  const keywords = newKw.split(',').map(k => k.trim().toLowerCase()).filter(Boolean)
+  if (!keywords.length || !newAns.trim()) return toast('Keywords and answer required', 'warning')
+  apiFetch(`/agents/${AGENT_ID}/rules/${r._id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ keywords, answer: newAns.trim() })
+  }).then(() => { toast('Rule updated!', 'success'); loadRules() })
+    .catch(e => toast(e.message, 'error'))
+}
+
+async function deleteRule(id) {
+  const ok = await confirmModal({ title: 'Delete this rule?', message: 'This rule will no longer fire on incoming messages.', confirmText: 'Delete', danger: true })
+  if (!ok) return
+  try {
+    await apiFetch(`/agents/${AGENT_ID}/rules/${id}`, { method: 'DELETE' })
+    toast('Rule deleted', 'success')
+    await loadRules()
+  } catch(e) { toast(e.message, 'error') }
 }
 
 /* ══════════════════════════════════════════════════════════════════
