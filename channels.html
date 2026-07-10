@@ -601,6 +601,7 @@ async function loadPage() {
     // Load settings quietly in background
     loadFilterSettings().catch(()=>{})
     loadQuickReplies().catch(()=>{})
+    loadNotifPrefs().catch(()=>{})
     setTimeout(() => loadFollowupQueue().catch(()=>{}), 1500)
   } catch (e) {
     document.getElementById('pageBody').innerHTML = `<div style="padding:60px;text-align:center;color:var(--text-3)">😵 ${esc(e.message)}</div>`
@@ -749,9 +750,49 @@ function renderPage() {
         </div>
       </div>
     </div>
-  </div>
-\`
-`
+    <!-- Followup Queue -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">⏰ Followup Queue</div>
+        <span style="font-size:11px;color:var(--text-3)" id="followup-count-badge"></span>
+      </div>
+      <div class="settings-card-body" id="followup-queue-list">
+        <div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Loading…</div>
+      </div>
+    </div>
+    <!-- Email Notification Preferences -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">🔔 Email Notifications</div>
+        <button class="btn btn-secondary btn-sm" onclick="saveNotifPrefs()" id="notif-save-btn"><span class="btn-text">Save</span></button>
+      </div>
+      <div class="settings-card-body" id="notif-prefs-body">
+        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:14px;padding:8px 10px;background:var(--surface-2);border-radius:8px">
+          💡 Control which emails you receive. Uncheck to silence notifications you don't need.
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Escalation alerts</div><div class="filter-label-desc">When AI confidence is too low and a message needs manual reply</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="np-escalation" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Offline message alerts</div><div class="filter-label-desc">New WhatsApp / Instagram / Messenger messages when auto-reply is OFF</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="np-offline" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Channel connected / disconnected</div><div class="filter-label-desc">When a channel is linked or unlinked from an agent</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="np-channel" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Low token balance</div><div class="filter-label-desc">Alert when AI token balance drops below 20%</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="np-low-tokens" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label-wrap"><div class="filter-label-title">Weekly digest</div><div class="filter-label-desc">Weekly summary of inbox, auto-replies, CSAT and escalations</div></div>
+          <label class="toggle-switch"><input type="checkbox" id="np-weekly" checked><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>`
 
   document.getElementById('platformTabsBar').addEventListener('click', e => {
     const tab = e.target.closest('.platform-tab')
@@ -1644,7 +1685,14 @@ function renderConvList(platform) {
           <div class="conv-row-time">${fmtRelTime(c.created_at)}</div>
         </div>
         <div class="conv-row-preview ${c.reply_sent && !hasUnread ? 'sent-preview' : ''}">${esc(preview)}</div>
-        ${c.sentiment==='positive'?`<span class="sent-pos" style="font-size:9.5px;margin-top:3px;display:inline-block">😊</span>`:c.sentiment==='negative'?`<span class="sent-neg" style="font-size:9.5px;margin-top:3px;display:inline-block">😤</span>`:''}
+        <div class="msg-badges" style="margin-top:4px">
+          ${c.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700;font-size:9.5px;padding:1px 6px">⚠️ Escalated</span>`:''}
+          ${c.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;font-size:9.5px;padding:1px 6px">🤝 Human</span>`:''}
+          ${c.auto_replied&&c.status==='replied'?`<span class="badge-pill" style="background:linear-gradient(135deg,#ede9fe,#d1fae5);color:#059669;border:1px solid #a7f3d0;font-size:9.5px;padding:1px 6px">✦ AI replied</span>`:''}
+          ${!c.auto_replied&&c.status==='replied'?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);font-size:9.5px;padding:1px 6px">✅ Replied</span>`:''}
+          ${c.status==='failed'?`<span class="badge-pill" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);font-size:9.5px;padding:1px 6px">❌ Failed</span>`:''}
+          ${c.sentiment==='positive'?`<span class="sent-pos" style="font-size:9.5px">😊</span>`:c.sentiment==='negative'?`<span class="sent-neg" style="font-size:9.5px">😤</span>`:''}
+        </div>
       </div>
     </div>`
   }).join('')
@@ -1853,6 +1901,8 @@ async function loadFollowupQueue() {
   const el = document.getElementById('followup-queue-list'); if (!el) return
   try {
     const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue`)
+    const badge = document.getElementById('followup-count-badge')
+    if (badge) badge.textContent = items.length ? `${items.length} pending` : ''
     if (!items.length) {
       el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:12px">No pending followups 🎉</div>'
       return
@@ -2128,6 +2178,43 @@ document.addEventListener('click', e => {
     document.querySelectorAll('.qr-dropdown.open').forEach(d => d.classList.remove('open'))
   }
 })
+
+// ══════════════════════════════════════════════════════════════════════════════
+// EMAIL NOTIFICATION PREFERENCES
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function loadNotifPrefs() {
+  try {
+    const d = await apiFetch(`/agents/${STATE.agentId}/notification-prefs`).catch(() => null)
+    if (!d) return
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val !== false }
+    set('np-escalation',  d.escalation  ?? true)
+    set('np-offline',     d.offline      ?? true)
+    set('np-channel',     d.channel      ?? true)
+    set('np-low-tokens',  d.low_tokens   ?? true)
+    set('np-weekly',      d.weekly       ?? true)
+  } catch {}
+}
+
+async function saveNotifPrefs() {
+  const btn = document.getElementById('notif-save-btn')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin-ring spin-ring-sm spin-ring-dark"></span>' }
+  try {
+    const get = id => document.getElementById(id)?.checked ?? true
+    await apiFetch(`/agents/${STATE.agentId}/notification-prefs`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        escalation: get('np-escalation'),
+        offline:    get('np-offline'),
+        channel:    get('np-channel'),
+        low_tokens: get('np-low-tokens'),
+        weekly:     get('np-weekly'),
+      })
+    })
+    showToast('Notification preferences saved!', 'success')
+  } catch (e) { showToast(e.message, 'error') }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-text">Save</span>' } }
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // loadBucketCounts — extended to include failed
