@@ -838,14 +838,14 @@ function renderInboxPanel(platform) {
     </div>
   </div>
   ${arOn&&bucket==='inbox'?`<div class="auto-reply-banner">✦ AI Auto-Reply is ON — incoming ${label} messages will be replied to automatically<button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="toggleAutoReply('${arKey}',false)"><span class="btn-text">Pause</span></button></div>`:''}
-  ${isEmail&&bucket==='inbox'?`<div class="intent-filter-bar" id="intentBar-${platform}">
+  ${bucket==='inbox'?`<div class="intent-filter-bar" id="intentBar-${platform}">
     <span class="filter-label">Filter:</span>
     <button class="intent-pill ${ifilt==='all'?'active':''}" data-intent="all">All</button>
-    <button class="intent-pill ${ifilt==='enquiry'?'active':''}" data-intent="enquiry">❓ Enquiry <span class="pill-count" id="ic-enquiry">0</span></button>
-    <button class="intent-pill ${ifilt==='order'?'active':''}" data-intent="order">📦 Order <span class="pill-count" id="ic-order">0</span></button>
-    <button class="intent-pill ${ifilt==='complaint'?'active':''}" data-intent="complaint">😤 Complaint <span class="pill-count" id="ic-complaint">0</span></button>
-    <button class="intent-pill ${ifilt==='refund'?'active':''}" data-intent="refund">💸 Refund <span class="pill-count" id="ic-refund">0</span></button>
-    <button class="intent-pill ${ifilt==='other'?'active':''}" data-intent="other">• Other <span class="pill-count" id="ic-other">0</span></button>
+    <button class="intent-pill ${ifilt==='enquiry'?'active':''}" data-intent="enquiry">❓ Enquiry <span class="pill-count" id="ic-enquiry-${platform}">0</span></button>
+    <button class="intent-pill ${ifilt==='order'?'active':''}" data-intent="order">📦 Order <span class="pill-count" id="ic-order-${platform}">0</span></button>
+    <button class="intent-pill ${ifilt==='complaint'?'active':''}" data-intent="complaint">😤 Complaint <span class="pill-count" id="ic-complaint-${platform}">0</span></button>
+    <button class="intent-pill ${ifilt==='refund'?'active':''}" data-intent="refund">💸 Refund <span class="pill-count" id="ic-refund-${platform}">0</span></button>
+    <button class="intent-pill ${ifilt==='other'?'active':''}" data-intent="other">• Other <span class="pill-count" id="ic-other-${platform}">0</span></button>
   </div>`:''}
   <div class="inbox-wrap">
     <div class="inbox-split">
@@ -941,8 +941,8 @@ async function loadInbox(platform) {
     STATE.msgs[platform]=msgs; STATE.total[platform]=total
     STATE.msgMap[platform]={}; msgs.forEach(m=>{STATE.msgMap[platform][m._id]=m})
 
-    if (platform==='email' && bucket==='inbox') {
-      ;['enquiry','order','complaint','refund','other'].forEach(k=>{const el=document.getElementById(`ic-${k}`); if(el) el.textContent=intentCounts[k]||0})
+    if (bucket==='inbox') {
+      ;['enquiry','order','complaint','refund','other'].forEach(k=>{const el=document.getElementById(`ic-${k}-${platform}`); if(el) el.textContent=intentCounts[k]||0})
     }
     renderMsgList(platform)
     updateBucketCount(platform, bucket, total)
@@ -962,7 +962,7 @@ function updateBucketCount(platform, bucket, count) {
 
 async function loadBucketCounts(platform) {
   const ch=platCh(platform), isChat=platform!=='email'
-  await Promise.allSettled(['inbox','replied','escalated'].map(async b=>{
+  await Promise.allSettled(['inbox','replied','escalated','failed'].map(async b=>{
     try { const d=await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=${b}&page=1&limit=1`); updateBucketCount(platform,b,d.total||0) } catch{}
   }))
   try {
