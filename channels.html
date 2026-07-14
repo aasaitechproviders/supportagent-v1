@@ -118,6 +118,9 @@
     .subnav-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px var(--accent-glow)}
     .snt-count{font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.25);color:inherit;line-height:1.5}
     .subnav-tab:not(.active) .snt-count{background:var(--surface-3);color:var(--text-3)}
+    .subnav-tab-escalated:not(.active){color:var(--amber);border:1px solid var(--amber-border);background:var(--amber-dim)}
+    .subnav-tab-escalated:not(.active) .snt-count{background:var(--amber);color:#fff;animation:esc-pulse 1.5s ease-in-out infinite}
+    @keyframes esc-pulse{0%,100%{opacity:1}50%{opacity:.6}}
     .subnav-right{display:flex;align-items:center;gap:8px}
     .search-wrap{position:relative;flex:1;max-width:240px}
     .search-input{width:100%;height:34px;padding:0 12px 0 34px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;transition:border-color var(--dur-base),box-shadow var(--dur-base),background var(--dur-base)}
@@ -458,7 +461,7 @@ const STATE = {
   search:       {email:'',    whatsapp:'',     instagram:'',    messenger:''},
   loading:      {email:false, whatsapp:false,  instagram:false, messenger:false},
   msgMap:       {email:{},    whatsapp:{},     instagram:{},    messenger:{}},
-  counts:       {email:{inbox:0,replied:0,filtered:0,failed:0},whatsapp:{inbox:0,replied:0,filtered:0,failed:0},instagram:{inbox:0,replied:0,filtered:0,failed:0},messenger:{inbox:0,replied:0,filtered:0,failed:0}},
+  counts:       {email:{inbox:0,replied:0,filtered:0,failed:0,escalated:0},whatsapp:{inbox:0,replied:0,filtered:0,failed:0,escalated:0},instagram:{inbox:0,replied:0,filtered:0,failed:0,escalated:0},messenger:{inbox:0,replied:0,filtered:0,failed:0,escalated:0}},
   tokenUsage:{},
   // Conversation state for WhatsApp/Instagram/Messenger
   convs:        {whatsapp:[], instagram:[], messenger:[]},
@@ -824,6 +827,7 @@ function renderInboxPanel(platform) {
   <div class="subnav-wrap">
     <div class="subnav-tabs" id="subnav-${platform}">
       <button class="subnav-tab ${bucket==='inbox'?'active':''}" data-bucket="inbox"><span>${icon} Inbox</span><span class="snt-count" id="cnt-inbox-${platform}">${cnts.inbox||'—'}</span></button>
+      <button class="subnav-tab ${bucket==='escalated'?'active':''}${cnts.escalated>0?' subnav-tab-escalated':''}" data-bucket="escalated"><span>⚠️ Escalated</span><span class="snt-count" id="cnt-escalated-${platform}">${cnts.escalated||'0'}</span></button>
       <button class="subnav-tab ${bucket==='replied'?'active':''}" data-bucket="replied"><span>✅ AI Replied</span><span class="snt-count" id="cnt-replied-${platform}">${cnts.replied||'0'}</span></button>
       <button class="subnav-tab ${bucket==='filtered'?'active':''}" data-bucket="filtered"><span>🔕 Filtered</span><span class="snt-count" id="cnt-filtered-${platform}">${cnts.filtered||'0'}</span></button>
       <button class="subnav-tab ${bucket==='failed'?'active':''}" data-bucket="failed"><span>❌ Failed</span><span class="snt-count" id="cnt-failed-${platform}">${cnts.failed||'0'}</span></button>
@@ -924,6 +928,9 @@ async function loadInbox(platform) {
     } else if (bucket === 'failed') {
       const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=failed&page=${STATE.page[platform]||1}&limit=${PAGE_SIZE}${sp}`)
       msgs=data.messages||[]; total=data.total||msgs.length
+    } else if (bucket === 'escalated') {
+      const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=escalated&page=${STATE.page[platform]||1}&limit=${PAGE_SIZE}${sp}`)
+      msgs=data.messages||[]; total=data.total||msgs.length
     } else {
       const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=${bucket}&page=${page}&limit=${PAGE_SIZE}${sp}${ip}`)
       msgs=data.messages||[]; total=data.total||msgs.length; intentCounts=data.intent_counts||{}
@@ -955,7 +962,7 @@ function updateBucketCount(platform, bucket, count) {
 
 async function loadBucketCounts(platform) {
   const ch=platCh(platform), isChat=platform!=='email'
-  await Promise.allSettled(['inbox','replied'].map(async b=>{
+  await Promise.allSettled(['inbox','replied','escalated'].map(async b=>{
     try { const d=await apiFetch(`/agents/${STATE.agentId}/channels/gmail/inbox?channel=${ch}&bucket=${b}&page=1&limit=1`); updateBucketCount(platform,b,d.total||0) } catch{}
   }))
   try {
@@ -973,7 +980,7 @@ function renderMsgList(platform) {
   const pane = document.getElementById(`list-${platform}`); if(!pane) return
   const msgs = STATE.msgs[platform]||[], bucket=STATE.bucket[platform], isEmail=platform==='email'
   if (!msgs.length) {
-    const EMPTY={inbox:{icon:'📭',title:'Inbox is clear',sub:'All caught up!'},replied:{icon:'✅',title:'No replies yet',sub:'Sent replies will appear here'},filtered:{icon:'🔕',title:'Nothing filtered',sub:'Filtered messages will appear here'}}
+    const EMPTY={inbox:{icon:'📭',title:'Inbox is clear',sub:'All caught up!'},replied:{icon:'✅',title:'No replies yet',sub:'Sent replies will appear here'},filtered:{icon:'🔕',title:'Nothing filtered',sub:'Filtered messages will appear here'},escalated:{icon:'✅',title:'No escalations',sub:'All messages handled by AI — no manual replies needed'}}
     const e=EMPTY[bucket]||EMPTY.inbox
     pane.innerHTML=`<div class="msg-list-empty"><div class="msg-list-empty-icon">${e.icon}</div><div class="msg-list-empty-title">${e.title}</div><div class="msg-list-empty-sub">${e.sub}</div></div>`
     return
