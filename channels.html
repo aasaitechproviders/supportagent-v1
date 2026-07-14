@@ -314,6 +314,8 @@
     .conv-bucket-tab{height:30px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text-3);font-family:var(--font);transition:background var(--dur-fast),color var(--dur-fast)}
     .conv-bucket-tab.active{background:var(--accent);color:#fff}
     .conv-bucket-tab:hover:not(.active){background:var(--surface-3);color:var(--text-2)}
+    .conv-bucket-tab-esc:not(.active){color:var(--amber);border:1px solid var(--amber-border);background:var(--amber-dim)}
+    .conv-bucket-tab-esc.active{background:var(--amber);color:#fff}
     .conv-split{display:flex;flex:1;min-height:540px;overflow:hidden}
     .conv-list-pane{width:320px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:thin;scrollbar-color:var(--border-md) transparent}
     .conv-list-pane::-webkit-scrollbar{width:4px}
@@ -469,6 +471,7 @@ const STATE = {
   convPage:     {whatsapp:1,  instagram:1,  messenger:1},
   convSearch:   {whatsapp:'', instagram:'', messenger:''},
   convBucket:   {whatsapp:'all', instagram:'all', messenger:'all'},
+  convIntent:   {whatsapp:'all', instagram:'all', messenger:'all'},
   selThread:    {whatsapp:null, instagram:null, messenger:null},
   threadData:   {whatsapp:null, instagram:null, messenger:null},
   convLoading:  {whatsapp:false, instagram:false, messenger:false},
@@ -1584,7 +1587,8 @@ function renderConvPanel(platform) {
       <div class="conv-bucket-tabs" id="conv-buckets-${platform}">
         <button class="conv-bucket-tab active" data-bucket="all">All</button>
         <button class="conv-bucket-tab" data-bucket="inbox">📬 Unread</button>
-        <button class="conv-bucket-tab" data-bucket="replied">✅ Replied</button>
+        <button class="conv-bucket-tab conv-bucket-tab-esc" data-bucket="escalated" id="conv-esc-tab-${platform}">⚠️ Escalated</button>
+        <button class="conv-bucket-tab" data-bucket="replied">✅ AI Replied</button>
         <button class="conv-bucket-tab" data-bucket="failed">❌ Failed</button>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
@@ -1597,6 +1601,15 @@ function renderConvPanel(platform) {
         </button>
       </div>
     </div>
+    ${STATE.convBucket[platform]==='all'||STATE.convBucket[platform]==='inbox'?`<div class="intent-filter-bar" id="conv-intentBar-${platform}">
+      <span class="filter-label">Filter:</span>
+      <button class="intent-pill active" data-intent="all">All</button>
+      <button class="intent-pill" data-intent="enquiry">❓ Enquiry</button>
+      <button class="intent-pill" data-intent="order">📦 Order</button>
+      <button class="intent-pill" data-intent="complaint">😤 Complaint</button>
+      <button class="intent-pill" data-intent="refund">💸 Refund</button>
+      <button class="intent-pill" data-intent="other">• Other</button>
+    </div>`:''}
     <div class="conv-split">
       <div class="conv-list-pane" id="conv-list-${platform}">
         ${renderConvSkeletons()}
@@ -1623,7 +1636,20 @@ function wireConvPanel(platform) {
       STATE.convBucket[platform] = bucket
       STATE.convPage[platform] = 1
       STATE.selThread[platform] = null
+      STATE.convIntent[platform] = 'all'
       buckets.querySelectorAll('.conv-bucket-tab').forEach(b => b.classList.toggle('active', b === btn))
+      loadConversations(platform)
+    })
+  }
+  const intentBar = document.getElementById(`conv-intentBar-${platform}`)
+  if (intentBar && !intentBar._wired) {
+    intentBar._wired = true
+    intentBar.addEventListener('click', e => {
+      const pill = e.target.closest('.intent-pill'); if (!pill) return
+      STATE.convIntent[platform] = pill.dataset.intent || 'all'
+      STATE.convPage[platform] = 1
+      STATE.selThread[platform] = null
+      intentBar.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p === pill))
       loadConversations(platform)
     })
   }
@@ -1649,7 +1675,8 @@ async function loadConversations(platform) {
     const bucket = STATE.convBucket[platform] || 'all'
     const page   = STATE.convPage[platform] || 1
     const search = STATE.convSearch[platform] ? `&search=${encodeURIComponent(STATE.convSearch[platform])}` : ''
-    const data   = await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/conversations?bucket=${bucket}&page=${page}&limit=20${search}`)
+    const intent = (STATE.convIntent[platform] && STATE.convIntent[platform] !== 'all') ? `&intent=${STATE.convIntent[platform]}` : ''
+    const data   = await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/conversations?bucket=${bucket}&page=${page}&limit=20${search}${intent}`)
     STATE.convs[platform]     = data.conversations || []
     STATE.convTotal[platform] = data.total || 0
     renderConvList(platform)
