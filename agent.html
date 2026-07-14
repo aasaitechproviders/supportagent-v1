@@ -460,16 +460,16 @@
                   </div>
                 </div>
                 <div id="src-file" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, or text files. Content is extracted automatically.</div>
+                  <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, text files, or images (screenshots). Content is extracted automatically.</div>
                   <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
                     ondragover="event.preventDefault();this.classList.add('drag')"
                     ondragleave="this.classList.remove('drag')"
                     ondrop="handleKBFileDrop(event)">
                     <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <div style="font-size:13px">Drop files or <strong>browse</strong></div>
-                    <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF, DOCX, TXT</div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF, DOCX, TXT, JPG, PNG</div>
                   </div>
-                  <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt" onchange="handleKBFiles(this.files)"/>
+                  <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" onchange="handleKBFiles(this.files)"/>
                 </div>
                 <div id="sources-list" style="margin-top:16px"></div>
               </div>
