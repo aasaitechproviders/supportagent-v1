@@ -1788,21 +1788,25 @@ function renderChatPane(platform, data) {
     </div>`
   }
 
-  // Composer
+  // Composer — always show if there are any messages in the thread
+  // Use latest_inbox (inbox/escalated) as reply target; fall back to most recent received msg
+  const latestRecv = [...timeline].reverse().find(m => m.direction === 'recv')
+  const replyMsg   = latest || latestRecv || null
+
   let composerHTML = ''
-  if (latest) {
-    const expired = (Date.now() - new Date(latest.created_at).getTime()) > 86400000
-    if (platform === 'whatsapp' && expired) {
+  if (replyMsg) {
+    const expired = platform === 'whatsapp' && latestRecv && (Date.now() - new Date(latestRecv.created_at).getTime()) > 86400000
+    if (expired) {
       composerHTML = `<div class="chat-expired-warn">⚠️ 24-hour window expired. Use a template to re-engage.</div>`
     } else {
       composerHTML = `
       <div style="position:relative">
         <div class="qr-dropdown" id="qr-drop-${platform}">${renderQROptions(platform)}</div>
         <div class="chat-composer-inner">
-          <button class="chat-ai-btn" onclick="genChatDraft('${platform}','${latest._id}')">✦ AI Draft</button>
+          <button class="chat-ai-btn" onclick="genChatDraft('${platform}','${replyMsg._id}')">✦ AI Draft</button>
           <button class="btn btn-secondary btn-sm" onclick="toggleQRDropdown('${platform}')" title="Quick replies" style="height:36px;padding:0 10px;border-radius:20px;font-size:11px">⚡ Quick</button>
           <textarea class="chat-textarea" id="chat-reply-${platform}" placeholder="Type a message…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-          <button class="chat-send-btn" id="chat-send-${platform}" onclick="sendChatReply('${platform}','${latest._id}')">
+          <button class="chat-send-btn" id="chat-send-${platform}" onclick="sendChatReply('${platform}','${replyMsg._id}')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
