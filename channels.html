@@ -1765,9 +1765,10 @@ function renderChatPane(platform, data) {
   const latest = data.latest_inbox
 
   // Build date-separated timeline
+  const timeline = data.timeline || []
   let timelineHTML = ''
   let lastDate = ''
-  for (const item of (data.timeline || [])) {
+  for (const item of timeline) {
     const d = new Date(item.created_at)
     const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     if (dateStr !== lastDate) {
