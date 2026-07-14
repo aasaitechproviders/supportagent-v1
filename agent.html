@@ -411,7 +411,7 @@
               <div style="font-size:20px;flex-shrink:0">💡</div>
               <div>
                 <div class="info-banner-title">Knowledge Base</div>
-                <div class="info-banner-desc">Add FAQs, paste text, scrape URLs, or upload documents. The AI answers customer questions from this knowledge automatically.</div>
+                <div class="info-banner-desc">Add FAQs, paste text, or upload documents and screenshots. The AI answers customer questions from this knowledge automatically.</div>
               </div>
             </div>
             <div class="kb-stats-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px">
@@ -432,7 +432,6 @@
               <div class="card-body">
                 <div class="src-tab-bar">
                   <button class="src-tab active" onclick="switchSrcTab('text',this)">✍️ Text / FAQ</button>
-                  <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 URL</button>
                   <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
                 </div>
                 <div id="src-text" class="src-panel active">
@@ -450,15 +449,7 @@
                     <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addTextSrc()">➕ Add Source</button>
                   </div>
                 </div>
-                <div id="src-url" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:12px">Enter a public webpage URL — its content will be fetched and indexed.</div>
-                  <div class="src-add-row">
-                    <div style="display:flex;gap:8px">
-                      <input class="inp" type="url" id="src-url-inp" placeholder="https://yoursite.com/faq" style="flex:1"/>
-                      <button class="btn btn-primary" onclick="addUrlSrc()">Fetch &amp; Add</button>
-                    </div>
-                  </div>
-                </div>
+
                 <div id="src-file" class="src-panel">
                   <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, text files, or images (screenshots). Content is extracted automatically.</div>
                   <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
@@ -1168,20 +1159,7 @@ async function addTextSrc() {
   } catch(e) { toast(e.message, 'error') }
 }
 
-/* FIX F2: addUrlSrc uses URL as title automatically */
-async function addUrlSrc() {
-  const url = document.getElementById('src-url-inp').value.trim()
-  if (!url) return toast('Enter a URL', 'warning')
-  const loadingToast = toast('Fetching URL...', 'info')
-  try {
-    await apiFetch(`/agents/${AGENT_ID}/sources`, { method: 'POST', body: JSON.stringify({
-      type: 'url', content: url, title: url  // FIX F2: use URL as title
-    })})
-    document.getElementById('src-url-inp').value = ''
-    toast(t('toastUrlAdded'), 'success')
-    loadSources()
-  } catch(e) { toast(e.message, 'error') }
-}
+
 
 function handleKBFileDrop(e) {
   e.preventDefault(); document.getElementById('file-drop').classList.remove('drag')
