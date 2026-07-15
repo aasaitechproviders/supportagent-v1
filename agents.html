@@ -429,6 +429,7 @@ async function createAgent() {
   try {
     const a = await apiFetch('/agents', { method: 'POST', body: JSON.stringify({
       name, brand_color: _cmColor,
+      agent_type: _cmType,
       system_prompt: PROMPTS[_cmType],
       welcome_message: `Hi! I'm ${name}. How can I help you today?`
     })})
