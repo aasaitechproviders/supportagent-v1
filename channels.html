@@ -2007,7 +2007,7 @@ function renderChatPane(platform, data) {
       ${hasFollowup ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">📌 Followup ${fmtRelTime(data.followup_due)}</span>` : ''}
       <button class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','confirm')">🤝 Confirmed</button>
       <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','close')">✅ Close</button>
-      <button class="btn btn-sm" style="background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);height:28px" onclick="addFollowup('${platform}','${esc(data.thread_id)}','${esc(data.from)}')">📌 Follow Up</button>
+      <button class="btn btn-sm" style="background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);height:28px" onclick="toggleFollowupPicker('${platform}','${esc(data.thread_id)}','${esc(data.from)}')">📌 Follow Up</button>
       ${isHuman ? `<button class="btn btn-sm btn-ai" style="height:28px" onclick="resolveHandoff('${platform}','${esc(data.thread_id)}')">🤖 Resume AI</button>` : ''}
     </div>`
 
@@ -2021,6 +2021,12 @@ function renderChatPane(platform, data) {
   </div>
   <div class="chat-messages" id="chat-msgs-${platform}">${timelineHTML || `<div class="chat-empty"><div style="font-size:24px">💬</div><div style="font-size:12px">No messages yet</div></div>`}</div>
   ${actionBtns}
+  <div id="followup-picker-${platform}" style="display:none;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface-2);gap:8px;align-items:center;flex-wrap:wrap">
+    <span style="font-size:12px;font-weight:600;color:var(--text-2)">📌 Schedule follow-up for:</span>
+    <input type="datetime-local" id="followup-dt-${platform}" style="height:30px;padding:0 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:12.5px;outline:none;cursor:pointer" />
+    <button class="btn btn-sm btn-primary" style="height:30px" onclick="confirmFollowup('${platform}','${esc(data.thread_id)}','${esc(data.from)}')">Save</button>
+    <button class="btn btn-sm btn-secondary" style="height:30px" onclick="toggleFollowupPicker('${platform}')">Cancel</button>
+  </div>
   <div class="chat-composer">${composerHTML}</div>`
 
   // Scroll to bottom
@@ -2109,13 +2115,43 @@ function renderManualComposerHTML(platform, msg) {
   </div>`
 }
 
-async function addFollowup(platform, threadId, from) {
+function toggleFollowupPicker(platform, threadId, from) {
+  const picker = document.getElementById(`followup-picker-${platform}`)
+  if (!picker) return
+  const isOpen = picker.style.display !== 'none'
+  picker.style.display = isOpen ? 'none' : 'flex'
+  if (!isOpen) {
+    // Default to tomorrow at 10am
+    const dt = document.getElementById(`followup-dt-${platform}`)
+    if (dt) {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(10, 0, 0, 0)
+      dt.value = tomorrow.toISOString().slice(0, 16)
+      dt.min   = new Date().toISOString().slice(0, 16)
+    }
+    // Store threadId and from on the picker for confirmFollowup to use
+    if (picker) { picker.dataset.threadId = threadId; picker.dataset.from = from }
+  }
+}
+
+async function confirmFollowup(platform, threadId, from) {
+  const picker = document.getElementById(`followup-picker-${platform}`)
+  const dtEl   = document.getElementById(`followup-dt-${platform}`)
+  const tid    = threadId || picker?.dataset.threadId
+  const frm    = from    || picker?.dataset.from
+  if (!dtEl?.value) { showToast('Please pick a date and time', 'error'); return }
+  const scheduled_for = new Date(dtEl.value).toISOString()
   try {
-    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(threadId)}/followup`, {
-      method: 'POST', body: JSON.stringify({ from })
+    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(tid)}/followup`, {
+      method: 'POST', body: JSON.stringify({ from: frm, scheduled_for })
     })
-    showToast('📌 Follow-up scheduled for 24 hours from now', 'success')
+    const label = new Date(dtEl.value).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })
+    showToast(`📌 Follow-up scheduled for ${label}`, 'success')
+    if (picker) picker.style.display = 'none'
     loadFollowupQueue().catch(() => {})
+    // Reload thread to update followup badge
+    if (tid) loadThread(platform, tid).catch(() => {})
   } catch (e) { showToast(e.message, 'error') }
 }
 
