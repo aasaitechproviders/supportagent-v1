@@ -850,7 +850,25 @@ function renderPage() {
   <div class="platform-panel ${STATE.platform==='messenger'?'active':''}" id="panel-messenger">
     ${fbOn?renderConvPanel('messenger'):renderComingSoonPanel('Facebook Messenger','💙','Connect via Meta Embedded Signup to automate Messenger conversations with AI.')}
   </div>
-  <div class="section-label reveal" style="margin-top:24px">⚙️ Channel Settings</div>
+  <!-- ── Followup Queue Panel ── -->
+  <div class="section-label reveal" style="margin-top:24px">📌 Followup Queue</div>
+  <div class="reveal" style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:24px;box-shadow:var(--sh-sm)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface-2)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:13px;font-weight:700;color:var(--text)">⏰ Pending Followups</span>
+        <span id="followup-count-badge" style="font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);display:none"></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button id="fq-btn-today" class="btn btn-sm btn-primary" style="height:28px" onclick="switchFollowupFilter('today')">Today</button>
+        <button id="fq-btn-all" class="btn btn-sm btn-secondary" style="height:28px" onclick="switchFollowupFilter('all')">All</button>
+      </div>
+    </div>
+    <div id="followup-queue-list" style="min-height:80px;padding:4px 0">
+      <div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">Loading…</div>
+    </div>
+  </div>
+
+  <div class="section-label reveal" style="margin-top:4px">⚙️ Channel Settings</div>
   <div class="settings-grid reveal">
     <!-- Smart Filters -->
     <div class="settings-card">
@@ -920,16 +938,8 @@ function renderPage() {
         </div>
       </div>
     </div>
-    <!-- Followup Queue -->
-    <div class="settings-card">
-      <div class="settings-card-header">
-        <div class="settings-card-title">⏰ Followup Queue</div>
-        <span style="font-size:11px;color:var(--text-3)" id="followup-count-badge"></span>
-      </div>
-      <div class="settings-card-body" id="followup-queue-list">
-        <div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Loading…</div>
-      </div>
-    </div>
+    <!-- Followup Queue — moved to standalone panel above settings -->
+    <div class="settings-card" id="followup-settings-placeholder" style="display:none"></div>
     <!-- Email Notification Preferences -->
     <div class="settings-card">
       <div class="settings-card-header">
@@ -1982,13 +1992,33 @@ function renderChatPane(platform, data) {
     composerHTML = `<div class="chat-replied-notice">✅ All messages replied — waiting for customer response</div>`
   }
 
+  const isEsc       = data.human_handling && data.thread_status === 'escalated'
+  const isHuman     = data.human_handling
+  const hasFollowup = data.has_followup
+
+  // Build contextual action buttons for header
+  const actionBtns = `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      ${isEsc
+        ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)">⚠️ Escalated</span>`
+        : `<button class="btn btn-sm" style="background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','escalate')">🔴 Escalate</button>`
+      }
+      ${hasFollowup ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">📌 Followup due ${fmtRelTime(data.followup_due)}</span>` : ''}
+      <button class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','confirm')">🤝 Confirmed</button>
+      <button class="btn btn-sm" style="background:var(--surface-2);color:var(--text-2);border:1px solid var(--border-md);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','close')">✅ Close</button>
+      ${isHuman ? `<button class="btn btn-sm btn-ai" style="height:28px" onclick="resolveHandoff('${platform}','${esc(data.thread_id)}')">🤖 Resume AI</button>` : ''}
+    </div>`
+
   chatPane.innerHTML = `
-  <div class="chat-header">
-    <div class="chat-header-avatar" style="background:${bg}">${(name[0]||'?').toUpperCase()}</div>
-    <div>
-      <div class="chat-header-name">${esc(name)}</div>
-      <div class="chat-header-sub">${icon} ${data.total} message${data.total !== 1 ? 's' : ''}</div>
+  <div class="chat-header" style="flex-direction:column;align-items:flex-start;gap:10px;padding:13px 18px">
+    <div style="display:flex;align-items:center;gap:10px;width:100%">
+      <div class="chat-header-avatar" style="background:${bg}">${(name[0]||'?').toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="chat-header-name">${esc(name)}</div>
+        <div class="chat-header-sub">${icon} ${data.total} message${data.total !== 1 ? 's' : ''}</div>
+      </div>
     </div>
+    ${actionBtns}
   </div>
   <div class="chat-messages" id="chat-msgs-${platform}">${timelineHTML || `<div class="chat-empty"><div style="font-size:24px">💬</div><div style="font-size:12px">No messages yet</div></div>`}</div>
   <div class="chat-composer">${composerHTML}</div>`
@@ -2079,6 +2109,27 @@ function renderManualComposerHTML(platform, msg) {
   </div>`
 }
 
+async function threadAction(platform, threadId, action) {
+  const labels = { escalate: 'Escalating…', close: 'Closing…', confirm: 'Confirming…' }
+  showToast(labels[action] || 'Processing…', 'info')
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(threadId)}/action`, {
+      method: 'PUT', body: JSON.stringify({ action })
+    })
+    const msgs = {
+      escalate: '🔴 Escalated — AI paused, reply manually',
+      close:    '✅ Closed — AI will resume on next message',
+      confirm:  '🤝 Confirmed with customer — marked resolved',
+    }
+    showToast(msgs[action], 'success')
+    // Reload thread and conv list
+    await loadThread(platform, threadId)
+    await loadConversations(platform)
+    // Also refresh followup queue since close/confirm clears it
+    if (action !== 'escalate') loadFollowupQueue().catch(() => {})
+  } catch (e) { showToast(e.message, 'error') }
+}
+
 async function takeOverThread(platform, threadId) {
   try {
     await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/threads/${encodeURIComponent(threadId)}/handoff`, { method: 'PUT' })
@@ -2101,31 +2152,83 @@ async function resolveHandoff(platform, threadId) {
 // FOLLOWUP QUEUE PANEL
 // ══════════════════════════════════════════════════════════════════════════════
 
+let _fqFilter = 'today'
+
+function switchFollowupFilter(f) {
+  _fqFilter = f
+  const btnToday = document.getElementById('fq-btn-today')
+  const btnAll   = document.getElementById('fq-btn-all')
+  if (btnToday) { btnToday.className = f === 'today' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary'; btnToday.style.height = '28px' }
+  if (btnAll)   { btnAll.className   = f === 'all'   ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary'; btnAll.style.height = '28px' }
+  loadFollowupQueue()
+}
+
 async function loadFollowupQueue() {
   const el = document.getElementById('followup-queue-list'); if (!el) return
   try {
-    const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue`)
+    const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue?filter=${_fqFilter}`)
     const badge = document.getElementById('followup-count-badge')
-    if (badge) badge.textContent = items.length ? `${items.length} pending` : ''
+    if (badge) {
+      badge.textContent = items.length ? `${items.length} pending` : ''
+      badge.style.display = items.length ? '' : 'none'
+    }
     if (!items.length) {
-      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:12px">No pending followups 🎉</div>'
+      el.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-3);font-size:12.5px">
+        ${_fqFilter === 'today' ? '🎉 No followups due today' : '🎉 No pending followups'}
+      </div>`
       return
     }
-    el.innerHTML = items.map(item => `
-      <div class="qr-item" style="flex-direction:column;gap:6px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:12px;font-weight:700;color:var(--text)">${esc(item.from)} · <span style="text-transform:capitalize;color:var(--text-3)">${item.channel}</span></div>
-          <div style="font-size:10.5px;color:var(--text-3)">${fmtRelTime(item.scheduled_for)}</div>
+    el.innerHTML = items.map(item => {
+      const isOverdue = new Date(item.scheduled_for) < new Date()
+      const ch = item.channel === 'gmail' ? 'email' : item.channel
+      const chIcon = ch === 'email' ? '📧' : ch === 'whatsapp' ? '💬' : ch === 'instagram' ? '📸' : '💙'
+      const chLabel = ch === 'email' ? 'Gmail' : ch === 'whatsapp' ? 'WhatsApp' : ch === 'instagram' ? 'Instagram' : 'Messenger'
+      return `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)" id="fq-${esc(item._id)}">
+        <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor(item.from)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">
+          ${(item.from?.[0] || '?').toUpperCase()}
         </div>
-        <div style="font-size:11.5px;color:var(--text-3)">${esc((item.last_body||'').slice(0, 80))}</div>
-        <div style="display:flex;gap:6px;margin-top:4px">
-          <button class="btn btn-secondary btn-sm" onclick="markFollowupDone('${esc(item._id)}')">✅ Done</button>
-          <button class="btn btn-danger btn-sm" onclick="dismissFollowup('${esc(item._id)}')">🗑 Dismiss</button>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px">
+            <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.from)}</div>
+            <div style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;${isOverdue ? 'background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)' : 'background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)'}">
+              ${isOverdue ? '⚠️ Overdue' : '⏰'} ${fmtRelTime(item.scheduled_for)}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">
+            <span style="font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">${chIcon} ${chLabel}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-3);line-height:1.5;margin-bottom:8px">${esc((item.last_body||'').slice(0, 100))}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${item.channel !== 'gmail' ? `<button class="btn btn-sm" style="background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow);height:26px;font-size:11px" onclick="openFollowupConv('${esc(item.channel)}','${esc(item.thread_id)}')">💬 Open Chat</button>` : ''}
+            <button class="btn btn-secondary btn-sm" style="height:26px;font-size:11px" onclick="markFollowupDone('${esc(item._id)}')">✅ Done</button>
+            <button class="btn btn-danger btn-sm" style="height:26px;font-size:11px" onclick="dismissFollowup('${esc(item._id)}')">🗑 Dismiss</button>
+          </div>
         </div>
-      </div>`).join('')
+      </div>`
+    }).join('')
   } catch (e) {
     el.innerHTML = `<div style="padding:12px;color:var(--red);font-size:12px">${esc(e.message)}</div>`
   }
+}
+
+function openFollowupConv(channel, threadId) {
+  // Switch to the right platform tab and open the conversation thread
+  switchPlatform(channel)
+  // Wait for conv list to load then select the thread
+  setTimeout(async () => {
+    // Try to find thread in already-loaded convs
+    const existing = (STATE.convs[channel] || []).find(c => c.thread_id === threadId)
+    if (existing) {
+      STATE.selThread[channel] = threadId
+      const pane = document.getElementById(`conv-list-${channel}`)
+      if (pane) pane.querySelectorAll('.conv-row').forEach(r => r.classList.toggle('selected', r.dataset.thread === threadId))
+      loadThread(channel, threadId)
+    } else {
+      // Thread not in current list — load it directly
+      loadThread(channel, threadId)
+    }
+  }, 400)
 }
 
 async function markFollowupDone(id) {
