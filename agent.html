@@ -251,6 +251,16 @@
               <input class="inp" type="text" id="f-name" oninput="livePreview()" placeholder="My Support Agent"/>
             </div>
             <div class="field">
+              <label>Agent Type</label>
+              <select class="inp" id="f-agent-type" onchange="onAgentTypeChange(this.value)">
+                <option value="support">🎧 Support — Handle customer queries</option>
+                <option value="sales">🛒 Sales — Sell products via chat</option>
+                <option value="faq">❓ FAQ Bot — Answer common questions</option>
+                <option value="general">🤖 General — Flexible assistant</option>
+              </select>
+              <div class="field-hint">Changing type shows/hides the Shopping tab and updates the system prompt.</div>
+            </div>
+            <div class="field">
               <label>Welcome Message</label>
               <input class="inp" type="text" id="f-welcome" oninput="livePreview()" placeholder="Hi! How can I help you today?"/>
             </div>
@@ -793,6 +803,10 @@ function fillForm(a) {
   }
   document.getElementById('shopping-toggle').checked = !!a.shopping_enabled
 
+  // Populate agent type selector
+  const agentTypeEl = document.getElementById('f-agent-type')
+  if (agentTypeEl) agentTypeEl.value = a.agent_type || a.type || 'support'
+
   // Agent type badge in topbar
   const agentType = a.agent_type || a.type || 'general'
   const typeBadge = document.getElementById('agent-type-badge')
@@ -923,10 +937,28 @@ function removeLogo() {
   livePreview()
 }
 
+const AGENT_TYPE_PROMPTS = {
+  support: 'You are a helpful customer support agent. Answer questions from the knowledge base. Be empathetic and concise.',
+  sales:   'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, and guide them to purchase.',
+  faq:     'You are a FAQ bot. Answer only from the provided knowledge base. Be brief and accurate.',
+  general: 'You are a helpful AI assistant. Be friendly, concise, and accurate.',
+}
+
+function onAgentTypeChange(type) {
+  // Switch tab visibility immediately
+  applyAgentTypeTabs(type)
+  // Suggest updated system prompt only if current one is empty or matches a default
+  const promptEl = document.getElementById('f-system-prompt')
+  const currentPrompt = promptEl?.value?.trim() || ''
+  const isDefault = Object.values(AGENT_TYPE_PROMPTS).some(p => p === currentPrompt) || currentPrompt === ''
+  if (isDefault && promptEl) promptEl.value = AGENT_TYPE_PROMPTS[type] || ''
+}
+
 async function saveGeneral() {
   const btn = document.getElementById('save-btn')
   btn.disabled = true; btn.textContent = t('saving')
   try {
+    const newAgentType = document.getElementById('f-agent-type')?.value
     await apiFetch(`/agents/${AGENT_ID}`, { method: 'PUT', body: JSON.stringify({
       name:             document.getElementById('f-name').value,
       welcome_message:  document.getElementById('f-welcome').value,
@@ -935,8 +967,11 @@ async function saveGeneral() {
       logo_base64:      logoBase64,
       system_prompt:    document.getElementById('f-system-prompt').value,
       theme:            document.getElementById('f-theme').value,
-      shopping_enabled: document.getElementById('shopping-toggle').checked
+      shopping_enabled: document.getElementById('shopping-toggle').checked,
+      agent_type:       newAgentType,
     })})
+    // Re-apply tab visibility based on new type
+    if (newAgentType) applyAgentTypeTabs(newAgentType)
     toast(t('toastSaved'), 'success')
     document.getElementById('page-agent-name').textContent = document.getElementById('f-name').value
   } catch(e) { toast(e.message, 'error') }
