@@ -853,14 +853,15 @@ function renderPage() {
   <!-- ── Followup Queue Panel ── -->
   <div class="section-label reveal" style="margin-top:24px">📌 Followup Queue</div>
   <div class="reveal" style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:24px;box-shadow:var(--sh-sm)">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface-2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface-2);flex-wrap:wrap;gap:10px">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:13px;font-weight:700;color:var(--text)">⏰ Pending Followups</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">⏰ Followup Queue</span>
         <span id="followup-count-badge" style="font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);display:none"></span>
       </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <button id="fq-btn-today" class="btn btn-sm btn-primary" style="height:28px" onclick="switchFollowupFilter('today')">Today</button>
-        <button id="fq-btn-all" class="btn btn-sm btn-secondary" style="height:28px" onclick="switchFollowupFilter('all')">All</button>
+      <div style="display:flex;align-items:center;gap:4px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:3px">
+        <button id="fq-tab-today"    class="subnav-tab active" onclick="switchFollowupTab('today')">Today</button>
+        <button id="fq-tab-pending"  class="subnav-tab"        onclick="switchFollowupTab('pending')">All Pending</button>
+        <button id="fq-tab-resolved" class="subnav-tab"        onclick="switchFollowupTab('resolved')">Resolved</button>
       </div>
     </div>
     <div id="followup-queue-list" style="min-height:80px;padding:4px 0">
@@ -2198,58 +2199,87 @@ async function resolveHandoff(platform, threadId) {
 // FOLLOWUP QUEUE PANEL
 // ══════════════════════════════════════════════════════════════════════════════
 
-let _fqFilter = 'today'
+// ── Followup Queue state ──────────────────────────────────────────────────────
+let _fqTab = 'today'  // 'today' | 'pending' | 'resolved'
 
-function switchFollowupFilter(f) {
-  _fqFilter = f
-  const btnToday = document.getElementById('fq-btn-today')
-  const btnAll   = document.getElementById('fq-btn-all')
-  if (btnToday) { btnToday.className = f === 'today' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary'; btnToday.style.height = '28px' }
-  if (btnAll)   { btnAll.className   = f === 'all'   ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary'; btnAll.style.height = '28px' }
+function switchFollowupTab(tab) {
+  _fqTab = tab
+  ;['today','pending','resolved'].forEach(t => {
+    const btn = document.getElementById(`fq-tab-${t}`)
+    if (btn) btn.className = `subnav-tab${t === tab ? ' active' : ''}`
+  })
   loadFollowupQueue()
+}
+
+function _fqApiParams() {
+  if (_fqTab === 'today')    return 'status=pending&filter=today'
+  if (_fqTab === 'pending')  return 'status=pending&filter=all'
+  if (_fqTab === 'resolved') return 'status=resolved&filter=all'
+  return 'status=pending&filter=all'
 }
 
 async function loadFollowupQueue() {
   const el = document.getElementById('followup-queue-list'); if (!el) return
   try {
-    const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue?filter=${_fqFilter}`)
+    const items = await apiFetch(`/agents/${STATE.agentId}/followup-queue?${_fqApiParams()}`)
     const badge = document.getElementById('followup-count-badge')
-    if (badge) {
-      badge.textContent = items.length ? `${items.length} pending` : ''
+    if (badge && _fqTab !== 'resolved') {
+      badge.textContent = items.length ? `${items.length}` : ''
       badge.style.display = items.length ? '' : 'none'
-    }
-    if (!items.length) {
-      el.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-3);font-size:12.5px">
-        ${_fqFilter === 'today' ? '🎉 No followups due today' : '🎉 No pending followups'}
-      </div>`
-      return
-    }
+    } else if (badge) { badge.style.display = 'none' }
+
+    const emptyMsg = _fqTab === 'today' ? '🎉 No followups due today' : _fqTab === 'resolved' ? 'No resolved followups yet' : '🎉 No pending followups'
+    if (!items.length) { el.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-3);font-size:12.5px">${emptyMsg}</div>`; return }
+
     el.innerHTML = items.map(item => {
-      const isOverdue = new Date(item.scheduled_for) < new Date()
-      const ch = item.channel === 'gmail' ? 'email' : item.channel
-      const chIcon = ch === 'email' ? '📧' : ch === 'whatsapp' ? '💬' : ch === 'instagram' ? '📸' : '💙'
-      const chLabel = ch === 'email' ? 'Gmail' : ch === 'whatsapp' ? 'WhatsApp' : ch === 'instagram' ? 'Instagram' : 'Messenger'
+      const isResolved = item.status === 'done' || item.status === 'dismissed'
+      const isOverdue  = !isResolved && new Date(item.scheduled_for) < new Date()
+      const ch         = item.channel === 'gmail' ? 'email' : item.channel
+      const chIcon     = ch === 'email' ? '📧' : ch === 'whatsapp' ? '💬' : ch === 'instagram' ? '📸' : '💙'
+      const chLabel    = ch === 'email' ? 'Gmail' : ch === 'whatsapp' ? 'WhatsApp' : ch === 'instagram' ? 'Instagram' : 'Messenger'
+
+      let statusBadge = ''
+      if (item.status === 'done')
+        statusBadge = `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✅ Done${item.done_at ? ' · ' + fmtRelTime(item.done_at) : ''}</span>`
+      else if (item.status === 'dismissed')
+        statusBadge = `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">🚫 Dismissed${item.dismissed_at ? ' · ' + fmtRelTime(item.dismissed_at) : ''}</span>`
+      else if (isOverdue)
+        statusBadge = `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)">⚠️ Overdue · ${fmtRelTime(item.scheduled_for)}</span>`
+      else
+        statusBadge = `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:10px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)">⏰ Due ${fmtRelTime(item.scheduled_for)}</span>`
+
+      const reasonBadge = item.reason === 'manual'
+        ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)">Manual</span>`
+        : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">AI</span>`
+
+      const actionBtns = isResolved ? '' : `
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+          ${ch !== 'email' ? `<button class="btn btn-sm" style="background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow);height:26px;font-size:11px" onclick="openFollowupConv('${esc(item.channel)}','${esc(item.thread_id)}')">💬 Open Chat</button>` : ''}
+          <button class="btn btn-sm" style="background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border);height:26px;font-size:11px" onclick="toggleFqReschedule('${esc(item._id)}')">📅 Reschedule</button>
+          <button class="btn btn-secondary btn-sm" style="height:26px;font-size:11px" onclick="markFollowupDone('${esc(item._id)}')">✅ Done</button>
+          <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);height:26px;font-size:11px" onclick="dismissFollowup('${esc(item._id)}')">🚫 Dismiss</button>
+        </div>
+        <div id="fq-reschedule-${esc(item._id)}" style="display:none;margin-top:8px;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="datetime-local" id="fq-rs-dt-${esc(item._id)}" style="height:28px;padding:0 8px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:12px;outline:none" />
+          <button class="btn btn-sm btn-primary" style="height:28px" onclick="confirmReschedule('${esc(item._id)}')">Save</button>
+          <button class="btn btn-sm btn-secondary" style="height:28px" onclick="toggleFqReschedule('${esc(item._id)}')">Cancel</button>
+        </div>`
+
       return `
       <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)" id="fq-${esc(item._id)}">
-        <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor(item.from)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">
-          ${(item.from?.[0] || '?').toUpperCase()}
-        </div>
+        <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor(item.from)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(item.from?.[0]||'?').toUpperCase()}</div>
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
             <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.from)}</div>
-            <div style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0;${isOverdue ? 'background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)' : 'background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)'}">
-              ${isOverdue ? '⚠️ Overdue' : '⏰'} ${fmtRelTime(item.scheduled_for)}
-            </div>
+            ${statusBadge}
           </div>
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">
-            <span style="font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">${chIcon} ${chLabel}</span>
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap">
+            <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">${chIcon} ${chLabel}</span>
+            ${reasonBadge}
+            ${item.rescheduled_at ? `<span style="font-size:10px;color:var(--text-3)">📅 Rescheduled</span>` : ''}
           </div>
-          <div style="font-size:12px;color:var(--text-3);line-height:1.5;margin-bottom:8px">${esc((item.last_body||'').slice(0, 100))}</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            ${item.channel !== 'gmail' ? `<button class="btn btn-sm" style="background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow);height:26px;font-size:11px" onclick="openFollowupConv('${esc(item.channel)}','${esc(item.thread_id)}')">💬 Open Chat</button>` : ''}
-            <button class="btn btn-secondary btn-sm" style="height:26px;font-size:11px" onclick="markFollowupDone('${esc(item._id)}')">✅ Done</button>
-            <button class="btn btn-danger btn-sm" style="height:26px;font-size:11px" onclick="dismissFollowup('${esc(item._id)}')">🗑 Dismiss</button>
-          </div>
+          <div style="font-size:12px;color:var(--text-3);line-height:1.5">${esc((item.last_body||'').slice(0,100))}</div>
+          ${actionBtns}
         </div>
       </div>`
     }).join('')
@@ -2259,36 +2289,58 @@ async function loadFollowupQueue() {
 }
 
 function openFollowupConv(channel, threadId) {
-  // Switch to the right platform tab and open the conversation thread
   switchPlatform(channel)
-  // Wait for conv list to load then select the thread
   setTimeout(async () => {
-    // Try to find thread in already-loaded convs
     const existing = (STATE.convs[channel] || []).find(c => c.thread_id === threadId)
     if (existing) {
       STATE.selThread[channel] = threadId
       const pane = document.getElementById(`conv-list-${channel}`)
       if (pane) pane.querySelectorAll('.conv-row').forEach(r => r.classList.toggle('selected', r.dataset.thread === threadId))
-      loadThread(channel, threadId)
-    } else {
-      // Thread not in current list — load it directly
-      loadThread(channel, threadId)
     }
+    loadThread(channel, threadId)
   }, 400)
+}
+
+function toggleFqReschedule(id) {
+  const el = document.getElementById(`fq-reschedule-${id}`)
+  if (!el) return
+  const isOpen = el.style.display === 'flex'
+  el.style.display = isOpen ? 'none' : 'flex'
+  if (!isOpen) {
+    const dt = document.getElementById(`fq-rs-dt-${id}`)
+    if (dt) {
+      const d = new Date(); d.setDate(d.getDate()+1); d.setHours(10,0,0,0)
+      dt.value = d.toISOString().slice(0,16)
+      dt.min   = new Date().toISOString().slice(0,16)
+    }
+  }
+}
+
+async function confirmReschedule(id) {
+  const dt = document.getElementById(`fq-rs-dt-${id}`)
+  if (!dt?.value) { showToast('Pick a date and time', 'error'); return }
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}/reschedule`, {
+      method: 'PUT', body: JSON.stringify({ scheduled_for: new Date(dt.value).toISOString() })
+    })
+    const label = new Date(dt.value).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })
+    showToast(`📅 Rescheduled to ${label}`, 'success')
+    loadFollowupQueue()
+  } catch (e) { showToast(e.message, 'error') }
 }
 
 async function markFollowupDone(id) {
   try {
     await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}/done`, { method: 'PUT' })
-    showToast('Followup marked done!', 'success')
+    showToast('✅ Followup marked done', 'success')
     loadFollowupQueue()
   } catch (e) { showToast(e.message, 'error') }
 }
 
 async function dismissFollowup(id) {
   try {
-    await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}`, { method: 'DELETE' })
-    showToast('Dismissed', 'info')
+    await apiFetch(`/agents/${STATE.agentId}/followup-queue/${id}/dismiss`, { method: 'PUT' })
+    showToast('🚫 Followup dismissed', 'info')
     loadFollowupQueue()
   } catch (e) { showToast(e.message, 'error') }
 }
