@@ -21,7 +21,7 @@
   .agent-avatar{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin:0 auto 14px;background:var(--brand);overflow:hidden;border:2px solid rgba(255,255,255,.3);box-shadow:0 4px 16px rgba(124,111,255,.3)}
   .agent-avatar img{width:100%;height:100%;object-fit:cover}
   .agent-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
-  .agent-sub{font-size:13px;color:var(--text-2);line-height:1.5}
+  .agent-sub{font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:4px}
   .divider{height:1px;background:var(--border);margin:22px 0}
   .card-body{padding:0 28px 28px}
   .field{margin-bottom:16px}
@@ -31,18 +31,19 @@
   .inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-dim)}
   .inp::placeholder{color:var(--text-3)}
   textarea.inp{height:90px;padding:12px 14px;resize:none;line-height:1.5}
+  select.inp{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239DA6B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+  .field-err{font-size:12px;color:var(--red);margin-top:5px;display:none}
+  .field-err.show{display:block}
   .btn{width:100%;height:46px;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s,background .15s;color:#fff;background:var(--brand)}
   .btn:hover{background:var(--brand-dark);box-shadow:0 4px 16px rgba(124,111,255,.35);transform:translateY(-1px)}
   .btn:active{transform:translateY(0)}
   .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-  .err{font-size:12px;color:var(--red);margin-top:5px;display:none}
-  .err.show{display:block}
-  /* Success screen */
+  .err-general{font-size:12px;color:var(--red);text-align:center;margin-top:10px;display:none}
+  .err-general.show{display:block}
   .success-screen{padding:40px 28px;text-align:center;display:none}
   .success-icon{width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px}
   .success-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px}
   .success-sub{font-size:13.5px;color:var(--text-2);line-height:1.6}
-  /* Loading */
   .loading-screen{padding:60px 28px;text-align:center}
   .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -61,87 +62,68 @@
 <body>
 <div style="width:100%;max-width:440px">
   <div class="card" id="main-card">
-    <!-- Loading state -->
     <div class="loading-screen" id="loading-screen">
       <div class="spinner"></div>
       <div style="font-size:13px;color:var(--text-3)">Loading…</div>
     </div>
-
-    <!-- Enquiry form -->
     <div id="form-screen" style="display:none">
       <div class="card-header">
         <div class="agent-avatar" id="agent-avatar">S</div>
-        <div class="agent-name" id="agent-name">Send an Enquiry</div>
-        <div class="agent-sub" id="agent-sub">Fill in your details and we'll get back to you shortly.</div>
+        <div class="agent-name" id="form-title">Send an Enquiry</div>
+        <div class="agent-sub" id="form-subtitle">Fill in your details and we'll get back to you shortly.</div>
         <div class="divider"></div>
       </div>
       <div class="card-body">
-        <div class="field">
-          <label>Full Name <span class="req">*</span></label>
-          <input class="inp" type="text" id="f-name" placeholder="Your name" autocomplete="name">
-          <div class="err" id="err-name">Please enter your name</div>
-        </div>
-        <div class="field">
-          <label>Mobile Number <span class="req">*</span></label>
-          <input class="inp" type="tel" id="f-mobile" placeholder="+91 98765 43210" autocomplete="tel">
-          <div class="err" id="err-mobile">Please enter a valid mobile number</div>
-        </div>
-        <div class="field">
-          <label>Email Address</label>
-          <input class="inp" type="email" id="f-email" placeholder="you@example.com" autocomplete="email">
-        </div>
-        <div class="field" style="margin-bottom:22px">
-          <label>Message <span class="req">*</span></label>
-          <textarea class="inp" id="f-message" placeholder="How can we help you?"></textarea>
-          <div class="err" id="err-message">Please enter your message</div>
-        </div>
+        <div id="fields-container"></div>
         <button class="btn" id="submit-btn" onclick="submitForm()">Send Enquiry →</button>
-        <div class="err" id="err-general" style="text-align:center;margin-top:10px"></div>
+        <div class="err-general" id="err-general"></div>
       </div>
     </div>
-
-    <!-- Success screen -->
     <div class="success-screen" id="success-screen">
       <div class="success-icon">✓</div>
       <div class="success-title">Enquiry Received!</div>
-      <div class="success-sub" id="success-sub">Thank you! We've received your enquiry and will get back to you soon.</div>
+      <div class="success-sub" id="success-sub">Thank you! We've received your enquiry and will contact you shortly.</div>
     </div>
   </div>
-
   <div class="powered">Powered by <a href="https://supportagent.aasaitech.in" target="_blank">SupportGent</a></div>
 </div>
 
 <script>
-const API    = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
-const params = new URLSearchParams(location.search)
-const AGENT_ID = params.get('agent') || params.get('id') || location.pathname.split('/').pop()
-let agentData = null
+const API      = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
+const params   = new URLSearchParams(location.search)
+const AGENT_ID = params.get('agent') || params.get('id')
+let agentData  = null
+let formConfig = null
+
+const DEFAULT_FIELDS = [
+  { id:'name',    label:'Full Name',     type:'text',     required:true,  enabled:true, locked:false },
+  { id:'mobile',  label:'Mobile Number', type:'tel',      required:true,  enabled:true, locked:true  },
+  { id:'email',   label:'Email Address', type:'email',    required:false, enabled:true, locked:false },
+  { id:'message', label:'Message',       type:'textarea', required:true,  enabled:true, locked:false },
+]
 
 async function init() {
-  if (!AGENT_ID || AGENT_ID === 'inquiry.html') {
-    showError('No agent specified.')
-    return
-  }
+  if (!AGENT_ID) { showError('No agent specified.'); return }
   try {
-    const res  = await fetch(`${API}/chat/${AGENT_ID}/config`)
+    const res = await fetch(`${API}/chat/${AGENT_ID}/config`)
     if (!res.ok) throw new Error('Agent not found')
     agentData  = await res.json()
+    formConfig = agentData.enquiry_form || { title:'Send an Enquiry', subtitle:'Fill in your details and we\'ll get back to you shortly.', thank_you:'Thank you!', fields: DEFAULT_FIELDS }
     applyBranding(agentData)
+    renderForm(formConfig)
     document.getElementById('loading-screen').style.display = 'none'
     document.getElementById('form-screen').style.display    = 'block'
   } catch(e) {
-    showError('Unable to load enquiry form. Please try again.')
+    showError('Unable to load form. Please try again.')
   }
 }
 
 function applyBranding(a) {
-  // Colors
   if (a.brand_color) {
     document.documentElement.style.setProperty('--brand', a.brand_color)
     document.documentElement.style.setProperty('--brand-dark', dimColor(a.brand_color))
     document.documentElement.style.setProperty('--brand-dim', hexToRgba(a.brand_color, .10))
   }
-  // Avatar
   const av = document.getElementById('agent-avatar')
   if (a.logo_base64 && /^data:image\//.test(a.logo_base64)) {
     av.innerHTML = `<img src="${a.logo_base64}" alt="">`
@@ -149,76 +131,108 @@ function applyBranding(a) {
     av.textContent = (a.name?.[0] || 'S').toUpperCase()
     if (a.brand_color) av.style.background = a.brand_color
   }
-  // Text
-  if (a.name) {
-    document.getElementById('agent-name').textContent = `Send an Enquiry to ${a.name}`
-    document.title = `Enquiry — ${a.name}`
-  }
+  if (a.name) document.title = `Enquiry — ${a.name}`
+}
+
+function renderForm(cf) {
+  document.getElementById('form-title').textContent    = cf.title    || 'Send an Enquiry'
+  document.getElementById('form-subtitle').textContent = cf.subtitle || ''
+  const fields  = (cf.fields || DEFAULT_FIELDS).filter(f => f.enabled)
+  const container = document.getElementById('fields-container')
+  container.innerHTML = fields.map(f => {
+    const req = f.required ? `<span style="color:var(--red);margin-left:2px">*</span>` : ''
+    let input = ''
+    if (f.type === 'textarea') {
+      input = `<textarea class="inp" id="field-${f.id}" placeholder="Enter ${f.label.toLowerCase()}"></textarea>`
+    } else if (f.type === 'select' && f.options?.length) {
+      input = `<select class="inp" id="field-${f.id}"><option value="">Select ${f.label}</option>${f.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`
+    } else {
+      const pmap = { tel:'+91 98765 43210', email:'you@example.com', number:'0', text:'', url:'https://' }
+      input = `<input class="inp" type="${f.type}" id="field-${f.id}" placeholder="${pmap[f.type]||'Enter '+f.label.toLowerCase()}" autocomplete="${f.type==='tel'?'tel':f.type==='email'?'email':'off'}">`
+    }
+    return `<div class="field" id="field-wrap-${f.id}">
+      <label>${f.label}${req}</label>
+      ${input}
+      <div class="field-err" id="err-${f.id}">Please enter your ${f.label.toLowerCase()}</div>
+    </div>`
+  }).join('')
 }
 
 async function submitForm() {
-  // Reset errors
-  document.querySelectorAll('.err').forEach(e => e.classList.remove('show'))
+  document.querySelectorAll('.field-err').forEach(e => e.classList.remove('show'))
+  document.getElementById('err-general').classList.remove('show')
 
-  const name    = document.getElementById('f-name').value.trim()
-  const mobile  = document.getElementById('f-mobile').value.trim()
-  const email   = document.getElementById('f-email').value.trim()
-  const message = document.getElementById('f-message').value.trim()
+  const fields    = (formConfig.fields || DEFAULT_FIELDS).filter(f => f.enabled)
+  const formData  = {}
+  let   valid     = true
 
-  let valid = true
-  if (!name)            { showFieldErr('err-name', true);    valid = false }
-  if (mobile.length<6)  { showFieldErr('err-mobile', true);  valid = false }
-  if (!message)         { showFieldErr('err-message', true);  valid = false }
+  fields.forEach(f => {
+    const el  = document.getElementById(`field-${f.id}`)
+    if (!el) return
+    const val = el.value.trim()
+    formData[f.id] = val
+    if (f.required && !val) {
+      document.getElementById(`err-${f.id}`)?.classList.add('show')
+      valid = false
+    }
+    if (f.id === 'mobile' && val.length < 6) {
+      document.getElementById(`err-${f.id}`)?.classList.add('show')
+      valid = false
+    }
+  })
+
   if (!valid) return
 
   const btn = document.getElementById('submit-btn')
-  btn.disabled = true
-  btn.textContent = 'Sending…'
+  btn.disabled = true; btn.textContent = 'Sending…'
+
+  // Build the lead payload — extract known fields, put rest in message
+  const knownIds     = ['name','mobile','email','message']
+  const customFields = Object.entries(formData)
+    .filter(([k]) => !knownIds.includes(k))
+    .map(([k, v]) => `${k}: ${v}`)
+    .join('\n')
+  const fullMessage  = [formData.message, customFields].filter(Boolean).join('\n\n')
 
   try {
     const res = await fetch(`${API}/leads/${AGENT_ID}`, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, mobile, email, message, source: 'enquiry', referrer: document.referrer }),
+      body:    JSON.stringify({
+        name:     formData.name    || '',
+        mobile:   formData.mobile  || '',
+        email:    formData.email   || '',
+        message:  fullMessage,
+        source:   'enquiry',
+        referrer: document.referrer,
+        form_data: formData,
+      }),
     })
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({}))
-      throw new Error(e.error || 'Submission failed')
-    }
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error||'Submission failed') }
     document.getElementById('form-screen').style.display   = 'none'
     document.getElementById('success-screen').style.display = 'block'
-    if (agentData?.name) {
-      document.getElementById('success-sub').textContent =
-        `Thank you! ${agentData.name} has received your enquiry and will contact you at ${mobile} shortly.`
-    }
+    document.getElementById('success-sub').textContent     = formConfig.thank_you || 'Thank you! We\'ll get back to you soon.'
   } catch(e) {
     const errEl = document.getElementById('err-general')
     errEl.textContent = e.message || 'Something went wrong. Please try again.'
     errEl.classList.add('show')
-    btn.disabled = false
-    btn.textContent = 'Send Enquiry →'
+    btn.disabled = false; btn.textContent = 'Send Enquiry →'
   }
 }
 
-function showFieldErr(id, show) {
-  document.getElementById(id)?.classList[show ? 'add' : 'remove']('show')
-}
-function showError(msg) {
-  document.getElementById('loading-screen').innerHTML =
-    `<div style="padding:40px 24px;text-align:center;color:#E05252;font-size:13px">${msg}</div>`
-}
+// Helpers
 function hexToRgba(hex, a) {
-  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return r ? `rgba(${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)},${a})` : 'rgba(124,111,255,.1)'
+  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return r?`rgba(${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)},${a})`:'rgba(124,111,255,.1)'
 }
 function dimColor(hex) {
-  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  if(!r) return hex
+  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); if(!r)return hex
   const d=v=>Math.max(0,Math.round(parseInt(v,16)*.75))
   return `#${d(r[1]).toString(16).padStart(2,'0')}${d(r[2]).toString(16).padStart(2,'0')}${d(r[3]).toString(16).padStart(2,'0')}`
 }
-
-// Allow Enter to submit
+function showError(msg) {
+  document.getElementById('loading-screen').innerHTML=`<div style="padding:40px 24px;text-align:center;color:#E05252;font-size:13px">${msg}</div>`
+}
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') submitForm()
 })
