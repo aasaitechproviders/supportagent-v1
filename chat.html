@@ -517,6 +517,26 @@
     <div class="loading-label" id="loading-label">Loading agent…</div>
   </div>
 
+  <!-- Pre-chat capture screen -->
+  <div id="pre-chat-screen" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;gap:0">
+    <div id="pre-chat-avatar" style="width:56px;height:56px;border-radius:14px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:14px;overflow:hidden;box-shadow:0 4px 16px var(--brand-glow)"></div>
+    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;text-align:center" id="pre-chat-title">Before we start</div>
+    <div style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:22px;line-height:1.6" id="pre-chat-sub">Enter your mobile number so we can follow up with you.</div>
+    <div style="width:100%;max-width:280px">
+      <input id="pre-chat-mobile" type="tel" placeholder="+91 98765 43210" autocomplete="tel"
+        style="width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border2);border-radius:12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;text-align:center;letter-spacing:.02em;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border2)'"
+        onkeydown="if(event.key==='Enter')startChatFromPreCapture()">
+      <div id="pre-chat-err" style="font-size:12px;color:#E05252;text-align:center;margin-top:6px;display:none">Please enter a valid mobile number</div>
+      <button onclick="startChatFromPreCapture()" id="pre-chat-btn"
+        style="width:100%;margin-top:12px;height:44px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s"
+        onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px var(--brand-glow)'"
+        onmouseout="this.style.transform='';this.style.boxShadow=''">
+        Start Chat →
+      </button>
+    </div>
+  </div>
+
   <div class="chat-messages" id="chat-messages" style="display:none;"></div>
   <div class="topics-wrap" id="topics-wrap"></div>
 
@@ -798,16 +818,24 @@
 
       setupColors(agent); setupHeader(agent)
       document.getElementById('loading-screen').style.display  = 'none'
-      document.getElementById('chat-messages').style.display   = 'flex'
-      document.getElementById('chat-input-wrap').style.display = 'block'
-      document.getElementById('chat-header').style.display     = 'flex'
+
+      // Pre-chat capture — show mobile entry screen if enabled
+      if (agent.pre_chat_enabled) {
+        const preChatAv = document.getElementById('pre-chat-avatar')
+        if (agent.logo_base64 && /^data:image\//.test(agent.logo_base64)) {
+          preChatAv.innerHTML = `<img src="${agent.logo_base64}" alt="" style="width:100%;height:100%;object-fit:cover">`
+        } else {
+          preChatAv.textContent = (agent.name?.[0] || 'S').toUpperCase()
+        }
+        document.getElementById('pre-chat-title').textContent = `Chat with ${agent.name || 'us'}`
+        document.getElementById('chat-header').style.display  = 'flex'
+        document.getElementById('pre-chat-screen').style.display = 'flex'
+        document.getElementById('pre-chat-mobile').focus()
+      } else {
+        showChatUI()
+      }
+
       document.title = (agent.name || 'Chat') + ' — SupportGent'
-
-      addDateSeparator()
-      addWelcomeMsg(agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant'))
-      if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
-
-      if (agent.shopping_enabled || agentType === 'sales') await loadProducts()
 
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
@@ -821,6 +849,41 @@
       console.error('init error', e)
       showError(ct('failedLoad') + ' ' + (e.message || ct('tryAgain')))
     }
+  }
+
+  // ── SHOW MAIN CHAT UI ───────────────────────────────────────────────────
+  function showChatUI() {
+    document.getElementById('pre-chat-screen').style.display = 'none'
+    document.getElementById('chat-messages').style.display   = 'flex'
+    document.getElementById('chat-input-wrap').style.display = 'block'
+    document.getElementById('chat-header').style.display     = 'flex'
+    addDateSeparator()
+    addWelcomeMsg(agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant'))
+    if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
+    if (agent.shopping_enabled || agentType === 'sales') loadProducts()
+  }
+
+  // ── PRE-CHAT CAPTURE SUBMIT ─────────────────────────────────────────────
+  async function startChatFromPreCapture() {
+    const mobile = (document.getElementById('pre-chat-mobile')?.value || '').trim()
+    const errEl  = document.getElementById('pre-chat-err')
+    if (mobile.length < 6) { errEl.style.display = 'block'; return }
+    errEl.style.display = 'none'
+
+    const btn = document.getElementById('pre-chat-btn')
+    btn.disabled = true; btn.textContent = 'Starting…'
+
+    // Save lead in background — don't block chat on failure
+    fetch(`${API}/leads/${AGENT_ID}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ mobile, source: 'chat', referrer: document.referrer }),
+    }).catch(() => {})
+
+    // Store mobile for this session (passed as context to AI)
+    window._visitorMobile = mobile
+
+    showChatUI()
   }
 
   // ── HEADER & COLORS ─────────────────────────────────────────────────────
