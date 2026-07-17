@@ -184,8 +184,8 @@ const PROMPTS = {
 /* ── Load & render agent grid ──────────────────────────────────── */
 async function loadAgents(user) {
   const agents = await apiFetch('/agents')
-  const planLimits = { starter: 3, grower: 10, enterprise: Infinity }
-  const limit = planLimits[user?.plan || 'starter'] || 3
+  const planLimits = { starter: 1, grower: 3, enterprise: 5, elite: Infinity }
+  const limit = planLimits[user?.plan || 'starter'] ?? 1
   document.getElementById('agents-sub').textContent =
     agents.length + ' of ' + (limit === Infinity ? '∞' : limit) + ' agents'
   document.getElementById('page-content').style.display = 'block'
@@ -237,7 +237,7 @@ async function loadAgents(user) {
     grid.appendChild(card)
   })
 
-  // Create card
+  // Create card or upgrade prompt
   if (agents.length < limit) {
     const cc = document.createElement('div')
     cc.className = 'create-card'
@@ -247,6 +247,23 @@ async function loadAgents(user) {
       <div style="font-size:14px;font-weight:700" data-i18n="newAgentCard">New Agent</div>
       <div style="font-size:12px;color:var(--text-3)" data-i18n="newAgentCardSub">Build another AI assistant</div>`
     grid.appendChild(cc)
+  } else {
+    const planNames = { starter: 'Starter', grower: 'Growth', enterprise: 'Business', elite: 'Enterprise' }
+    const nextPlan  = { starter: 'Growth', grower: 'Business', enterprise: 'Enterprise', elite: null }
+    const curPlan   = user?.plan || 'starter'
+    const next      = nextPlan[curPlan]
+    const uc = document.createElement('div')
+    uc.className = 'create-card'
+    uc.style.cssText = 'border-color:var(--amber-border);background:var(--amber-dim);cursor:default'
+    uc.innerHTML = `
+      <div style="font-size:28px">🔒</div>
+      <div style="font-size:13.5px;font-weight:700;color:var(--amber)">Agent limit reached</div>
+      <div style="font-size:12px;color:var(--text-2);text-align:center;line-height:1.6">
+        Your <strong>${planNames[curPlan]}</strong> plan includes ${limit} agent${limit > 1 ? 's' : ''}.
+        ${next ? `Upgrade to <strong>${next}</strong> to add more.` : ''}
+      </div>
+      ${next ? `<a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:4px">Upgrade Plan →</a>` : ''}`
+    grid.appendChild(uc)
   }
 }
 
@@ -413,6 +430,17 @@ function cmColor(c, el) {
   el.classList.add('active')
 }
 function openCreate() {
+  // Re-check limit from current subtitle text (already loaded)
+  const sub = document.getElementById('agents-sub').textContent
+  const match = sub.match(/(\d+)\s+of\s+(\d+|∞)/)
+  if (match) {
+    const used = parseInt(match[1]), cap = match[2]
+    if (cap !== '∞' && used >= parseInt(cap)) {
+      toast('Agent limit reached. Upgrade your plan to add more agents.', 'warning', 4000)
+      setTimeout(() => location.href = 'payments.html', 1800)
+      return
+    }
+  }
   document.getElementById('create-modal').classList.add('open')
   document.getElementById('cm-name').focus()
   document.body.style.overflow = 'hidden'
