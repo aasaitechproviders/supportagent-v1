@@ -16,11 +16,14 @@
 .cur-plan-row{display:flex;align-items:center;gap:16px;padding:16px;background:var(--accent-soft);border:1px solid var(--accent-dim);border-radius:var(--r);margin-bottom:16px;flex-wrap:wrap}
 /* Billing cycle toggle */
 .cycle-toggle{display:flex;gap:3px;padding:3px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);width:fit-content;margin-bottom:18px;flex-wrap:wrap}
+/* Plans grid — 4 columns override */
+.plans-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 /* Tablet */
-@media(max-width:1024px) and (min-width:649px){
+@media(max-width:1200px) and (min-width:649px){
   .billing-layout{grid-template-columns:1fr}
   .billing-side{position:static;flex-direction:row;flex-wrap:wrap}
   .billing-side > *{flex:1;min-width:200px}
+  .plans-grid{grid-template-columns:repeat(2,1fr)!important}
 }
 /* Mobile */
 @media(max-width:648px){
@@ -107,6 +110,7 @@
               <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.7"></div>
               <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.4"></div>
               <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.2"></div>
+              <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.1"></div>
             </div>
           </div>
         </div>
@@ -146,7 +150,7 @@
         <div id="trial-card" style="display:none">
           <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.18);border-radius:var(--r-lg);padding:18px">
             <div style="font-size:14px;font-weight:800;margin-bottom:5px" data-i18n="freeTrialTitle">🎁 Free Trial Active</div>
-            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6" data-i18n="freeTrialDesc">You started on Growth with 2M AI Credits. Upgrade to keep all features after your trial ends.</div>
+            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6" data-i18n="freeTrialDesc">You're on a free trial with 100K AI Credits. Upgrade to a paid plan to keep your channels and agents after the trial ends.</div>
             <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px" id="trial-ends"></div>
             <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center" data-i18n="upgradeNow">Upgrade Now →</a>
           </div>
@@ -182,7 +186,7 @@ let billingData=null,billingCycle='yearly',selectedTopup=null
 })()
 function renderCurrentPlan(t){
   if(!t)return
-  const planLabels={starter:'Starter',grower:'Growth',enterprise:'Business'}
+  const planLabels={starter:'Starter',grower:'Growth',enterprise:'Business',elite:'Enterprise'}
   document.getElementById('cur-plan').textContent=planLabels[t.plan]||t.plan||'—'
   document.getElementById('cur-status').textContent=t.trial_active?`Free trial · Ends ${fmtDate(t.trial_ends_at)}`:t.subscription_end?`Renews ${fmtDate(t.subscription_end)}`:'Active'
   const badge=document.getElementById('cur-badge')
@@ -214,9 +218,10 @@ function setCycle(c,btn){
 function renderPlans(plans){
   const cur=billingData?.tokens?.plan||'starter'
   const defs=[
-    {key:'starter',features:['3 Agents','2M AI Credits/mo','10 sources/agent','WhatsApp, Instagram, Gmail, Messenger','Email support'],no:['Shopping & Razorpay','Custom domain']},
-    {key:'grower',features:['10 Agents','7.5M AI Credits/mo','30 sources/agent','All channels','Custom domain','Shopping + Razorpay','Priority support'],recommended:true},
-    {key:'enterprise',features:['Unlimited Agents','30M AI Credits/mo','Unlimited sources','All channels','Custom domain','Shopping + Razorpay','Dedicated support']}
+    {key:'starter',features:['1 Agent','2M AI Credits/mo','10 sources/agent','WhatsApp, Instagram, Gmail, Messenger','Email support'],no:['Shopping & Razorpay','Custom domain']},
+    {key:'grower',features:['3 Agents','7.5M AI Credits/mo','30 sources/agent','All channels','Custom domain','Shopping + Razorpay','Priority support'],recommended:true},
+    {key:'enterprise',features:['5 Agents','30M AI Credits/mo','Unlimited sources','All channels','Custom domain','Shopping + Razorpay','Dedicated support']},
+    {key:'elite',features:['Unlimited Agents','50M AI Credits/mo','Unlimited sources','All channels','Custom domain','Shopping + Razorpay','Dedicated support','365-day analytics']}
   ]
   const featHtml=(f,yes)=>`<div class="plan-feature${yes?'':' no'}"><div class="pf-icon ${yes?'yes':'no'}"><svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">${yes?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg></div>${f}</div>`
   const planCards=defs.map(({key,features,no=[],recommended})=>{
@@ -233,17 +238,7 @@ function renderPlans(plans){
       ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled>Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Get ${p.label} →</button>`}
     </div>`
   }).join('')
-  // Enterprise contact card (not self-serve)
-  const enterpriseCard=`<div class="plan-card" style="grid-column:1/-1;background:linear-gradient(135deg,var(--surface-2) 0%,var(--surface) 100%);border:1px solid var(--border-md)">
-    <div class="plan-name" style="display:flex;align-items:center;gap:8px">🏢 Enterprise <span class="badge badge-accent" style="font-size:10px">Custom</span></div>
-    <div class="plan-price" style="font-size:22px">₹49,999<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo+</span></div>
-    <div class="plan-price-note" style="color:var(--text-3)">Custom AI Credits · Tailored to your scale</div>
-    <div class="plan-features" style="flex-direction:row;flex-wrap:wrap;gap:6px 20px;margin:10px 0">
-      ${['Unlimited everything','Custom AI Credit volume','Dedicated infrastructure','SLA & uptime guarantee','White-glove onboarding','Custom integrations'].map(f=>featHtml(f,true)).join('')}
-    </div>
-    <a href="mailto:hello@aasaitech.in?subject=SupportGent Enterprise" class="btn btn-secondary" style="width:100%;justify-content:center">Contact Us for Enterprise →</a>
-  </div>`
-  document.getElementById('plans-grid').innerHTML=planCards+enterpriseCard
+  document.getElementById('plans-grid').innerHTML=planCards
 }
 function renderTopupPacks(packs){
   if(!packs)return
