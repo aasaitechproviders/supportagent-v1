@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Enquiry Forms — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Form cards grid */
+  .forms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:14px}
+  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;box-shadow:var(--sh-sm);animation:cardIn .3s var(--ease) both}
+  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .form-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh),0 0 0 1px var(--accent-dim)}
+  .fc-stripe{height:3px;width:100%;background:var(--accent)}
+  .fc-body{padding:16px}
+  .fc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .fc-meta{font-size:12px;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .fc-url{font-size:11px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);padding:6px 10px;border-radius:8px;word-break:break-all;margin-bottom:12px;cursor:pointer;transition:background .15s}
+  .fc-url:hover{background:var(--accent);color:#fff}
+  .fc-actions{display:flex;gap:7px;flex-wrap:wrap}
+  /* Create card */
+  .create-form-card{background:var(--surface);border:2px dashed var(--border-md);border-radius:var(--r-lg);padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;transition:var(--t)}
+  .create-form-card:hover{border-color:var(--accent);background:var(--accent-dim)}
+  /* Builder modal */
+  .builder-modal{max-width:600px;width:100%}
+  .field-builder-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px}
+  .fb-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:default}
+  .fb-row:hover{border-color:var(--border-md)}
+  .fb-row[draggable="true"]{cursor:grab}
+  .fb-grip{font-size:16px;padding-top:5px;user-select:none;color:var(--text-3);flex-shrink:0}
+  .fb-fields{flex:1;display:flex;flex-direction:column;gap:6px}
+  .fb-row-top{display:flex;gap:8px;align-items:center}
+  .fb-row-top .inp{height:34px;font-size:13px}
+  .fb-type-sel{height:34px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-size:12.5px;color:var(--text);background:var(--surface);flex-shrink:0}
+  .fb-row-bottom{display:flex;gap:14px;align-items:center;font-size:12px}
+  .fb-check{display:flex;align-items:center;gap:5px;cursor:pointer}
+  .fb-del{border:none;background:none;color:var(--red);cursor:pointer;font-size:20px;padding:0 4px;flex-shrink:0;line-height:1}
+  .fb-del:disabled{opacity:.25;cursor:default}
+  .options-inp{flex:1;height:28px;font-size:12px}
+  /* Empty state */
+  .empty-forms{padding:60px 20px;text-align:center;color:var(--text-3);grid-column:1/-1}
+  .empty-forms-icon{font-size:44px;margin-bottom:14px}
+  @media(max-width:648px){.forms-grid{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="shared.css">
+<script>;(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();</script>
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
+</head>
+<body>
+<div id="toast-container"></div>
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button>
+    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:13px;width:120px;border-radius:4px"></div>
+    <div class="skel" style="height:34px;width:130px;border-radius:var(--r-sm)"></div>
+  </div>
+  <div class="skel-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+      <div class="skel" style="height:180px;border-radius:var(--r-lg)"></div>
+      <div class="skel" style="height:180px;border-radius:var(--r-lg);opacity:.6"></div>
+      <div class="skel" style="height:180px;border-radius:var(--r-lg);opacity:.35"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title">📋 Enquiry Forms</div>
+        <div class="topbar-subtitle" id="forms-sub">Create unlimited lead capture forms</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" style="font-size:15px"></button>
+      <button class="btn btn-primary" onclick="openCreateModal()">+ New Form</button>
+    </div>
+  </div>
+
+  <div class="content" id="page-content" style="display:none">
+    <div class="forms-grid" id="forms-grid"></div>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" id="form-modal">
+  <div class="modal builder-modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">Create Enquiry Form</div>
+        <div class="modal-sub" id="modal-sub">Configure fields visitors will fill in</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Basic info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="field" style="margin:0">
+        <label>Form Name <span style="color:var(--red)">*</span></label>
+        <input class="inp" type="text" id="fm-name" placeholder="e.g. Product Enquiry" style="margin-top:6px">
+      </div>
+      <div class="field" style="margin:0">
+        <label>Link to Agent <span style="font-size:10px;color:var(--text-3)">(for branding)</span></label>
+        <select class="inp" id="fm-agent" style="margin-top:6px;height:42px"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Form Title</label>
+      <input class="inp" type="text" id="fm-title" placeholder="Send an Enquiry" style="margin-top:6px">
+    </div>
+    <div class="field">
+      <label>Subtitle</label>
+      <input class="inp" type="text" id="fm-subtitle" placeholder="Fill in your details and we'll get back to you." style="margin-top:6px">
+    </div>
+    <div class="field">
+      <label>Thank You Message</label>
+      <input class="inp" type="text" id="fm-thankyou" placeholder="Thank you! We'll contact you soon." style="margin-top:6px">
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Field builder -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-2)">Form Fields</div>
+      <button class="btn btn-secondary btn-sm" onclick="addField()" style="gap:5px">+ Add Field</button>
+    </div>
+    <div class="field-builder-list" id="field-builder-list"></div>
+
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveForm()">Create Form →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title" style="color:var(--red)">Delete Form?</div>
+      <button class="modal-close" onclick="document.getElementById('delete-modal').classList.remove('open')">✕</button>
+    </div>
+    <p style="font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:20px">This will permanently delete the form and its URL. Existing lead submissions in your Leads page won't be affected.</p>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('delete-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">Delete Form</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FRONTEND = location.origin
+let forms    = []
+let agents   = []
+let editId   = null
+let deleteId = null
+let fbFields = []
+let _dragIdx = null
+
+const DEFAULT_FIELDS = [
+  { id:'name',    label:'Full Name',     type:'text',     required:true,  enabled:true,  locked:false },
+  { id:'mobile',  label:'Mobile Number', type:'tel',      required:true,  enabled:true,  locked:true  },
+  { id:'email',   label:'Email Address', type:'email',    required:false, enabled:true,  locked:false },
+  { id:'message', label:'Message',       type:'textarea', required:true,  enabled:true,  locked:false },
+]
+
+;(async () => {
+  const nav = await renderNav('forms')
+  if (!nav) return
+  try {
+    const [formsRes, agentsRes] = await Promise.all([
+      apiFetch('/inquiry-forms'),
+      apiFetch('/agents'),
+    ])
+    forms  = formsRes.forms || []
+    agents = agentsRes || []
+    populateAgentDropdown()
+    renderGrid()
+    document.getElementById('page-content').style.display = 'block'
+    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
+  } catch(e) { toast(e.message, 'error') }
+  dismissSkeleton()
+})()
+
+function populateAgentDropdown() {
+  const sel = document.getElementById('fm-agent')
+  sel.innerHTML = '<option value="">No agent (unbranded)</option>' +
+    agents.map(a => `<option value="${a._id}">${esc(a.name)}</option>`).join('')
+}
+
+/* ── Grid rendering ────────────────────────────────────────────── */
+function renderGrid() {
+  const grid = document.getElementById('forms-grid')
+  if (!forms.length) {
+    grid.innerHTML = `<div class="empty-forms">
+      <div class="empty-forms-icon">📋</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text-2)">No enquiry forms yet</div>
+      <div style="font-size:13px;margin-bottom:20px">Create a form, share the URL, and leads flow straight into your portal.</div>
+      <button class="btn btn-primary" style="display:inline-flex;width:auto;padding:0 24px" onclick="openCreateModal()">+ Create Your First Form</button>
+    </div>`
+    return
+  }
+
+  grid.innerHTML = forms.map((f, i) => {
+    const formURL  = `${FRONTEND}/inquiry.html?form=${f._id}`
+    const fieldCnt = (f.fields || []).filter(x => x.enabled).length
+    const agent    = agents.find(a => String(a._id) === String(f.agent_id))
+    const color    = agent?.brand_color || 'var(--accent)'
+    return `<div class="form-card" style="animation-delay:${i*.04}s">
+      <div class="fc-stripe" style="background:${color}"></div>
+      <div class="fc-body">
+        <div class="fc-name">
+          📋 ${esc(f.name)}
+          ${agent ? `<span class="badge badge-accent" style="font-size:9.5px">${esc(agent.name)}</span>` : ''}
+        </div>
+        <div class="fc-meta">
+          <span>${fieldCnt} field${fieldCnt!==1?'s':''}</span>
+          <span>·</span>
+          <span>${f.submissions_count||0} submission${(f.submissions_count||0)!==1?'s':''}</span>
+          <span>·</span>
+          <span>${fmtDate(f.created_at)}</span>
+        </div>
+        <div class="fc-url" onclick="copyURL('${formURL}')" title="Click to copy URL">${formURL}</div>
+        <div class="fc-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openEditModal('${f._id}')" style="flex:1;justify-content:center">✏ Edit</button>
+          <a href="${formURL}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0">Open ↗</a>
+          <button class="btn btn-secondary btn-sm" onclick="copyURL('${formURL}')" style="flex-shrink:0" title="Copy URL">🔗</button>
+          <a href="leads.html" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0" title="View submissions">📊</a>
+          <button class="btn btn-sm" style="color:var(--red);border-color:var(--red-border);background:var(--red-dim);flex-shrink:0" onclick="openDeleteModal('${f._id}')">🗑</button>
+        </div>
+      </div>
+    </div>`
+  }).join('') +
+  `<div class="create-form-card" onclick="openCreateModal()">
+    <div style="font-size:36px;opacity:.3">+</div>
+    <div style="font-size:14px;font-weight:700">New Enquiry Form</div>
+    <div style="font-size:12px;color:var(--text-3)">Create another lead capture form</div>
+  </div>`
+}
+
+/* ── Field builder ─────────────────────────────────────────────── */
+function renderFields() {
+  const list = document.getElementById('field-builder-list')
+  list.innerHTML = fbFields.map((f, i) => {
+    const locked = !!f.locked
+    return `<div class="fb-row" draggable="${!locked}" ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="drop(event,${i})">
+      <div class="fb-grip">${locked ? '🔒' : '⠿'}</div>
+      <div class="fb-fields">
+        <div class="fb-row-top">
+          <input class="inp fb-label-inp" type="text" value="${esc(f.label)}" placeholder="Field label"
+            oninput="fbFields[${i}].label=this.value" ${locked?'readonly':''} style="flex:1">
+          <select class="fb-type-sel" onchange="fbFields[${i}].type=this.value" ${locked?'disabled':''}>
+            ${['text','textarea','email','tel','number','select'].map(t=>`<option value="${t}"${f.type===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fb-row-bottom">
+          <label class="fb-check"><input type="checkbox" ${f.enabled?'checked':''} ${locked?'disabled':''}
+            onchange="fbFields[${i}].enabled=this.checked"> Enabled</label>
+          <label class="fb-check"><input type="checkbox" ${f.required?'checked':''} ${locked?'disabled':''}
+            onchange="fbFields[${i}].required=this.checked"> Required</label>
+          ${f.type==='select'?`<input class="inp options-inp" type="text" placeholder="Option1, Option2, Option3"
+            value="${esc((f.options||[]).join(', '))}" oninput="fbFields[${i}].options=this.value.split(',').map(s=>s.trim())">`:``}
+          ${locked?`<span style="font-size:11px;color:var(--text-3);margin-left:auto">Always required</span>`:''}
+        </div>
+      </div>
+      <button class="fb-del" onclick="removeField(${i})" ${locked?'disabled':''} title="Remove field">×</button>
+    </div>`
+  }).join('')
+}
+
+function addField() {
+  fbFields.push({ id:'custom_'+Date.now(), label:'New Field', type:'text', required:false, enabled:true, locked:false })
+  renderFields()
+  setTimeout(() => document.getElementById('field-builder-list').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50)
+}
+
+function removeField(i) {
+  if (fbFields[i]?.locked) return
+  fbFields.splice(i, 1)
+  renderFields()
+}
+
+function dragStart(i) { _dragIdx = i }
+function dragOver(e, i) { e.preventDefault() }
+function drop(e, i) {
+  e.preventDefault()
+  if (_dragIdx === null || _dragIdx === i) return
+  const moved = fbFields.splice(_dragIdx, 1)[0]
+  fbFields.splice(i, 0, moved)
+  _dragIdx = null
+  renderFields()
+}
+
+/* ── Modal open/close ──────────────────────────────────────────── */
+function openCreateModal() {
+  editId = null
+  fbFields = JSON.parse(JSON.stringify(DEFAULT_FIELDS))
+  document.getElementById('modal-title').textContent   = 'Create Enquiry Form'
+  document.getElementById('modal-sub').textContent     = 'Configure fields visitors will fill in'
+  document.getElementById('modal-save-btn').textContent = 'Create Form →'
+  document.getElementById('fm-name').value     = ''
+  document.getElementById('fm-title').value    = ''
+  document.getElementById('fm-subtitle').value = ''
+  document.getElementById('fm-thankyou').value = ''
+  document.getElementById('fm-agent').value    = ''
+  renderFields()
+  document.getElementById('form-modal').classList.add('open')
+  document.getElementById('fm-name').focus()
+  document.body.style.overflow = 'hidden'
+}
+
+async function openEditModal(id) {
+  editId = id
+  try {
+    const form = await apiFetch(`/inquiry-forms/${id}`)
+    fbFields = JSON.parse(JSON.stringify(form.fields || DEFAULT_FIELDS))
+    document.getElementById('modal-title').textContent    = 'Edit Enquiry Form'
+    document.getElementById('modal-sub').textContent      = esc(form.name)
+    document.getElementById('modal-save-btn').textContent = 'Save Changes →'
+    document.getElementById('fm-name').value     = form.name     || ''
+    document.getElementById('fm-title').value    = form.title    || ''
+    document.getElementById('fm-subtitle').value = form.subtitle || ''
+    document.getElementById('fm-thankyou').value = form.thank_you|| ''
+    document.getElementById('fm-agent').value    = form.agent_id ? String(form.agent_id) : ''
+    renderFields()
+    document.getElementById('form-modal').classList.add('open')
+    document.body.style.overflow = 'hidden'
+  } catch(e) { toast(e.message, 'error') }
+}
+
+function closeModal() {
+  document.getElementById('form-modal').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+/* ── Save form ─────────────────────────────────────────────────── */
+async function saveForm() {
+  const name = document.getElementById('fm-name').value.trim()
+  if (!name) { toast('Form name is required', 'error'); document.getElementById('fm-name').focus(); return }
+
+  const btn = document.getElementById('modal-save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
+
+  const payload = {
+    name,
+    title:     document.getElementById('fm-title').value.trim()    || name,
+    subtitle:  document.getElementById('fm-subtitle').value.trim() || '',
+    thank_you: document.getElementById('fm-thankyou').value.trim() || 'Thank you! We\'ll contact you soon.',
+    agent_id:  document.getElementById('fm-agent').value           || null,
+    fields:    fbFields,
+  }
+
+  try {
+    if (editId) {
+      await apiFetch(`/inquiry-forms/${editId}`, { method:'PUT', body:JSON.stringify(payload) })
+      toast('Form updated ✓', 'success')
+    } else {
+      const created = await apiFetch('/inquiry-forms', { method:'POST', body:JSON.stringify(payload) })
+      forms.unshift(created)
+      toast('Form created ✓', 'success')
+    }
+    // Refresh list
+    const res = await apiFetch('/inquiry-forms')
+    forms = res.forms || []
+    renderGrid()
+    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
+    closeModal()
+  } catch(e) {
+    toast(e.message, 'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = editId ? 'Save Changes →' : 'Create Form →'
+  }
+}
+
+/* ── Delete ────────────────────────────────────────────────────── */
+function openDeleteModal(id) {
+  deleteId = id
+  document.getElementById('delete-modal').classList.add('open')
+}
+async function confirmDelete() {
+  if (!deleteId) return
+  const btn = document.getElementById('confirm-delete-btn')
+  btn.disabled = true; btn.textContent = 'Deleting…'
+  try {
+    await apiFetch(`/inquiry-forms/${deleteId}`, { method:'DELETE' })
+    forms = forms.filter(f => String(f._id) !== String(deleteId))
+    renderGrid()
+    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
+    document.getElementById('delete-modal').classList.remove('open')
+    toast('Form deleted', 'success')
+  } catch(e) {
+    toast(e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Delete Form'
+    deleteId = null
+  }
+}
+
+/* ── Utils ─────────────────────────────────────────────────────── */
+function copyURL(url) {
+  navigator.clipboard.writeText(url)
+    .then(() => toast('URL copied!', 'success'))
+    .catch(() => toast('Copy failed', 'error'))
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function fmtDate(d) {
+  if (!d) return '—'
+  const dt = new Date(d), now = new Date(), diff = now - dt
+  if (diff < 86400000) return 'Today'
+  if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago'
+  return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+}
+
+/* ── Keyboard shortcuts ────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); document.getElementById('delete-modal').classList.remove('open') }
+})
+document.getElementById('form-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal() })
+document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('delete-modal').classList.remove('open') })
+</script>
+</body>
+</html>
