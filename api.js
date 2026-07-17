@@ -34,6 +34,18 @@ async function apiFetch(path, opts = {}) {
   Object.assign(headers, opts.headers || {})
   const res = await fetch(API + path, { ...opts, headers })
   if (res.status === 401) { clearToken(); location.replace('/'); return }
+  if (res.status === 402) {
+    const e = await res.json().catch(() => ({}))
+    if (e.account_suspended) {
+      // Don't redirect if already on billing or account page
+      const page = location.pathname.split('/').pop()
+      if (page !== 'payments.html' && page !== 'account.html') {
+        toast('Your trial has expired. Please upgrade to continue.', 'warning', 5000)
+        setTimeout(() => location.replace('payments.html'), 1800)
+      }
+      throw new Error(e.error || 'Account suspended')
+    }
+  }
   if (!res.ok) {
     const e = await res.json().catch(() => ({ error: 'Request failed' }))
     throw new Error(e.error || 'Request failed')
@@ -77,6 +89,15 @@ function fmtDate(date) {
 }
 // Alias used across some pages
 const formatDate = fmtDate
+
+// ── Account status helper ─────────────────────────────────────────────────────
+function isAccountSuspended(user) {
+  if (!user) return true
+  const now = new Date()
+  const isTrial = user.trial_active && user.trial_ends_at && new Date(user.trial_ends_at) > now
+  const isPaid  = user.subscription_status === 'active' && user.subscription_end && new Date(user.subscription_end) > now
+  return !isTrial && !isPaid
+}
 
 // ── Toast ─────────────────────────────────────────────────────────
 function toast(msg, type = 'success', duration = 3200) {
