@@ -162,6 +162,12 @@
     /* Right panel stats always show below on mobile */
     #agent-url-side-card .url-copy-row{flex-direction:column;align-items:stretch}
   }
+
+    /* ── Enquiry form builder ─────────────────────────────────────────────── */
+    .enq-field-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;transition:border-color .15s}
+    .enq-field-row:hover{border-color:var(--border-md)}
+    .enq-row-grip{font-size:16px;padding-top:6px;user-select:none;flex-shrink:0}
+    .enq-field-row.drag-over{border-color:var(--accent);background:var(--accent-dim)}
 </style>
 <script>
 ;(function(){
@@ -605,7 +611,7 @@
                 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Chat Embed</button>
                 <div class="divider"></div>
                 <div class="pub-url-label" style="margin-top:0">Enquiry Form URL</div>
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Share this link or embed it on your website to collect leads with name, mobile, email and message.</div>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Share this link or embed it — collects leads directly into your portal.</div>
                 <div class="pub-url-card">
                   <div class="url-copy-row">
                     <a id="inquiry-url" href="#" target="_blank" class="url-copy-link">—</a>
@@ -618,6 +624,41 @@
                 <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('inquiry-embed-box').textContent)">Copy Enquiry Embed</button>
               </div>
             </div>
+            <!-- Enquiry Form Builder -->
+            <div class="card" style="margin-bottom:16px" id="enquiry-builder-card">
+              <div class="card-header" style="cursor:pointer" onclick="toggleEnqBuilder()">
+                <div class="card-title">📋 Enquiry Form Builder</div>
+                <span id="enq-builder-toggle-icon" style="font-size:12px;color:var(--text-3)">▼ Expand</span>
+              </div>
+              <div id="enq-builder-body" style="display:none">
+                <div class="card-body" style="padding-bottom:0">
+                  <!-- Form meta -->
+                  <div class="field">
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)">Form Title</label>
+                    <input class="inp" type="text" id="enq-title" placeholder="Send an Enquiry" style="margin-top:6px">
+                  </div>
+                  <div class="field">
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)">Subtitle</label>
+                    <input class="inp" type="text" id="enq-subtitle" placeholder="Fill in your details and we'll get back to you." style="margin-top:6px">
+                  </div>
+                  <div class="field">
+                    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)">Thank You Message</label>
+                    <input class="inp" type="text" id="enq-thankyou" placeholder="Thank you! We'll contact you soon." style="margin-top:6px">
+                  </div>
+                  <div class="divider"></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <div style="font-size:12px;font-weight:700;color:var(--text-2)">Form Fields</div>
+                    <button class="btn btn-secondary btn-sm" onclick="addEnqField()" style="gap:5px">+ Add Field</button>
+                  </div>
+                  <div id="enq-fields-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+                </div>
+                <div style="padding:0 20px 20px;display:flex;gap:8px">
+                  <button class="btn btn-primary btn-sm" onclick="saveEnqForm()" id="enq-save-btn" style="flex:1;justify-content:center">Save Form</button>
+                  <button class="btn btn-secondary btn-sm" onclick="previewEnqForm()" style="flex-shrink:0">Preview ↗</button>
+                </div>
+              </div>
+            </div>
+
             <div class="card" style="margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">🌐 Custom Domain</div>
@@ -791,7 +832,7 @@ async function loadAgent() {
     livePreview()
     updateStats(agent)
     applyAgentTypeTabs(agent.agent_type || agent.type || 'support')
-    if (agent.published) updatePublishUI(agent)
+    if (agent.published) { updatePublishUI(agent); loadEnqForm(agent.enquiry_form) }
     document.getElementById('main-content').style.display = 'grid'
     dismissSkeleton()
   } catch(e) {
@@ -914,7 +955,7 @@ function switchTab(tab, btn) {
   if (tab === 'behaviour')     loadBehaviour()
   if (tab === 'knowledge')     loadSources()
   if (tab === 'shopping')      { loadProducts(); loadPaymentSettings() }
-  if (tab === 'publish')       updatePublishUI(agent)
+  if (tab === 'publish')       { updatePublishUI(agent); loadEnqForm(agent.enquiry_form) }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1606,6 +1647,115 @@ async function togglePreChat(enabled) {
     document.getElementById('pre-chat-toggle').checked = !enabled
   }
 }
+
+/* ── Enquiry Form Builder ──────────────────────────────────────── */
+const ENQ_DEFAULT_FIELDS = [
+  { id: 'name',    label: 'Full Name',     type: 'text',     required: true,  enabled: true, locked: false },
+  { id: 'mobile',  label: 'Mobile Number', type: 'tel',      required: true,  enabled: true, locked: true  },
+  { id: 'email',   label: 'Email Address', type: 'email',    required: false, enabled: true, locked: false },
+  { id: 'message', label: 'Message',       type: 'textarea', required: true,  enabled: true, locked: false },
+]
+let enqFields = []
+
+function toggleEnqBuilder() {
+  const body = document.getElementById('enq-builder-body')
+  const icon = document.getElementById('enq-builder-toggle-icon')
+  const open = body.style.display === 'block'
+  body.style.display = open ? 'none' : 'block'
+  icon.textContent   = open ? '▼ Expand' : '▲ Collapse'
+}
+
+function loadEnqForm(ef) {
+  const form = ef || {}
+  document.getElementById('enq-title').value    = form.title    || 'Send an Enquiry'
+  document.getElementById('enq-subtitle').value = form.subtitle || ''
+  document.getElementById('enq-thankyou').value = form.thank_you || ''
+  enqFields = JSON.parse(JSON.stringify(form.fields || ENQ_DEFAULT_FIELDS))
+  renderEnqFields()
+}
+
+function renderEnqFields() {
+  const list = document.getElementById('enq-fields-list')
+  list.innerHTML = enqFields.map((f, i) => {
+    const locked = f.locked
+    return `<div class="enq-field-row" id="enq-row-${i}" draggable="${!locked}" ondragstart="enqDragStart(${i})" ondragover="enqDragOver(event,${i})" ondrop="enqDrop(event,${i})">
+      <div class="enq-row-grip" style="${locked ? 'opacity:.25;cursor:default' : 'cursor:grab;opacity:.5'}">⠿</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="inp" type="text" value="${esc(f.label)}" placeholder="Field label" style="flex:1;height:34px;font-size:13px" oninput="enqFields[${i}].label=this.value">
+          <select style="height:34px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-size:12.5px;color:var(--text);background:var(--surface);cursor:pointer" onchange="enqFields[${i}].type=this.value" ${locked ? 'disabled' : ''}>
+            ${['text','textarea','email','tel','number','select'].map(t=>`<option value="${t}" ${f.type===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;font-size:12px">
+          <label style="display:flex;align-items:center;gap:5px;cursor:${locked?'default':'pointer'}">
+            <input type="checkbox" ${f.enabled?'checked':''} ${locked?'disabled':''} onchange="enqFields[${i}].enabled=this.checked"> Enabled
+          </label>
+          <label style="display:flex;align-items:center;gap:5px;cursor:${locked?'default':'pointer'}">
+            <input type="checkbox" ${f.required?'checked':''} ${locked?'disabled':''} onchange="enqFields[${i}].required=this.checked"> Required
+          </label>
+          ${f.type==='select' ? `<input class="inp" type="text" placeholder="Option1, Option2, Option3" value="${esc((f.options||[]).join(', '))}" style="flex:1;height:28px;font-size:12px" oninput="enqFields[${i}].options=this.value.split(',').map(s=>s.trim())">` : ''}
+        </div>
+      </div>
+      ${!locked ? `<button onclick="removeEnqField(${i})" style="border:none;background:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;flex-shrink:0" title="Remove field">×</button>` : '<div style="width:28px"></div>'}
+    </div>`
+  }).join('')
+}
+
+function addEnqField() {
+  const id = 'custom_' + Date.now()
+  enqFields.push({ id, label: 'New Field', type: 'text', required: false, enabled: true, locked: false })
+  renderEnqFields()
+  // Scroll to new field
+  setTimeout(() => document.getElementById('enq-fields-list').lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50)
+}
+
+function removeEnqField(i) {
+  if (enqFields[i]?.locked) return
+  enqFields.splice(i, 1)
+  renderEnqFields()
+}
+
+// Drag & drop reorder
+let _dragIdx = null
+function enqDragStart(i) { _dragIdx = i }
+function enqDragOver(e, i) { e.preventDefault() }
+function enqDrop(e, i) {
+  e.preventDefault()
+  if (_dragIdx === null || _dragIdx === i) return
+  const moved = enqFields.splice(_dragIdx, 1)[0]
+  enqFields.splice(i, 0, moved)
+  _dragIdx = null
+  renderEnqFields()
+}
+
+async function saveEnqForm() {
+  const btn = document.getElementById('enq-save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
+  try {
+    const enquiry_form = {
+      title:    document.getElementById('enq-title').value.trim()    || 'Send an Enquiry',
+      subtitle: document.getElementById('enq-subtitle').value.trim() || '',
+      thank_you: document.getElementById('enq-thankyou').value.trim() || 'Thank you! We\'ll contact you soon.',
+      fields:   enqFields,
+    }
+    await apiFetch(`/agents/${agent._id}`, { method: 'PUT', body: JSON.stringify({ enquiry_form }) })
+    agent.enquiry_form = enquiry_form
+    toast('Enquiry form saved ✓', 'success')
+  } catch(e) {
+    toast(e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Form'
+  }
+}
+
+function previewEnqForm() {
+  const url = document.getElementById('inquiry-url')?.href
+  if (url && url !== '#') window.open(url, '_blank')
+  else toast('Publish the agent first to preview the enquiry form', 'warning')
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
 
 async function connectDomain() {
   const domain = document.getElementById('domain-inp').value.trim()
