@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Enquiry — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --brand:#7C6FFF;--brand-dim:rgba(124,111,255,.1);--brand-dark:#5a4fe8;
+    --bg:#F4F5FA;--surface:#fff;--border:#E5E7EF;--text:#0F1117;--text-2:#5A6070;--text-3:#9DA6B8;
+    --red:#E05252;--green:#22C55E;--r:14px;--font:'Plus Jakarta Sans',sans-serif;
+    --sh:0 4px 20px rgba(0,0,0,.08);--sh-lg:0 8px 40px rgba(0,0,0,.12);
+  }
+  body{font-family:var(--font);background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-lg);width:100%;max-width:440px;overflow:hidden}
+  .card-header{padding:28px 28px 0;text-align:center}
+  .agent-avatar{width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin:0 auto 14px;background:var(--brand);overflow:hidden;border:2px solid rgba(255,255,255,.3);box-shadow:0 4px 16px rgba(124,111,255,.3)}
+  .agent-avatar img{width:100%;height:100%;object-fit:cover}
+  .agent-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+  .agent-sub{font-size:13px;color:var(--text-2);line-height:1.5}
+  .divider{height:1px;background:var(--border);margin:22px 0}
+  .card-body{padding:0 28px 28px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+  .field label .req{color:var(--red);margin-left:2px}
+  .inp{width:100%;height:42px;padding:0 14px;border:1.5px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+  .inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-dim)}
+  .inp::placeholder{color:var(--text-3)}
+  textarea.inp{height:90px;padding:12px 14px;resize:none;line-height:1.5}
+  .btn{width:100%;height:46px;border:none;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s,background .15s;color:#fff;background:var(--brand)}
+  .btn:hover{background:var(--brand-dark);box-shadow:0 4px 16px rgba(124,111,255,.35);transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .err{font-size:12px;color:var(--red);margin-top:5px;display:none}
+  .err.show{display:block}
+  /* Success screen */
+  .success-screen{padding:40px 28px;text-align:center;display:none}
+  .success-icon{width:64px;height:64px;background:rgba(34,197,94,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:28px}
+  .success-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px}
+  .success-sub{font-size:13.5px;color:var(--text-2);line-height:1.6}
+  /* Loading */
+  .loading-screen{padding:60px 28px;text-align:center}
+  .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .powered{text-align:center;font-size:11px;color:var(--text-3);margin-top:18px}
+  .powered a{color:var(--text-3);text-decoration:none}
+  .powered a:hover{color:var(--brand)}
+  @media(max-width:480px){
+    body{padding:12px;align-items:flex-start}
+    .card{border-radius:16px}
+    .card-header{padding:22px 20px 0}
+    .card-body{padding:0 20px 22px}
+    .success-screen{padding:32px 20px}
+  }
+</style>
+</head>
+<body>
+<div style="width:100%;max-width:440px">
+  <div class="card" id="main-card">
+    <!-- Loading state -->
+    <div class="loading-screen" id="loading-screen">
+      <div class="spinner"></div>
+      <div style="font-size:13px;color:var(--text-3)">Loading…</div>
+    </div>
+
+    <!-- Enquiry form -->
+    <div id="form-screen" style="display:none">
+      <div class="card-header">
+        <div class="agent-avatar" id="agent-avatar">S</div>
+        <div class="agent-name" id="agent-name">Send an Enquiry</div>
+        <div class="agent-sub" id="agent-sub">Fill in your details and we'll get back to you shortly.</div>
+        <div class="divider"></div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input class="inp" type="text" id="f-name" placeholder="Your name" autocomplete="name">
+          <div class="err" id="err-name">Please enter your name</div>
+        </div>
+        <div class="field">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input class="inp" type="tel" id="f-mobile" placeholder="+91 98765 43210" autocomplete="tel">
+          <div class="err" id="err-mobile">Please enter a valid mobile number</div>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input class="inp" type="email" id="f-email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field" style="margin-bottom:22px">
+          <label>Message <span class="req">*</span></label>
+          <textarea class="inp" id="f-message" placeholder="How can we help you?"></textarea>
+          <div class="err" id="err-message">Please enter your message</div>
+        </div>
+        <button class="btn" id="submit-btn" onclick="submitForm()">Send Enquiry →</button>
+        <div class="err" id="err-general" style="text-align:center;margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- Success screen -->
+    <div class="success-screen" id="success-screen">
+      <div class="success-icon">✓</div>
+      <div class="success-title">Enquiry Received!</div>
+      <div class="success-sub" id="success-sub">Thank you! We've received your enquiry and will get back to you soon.</div>
+    </div>
+  </div>
+
+  <div class="powered">Powered by <a href="https://supportagent.aasaitech.in" target="_blank">SupportGent</a></div>
+</div>
+
+<script>
+const API    = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
+const params = new URLSearchParams(location.search)
+const AGENT_ID = params.get('agent') || params.get('id') || location.pathname.split('/').pop()
+let agentData = null
+
+async function init() {
+  if (!AGENT_ID || AGENT_ID === 'inquiry.html') {
+    showError('No agent specified.')
+    return
+  }
+  try {
+    const res  = await fetch(`${API}/chat/${AGENT_ID}/config`)
+    if (!res.ok) throw new Error('Agent not found')
+    agentData  = await res.json()
+    applyBranding(agentData)
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('form-screen').style.display    = 'block'
+  } catch(e) {
+    showError('Unable to load enquiry form. Please try again.')
+  }
+}
+
+function applyBranding(a) {
+  // Colors
+  if (a.brand_color) {
+    document.documentElement.style.setProperty('--brand', a.brand_color)
+    document.documentElement.style.setProperty('--brand-dark', dimColor(a.brand_color))
+    document.documentElement.style.setProperty('--brand-dim', hexToRgba(a.brand_color, .10))
+  }
+  // Avatar
+  const av = document.getElementById('agent-avatar')
+  if (a.logo_base64 && /^data:image\//.test(a.logo_base64)) {
+    av.innerHTML = `<img src="${a.logo_base64}" alt="">`
+  } else {
+    av.textContent = (a.name?.[0] || 'S').toUpperCase()
+    if (a.brand_color) av.style.background = a.brand_color
+  }
+  // Text
+  if (a.name) {
+    document.getElementById('agent-name').textContent = `Send an Enquiry to ${a.name}`
+    document.title = `Enquiry — ${a.name}`
+  }
+}
+
+async function submitForm() {
+  // Reset errors
+  document.querySelectorAll('.err').forEach(e => e.classList.remove('show'))
+
+  const name    = document.getElementById('f-name').value.trim()
+  const mobile  = document.getElementById('f-mobile').value.trim()
+  const email   = document.getElementById('f-email').value.trim()
+  const message = document.getElementById('f-message').value.trim()
+
+  let valid = true
+  if (!name)            { showFieldErr('err-name', true);    valid = false }
+  if (mobile.length<6)  { showFieldErr('err-mobile', true);  valid = false }
+  if (!message)         { showFieldErr('err-message', true);  valid = false }
+  if (!valid) return
+
+  const btn = document.getElementById('submit-btn')
+  btn.disabled = true
+  btn.textContent = 'Sending…'
+
+  try {
+    const res = await fetch(`${API}/leads/${AGENT_ID}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, mobile, email, message, source: 'enquiry', referrer: document.referrer }),
+    })
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}))
+      throw new Error(e.error || 'Submission failed')
+    }
+    document.getElementById('form-screen').style.display   = 'none'
+    document.getElementById('success-screen').style.display = 'block'
+    if (agentData?.name) {
+      document.getElementById('success-sub').textContent =
+        `Thank you! ${agentData.name} has received your enquiry and will contact you at ${mobile} shortly.`
+    }
+  } catch(e) {
+    const errEl = document.getElementById('err-general')
+    errEl.textContent = e.message || 'Something went wrong. Please try again.'
+    errEl.classList.add('show')
+    btn.disabled = false
+    btn.textContent = 'Send Enquiry →'
+  }
+}
+
+function showFieldErr(id, show) {
+  document.getElementById(id)?.classList[show ? 'add' : 'remove']('show')
+}
+function showError(msg) {
+  document.getElementById('loading-screen').innerHTML =
+    `<div style="padding:40px 24px;text-align:center;color:#E05252;font-size:13px">${msg}</div>`
+}
+function hexToRgba(hex, a) {
+  const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return r ? `rgba(${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)},${a})` : 'rgba(124,111,255,.1)'
+}
+function dimColor(hex) {
+  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if(!r) return hex
+  const d=v=>Math.max(0,Math.round(parseInt(v,16)*.75))
+  return `#${d(r[1]).toString(16).padStart(2,'0')}${d(r[2]).toString(16).padStart(2,'0')}${d(r[3]).toString(16).padStart(2,'0')}`
+}
+
+// Allow Enter to submit
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') submitForm()
+})
+
+init()
+</script>
+</body>
+</html>
