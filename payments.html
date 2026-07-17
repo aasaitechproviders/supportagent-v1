@@ -64,7 +64,7 @@
 </div>
 <div class="main-wrap">
   <div class="topbar">
-    <div class="topbar-left"><div><div class="topbar-title" data-i18n="billing">Billing</div><div class="topbar-subtitle" data-i18n="billingSubtitle">Manage your plan and token balance</div></div></div>
+    <div class="topbar-left"><div><div class="topbar-title" data-i18n="billing">Billing</div><div class="topbar-subtitle" >Manage your plan and AI Credits</div></div></div>
     <div class="topbar-right"><button class="theme-toggle" style="font-size:15px"></button></div>
   </div>
   <div class="content" id="page-content" style="display:none">
@@ -83,12 +83,12 @@
               </div>
               <span class="badge" id="cur-badge" style="margin-left:auto">—</span>
             </div>
-            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px" data-i18n="monthlyTokenUsage">Monthly Token Usage</div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px" >Monthly AI Credit Usage</div>
             <div class="progress-bar" style="height:8px;margin-bottom:7px"><div class="progress-fill" id="usage-fill" style="width:0%"></div></div>
             <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-3);margin-bottom:14px"><span id="usage-used">0 used</span><span id="usage-cap">—</span></div>
             <div class="plan-stats-row">
-              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="monthlyCap">Monthly Cap</div></div>
-              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="topupBalance">Topup Balance</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-mcap">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" >Monthly Credits</div></div>
+              <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-topup">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" >Extra Credits</div></div>
               <div style="text-align:center"><div style="font-size:15px;font-weight:800;font-family:var(--mono)" id="inf-reset">—</div><div style="font-size:9.5px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:3px" data-i18n="resetsOn">Resets On</div></div>
             </div>
           </div>
@@ -99,24 +99,25 @@
           <div class="card-header"><div class="card-title"><span class="card-icon">🚀</span data-i18n="upgradePlan">Upgrade Plan</div></div>
           <div class="card-body">
             <div class="cycle-toggle">
-              <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px" data-i18n="save20">Save 20%</span></button>
+              <button class="btn btn-secondary btn-sm active" id="cycle-yearly" onclick="setCycle('yearly',this)" style="border:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08)">Yearly <span style="font-size:9px;font-weight:700;background:var(--green-dim);color:var(--green);padding:1px 6px;border-radius:10px;margin-left:3px" data-i18n="save20">Save 10%</span></button>
               <button class="btn btn-ghost btn-sm" id="cycle-monthly" onclick="setCycle('monthly',this)">Monthly</button>
             </div>
             <div class="plans-grid" id="plans-grid">
               <div class="skel" style="height:280px;border-radius:var(--r-lg)"></div>
               <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.7"></div>
               <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.4"></div>
+              <div class="skel" style="height:280px;border-radius:var(--r-lg);opacity:.2"></div>
             </div>
           </div>
         </div>
 
         <!-- Token topup -->
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span data-i18n="buyTokenCredits">Buy Token Credits</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span >Buy AI Credits</div></div>
           <div class="card-body">
-            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7" data-i18n="buyTokenDesc">Top up instantly. Credits never expire and are used after your monthly cap is reached.</p>
+            <p style="font-size:13.5px;color:var(--text-2);margin-bottom:16px;line-height:1.7" data-i18n="buyTokenDesc">Purchase additional AI Credits anytime. Credits never expire and are used after your monthly allocation runs out.</p>
             <div class="topup-grid" id="topup-grid"></div>
-            <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center;height:40px" onclick="buyTopup()" id="topup-btn" data-i18n="buyTokenCredits">Buy Token Credits</button>
+            <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center;height:40px" onclick="buyTopup()" id="topup-btn" >Buy AI Credits</button>
           </div>
         </div>
 
@@ -133,19 +134,19 @@
       <!-- Side -->
       <div class="billing-side">
         <div class="card">
-          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span data-i18n="topupBalance">Topup Balance</div></div>
+          <div class="card-header"><div class="card-title"><span class="card-icon">🪙</span >Extra Credits</div></div>
           <div class="card-body">
             <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:13px">
               <div style="font-size:28px;font-weight:800;font-family:var(--mono);letter-spacing:-.04em" id="side-topup">—</div>
-              <div style="font-size:12px;color:var(--text-3)" data-i18n="extraTokens">extra tokens</div>
+              <div style="font-size:12px;color:var(--text-3)" data-i18n="extraTokens">extra AI Credits</div>
             </div>
-            <p style="font-size:12.5px;color:var(--text-2);line-height:1.7">Topup tokens are used after your monthly cap. They never expire.</p>
+            <p style="font-size:12.5px;color:var(--text-2);line-height:1.7">AI Credits are used after your monthly allocation. They never expire and roll over indefinitely.</p>
           </div>
         </div>
         <div id="trial-card" style="display:none">
           <div style="background:var(--accent-dim);border:1px solid rgba(124,111,255,.18);border-radius:var(--r-lg);padding:18px">
             <div style="font-size:14px;font-weight:800;margin-bottom:5px" data-i18n="freeTrialTitle">🎁 Free Trial Active</div>
-            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6" data-i18n="freeTrialDesc">You started on Grower with 500K tokens. Upgrade to keep all features after your trial ends.</div>
+            <div style="font-size:12.5px;color:var(--text-2);line-height:1.6" data-i18n="freeTrialDesc">You started on Growth with 2M AI Credits. Upgrade to keep all features after your trial ends.</div>
             <div style="font-size:12px;color:var(--accent);font-weight:700;margin-top:6px" id="trial-ends"></div>
             <a href="payments.html" class="btn btn-primary btn-sm" style="margin-top:12px;width:100%;justify-content:center" data-i18n="upgradeNow">Upgrade Now →</a>
           </div>
@@ -181,7 +182,7 @@ let billingData=null,billingCycle='yearly',selectedTopup=null
 })()
 function renderCurrentPlan(t){
   if(!t)return
-  const planLabels={starter:window.t('planStarter'),grower:window.t('planGrower'),enterprise:window.t('planEnterprise')}
+  const planLabels={starter:'Starter',grower:'Growth',enterprise:'Business'}
   document.getElementById('cur-plan').textContent=planLabels[t.plan]||t.plan||'—'
   document.getElementById('cur-status').textContent=t.trial_active?`Free trial · Ends ${fmtDate(t.trial_ends_at)}`:t.subscription_end?`Renews ${fmtDate(t.subscription_end)}`:'Active'
   const badge=document.getElementById('cur-badge')
@@ -190,7 +191,7 @@ function renderCurrentPlan(t){
   const pct=t.monthly_cap?Math.min(100,Math.round(t.monthly_used/t.monthly_cap*100)):0
   const fill=document.getElementById('usage-fill')
   fill.style.width=pct+'%';fill.className='progress-fill'+(pct>=90?' danger':pct>=70?' warn':'')
-  document.getElementById('usage-used').textContent=fmtTokens(t.monthly_used)+' used'
+  document.getElementById('usage-used').textContent=fmtTokens(t.monthly_used)+' AI Credits used'
   document.getElementById('usage-cap').textContent=fmtTokens(t.monthly_cap)
   document.getElementById('inf-mcap').textContent=fmtTokens(t.monthly_cap)
   document.getElementById('inf-topup').textContent=fmtTokens(t.topup_balance)
@@ -213,12 +214,12 @@ function setCycle(c,btn){
 function renderPlans(plans){
   const cur=billingData?.tokens?.plan||'starter'
   const defs=[
-    {key:'starter',features:['3 Agents','500K tokens/mo','10 sources/agent','Email support'],no:['Shopping & Razorpay','Custom domain']},
-    {key:'grower',features:['10 Agents','2M tokens/mo','30 sources/agent','Custom domain','Shopping + Razorpay','Priority support'],recommended:true},
-    {key:'enterprise',features:['Unlimited agents','10M tokens/mo','Unlimited sources','Custom domain','Shopping + Razorpay','Dedicated support']}
+    {key:'starter',features:['3 Agents','2M AI Credits/mo','10 sources/agent','WhatsApp, Instagram, Gmail, Messenger','Email support'],no:['Shopping & Razorpay','Custom domain']},
+    {key:'grower',features:['10 Agents','7.5M AI Credits/mo','30 sources/agent','All channels','Custom domain','Shopping + Razorpay','Priority support'],recommended:true},
+    {key:'enterprise',features:['Unlimited Agents','30M AI Credits/mo','Unlimited sources','All channels','Custom domain','Shopping + Razorpay','Dedicated support']}
   ]
   const featHtml=(f,yes)=>`<div class="plan-feature${yes?'':' no'}"><div class="pf-icon ${yes?'yes':'no'}"><svg width="8" height="8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">${yes?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg></div>${f}</div>`
-  document.getElementById('plans-grid').innerHTML=defs.map(({key,features,no=[],recommended})=>{
+  const planCards=defs.map(({key,features,no=[],recommended})=>{
     const p=plans[key];if(!p)return''
     const price=billingCycle==='yearly'?p.price_monthly:p.price_monthly_mo
     const isCur=key===cur
@@ -226,11 +227,23 @@ function renderPlans(plans){
       ${recommended?'<div class="plan-recommend-badge" data-i18n="mostPopular">Most Popular</div>':''}
       ${isCur?'<div class="plan-recommend-badge" style="background:var(--green)" data-i18n="currentPlan">Current Plan</div>':''}
       <div class="plan-name">${p.label}</div>
-      <div class="plan-price"><sup style="font-size:15px;vertical-align:top;margin-top:6px">₹</sup>${price}<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo</span></div>
-      <div class="plan-price-note">${billingCycle==='yearly'?`<span style="color:var(--green)">Billed ₹${(price*12).toLocaleString()}/yr — 20% off</span>`:'Billed monthly'}</div>
+      <div class="plan-price"><sup style="font-size:15px;vertical-align:top;margin-top:6px">₹</sup>${price.toLocaleString('en-IN')}<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo</span></div>
+      <div class="plan-price-note">${billingCycle==='yearly'?`<span style="color:var(--green)">Billed ₹${(price*12).toLocaleString('en-IN')}/yr · Save 10%</span>`:'Billed monthly · Save 10% yearly'}</div>
       <div class="plan-features">${features.map(f=>featHtml(f,true)).join('')}${no.map(f=>featHtml(f,false)).join('')}</div>
-      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled data-i18n="currentPlan">Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Upgrade to ${p.label} →</button>`}
-    </div>`}).join('')
+      ${isCur?`<button class="btn btn-secondary" style="width:100%;justify-content:center;cursor:default" disabled>Current Plan</button>`:`<button class="btn ${recommended?'btn-primary':'btn-secondary'}" style="width:100%;justify-content:center" onclick="subscribePlan('${key}')">Get ${p.label} →</button>`}
+    </div>`
+  }).join('')
+  // Enterprise contact card (not self-serve)
+  const enterpriseCard=`<div class="plan-card" style="grid-column:1/-1;background:linear-gradient(135deg,var(--surface-2) 0%,var(--surface) 100%);border:1px solid var(--border-md)">
+    <div class="plan-name" style="display:flex;align-items:center;gap:8px">🏢 Enterprise <span class="badge badge-accent" style="font-size:10px">Custom</span></div>
+    <div class="plan-price" style="font-size:22px">₹49,999<span style="font-size:13px;font-weight:500;color:var(--text-3)">/mo+</span></div>
+    <div class="plan-price-note" style="color:var(--text-3)">Custom AI Credits · Tailored to your scale</div>
+    <div class="plan-features" style="flex-direction:row;flex-wrap:wrap;gap:6px 20px;margin:10px 0">
+      ${['Unlimited everything','Custom AI Credit volume','Dedicated infrastructure','SLA & uptime guarantee','White-glove onboarding','Custom integrations'].map(f=>featHtml(f,true)).join('')}
+    </div>
+    <a href="mailto:hello@aasaitech.in?subject=SupportGent Enterprise" class="btn btn-secondary" style="width:100%;justify-content:center">Contact Us for Enterprise →</a>
+  </div>`
+  document.getElementById('plans-grid').innerHTML=planCards+enterpriseCard
 }
 function renderTopupPacks(packs){
   if(!packs)return
