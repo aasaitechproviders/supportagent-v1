@@ -91,9 +91,10 @@
 <script>
 const API      = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
 const params   = new URLSearchParams(location.search)
-const AGENT_ID = params.get('agent') || params.get('id')
-let agentData  = null
+const FORM_ID  = params.get('form')                        // standalone inquiry form
+const AGENT_ID = params.get('agent') || params.get('id')   // agent-based form (legacy)
 let formConfig = null
+let _formId    = null   // which ID to POST to
 
 const DEFAULT_FIELDS = [
   { id:'name',    label:'Full Name',     type:'text',     required:true,  enabled:true, locked:false },
@@ -103,13 +104,26 @@ const DEFAULT_FIELDS = [
 ]
 
 async function init() {
-  if (!AGENT_ID) { showError('No agent specified.'); return }
   try {
-    const res = await fetch(`${API}/chat/${AGENT_ID}/config`)
-    if (!res.ok) throw new Error('Agent not found')
-    agentData  = await res.json()
-    formConfig = agentData.enquiry_form || { title:'Send an Enquiry', subtitle:'Fill in your details and we\'ll get back to you shortly.', thank_you:'Thank you!', fields: DEFAULT_FIELDS }
-    applyBranding(agentData)
+    if (FORM_ID) {
+      // ── Standalone inquiry form ───────────────────────────────────────
+      const res = await fetch(`${API}/inquiry-forms/${FORM_ID}/public`)
+      if (!res.ok) throw new Error('Form not found')
+      const data = await res.json()
+      formConfig = { title: data.title, subtitle: data.subtitle, thank_you: data.thank_you, fields: data.fields }
+      if (data.branding) applyBranding(data.branding)
+      _formId = FORM_ID
+    } else if (AGENT_ID) {
+      // ── Agent-based form (from agent.html Publish tab embed) ──────────
+      const res = await fetch(`${API}/chat/${AGENT_ID}/config`)
+      if (!res.ok) throw new Error('Agent not found')
+      const agent = await res.json()
+      formConfig = agent.enquiry_form || { title:'Send an Enquiry', subtitle:'Fill in your details and we\'ll get back to you shortly.', thank_you:'Thank you!', fields: DEFAULT_FIELDS }
+      applyBranding(agent)
+      _formId = null // uses /leads/:agentId route
+    } else {
+      showError('No form specified.'); return
+    }
     renderForm(formConfig)
     document.getElementById('loading-screen').style.display = 'none'
     document.getElementById('form-screen').style.display    = 'block'
@@ -195,7 +209,10 @@ async function submitForm() {
   const fullMessage  = [formData.message, customFields].filter(Boolean).join('\n\n')
 
   try {
-    const res = await fetch(`${API}/leads/${AGENT_ID}`, {
+    const endpoint = FORM_ID
+      ? `${API}/inquiry-forms/${FORM_ID}/submit`
+      : `${API}/leads/${AGENT_ID}`
+    const res = await fetch(endpoint, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
