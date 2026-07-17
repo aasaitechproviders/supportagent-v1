@@ -565,6 +565,18 @@
               </div>
               <button class="btn btn-primary" style="height:46px;padding:0 28px;font-size:14px" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
             </div>
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">📱 Pre-Chat Lead Capture</div>
+                <label class="toggle-switch" style="margin-left:auto">
+                  <input type="checkbox" id="pre-chat-toggle" onchange="togglePreChat(this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="card-body">
+                <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0">When enabled, visitors must enter their <strong>mobile number</strong> before starting a chat. Their details are saved to your Leads automatically.</p>
+              </div>
+            </div>
             <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">🔗 Live Links</div>
@@ -588,9 +600,22 @@
                   </div>
                 </div>
                 <div class="divider"></div>
-                <div class="pub-url-label">Embed Widget</div>
+                <div class="pub-url-label">Chat Widget Embed</div>
                 <div class="embed-box" id="embed-box">—</div>
-                <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Embed Code</button>
+                <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('embed-box').textContent)">Copy Chat Embed</button>
+                <div class="divider"></div>
+                <div class="pub-url-label" style="margin-top:0">Enquiry Form URL</div>
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:10px">Share this link or embed it on your website to collect leads with name, mobile, email and message.</div>
+                <div class="pub-url-card">
+                  <div class="url-copy-row">
+                    <a id="inquiry-url" href="#" target="_blank" class="url-copy-link">—</a>
+                    <button class="url-copy-btn" onclick="copyText(document.getElementById('inquiry-url').href)">Copy</button>
+                    <a id="inquiry-url-open" href="#" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none">Open ↗</a>
+                  </div>
+                </div>
+                <div class="pub-url-label" style="margin-top:14px">Enquiry Form Embed</div>
+                <div class="embed-box" id="inquiry-embed-box">—</div>
+                <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="copyText(document.getElementById('inquiry-embed-box').textContent)">Copy Enquiry Embed</button>
               </div>
             </div>
             <div class="card" style="margin-bottom:16px">
@@ -1539,6 +1564,19 @@ function updatePublishUI(a) {
   setLink('pub-url', fbURL, fbURL)
   const embed = document.getElementById('embed-box')
   if (embed) embed.textContent = `<iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone"></iframe>`
+
+  // Inquiry form URL
+  const frontendBase = location.origin
+  const inquiryURL   = `${frontendBase}/inquiry.html?agent=${a._id}`
+  setLink('inquiry-url', inquiryURL, inquiryURL)
+  setLink('inquiry-url-open', inquiryURL)
+  const inqEmbed = document.getElementById('inquiry-embed-box')
+  if (inqEmbed) inqEmbed.textContent = `<iframe src="${inquiryURL}" width="100%" height="560" frameborder="0"></iframe>`
+
+  // Pre-chat toggle state
+  const toggle = document.getElementById('pre-chat-toggle')
+  if (toggle) toggle.checked = !!a.pre_chat_enabled
+
   const sideCard = document.getElementById('agent-url-side-card')
   const sideUrl  = document.getElementById('side-agent-url')
   const sideOpen = document.getElementById('side-agent-open')
@@ -1556,6 +1594,17 @@ function setLink(id, href, text) {
   el.href = href || '#'
   if (text !== undefined) el.textContent = text
   else if (!el.textContent.trim() || el.textContent === '—') el.textContent = href || '—'
+}
+
+async function togglePreChat(enabled) {
+  try {
+    await apiFetch(`/agents/${agent._id}`, { method: 'PUT', body: JSON.stringify({ pre_chat_enabled: enabled }) })
+    agent.pre_chat_enabled = enabled
+    toast(enabled ? 'Pre-chat capture enabled' : 'Pre-chat capture disabled', 'success')
+  } catch(e) {
+    toast(e.message, 'error')
+    document.getElementById('pre-chat-toggle').checked = !enabled
+  }
 }
 
 async function connectDomain() {
