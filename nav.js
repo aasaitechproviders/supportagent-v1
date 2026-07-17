@@ -12,6 +12,7 @@ const _NAV_SECTIONS = [
       { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
       { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
       { page:'contacts',      href:'contacts.html',      label:'Contacts',            icon:'👥' },
+      { page:'leads',         href:'leads.html',         label:'Leads',               icon:'🎯' },
       { page:'campaigns',     href:'campaigns.html',     label:'Campaigns',           icon:'📣' },
       { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
@@ -127,9 +128,10 @@ function _populateUser(user) {
   }
 
   const planLabel = {
-    starter:    t('planStarter'),
-    grower:     t('planGrower'),
-    enterprise: t('planEnterprise'),
+    starter:    'Starter',
+    grower:     'Growth',
+    enterprise: 'Business',
+    elite:      'Enterprise',
   }
   const nameEl = document.getElementById('nav-user-name')
   const planEl = document.getElementById('nav-user-plan')
