@@ -539,6 +539,9 @@ function goToStep(n) {
   btnNext.style.display = n < 3 ? '' : 'none'
   btnDone.style.display = n === 3 ? '' : 'none'
 
+  if (n === 1) btnNext.textContent = 'Next: Add Fields →'
+  if (n === 2) btnNext.textContent = 'Save & Continue →'
+
   if (n === 2) renderFieldList()
   if (n === 3) renderDoneScreen()
 }
@@ -863,19 +866,7 @@ function fmtDate(d) {
   return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
 }
 
-// Update footer button text based on step
-const origNext = document.getElementById('btn-next')
-;(function patchBtnText() {
-  const obs = new MutationObserver(() => {})
-})()
-// Override goToStep to also update btn label
-const _origGoToStep = goToStep
-function goToStep(n) {
-  _origGoToStep(n)
-  const btn = document.getElementById('btn-next')
-  if (n === 1) btn.textContent = 'Next: Add Fields →'
-  if (n === 2) btn.textContent = 'Save & Continue →'
-}
+
 </script>
 </body>
 </html>
