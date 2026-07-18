@@ -238,7 +238,7 @@ function renderGrid() {
           <button class="btn btn-secondary btn-sm" onclick="openEditModal('${f._id}')" style="flex:1;justify-content:center">✏ Edit</button>
           <a href="${formURL}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0">Open ↗</a>
           <button class="btn btn-secondary btn-sm" onclick="copyURL('${formURL}')" style="flex-shrink:0" title="Copy URL">🔗</button>
-          <a href="leads.html" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0" title="View submissions">📊</a>
+          <a href="leads-forms.html?tab=forms&form=${f._id}" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0" title="View submissions">📊</a>
           <button class="btn btn-sm" style="color:var(--red);border-color:var(--red-border);background:var(--red-dim);flex-shrink:0" onclick="openDeleteModal('${f._id}')">🗑</button>
         </div>
       </div>
