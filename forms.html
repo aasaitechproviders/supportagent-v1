@@ -3,46 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>Enquiry Forms — SupportGent</title>
+<title>Form Builder — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* Form cards grid */
-  .forms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:14px}
-  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;box-shadow:var(--sh-sm);animation:cardIn .3s var(--ease) both}
-  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  .form-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh),0 0 0 1px var(--accent-dim)}
-  .fc-stripe{height:3px;width:100%;background:var(--accent)}
-  .fc-body{padding:16px}
-  .fc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
-  .fc-meta{font-size:12px;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .fc-url{font-size:11px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);padding:6px 10px;border-radius:8px;word-break:break-all;margin-bottom:12px;cursor:pointer;transition:background .15s}
-  .fc-url:hover{background:var(--accent);color:#fff}
-  .fc-actions{display:flex;gap:7px;flex-wrap:wrap}
-  /* Create card */
-  .create-form-card{background:var(--surface);border:2px dashed var(--border-md);border-radius:var(--r-lg);padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;transition:var(--t)}
-  .create-form-card:hover{border-color:var(--accent);background:var(--accent-dim)}
-  /* Builder modal */
-  .builder-modal{max-width:600px;width:100%}
-  .field-builder-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px}
-  .fb-row{display:flex;align-items:flex-start;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:default}
-  .fb-row:hover{border-color:var(--border-md)}
-  .fb-row[draggable="true"]{cursor:grab}
-  .fb-grip{font-size:16px;padding-top:5px;user-select:none;color:var(--text-3);flex-shrink:0}
-  .fb-fields{flex:1;display:flex;flex-direction:column;gap:6px}
-  .fb-row-top{display:flex;gap:8px;align-items:center}
-  .fb-row-top .inp{height:34px;font-size:13px}
-  .fb-type-sel{height:34px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-size:12.5px;color:var(--text);background:var(--surface);flex-shrink:0}
-  .fb-row-bottom{display:flex;gap:14px;align-items:center;font-size:12px}
-  .fb-check{display:flex;align-items:center;gap:5px;cursor:pointer}
-  .fb-del{border:none;background:none;color:var(--red);cursor:pointer;font-size:20px;padding:0 4px;flex-shrink:0;line-height:1}
-  .fb-del:disabled{opacity:.25;cursor:default}
-  .options-inp{flex:1;height:28px;font-size:12px}
-  /* Empty state */
-  .empty-forms{padding:60px 20px;text-align:center;color:var(--text-3);grid-column:1/-1}
-  .empty-forms-icon{font-size:44px;margin-bottom:14px}
-  @media(max-width:648px){.forms-grid{grid-template-columns:1fr}}
+/* ── Form cards grid ────────────────────────────────────────── */
+.forms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:14px}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;box-shadow:var(--sh-sm);animation:cardIn .3s var(--ease) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.form-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--sh),0 0 0 1px var(--accent-dim)}
+.fc-stripe{height:3px;width:100%;background:var(--accent)}
+.fc-body{padding:16px}
+.fc-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.fc-meta{font-size:12px;color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fc-url{font-size:11px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);padding:6px 10px;border-radius:8px;word-break:break-all;margin-bottom:12px;cursor:pointer;transition:background .15s}
+.fc-url:hover{background:var(--accent);color:#fff}
+.fc-actions{display:flex;gap:7px;flex-wrap:wrap}
+.create-form-card{background:var(--surface);border:2px dashed var(--border-md);border-radius:var(--r-lg);padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;text-align:center;transition:var(--t)}
+.create-form-card:hover{border-color:var(--accent);background:var(--accent-dim)}
+.empty-forms{padding:60px 20px;text-align:center;color:var(--text-3);grid-column:1/-1}
+.empty-forms-icon{font-size:44px;margin-bottom:14px}
+
+/* ════════════════════════════════════════════════════════════════
+   BUILDER PANEL
+════════════════════════════════════════════════════════════════ */
+.builder-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:390;opacity:0;pointer-events:none;transition:opacity .28s}
+.builder-panel{position:fixed;inset:0;z-index:400;display:flex;pointer-events:none;opacity:0;transition:opacity .28s}
+.builder-panel.open{opacity:1;pointer-events:all}
+.builder-panel.open .builder-backdrop{opacity:1;pointer-events:all}
+.builder-panel.open .builder-wrap{transform:translateX(0)}
+
+.builder-wrap{position:absolute;inset:0;left:auto;right:0;width:100%;max-width:1080px;display:flex;background:var(--surface);box-shadow:-8px 0 60px rgba(0,0,0,.18);transform:translateX(60px);transition:transform .32s cubic-bezier(.22,1,.36,1)}
+
+/* Left: wizard */
+.builder-left{width:420px;min-width:320px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden}
+.bl-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.bl-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.bl-title{font-size:16px;font-weight:800;color:var(--text)}
+.bl-close{border:none;background:none;font-size:20px;cursor:pointer;color:var(--text-3);padding:2px 6px;border-radius:6px;line-height:1;transition:var(--t)}
+.bl-close:hover{background:var(--surface-2);color:var(--text)}
+
+/* Step indicator */
+.step-indicator{display:flex;align-items:center;gap:0}
+.step-dot{display:flex;align-items:center;gap:8px;flex:1}
+.step-dot:last-child{flex:0}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;transition:var(--t);border:2px solid var(--border-md);background:var(--surface-2);color:var(--text-3)}
+.step-circle.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-circle.done{border-color:var(--green);background:var(--green);color:#fff}
+.step-label{font-size:11.5px;font-weight:600;color:var(--text-3);white-space:nowrap}
+.step-label.active{color:var(--accent)}
+.step-label.done{color:var(--green)}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 8px;border-radius:2px;transition:background .3s}
+.step-line.done{background:var(--green)}
+
+/* Step content area */
+.bl-content{flex:1;overflow-y:auto;padding:22px 24px}
+.step-section{display:none}
+.step-section.active{display:block}
+
+/* Field rows */
+.field-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:6px}
+.field-row{margin-bottom:16px}
+.inp-clean{width:100%;height:40px;padding:0 12px;border:1.5px solid var(--border-md);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.inp-clean:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.inp-clean::placeholder{color:var(--text-3)}
+.sel-clean{height:40px;padding:0 12px;border:1.5px solid var(--border-md);border-radius:var(--r-sm);font-family:var(--font);font-size:13.5px;color:var(--text);background:var(--surface);cursor:pointer;outline:none;width:100%}
+.sel-clean:focus{border-color:var(--accent)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hint{font-size:11.5px;color:var(--text-3);margin-top:5px}
+
+/* Field builder list */
+.fb-list{display:flex;flex-direction:column;gap:8px}
+.fb-card{background:var(--surface-2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:12px 14px;transition:border-color .15s}
+.fb-card:hover{border-color:var(--border-md)}
+.fb-card.fb-locked{opacity:.75}
+.fb-card-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.fb-drag{color:var(--text-3);font-size:16px;cursor:grab;user-select:none;flex-shrink:0}
+.fb-drag.locked-icon{cursor:default;font-size:14px}
+.fb-name-inp{flex:1;height:34px;padding:0 10px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;color:var(--text);background:var(--surface);outline:none}
+.fb-name-inp:focus{border-color:var(--accent)}
+.fb-del{border:none;background:none;color:var(--red);cursor:pointer;font-size:20px;padding:0 2px;flex-shrink:0;line-height:1;opacity:.6;transition:opacity .15s}
+.fb-del:hover{opacity:1}
+.fb-del:disabled{opacity:.15;cursor:default}
+
+/* Type pills */
+.type-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.type-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--border-md);background:var(--surface);color:var(--text-3);transition:var(--t)}
+.type-pill:hover{border-color:var(--border-md);background:var(--surface-2);color:var(--text-2)}
+.type-pill.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* Toggles row */
+.fb-toggles{display:flex;gap:14px;align-items:center}
+.toggle-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.toggle-wrap input[type=checkbox]{display:none}
+.toggle-track{width:34px;height:18px;border-radius:9px;background:var(--border-md);transition:background .2s;flex-shrink:0;position:relative}
+.toggle-thumb{position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle-wrap input:checked ~ .toggle-track{background:var(--accent)}
+.toggle-wrap input:checked ~ .toggle-track .toggle-thumb{left:18px}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text-2)}
+
+/* Options input */
+.options-row{margin-top:6px}
+.options-inp{width:100%;height:32px;padding:0 10px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface);outline:none}
+.options-inp:focus{border-color:var(--accent)}
+
+/* Add field section */
+.add-field-area{margin-top:14px}
+.add-field-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:8px}
+.type-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.type-pick-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;font-size:11.5px;font-weight:600;color:var(--text-2);transition:var(--t);background:var(--surface);text-align:center}
+.type-pick-card:hover{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.type-pick-icon{font-size:20px;line-height:1}
+
+/* Footer buttons */
+.bl-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;background:var(--surface)}
+
+/* ── Step 3: Done ───────────────────────────────────────────── */
+.done-screen{text-align:center;padding:8px 0}
+.done-icon{font-size:48px;margin-bottom:14px}
+.done-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.done-sub{font-size:13px;color:var(--text-2);margin-bottom:24px;line-height:1.6}
+.url-copy-box{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+.url-copy-box:hover{border-color:var(--accent)}
+.url-text{font-size:12px;font-family:var(--mono);color:var(--accent);flex:1;word-break:break-all;text-align:left}
+.copy-icon{font-size:16px;flex-shrink:0;color:var(--text-3)}
+.embed-toggle{font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:8px;display:inline-block;text-decoration:underline;text-underline-offset:2px}
+.embed-code-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;font-family:var(--mono);font-size:11.5px;color:var(--text-2);word-break:break-all;white-space:pre-wrap;text-align:left;display:none;margin-bottom:14px}
+
+/* ── Right: live preview ────────────────────────────────────── */
+.builder-right{flex:1;display:flex;flex-direction:column;background:var(--surface-2);overflow:hidden}
+.br-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface);flex-shrink:0}
+.preview-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+.live-badge{padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.12);color:var(--green)}
+.br-body{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:32px 20px}
+
+/* Inquiry card preview — mirrors inquiry.html exactly */
+.preview-card{background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.12);width:100%;max-width:400px;overflow:hidden;flex-shrink:0}
+.pc-header{padding:24px 24px 0;text-align:center}
+.pc-avatar{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;margin:0 auto 12px;background:#7C6FFF;box-shadow:0 4px 16px rgba(124,111,255,.3)}
+.pc-title{font-size:17px;font-weight:800;color:#0F1117;margin-bottom:4px}
+.pc-sub{font-size:13px;color:#5A6070;line-height:1.5}
+.pc-divider{height:1px;background:#E5E7EF;margin:20px 0}
+.pc-body{padding:0 24px 24px}
+.pc-field{margin-bottom:14px}
+.pc-label{display:block;font-size:11px;font-weight:700;color:#5A6070;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.pc-req{color:#E05252;margin-left:2px}
+.pc-inp{width:100%;height:40px;padding:0 12px;border:1.5px solid #E5E7EF;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;color:#0F1117;background:#fff;outline:none;pointer-events:none}
+.pc-textarea{height:80px;padding:10px 12px;resize:none;line-height:1.5}
+.pc-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239DA6B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.pc-btn{width:100%;height:44px;border:none;border-radius:10px;background:#7C6FFF;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+.pc-powered{text-align:center;font-size:10.5px;color:#9DA6B8;padding:12px;border-top:1px solid #F0F1F6}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .preview-card{background:#1a1b22;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+[data-theme="dark"] .pc-title{color:#F0F1FF}
+[data-theme="dark"] .pc-sub{color:#7A8099}
+[data-theme="dark"] .pc-divider{background:#2a2b35}
+[data-theme="dark"] .pc-inp{background:#12131a;border-color:#2a2b35;color:#E0E1F0}
+[data-theme="dark"] .pc-label{color:#7A8099}
+[data-theme="dark"] .pc-powered{color:#4a5070;border-color:#2a2b35}
+[data-theme="dark"] .pc-btn{background:#7C6FFF}
+
+/* Delete confirm modal */
+.del-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.del-modal-overlay.open{opacity:1;pointer-events:all}
+.del-modal{background:var(--surface);border-radius:var(--r-lg);padding:24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+
+@media(max-width:900px){
+  .builder-wrap{max-width:100%}
+  .builder-right{display:none}
+  .builder-left{width:100%}
+}
+@media(max-width:648px){
+  .forms-grid{grid-template-columns:1fr}
+  .two-col{grid-template-columns:1fr}
+}
 </style>
 <link rel="stylesheet" href="shared.css">
 <script>;(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9';})();</script>
@@ -80,13 +216,13 @@
   <div class="topbar">
     <div class="topbar-left">
       <div>
-        <div class="topbar-title">📋 Enquiry Forms</div>
+        <div class="topbar-title">📋 Form Builder</div>
         <div class="topbar-subtitle" id="forms-sub">Create unlimited lead capture forms</div>
       </div>
     </div>
     <div class="topbar-right">
       <button class="theme-toggle" style="font-size:15px"></button>
-      <button class="btn btn-primary" onclick="openCreateModal()">+ New Form</button>
+      <button class="btn btn-primary" onclick="openCreatePanel()">+ New Form</button>
     </div>
   </div>
 
@@ -95,68 +231,170 @@
   </div>
 </div>
 
-<!-- Create / Edit Modal -->
-<div class="modal-overlay" id="form-modal">
-  <div class="modal builder-modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="modal-title">Create Enquiry Form</div>
-        <div class="modal-sub" id="modal-sub">Configure fields visitors will fill in</div>
+<!-- ════════════════════════════════════════════════════════════════
+     BUILDER PANEL
+════════════════════════════════════════════════════════════════ -->
+<div class="builder-panel" id="builder-panel">
+  <div class="builder-backdrop" onclick="closePanel()"></div>
+  <div class="builder-wrap">
+
+    <!-- LEFT: Stepper wizard -->
+    <div class="builder-left">
+      <div class="bl-header">
+        <div class="bl-header-top">
+          <div class="bl-title" id="panel-title">Create Form</div>
+          <button class="bl-close" onclick="closePanel()">✕</button>
+        </div>
+        <!-- Step indicator -->
+        <div class="step-indicator">
+          <div class="step-dot">
+            <div class="step-circle" id="s-circle-1">1</div>
+            <div class="step-label" id="s-label-1">Basics</div>
+          </div>
+          <div class="step-line" id="s-line-1"></div>
+          <div class="step-dot">
+            <div class="step-circle" id="s-circle-2">2</div>
+            <div class="step-label" id="s-label-2">Fields</div>
+          </div>
+          <div class="step-line" id="s-line-2"></div>
+          <div class="step-dot">
+            <div class="step-circle" id="s-circle-3">3</div>
+            <div class="step-label" id="s-label-3">Share</div>
+          </div>
+        </div>
       </div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
 
-    <!-- Basic info -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div class="field" style="margin:0">
-        <label>Form Name <span style="color:var(--red)">*</span></label>
-        <input class="inp" type="text" id="fm-name" placeholder="e.g. Product Enquiry" style="margin-top:6px">
+      <!-- STEP CONTENT -->
+      <div class="bl-content">
+
+        <!-- STEP 1: Basics -->
+        <div class="step-section" id="step-1">
+          <div class="field-row">
+            <div class="field-lbl">Form Name <span style="color:var(--red)">*</span></div>
+            <input class="inp-clean" type="text" id="fm-name" placeholder="e.g. Product Enquiry, Job Application…" oninput="updatePreview()">
+          </div>
+          <div class="field-row">
+            <div class="field-lbl">Link to Agent <span style="font-size:10px;color:var(--text-3)">(optional, for branding)</span></div>
+            <select class="sel-clean" id="fm-agent" onchange="updatePreview()">
+              <option value="">No agent (unbranded)</option>
+            </select>
+          </div>
+          <div class="two-col">
+            <div class="field-row" style="margin-bottom:0">
+              <div class="field-lbl">Form Title</div>
+              <input class="inp-clean" type="text" id="fm-title" placeholder="Send an Enquiry" oninput="updatePreview()">
+            </div>
+          </div>
+          <div class="field-row" style="margin-top:12px">
+            <div class="field-lbl">Subtitle</div>
+            <input class="inp-clean" type="text" id="fm-subtitle" placeholder="Fill in your details and we'll get back to you." oninput="updatePreview()">
+          </div>
+          <div class="field-row">
+            <div class="field-lbl">Thank You Message</div>
+            <input class="inp-clean" type="text" id="fm-thankyou" placeholder="Thank you! We'll contact you soon.">
+            <div class="hint">Shown after someone submits the form.</div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Fields -->
+        <div class="step-section" id="step-2">
+          <div class="fb-list" id="fb-list"></div>
+
+          <div class="add-field-area">
+            <div class="add-field-label">Add a field</div>
+            <div class="type-pick-grid">
+              <div class="type-pick-card" onclick="addField('text')">
+                <div class="type-pick-icon">📝</div>
+                <div>Short Text</div>
+              </div>
+              <div class="type-pick-card" onclick="addField('textarea')">
+                <div class="type-pick-icon">📄</div>
+                <div>Long Text</div>
+              </div>
+              <div class="type-pick-card" onclick="addField('email')">
+                <div class="type-pick-icon">📧</div>
+                <div>Email</div>
+              </div>
+              <div class="type-pick-card" onclick="addField('tel')">
+                <div class="type-pick-icon">📞</div>
+                <div>Phone</div>
+              </div>
+              <div class="type-pick-card" onclick="addField('number')">
+                <div class="type-pick-icon">#</div>
+                <div>Number</div>
+              </div>
+              <div class="type-pick-card" onclick="addField('select')">
+                <div class="type-pick-icon">📋</div>
+                <div>Dropdown</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Share -->
+        <div class="step-section" id="step-3">
+          <div class="done-screen">
+            <div class="done-icon">🎉</div>
+            <div class="done-title" id="done-form-name">Form Ready!</div>
+            <div class="done-sub">Your form is live. Share the link or embed it anywhere.</div>
+
+            <div class="url-copy-box" onclick="copyFormURL()" id="url-copy-box">
+              <div class="url-text" id="done-url">—</div>
+              <div class="copy-icon">🔗</div>
+            </div>
+
+            <span class="embed-toggle" onclick="toggleEmbed()">Show embed code</span>
+            <div class="embed-code-box" id="embed-code"></div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+              <a id="done-open-link" href="#" target="_blank" class="btn btn-secondary" style="text-decoration:none;justify-content:center">Open Form ↗</a>
+              <a id="done-responses-link" href="#" class="btn btn-secondary" style="text-decoration:none;justify-content:center">View Responses 📊</a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /bl-content -->
+
+      <!-- FOOTER BUTTONS -->
+      <div class="bl-footer">
+        <button class="btn btn-secondary" id="btn-back" onclick="goBack()" style="display:none">← Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="goNext()" style="flex:1">Next →</button>
+        <button class="btn btn-secondary" id="btn-done" onclick="closePanel()" style="display:none;flex:1">Done</button>
       </div>
-      <div class="field" style="margin:0">
-        <label>Link to Agent <span style="font-size:10px;color:var(--text-3)">(for branding)</span></label>
-        <select class="inp" id="fm-agent" style="margin-top:6px;height:42px"></select>
+    </div><!-- /builder-left -->
+
+    <!-- RIGHT: Live preview -->
+    <div class="builder-right">
+      <div class="br-header">
+        <div class="preview-label">Live Preview</div>
+        <div class="live-badge">● LIVE</div>
+        <div style="margin-left:auto;font-size:12px;color:var(--text-3)">Updates as you type</div>
+      </div>
+      <div class="br-body">
+        <div class="preview-card" id="preview-card">
+          <div class="pc-header">
+            <div class="pc-avatar" id="pc-avatar">S</div>
+            <div class="pc-title" id="pc-title">Send an Enquiry</div>
+            <div class="pc-sub" id="pc-sub">Fill in your details and we'll get back to you.</div>
+            <div class="pc-divider"></div>
+          </div>
+          <div class="pc-body" id="pc-body"></div>
+          <div class="pc-powered">Powered by SupportGent</div>
+        </div>
       </div>
     </div>
-    <div class="field">
-      <label>Form Title</label>
-      <input class="inp" type="text" id="fm-title" placeholder="Send an Enquiry" style="margin-top:6px">
-    </div>
-    <div class="field">
-      <label>Subtitle</label>
-      <input class="inp" type="text" id="fm-subtitle" placeholder="Fill in your details and we'll get back to you." style="margin-top:6px">
-    </div>
-    <div class="field">
-      <label>Thank You Message</label>
-      <input class="inp" type="text" id="fm-thankyou" placeholder="Thank you! We'll contact you soon." style="margin-top:6px">
-    </div>
 
-    <div class="divider"></div>
+  </div><!-- /builder-wrap -->
+</div><!-- /builder-panel -->
 
-    <!-- Field builder -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--text-2)">Form Fields</div>
-      <button class="btn btn-secondary btn-sm" onclick="addField()" style="gap:5px">+ Add Field</button>
-    </div>
-    <div class="field-builder-list" id="field-builder-list"></div>
-
-    <div class="modal-footer" style="margin-top:16px">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="modal-save-btn" onclick="saveForm()">Create Form →</button>
-    </div>
-  </div>
-</div>
-
-<!-- Delete confirm modal -->
-<div class="modal-overlay" id="delete-modal">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header">
-      <div class="modal-title" style="color:var(--red)">Delete Form?</div>
-      <button class="modal-close" onclick="document.getElementById('delete-modal').classList.remove('open')">✕</button>
-    </div>
-    <p style="font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:20px">This will permanently delete the form and its URL. Existing lead submissions in your Leads page won't be affected.</p>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="document.getElementById('delete-modal').classList.remove('open')">Cancel</button>
-      <button class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">Delete Form</button>
+<!-- Delete confirm -->
+<div class="del-modal-overlay" id="del-modal" onclick="if(event.target===this)closeDeleteModal()">
+  <div class="del-modal">
+    <div style="font-size:16px;font-weight:800;color:var(--red);margin-bottom:10px">Delete Form?</div>
+    <p style="font-size:13.5px;color:var(--text-2);line-height:1.6;margin-bottom:20px">This permanently deletes the form and its URL. Existing submissions in Leads & Forms are kept.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-del-btn" onclick="confirmDelete()">Delete Form</button>
     </div>
   </div>
 </div>
@@ -165,18 +403,33 @@
 const FRONTEND = location.origin
 let forms    = []
 let agents   = []
+let panelMode = null   // 'create' | 'edit'
 let editId   = null
 let deleteId = null
 let fbFields = []
+let currentStep = 1
+let savedFormId = null  // set after successful save
 let _dragIdx = null
 
 const DEFAULT_FIELDS = [
-  { id:'name',    label:'Full Name',     type:'text',     required:true,  enabled:true,  locked:false },
-  { id:'mobile',  label:'Mobile Number', type:'tel',      required:true,  enabled:true,  locked:true  },
-  { id:'email',   label:'Email Address', type:'email',    required:false, enabled:true,  locked:false },
-  { id:'message', label:'Message',       type:'textarea', required:true,  enabled:true,  locked:false },
+  { id:'name',    label:'Full Name',     type:'text',     required:true,  enabled:true, locked:false },
+  { id:'mobile',  label:'Mobile Number', type:'tel',      required:true,  enabled:true, locked:true  },
+  { id:'email',   label:'Email Address', type:'email',    required:false, enabled:true, locked:false },
+  { id:'message', label:'Message',       type:'textarea', required:true,  enabled:true, locked:false },
 ]
 
+const TYPE_META = {
+  text:     { icon:'📝', label:'Short Text',  placeholder:'Enter text…' },
+  textarea: { icon:'📄', label:'Long Text',   placeholder:'Enter your message…' },
+  email:    { icon:'📧', label:'Email',       placeholder:'you@example.com' },
+  tel:      { icon:'📞', label:'Phone',       placeholder:'+91 98765 43210' },
+  number:   { icon:'#',  label:'Number',      placeholder:'0' },
+  select:   { icon:'📋', label:'Dropdown',    placeholder:'' },
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════════ */
 ;(async () => {
   const nav = await renderNav('forms')
   if (!nav) return
@@ -190,10 +443,15 @@ const DEFAULT_FIELDS = [
     populateAgentDropdown()
     renderGrid()
     document.getElementById('page-content').style.display = 'block'
-    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
+    updateFormsSubtitle()
   } catch(e) { toast(e.message, 'error') }
   dismissSkeleton()
 })()
+
+function updateFormsSubtitle() {
+  document.getElementById('forms-sub').textContent =
+    `${forms.length} form${forms.length !== 1 ? 's' : ''} · Share URLs or embed on your website`
+}
 
 function populateAgentDropdown() {
   const sel = document.getElementById('fm-agent')
@@ -201,15 +459,320 @@ function populateAgentDropdown() {
     agents.map(a => `<option value="${a._id}">${esc(a.name)}</option>`).join('')
 }
 
-/* ── Grid rendering ────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════
+   PANEL OPEN / CLOSE
+════════════════════════════════════════════════════════════════ */
+function openCreatePanel() {
+  panelMode = 'create'
+  editId    = null
+  savedFormId = null
+  fbFields  = JSON.parse(JSON.stringify(DEFAULT_FIELDS))
+  document.getElementById('panel-title').textContent = 'Create Form'
+  document.getElementById('fm-name').value     = ''
+  document.getElementById('fm-title').value    = ''
+  document.getElementById('fm-subtitle').value = ''
+  document.getElementById('fm-thankyou').value = ''
+  document.getElementById('fm-agent').value    = ''
+  showPanel()
+  goToStep(1)
+  updatePreview()
+}
+
+async function openEditPanel(id) {
+  panelMode = 'edit'
+  editId    = id
+  savedFormId = id
+  try {
+    const form = await apiFetch(`/inquiry-forms/${id}`)
+    fbFields = JSON.parse(JSON.stringify(form.fields || DEFAULT_FIELDS))
+    document.getElementById('panel-title').textContent = 'Edit Form'
+    document.getElementById('fm-name').value     = form.name     || ''
+    document.getElementById('fm-title').value    = form.title    || ''
+    document.getElementById('fm-subtitle').value = form.subtitle || ''
+    document.getElementById('fm-thankyou').value = form.thank_you || ''
+    document.getElementById('fm-agent').value    = form.agent_id ? String(form.agent_id) : ''
+    showPanel()
+    goToStep(1)
+    updatePreview()
+  } catch(e) { toast(e.message, 'error') }
+}
+
+function showPanel() {
+  document.getElementById('builder-panel').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+
+function closePanel() {
+  document.getElementById('builder-panel').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('builder-panel').classList.contains('open')) closePanel()
+})
+
+/* ════════════════════════════════════════════════════════════════
+   STEP NAVIGATION
+════════════════════════════════════════════════════════════════ */
+function goToStep(n) {
+  currentStep = n
+  ;[1,2,3].forEach(i => {
+    const sec    = document.getElementById(`step-${i}`)
+    const circle = document.getElementById(`s-circle-${i}`)
+    const label  = document.getElementById(`s-label-${i}`)
+    sec.classList.toggle('active', i === n)
+    circle.classList.toggle('active', i === n)
+    circle.classList.toggle('done',   i < n)
+    label.classList.toggle('active',  i === n)
+    label.classList.toggle('done',    i < n)
+    if (i < 3) {
+      const line = document.getElementById(`s-line-${i}`)
+      line.classList.toggle('done', i < n)
+    }
+  })
+
+  const btnBack = document.getElementById('btn-back')
+  const btnNext = document.getElementById('btn-next')
+  const btnDone = document.getElementById('btn-done')
+
+  btnBack.style.display = n > 1 && n < 3 ? '' : 'none'
+  btnNext.style.display = n < 3 ? '' : 'none'
+  btnDone.style.display = n === 3 ? '' : 'none'
+
+  if (n === 2) renderFieldList()
+  if (n === 3) renderDoneScreen()
+}
+
+async function goNext() {
+  if (currentStep === 1) {
+    const name = document.getElementById('fm-name').value.trim()
+    if (!name) { toast('Form name is required', 'error'); document.getElementById('fm-name').focus(); return }
+    goToStep(2)
+  } else if (currentStep === 2) {
+    // Save form
+    const saved = await saveForm()
+    if (saved) goToStep(3)
+  }
+}
+
+function goBack() {
+  if (currentStep === 2) goToStep(1)
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SAVE
+════════════════════════════════════════════════════════════════ */
+async function saveForm() {
+  const btn = document.getElementById('btn-next')
+  btn.disabled = true; btn.textContent = 'Saving…'
+
+  const payload = {
+    name:      document.getElementById('fm-name').value.trim(),
+    title:     document.getElementById('fm-title').value.trim() || document.getElementById('fm-name').value.trim(),
+    subtitle:  document.getElementById('fm-subtitle').value.trim() || '',
+    thank_you: document.getElementById('fm-thankyou').value.trim() || "Thank you! We'll contact you soon.",
+    agent_id:  document.getElementById('fm-agent').value || null,
+    fields:    fbFields,
+  }
+
+  try {
+    let result
+    if (panelMode === 'edit' && editId) {
+      await apiFetch(`/inquiry-forms/${editId}`, { method:'PUT', body:JSON.stringify(payload) })
+      savedFormId = editId
+      toast('Form updated ✓', 'success')
+    } else {
+      result = await apiFetch('/inquiry-forms', { method:'POST', body:JSON.stringify(payload) })
+      savedFormId = result._id || result.id
+      toast('Form created ✓', 'success')
+    }
+    // Refresh list
+    const res = await apiFetch('/inquiry-forms')
+    forms = res.forms || []
+    renderGrid()
+    updateFormsSubtitle()
+    return true
+  } catch(e) {
+    toast(e.message, 'error')
+    return false
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Save & Continue →'
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DONE SCREEN
+════════════════════════════════════════════════════════════════ */
+function renderDoneScreen() {
+  const name   = document.getElementById('fm-name').value.trim()
+  const formId = savedFormId
+  const url    = formId ? `${FRONTEND}/inquiry.html?form=${formId}` : ''
+  const embed  = `<iframe src="${url}" width="100%" height="640" frameborder="0" style="border-radius:14px;max-width:480px;display:block"></iframe>`
+
+  document.getElementById('done-form-name').textContent = `${name} — Ready! 🎉`
+  document.getElementById('done-url').textContent       = url
+  document.getElementById('embed-code').textContent     = embed
+  if (formId) {
+    document.getElementById('done-open-link').href       = url
+    document.getElementById('done-responses-link').href  = `leads-forms.html?tab=forms&form=${formId}`
+  }
+  document.getElementById('embed-code').style.display = 'none'
+}
+
+function copyFormURL() {
+  const url = document.getElementById('done-url').textContent
+  navigator.clipboard.writeText(url)
+    .then(() => toast('Link copied! 🔗', 'success'))
+    .catch(() => toast('Copy failed', 'error'))
+}
+
+function toggleEmbed() {
+  const box = document.getElementById('embed-code')
+  const tog = document.querySelector('.embed-toggle')
+  const shown = box.style.display !== 'none'
+  box.style.display = shown ? 'none' : 'block'
+  tog.textContent   = shown ? 'Show embed code' : 'Hide embed code'
+  if (!shown) navigator.clipboard.writeText(box.textContent).then(() => toast('Embed code copied!', 'success'))
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FIELD BUILDER
+════════════════════════════════════════════════════════════════ */
+function addField(type) {
+  const labels = { text:'New Field', textarea:'Message', email:'Email Address', tel:'Phone Number', number:'Number', select:'Choose Option' }
+  fbFields.push({
+    id:       'custom_' + Date.now(),
+    label:    labels[type] || 'New Field',
+    type,
+    required: false,
+    enabled:  true,
+    locked:   false,
+    options:  type === 'select' ? ['Option 1','Option 2'] : [],
+  })
+  renderFieldList()
+  updatePreview()
+  // Scroll to bottom of list
+  setTimeout(() => document.getElementById('fb-list').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60)
+}
+
+function removeField(i) {
+  if (fbFields[i]?.locked) return
+  fbFields.splice(i, 1)
+  renderFieldList()
+  updatePreview()
+}
+
+function renderFieldList() {
+  const list = document.getElementById('fb-list')
+  list.innerHTML = fbFields.map((f, i) => {
+    const locked = !!f.locked
+    const meta   = TYPE_META[f.type] || TYPE_META.text
+    const typeOptions = Object.entries(TYPE_META).map(([k, v]) =>
+      `<span class="type-pill${f.type === k ? ' active' : ''}" onclick="changeType(${i},'${k}')">${v.icon} ${v.label}</span>`
+    ).join('')
+    return `<div class="fb-card${locked ? ' fb-locked' : ''}" draggable="${!locked}"
+        ondragstart="if(!${locked})dStart(${i})"
+        ondragover="dOver(event)"
+        ondrop="dDrop(event,${i})">
+      <div class="fb-card-top">
+        <span class="${locked ? 'fb-drag locked-icon' : 'fb-drag'}" title="${locked ? 'Required field' : 'Drag to reorder'}">${locked ? '🔒' : '⠿'}</span>
+        <input class="fb-name-inp" type="text" value="${esc(f.label)}" placeholder="Field label"
+          oninput="fbFields[${i}].label=this.value;updatePreview()" ${locked ? 'readonly' : ''} style="flex:1">
+        <button class="fb-del" onclick="removeField(${i})" ${locked ? 'disabled' : ''} title="Remove">×</button>
+      </div>
+      <div class="type-pills">${typeOptions}</div>
+      <div class="fb-toggles">
+        <label class="toggle-wrap">
+          <input type="checkbox" ${f.enabled ? 'checked' : ''} ${locked ? 'disabled' : ''}
+            onchange="fbFields[${i}].enabled=this.checked;updatePreview()">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label">Enabled</span>
+        </label>
+        <label class="toggle-wrap">
+          <input type="checkbox" ${f.required ? 'checked' : ''} ${locked ? 'disabled' : ''}
+            onchange="fbFields[${i}].required=this.checked">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label">Required</span>
+        </label>
+        ${locked ? '<span style="font-size:11px;color:var(--text-3);margin-left:auto">Always included</span>' : ''}
+      </div>
+      ${f.type === 'select' ? `<div class="options-row">
+        <input class="options-inp" type="text" placeholder="Option 1, Option 2, Option 3"
+          value="${esc((f.options||[]).join(', '))}"
+          oninput="fbFields[${i}].options=this.value.split(',').map(s=>s.trim()).filter(Boolean);updatePreview()">
+        </div>` : ''}
+    </div>`
+  }).join('')
+}
+
+function changeType(i, type) {
+  fbFields[i].type = type
+  if (type === 'select' && !fbFields[i].options?.length) fbFields[i].options = ['Option 1','Option 2']
+  renderFieldList()
+  updatePreview()
+}
+
+/* Drag to reorder */
+function dStart(i) { _dragIdx = i }
+function dOver(e)  { e.preventDefault() }
+function dDrop(e, i) {
+  e.preventDefault()
+  if (_dragIdx === null || _dragIdx === i) { _dragIdx = null; return }
+  if (fbFields[_dragIdx]?.locked || fbFields[i]?.locked) { _dragIdx = null; return }
+  const moved = fbFields.splice(_dragIdx, 1)[0]
+  fbFields.splice(i, 0, moved)
+  _dragIdx = null
+  renderFieldList()
+  updatePreview()
+}
+
+/* ════════════════════════════════════════════════════════════════
+   LIVE PREVIEW
+════════════════════════════════════════════════════════════════ */
+function updatePreview() {
+  const name     = document.getElementById('fm-name').value.trim()
+  const title    = document.getElementById('fm-title').value.trim()    || name || 'Send an Enquiry'
+  const subtitle = document.getElementById('fm-subtitle').value.trim() || "Fill in your details and we'll get back to you."
+  const agentSel = document.getElementById('fm-agent')
+  const agentName = agentSel.options[agentSel.selectedIndex]?.text
+
+  // Avatar
+  const av = document.getElementById('pc-avatar')
+  av.textContent = agentName && agentName !== 'No agent (unbranded)'
+    ? agentName[0].toUpperCase() : (name[0] || 'S').toUpperCase()
+
+  document.getElementById('pc-title').textContent = title
+  document.getElementById('pc-sub').textContent   = subtitle
+
+  // Render fields
+  const placeholders = { tel:'+91 98765 43210', email:'you@example.com', number:'0', url:'https://', text:'', textarea:'' }
+  const enabledFields = fbFields.filter(f => f.enabled)
+  document.getElementById('pc-body').innerHTML = enabledFields.map(f => {
+    const req = f.required ? `<span class="pc-req">*</span>` : ''
+    let inp = ''
+    if (f.type === 'textarea') {
+      inp = `<textarea class="pc-inp pc-textarea" placeholder="Enter ${(f.label||'').toLowerCase()}" tabindex="-1"></textarea>`
+    } else if (f.type === 'select' && f.options?.length) {
+      inp = `<select class="pc-inp pc-select" tabindex="-1"><option>${f.label}</option>${(f.options||[]).map(o=>`<option>${esc(o)}</option>`).join('')}</select>`
+    } else {
+      inp = `<input class="pc-inp" type="${f.type}" placeholder="${esc(placeholders[f.type] || 'Enter ' + (f.label||'').toLowerCase())}" tabindex="-1">`
+    }
+    return `<div class="pc-field"><label class="pc-label">${esc(f.label||'Field')}${req}</label>${inp}</div>`
+  }).join('') + `<button class="pc-btn" tabindex="-1">Send Enquiry →</button>`
+}
+
+/* ════════════════════════════════════════════════════════════════
+   GRID RENDERING
+════════════════════════════════════════════════════════════════ */
 function renderGrid() {
   const grid = document.getElementById('forms-grid')
   if (!forms.length) {
     grid.innerHTML = `<div class="empty-forms">
       <div class="empty-forms-icon">📋</div>
       <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text-2)">No enquiry forms yet</div>
-      <div style="font-size:13px;margin-bottom:20px">Create a form, share the URL, and leads flow straight into your portal.</div>
-      <button class="btn btn-primary" style="display:inline-flex;width:auto;padding:0 24px" onclick="openCreateModal()">+ Create Your First Form</button>
+      <div style="font-size:13px;margin-bottom:20px">Create a form, share the URL, and leads flow straight into Leads & Forms.</div>
+      <button class="btn btn-primary" style="display:inline-flex;width:auto;padding:0 24px" onclick="openCreatePanel()">+ Create Your First Form</button>
     </div>`
     return
   }
@@ -219,7 +782,7 @@ function renderGrid() {
     const fieldCnt = (f.fields || []).filter(x => x.enabled).length
     const agent    = agents.find(a => String(a._id) === String(f.agent_id))
     const color    = agent?.brand_color || 'var(--accent)'
-    return `<div class="form-card" style="animation-delay:${i*.04}s">
+    return `<div class="form-card" style="animation-delay:${i * .04}s">
       <div class="fc-stripe" style="background:${color}"></div>
       <div class="fc-body">
         <div class="fc-name">
@@ -227,180 +790,51 @@ function renderGrid() {
           ${agent ? `<span class="badge badge-accent" style="font-size:9.5px">${esc(agent.name)}</span>` : ''}
         </div>
         <div class="fc-meta">
-          <span>${fieldCnt} field${fieldCnt!==1?'s':''}</span>
+          <span>${fieldCnt} field${fieldCnt !== 1 ? 's' : ''}</span>
           <span>·</span>
-          <span>${f.submissions_count||0} submission${(f.submissions_count||0)!==1?'s':''}</span>
+          <span>${f.submissions_count || 0} response${(f.submissions_count || 0) !== 1 ? 's' : ''}</span>
           <span>·</span>
           <span>${fmtDate(f.created_at)}</span>
         </div>
         <div class="fc-url" onclick="copyURL('${formURL}')" title="Click to copy URL">${formURL}</div>
         <div class="fc-actions">
-          <button class="btn btn-secondary btn-sm" onclick="openEditModal('${f._id}')" style="flex:1;justify-content:center">✏ Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEditPanel('${f._id}')" style="flex:1;justify-content:center">✏ Edit</button>
           <a href="${formURL}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0">Open ↗</a>
           <button class="btn btn-secondary btn-sm" onclick="copyURL('${formURL}')" style="flex-shrink:0" title="Copy URL">🔗</button>
-          <a href="leads-forms.html?tab=forms&form=${f._id}" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0" title="View submissions">📊</a>
+          <a href="leads-forms.html?tab=forms&form=${f._id}" class="btn btn-secondary btn-sm" style="text-decoration:none;flex-shrink:0" title="View responses">📊</a>
           <button class="btn btn-sm" style="color:var(--red);border-color:var(--red-border);background:var(--red-dim);flex-shrink:0" onclick="openDeleteModal('${f._id}')">🗑</button>
         </div>
       </div>
     </div>`
   }).join('') +
-  `<div class="create-form-card" onclick="openCreateModal()">
+  `<div class="create-form-card" onclick="openCreatePanel()">
     <div style="font-size:36px;opacity:.3">+</div>
-    <div style="font-size:14px;font-weight:700">New Enquiry Form</div>
+    <div style="font-size:14px;font-weight:700">New Form</div>
     <div style="font-size:12px;color:var(--text-3)">Create another lead capture form</div>
   </div>`
 }
 
-/* ── Field builder ─────────────────────────────────────────────── */
-function renderFields() {
-  const list = document.getElementById('field-builder-list')
-  list.innerHTML = fbFields.map((f, i) => {
-    const locked = !!f.locked
-    return `<div class="fb-row" draggable="${!locked}" ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondrop="drop(event,${i})">
-      <div class="fb-grip">${locked ? '🔒' : '⠿'}</div>
-      <div class="fb-fields">
-        <div class="fb-row-top">
-          <input class="inp fb-label-inp" type="text" value="${esc(f.label)}" placeholder="Field label"
-            oninput="fbFields[${i}].label=this.value" ${locked?'readonly':''} style="flex:1">
-          <select class="fb-type-sel" onchange="fbFields[${i}].type=this.value" ${locked?'disabled':''}>
-            ${['text','textarea','email','tel','number','select'].map(t=>`<option value="${t}"${f.type===t?' selected':''}>${t}</option>`).join('')}
-          </select>
-        </div>
-        <div class="fb-row-bottom">
-          <label class="fb-check"><input type="checkbox" ${f.enabled?'checked':''} ${locked?'disabled':''}
-            onchange="fbFields[${i}].enabled=this.checked"> Enabled</label>
-          <label class="fb-check"><input type="checkbox" ${f.required?'checked':''} ${locked?'disabled':''}
-            onchange="fbFields[${i}].required=this.checked"> Required</label>
-          ${f.type==='select'?`<input class="inp options-inp" type="text" placeholder="Option1, Option2, Option3"
-            value="${esc((f.options||[]).join(', '))}" oninput="fbFields[${i}].options=this.value.split(',').map(s=>s.trim())">`:``}
-          ${locked?`<span style="font-size:11px;color:var(--text-3);margin-left:auto">Always required</span>`:''}
-        </div>
-      </div>
-      <button class="fb-del" onclick="removeField(${i})" ${locked?'disabled':''} title="Remove field">×</button>
-    </div>`
-  }).join('')
-}
-
-function addField() {
-  fbFields.push({ id:'custom_'+Date.now(), label:'New Field', type:'text', required:false, enabled:true, locked:false })
-  renderFields()
-  setTimeout(() => document.getElementById('field-builder-list').lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50)
-}
-
-function removeField(i) {
-  if (fbFields[i]?.locked) return
-  fbFields.splice(i, 1)
-  renderFields()
-}
-
-function dragStart(i) { _dragIdx = i }
-function dragOver(e, i) { e.preventDefault() }
-function drop(e, i) {
-  e.preventDefault()
-  if (_dragIdx === null || _dragIdx === i) return
-  const moved = fbFields.splice(_dragIdx, 1)[0]
-  fbFields.splice(i, 0, moved)
-  _dragIdx = null
-  renderFields()
-}
-
-/* ── Modal open/close ──────────────────────────────────────────── */
-function openCreateModal() {
-  editId = null
-  fbFields = JSON.parse(JSON.stringify(DEFAULT_FIELDS))
-  document.getElementById('modal-title').textContent   = 'Create Enquiry Form'
-  document.getElementById('modal-sub').textContent     = 'Configure fields visitors will fill in'
-  document.getElementById('modal-save-btn').textContent = 'Create Form →'
-  document.getElementById('fm-name').value     = ''
-  document.getElementById('fm-title').value    = ''
-  document.getElementById('fm-subtitle').value = ''
-  document.getElementById('fm-thankyou').value = ''
-  document.getElementById('fm-agent').value    = ''
-  renderFields()
-  document.getElementById('form-modal').classList.add('open')
-  document.getElementById('fm-name').focus()
-  document.body.style.overflow = 'hidden'
-}
-
-async function openEditModal(id) {
-  editId = id
-  try {
-    const form = await apiFetch(`/inquiry-forms/${id}`)
-    fbFields = JSON.parse(JSON.stringify(form.fields || DEFAULT_FIELDS))
-    document.getElementById('modal-title').textContent    = 'Edit Enquiry Form'
-    document.getElementById('modal-sub').textContent      = esc(form.name)
-    document.getElementById('modal-save-btn').textContent = 'Save Changes →'
-    document.getElementById('fm-name').value     = form.name     || ''
-    document.getElementById('fm-title').value    = form.title    || ''
-    document.getElementById('fm-subtitle').value = form.subtitle || ''
-    document.getElementById('fm-thankyou').value = form.thank_you|| ''
-    document.getElementById('fm-agent').value    = form.agent_id ? String(form.agent_id) : ''
-    renderFields()
-    document.getElementById('form-modal').classList.add('open')
-    document.body.style.overflow = 'hidden'
-  } catch(e) { toast(e.message, 'error') }
-}
-
-function closeModal() {
-  document.getElementById('form-modal').classList.remove('open')
-  document.body.style.overflow = ''
-}
-
-/* ── Save form ─────────────────────────────────────────────────── */
-async function saveForm() {
-  const name = document.getElementById('fm-name').value.trim()
-  if (!name) { toast('Form name is required', 'error'); document.getElementById('fm-name').focus(); return }
-
-  const btn = document.getElementById('modal-save-btn')
-  btn.disabled = true; btn.textContent = 'Saving…'
-
-  const payload = {
-    name,
-    title:     document.getElementById('fm-title').value.trim()    || name,
-    subtitle:  document.getElementById('fm-subtitle').value.trim() || '',
-    thank_you: document.getElementById('fm-thankyou').value.trim() || 'Thank you! We\'ll contact you soon.',
-    agent_id:  document.getElementById('fm-agent').value           || null,
-    fields:    fbFields,
-  }
-
-  try {
-    if (editId) {
-      await apiFetch(`/inquiry-forms/${editId}`, { method:'PUT', body:JSON.stringify(payload) })
-      toast('Form updated ✓', 'success')
-    } else {
-      const created = await apiFetch('/inquiry-forms', { method:'POST', body:JSON.stringify(payload) })
-      forms.unshift(created)
-      toast('Form created ✓', 'success')
-    }
-    // Refresh list
-    const res = await apiFetch('/inquiry-forms')
-    forms = res.forms || []
-    renderGrid()
-    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
-    closeModal()
-  } catch(e) {
-    toast(e.message, 'error')
-  } finally {
-    btn.disabled = false
-    btn.textContent = editId ? 'Save Changes →' : 'Create Form →'
-  }
-}
-
-/* ── Delete ────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════
+   DELETE
+════════════════════════════════════════════════════════════════ */
 function openDeleteModal(id) {
   deleteId = id
-  document.getElementById('delete-modal').classList.add('open')
+  document.getElementById('del-modal').classList.add('open')
+}
+function closeDeleteModal() {
+  document.getElementById('del-modal').classList.remove('open')
+  deleteId = null
 }
 async function confirmDelete() {
   if (!deleteId) return
-  const btn = document.getElementById('confirm-delete-btn')
+  const btn = document.getElementById('confirm-del-btn')
   btn.disabled = true; btn.textContent = 'Deleting…'
   try {
     await apiFetch(`/inquiry-forms/${deleteId}`, { method:'DELETE' })
     forms = forms.filter(f => String(f._id) !== String(deleteId))
     renderGrid()
-    document.getElementById('forms-sub').textContent = `${forms.length} form${forms.length!==1?'s':''} · Share URLs or embed on your website`
-    document.getElementById('delete-modal').classList.remove('open')
+    updateFormsSubtitle()
+    closeDeleteModal()
     toast('Form deleted', 'success')
   } catch(e) {
     toast(e.message, 'error')
@@ -410,27 +844,38 @@ async function confirmDelete() {
   }
 }
 
-/* ── Utils ─────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════════════════════════ */
 function copyURL(url) {
   navigator.clipboard.writeText(url)
     .then(() => toast('URL copied!', 'success'))
     .catch(() => toast('Copy failed', 'error'))
 }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
 function fmtDate(d) {
   if (!d) return '—'
   const dt = new Date(d), now = new Date(), diff = now - dt
-  if (diff < 86400000) return 'Today'
-  if (diff < 604800000) return Math.floor(diff/86400000) + 'd ago'
-  return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+  if (diff < 86400000)  return 'Today'
+  if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago'
+  return dt.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
 }
 
-/* ── Keyboard shortcuts ────────────────────────────────────────── */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); document.getElementById('delete-modal').classList.remove('open') }
-})
-document.getElementById('form-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal() })
-document.getElementById('delete-modal').addEventListener('click', e => { if (e.target === e.currentTarget) document.getElementById('delete-modal').classList.remove('open') })
+// Update footer button text based on step
+const origNext = document.getElementById('btn-next')
+;(function patchBtnText() {
+  const obs = new MutationObserver(() => {})
+})()
+// Override goToStep to also update btn label
+const _origGoToStep = goToStep
+function goToStep(n) {
+  _origGoToStep(n)
+  const btn = document.getElementById('btn-next')
+  if (n === 1) btn.textContent = 'Next: Add Fields →'
+  if (n === 2) btn.textContent = 'Save & Continue →'
+}
 </script>
 </body>
 </html>
