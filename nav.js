@@ -12,8 +12,8 @@ const _NAV_SECTIONS = [
       { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
       { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
       { page:'contacts',      href:'contacts.html',      label:'Contacts',            icon:'👥' },
-      { page:'leads',         href:'leads.html',         label:'Leads',               icon:'🎯' },
-      { page:'forms',         href:'forms.html',         label:'Enquiry Forms',       icon:'📋' },
+      { page:'leads-forms',   href:'leads-forms.html',   label:'Leads & Forms',       icon:'🎯' },
+      { page:'forms',         href:'forms.html',         label:'Form Builder',        icon:'📋' },
       { page:'campaigns',     href:'campaigns.html',     label:'Campaigns',           icon:'📣' },
       { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
