@@ -1612,18 +1612,19 @@ async function connectMeta(btn) {
   FB.login(function(response) {
     console.log('[meta embedded] FB.login response:', JSON.stringify(response))
 
-    // FB JS SDK returns access_token directly — no code exchange needed
+    // Embedded Signup with response_type:code returns a code, not a token
+    const code = response.authResponse?.code
     const accessToken = response.authResponse?.accessToken || response.authResponse?.access_token
-    if (!accessToken) {
+    if (!code && !accessToken) {
       const status = response.status || 'unknown'
       showToast(status === 'not_authorized' ? 'Meta connection cancelled.' : 'Meta login failed — please try again.', 'error')
       setBtnLoading(btn, false); hideSyncProgress()
       return
     }
 
-    console.log('[meta embedded] got access token, sending to backend...')
+    console.log('[meta embedded] got auth response, code:', !!code, 'token:', !!accessToken)
 
-    // Send token directly to backend — no code exchange needed
+    // Send code (preferred) or token to backend for exchange
     const callbackUrl = LAMBDA_API + '/channels/meta/callback'
 
     fetch(callbackUrl, {
@@ -1634,7 +1635,7 @@ async function connectMeta(btn) {
         'Accept': 'application/json',
         'X-Embedded-Signup': '1'
       },
-      body: JSON.stringify({ access_token: accessToken, state: stateToken })
+      body: JSON.stringify(code ? { code, state: stateToken } : { access_token: accessToken, state: stateToken })
     })
       .then(async r => {
         const json = await r.json().catch(() => ({}))
@@ -1662,7 +1663,8 @@ async function connectMeta(btn) {
 
   }, {
     config_id: META_CONFIG_ID,
-    // Use default response_type (token) — avoids redirect_uri mismatch issues with code flow
+    response_type: 'code',
+    override_default_response_type: true,
   })
 }
 async function disconnectChannel(channelType) {
