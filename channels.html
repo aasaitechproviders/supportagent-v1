@@ -807,7 +807,7 @@ function renderPage() {
         </div>`:`
         <div class="channel-connect-cta" onclick="event.stopPropagation()">
           <div class="channel-connect-hint">Connect WhatsApp Business to handle customer chats with AI auto-reply</div>
-          <button class="btn btn-meta btn-sm" onclick="connectMeta(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect via Meta</button>
+          <button class="btn btn-meta btn-sm" onclick="connectWhatsAppES(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect WhatsApp</button>
         </div>`}
       </div>
     </div>
@@ -1567,6 +1567,7 @@ async function syncGmail(btn) {
 // FB SDK loaded async in <head>. FB.init called on first use.
 const META_APP_ID = '957411050339754'
 const META_CONFIG_ID = '1322537706690126'
+const WA_ES_CONFIG_ID = '1698411307923991'  // WhatsApp Embedded Signup (Tech Provider) — Cloud API onboarding for real customers
 const LAMBDA_API = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
 
 let _fbInitDone = false
@@ -1574,6 +1575,100 @@ function _ensureFBInit() {
   if (_fbInitDone || typeof FB === 'undefined') return
   FB.init({ appId: META_APP_ID, autoLogAppEvents: true, xfbml: false, version: 'v25.0' })
   _fbInitDone = true
+}
+
+// ── WhatsApp Embedded Signup (Tech Provider) ───────────────────────────────
+// Dedicated WA-only flow. Uses the WhatsApp ES config (code flow) + a message
+// listener that captures waba_id + phone_number_id from the ES session event.
+// Completely separate from connectMeta() so FB/Instagram are never affected.
+let _waEsSession = null  // { waba_id, phone_number_id } captured from the ES FINISH event
+
+function _waEsMessageListener(event) {
+  if (event.origin !== 'https://www.facebook.com' && event.origin !== 'https://web.facebook.com') return
+  try {
+    const data = JSON.parse(event.data)
+    if (data.type !== 'WA_EMBEDDED_SIGNUP') return
+    console.log('[wa-es] session event:', JSON.stringify(data))
+    if (data.event === 'FINISH' || data.event === 'FINISH_ONLY_WABA' || data.event === 'FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING') {
+      _waEsSession = {
+        waba_id:         data.data?.waba_id || null,
+        phone_number_id: data.data?.phone_number_id || null,
+      }
+    } else if (data.event === 'CANCEL') {
+      console.warn('[wa-es] user cancelled at step:', data.data?.current_step)
+    }
+  } catch (e) { /* non-JSON postMessage from FB — ignore */ }
+}
+
+async function connectWhatsAppES(btn) {
+  setBtnLoading(btn, true)
+  showSyncProgress()
+
+  // 1. state token (CSRF + agent binding) — reuse the existing connect endpoint
+  let stateToken
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/channels/meta/connect`)
+    stateToken = new URL(data.url).searchParams.get('state')
+  } catch (e) {
+    showToast('Failed to start WhatsApp connect: ' + e.message, 'error')
+    setBtnLoading(btn, false); hideSyncProgress(); return
+  }
+
+  // 2. wait for the FB SDK
+  let attempts = 0
+  while (typeof FB === 'undefined' && attempts < 30) { await new Promise(r => setTimeout(r, 200)); attempts++ }
+  if (typeof FB === 'undefined') {
+    showToast('Facebook SDK failed to load. Disable ad blockers and try again.', 'error')
+    setBtnLoading(btn, false); hideSyncProgress(); return
+  }
+  _ensureFBInit()
+
+  // 3. register the ES session listener BEFORE launching (captures waba_id + phone_number_id)
+  _waEsSession = null
+  window.removeEventListener('message', _waEsMessageListener)
+  window.addEventListener('message', _waEsMessageListener)
+
+  // 4. launch WhatsApp Embedded Signup — CODE flow (not token)
+  FB.login(function(response) {
+    const code = response.authResponse?.code
+    if (!code) {
+      const status = response.status || 'unknown'
+      showToast(status === 'not_authorized' ? 'WhatsApp connection cancelled.' : 'WhatsApp signup was not completed.', 'error')
+      setBtnLoading(btn, false); hideSyncProgress()
+      window.removeEventListener('message', _waEsMessageListener)
+      return
+    }
+
+    // small delay so the FINISH message event (which carries waba_id/phone_number_id) is captured
+    setTimeout(() => {
+      const sess = _waEsSession || {}
+      fetch(LAMBDA_API + '/channels/whatsapp/es-callback', {
+        method:  'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Embedded-Signup': '1' },
+        body: JSON.stringify({
+          code,
+          state:           stateToken,
+          waba_id:         sess.waba_id || null,
+          phone_number_id: sess.phone_number_id || null,
+        }),
+      })
+        .then(async r => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `Connect failed (${r.status})`); return j })
+        .then(() => { showToast('✅ WhatsApp connected!', 'success'); loadPage() })
+        .catch(e => { console.error('[wa-es] callback error:', e.message); showToast('WhatsApp connect failed: ' + e.message, 'error') })
+        .finally(() => { setBtnLoading(btn, false); hideSyncProgress(); window.removeEventListener('message', _waEsMessageListener) })
+    }, 1200)
+
+  }, {
+    config_id:                      WA_ES_CONFIG_ID,
+    response_type:                  'code',
+    override_default_response_type: true,
+    extras: {
+      setup:              {},
+      featureType:        '',
+      sessionInfoVersion: '3',
+    },
+  })
 }
 
 async function connectMeta(btn) {
