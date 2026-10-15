@@ -1529,6 +1529,13 @@ function switchPlatform(platform) {
   document.querySelectorAll('.platform-tab').forEach(t => t.classList.toggle('active', t.dataset.platform === platform))
   document.querySelectorAll('.platform-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${platform}`))
 
+  // Update channel card highlight — maps platform name to card CSS class
+  const cardMap = { email: 'ch-gmail', whatsapp: 'ch-whatsapp', instagram: 'ch-instagram', messenger: 'ch-messenger' }
+  document.querySelectorAll('.channel-card').forEach(card => {
+    const isActive = Object.entries(cardMap).some(([plat, cls]) => plat === platform && card.classList.contains(cls))
+    card.classList.toggle('active-platform', isActive)
+  })
+
   if (platform === 'email') {
     if (!STATE.loaded[platform]) {
       const ch = STATE.channels.gmail
