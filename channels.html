@@ -594,6 +594,7 @@ const STATE = {
   selThread:    {whatsapp:null, instagram:null, messenger:null},
   threadData:   {whatsapp:null, instagram:null, messenger:null},
   convLoading:  {whatsapp:false, instagram:false, messenger:false},
+  convLoadedAt: {whatsapp:0,     instagram:0,     messenger:0},
   filterSettings: null,
   quickReplies:   [],
   pollingTimer:   null,
@@ -1521,19 +1522,44 @@ async function toggleAutoReply(channelType, enabled) {
 }
 
 // ── PLATFORM SWITCHER ─────────────────────────────────────────────────────────
+const CONV_STALE_MS = 60_000  // re-fetch if data older than 60s
+
 function switchPlatform(platform) {
-  STATE.platform=platform
-  document.querySelectorAll('.platform-tab').forEach(t=>t.classList.toggle('active',t.dataset.platform===platform))
-  document.querySelectorAll('.platform-panel').forEach(p=>p.classList.toggle('active',p.id===`panel-${platform}`))
+  STATE.platform = platform
+  document.querySelectorAll('.platform-tab').forEach(t => t.classList.toggle('active', t.dataset.platform === platform))
+  document.querySelectorAll('.platform-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${platform}`))
+
   if (platform === 'email') {
     if (!STATE.loaded[platform]) {
       const ch = STATE.channels.gmail
       if (ch?.status === 'active') loadInbox(platform)
     }
   } else {
-    if (!STATE.convLoading[platform] && STATE.convs[platform].length === 0) {
-      const ch = STATE.channels[platform]
-      if (ch?.status === 'active') loadConversations(platform)
+    const ch      = STATE.channels[platform]
+    const isStale = (Date.now() - (STATE.convLoadedAt[platform] || 0)) > CONV_STALE_MS
+    const isEmpty = STATE.convs[platform].length === 0
+
+    if (!STATE.convLoading[platform] && ch?.status === 'active' && (isEmpty || isStale)) {
+      // Use silent refresh if we already have data (avoid skeleton flash on re-visit)
+      loadConversations(platform, !isEmpty)
+    }
+
+    // Restore search input value to match current STATE
+    const searchInp = document.getElementById(`conv-search-${platform}`)
+    if (searchInp) searchInp.value = STATE.convSearch[platform] || ''
+
+    // Restore active bucket tab visual
+    const buckets = document.getElementById(`conv-buckets-${platform}`)
+    if (buckets) {
+      const activeBucket = STATE.convBucket[platform] || 'all'
+      buckets.querySelectorAll('.conv-bucket-tab').forEach(b => b.classList.toggle('active', b.dataset.bucket === activeBucket))
+    }
+
+    // Restore active intent pill visual
+    const intentBar = document.getElementById(`conv-intentBar-${platform}`)
+    if (intentBar) {
+      const activeIntent = STATE.convIntent[platform] || 'all'
+      intentBar.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p.dataset.intent === activeIntent))
     }
   }
 }
@@ -1943,6 +1969,10 @@ function wireConvPanel(platform) {
   const buckets = document.getElementById(`conv-buckets-${platform}`)
   if (buckets && !buckets._wired) {
     buckets._wired = true
+    // Restore active bucket visual to match current STATE (may differ from hardcoded 'all' in HTML)
+    const curBucket = STATE.convBucket[platform] || 'all'
+    buckets.querySelectorAll('.conv-bucket-tab').forEach(b => b.classList.toggle('active', b.dataset.bucket === curBucket))
+
     buckets.addEventListener('click', e => {
       const btn = e.target.closest('.conv-bucket-tab'); if (!btn) return
       const bucket = btn.dataset.bucket
@@ -1958,6 +1988,10 @@ function wireConvPanel(platform) {
   const intentBar = document.getElementById(`conv-intentBar-${platform}`)
   if (intentBar && !intentBar._wired) {
     intentBar._wired = true
+    // Restore active intent pill
+    const curIntent = STATE.convIntent[platform] || 'all'
+    intentBar.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p.dataset.intent === curIntent))
+
     intentBar.addEventListener('click', e => {
       const pill = e.target.closest('.intent-pill'); if (!pill) return
       STATE.convIntent[platform] = pill.dataset.intent || 'all'
@@ -1966,6 +2000,12 @@ function wireConvPanel(platform) {
       intentBar.querySelectorAll('.intent-pill').forEach(p => p.classList.toggle('active', p === pill))
       loadConversations(platform)
     })
+  }
+  // Restore search input value
+  const searchInp = document.getElementById(`conv-search-${platform}`)
+  if (searchInp && !searchInp._wired) {
+    searchInp._wired = true
+    searchInp.value = STATE.convSearch[platform] || ''
   }
 }
 
@@ -1980,11 +2020,12 @@ function handleConvSearch(platform, val) {
   }, 350)
 }
 
-async function loadConversations(platform) {
+async function loadConversations(platform, silent = false) {
   if (STATE.convLoading[platform]) return
   STATE.convLoading[platform] = true
   const listPane = document.getElementById(`conv-list-${platform}`)
-  if (listPane) listPane.innerHTML = renderConvSkeletons()
+  // Only show skeleton on first load or explicit (non-silent) refresh
+  if (listPane && !silent) listPane.innerHTML = renderConvSkeletons()
   try {
     const bucket = STATE.convBucket[platform] || 'all'
     const page   = STATE.convPage[platform] || 1
@@ -1993,6 +2034,7 @@ async function loadConversations(platform) {
     const data   = await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/conversations?bucket=${bucket}&page=${page}&limit=20${search}${intent}`)
     STATE.convs[platform]     = data.conversations || []
     STATE.convTotal[platform] = data.total || 0
+    STATE.convLoadedAt[platform] = Date.now()
     renderConvList(platform)
 
     // Update tab badge
@@ -2000,7 +2042,7 @@ async function loadConversations(platform) {
     const ptBadge = document.getElementById(`pt-badge-${platform}`)
     if (ptBadge) ptBadge.textContent = totalUnread || STATE.convTotal[platform] || '0'
   } catch (e) {
-    if (listPane) listPane.innerHTML = `<div class="conv-empty"><div style="font-size:24px">😵</div><div style="font-size:12px;color:var(--red)">${esc(e.message)}</div></div>`
+    if (listPane && !silent) listPane.innerHTML = `<div class="conv-empty"><div style="font-size:24px">😵</div><div style="font-size:12px;color:var(--red)">${esc(e.message)}</div></div>`
   } finally { STATE.convLoading[platform] = false }
 }
 
@@ -2030,7 +2072,7 @@ function renderConvList(platform) {
       <div class="conv-row-right">
         <div class="conv-row-top">
           <div class="conv-row-name">${esc(name)}</div>
-          <div class="conv-row-time">${fmtRelTime(c.created_at)}</div>
+          <div class="conv-row-time">${fmtRelTime(c.last_active || c.updated_at || c.created_at)}</div>
         </div>
         <div class="conv-row-preview ${c.reply_sent && !hasUnread ? 'sent-preview' : ''}">${esc(preview)}</div>
         <div class="msg-badges" style="margin-top:4px">
@@ -2045,13 +2087,14 @@ function renderConvList(platform) {
     </div>`
   }).join('')
 
-  // Wire click
+  // Wire click once via event delegation.
+  // No early-return for already-selected — clicking the same row refreshes the
+  // thread (catches new messages that arrived since it was last opened).
   if (!pane._clickWired) {
     pane._clickWired = true
     pane.addEventListener('click', e => {
       const row = e.target.closest('.conv-row[data-thread]'); if (!row) return
       const threadId = row.dataset.thread
-      if (STATE.selThread[platform] === threadId) return
       STATE.selThread[platform] = threadId
       pane.querySelectorAll('.conv-row').forEach(r => r.classList.toggle('selected', r.dataset.thread === threadId))
       loadThread(platform, threadId)
@@ -2407,12 +2450,13 @@ async function loadFollowupQueue() {
           <button class="btn btn-sm btn-secondary" style="height:28px" onclick="toggleFqReschedule('${esc(item._id)}')">Cancel</button>
         </div>`
 
+      const fqName = item.display_name || item.from || 'Unknown'
       return `
       <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border)" id="fq-${esc(item._id)}">
-        <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor(item.from)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(item.from?.[0]||'?').toUpperCase()}</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:${avatarColor(fqName)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(fqName[0]||'?').toUpperCase()}</div>
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
-            <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(item.from)}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(fqName)}</div>
             ${statusBadge}
           </div>
           <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;flex-wrap:wrap">
@@ -2500,6 +2544,12 @@ function startPolling() {
       silentGmailSync().catch(() => {})
     }
     await refreshBadgeCounts()
+    // Silently refresh the conv list for the active platform so new
+    // WA/IG/Messenger messages appear without needing a manual refresh
+    const p = STATE.platform
+    if (p !== 'email' && STATE.channels[p]?.status === 'active' && !STATE.convLoading[p]) {
+      loadConversations(p, true).catch(() => {})
+    }
   }, 30000)
 }
 
