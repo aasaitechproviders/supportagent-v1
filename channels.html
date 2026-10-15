@@ -2014,7 +2014,7 @@ function renderConvList(platform) {
   }
 
   pane.innerHTML = convs.map((c, idx) => {
-    const name    = c.from || 'Unknown'
+    const name    = c.display_name || c.from || 'Unknown'
     const bg      = avatarColor(name)
     const initial = (name[0] || '?').toUpperCase()
     const isSel   = STATE.selThread[platform] === c.thread_id
@@ -2073,7 +2073,7 @@ async function loadThread(platform, threadId) {
 
 function renderChatPane(platform, data) {
   const chatPane = document.getElementById(`chat-pane-${platform}`); if (!chatPane) return
-  const name   = data.from || data.thread_id || 'Unknown'
+  const name   = data.display_name || data.from || data.thread_id || 'Unknown'
   const bg     = avatarColor(name)
   const icon   = platform === 'whatsapp' ? '💬' : '📸'
   const latest = data.latest_inbox
