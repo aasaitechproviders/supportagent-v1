@@ -903,28 +903,56 @@ function renderPage() {
   </div>
 
   <div class="section-label reveal" style="margin-top:4px">⚙️ Channel Settings</div>
+
+  <!-- Scope legend pill styles -->
+  <style>
+    .scope-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
+    .scope-all{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
+    .scope-perchannel{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    .scope-info{font-size:11px;color:var(--text-3);padding:7px 10px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;line-height:1.5}
+    .scope-info strong{color:var(--text-2)}
+    .filter-channel-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);margin-left:4px;vertical-align:middle}
+  </style>
+
   <div class="settings-grid reveal">
     <!-- Smart Filters -->
     <div class="settings-card">
       <div class="settings-card-header">
         <div class="settings-card-title">🔕 Smart Filters</div>
-        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">Zero AI tokens</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span class="scope-pill scope-all">🌐 All channels</span>
+          <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">Zero AI tokens</span>
+        </div>
       </div>
       <div class="settings-card-body" id="filter-settings-body">
+        <!-- Scope explanation -->
+        <div class="scope-info">
+          These filters apply to <strong>all connected channels</strong> — Gmail, WhatsApp, Instagram and Messenger — for this agent. Email-specific filters (domain blocking) only take effect on Gmail; keyword and message-type filters work across all channels.
+        </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Block company/B2B domains</div><div class="filter-label-desc">Auto-filter emails from business domains (info@, no-reply@, noreply@, newsletter@…)</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Block company/B2B domains <span class="filter-channel-badge">📧 Gmail only</span></div>
+            <div class="filter-label-desc">Auto-filter emails from business domains (info@, no-reply@, noreply@, newsletter@…)</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="flt-company" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Block no-value messages</div><div class="filter-label-desc">Filter OTPs, order alerts, promotional blasts and other automated non-customer messages</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Block no-value messages <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">Filter OTPs, order alerts, promotional blasts and other automated non-customer messages</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="flt-novalue" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Smart business reply filter</div><div class="filter-label-desc">Only auto-reply to real customer messages needing support — skip non-business messages</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Smart business reply filter <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">Only auto-reply to real customer messages needing support — skip non-business messages</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="flt-smart" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
         </div>
         <div style="margin-top:14px">
-          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Blocked Domains</div>
+          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:4px">Blocked Domains <span class="filter-channel-badge">📧 Gmail only</span></div>
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Messages from these domains are silently filtered — no auto-reply, no inbox noise.</div>
           <div id="flt-domains-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
           <div style="display:flex;gap:6px">
             <input class="search-input" type="text" id="flt-domain-inp" placeholder="e.g. amazon.com" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedDomain();event.preventDefault()}"/>
@@ -932,7 +960,8 @@ function renderPage() {
           </div>
         </div>
         <div style="margin-top:12px">
-          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:6px">Blocked Keywords</div>
+          <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:4px">Blocked Keywords <span class="filter-channel-badge">🌐 All channels</span></div>
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Messages containing these words are blocked across all channels — Gmail, WhatsApp, Instagram and Messenger.</div>
           <div id="flt-keywords-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
           <div style="display:flex;gap:6px">
             <input class="search-input" type="text" id="flt-kw-inp" placeholder="e.g. unsubscribe" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedKeyword();event.preventDefault()}"/>
@@ -941,15 +970,16 @@ function renderPage() {
         </div>
       </div>
     </div>
+
     <!-- Quick Reply Templates -->
     <div class="settings-card">
       <div class="settings-card-header">
         <div class="settings-card-title">⚡ Quick Reply Templates</div>
-        <span style="font-size:11px;color:var(--text-3)">WhatsApp • IG • Email • Messenger</span>
+        <span class="scope-pill scope-perchannel">📌 Filter per channel</span>
       </div>
       <div class="settings-card-body">
-        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:12px;padding:8px 10px;background:var(--surface-2);border-radius:8px">
-          💡 Templates appear as one-tap inserts in the chat composer. For WhatsApp approved templates, paste the approved text here.
+        <div class="scope-info">
+          Templates are shared across this agent. Use the <strong>channel selector</strong> when adding a template to control where it appears — pick a specific channel or leave it as "All channels" to show it everywhere.
         </div>
         <!-- Add template form -->
         <div style="background:var(--surface-2);border-radius:10px;padding:12px;margin-bottom:14px">
@@ -957,11 +987,11 @@ function renderPage() {
           <textarea id="qr-body-inp" style="width:100%;min-height:60px;padding:8px 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:12.5px;resize:vertical;outline:none;box-sizing:border-box" placeholder="Template message body…"></textarea>
           <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
             <select id="qr-channels-inp" style="height:30px;padding:0 8px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-size:12px;outline:none">
-              <option value="all">All channels</option>
-              <option value="whatsapp">WhatsApp only</option>
-              <option value="instagram">Instagram only</option>
-              <option value="messenger">Messenger only</option>
-              <option value="email">Email only</option>
+              <option value="all">🌐 All channels</option>
+              <option value="whatsapp">💬 WhatsApp only</option>
+              <option value="instagram">📸 Instagram only</option>
+              <option value="messenger">💙 Messenger only</option>
+              <option value="email">📧 Email only</option>
             </select>
             <button class="btn btn-primary btn-sm" onclick="addQuickReply()" style="margin-left:auto">Add Template</button>
           </div>
@@ -972,36 +1002,56 @@ function renderPage() {
         </div>
       </div>
     </div>
+
     <!-- Followup Queue — moved to standalone panel above settings -->
     <div class="settings-card" id="followup-settings-placeholder" style="display:none"></div>
+
     <!-- Email Notification Preferences -->
     <div class="settings-card">
       <div class="settings-card-header">
         <div class="settings-card-title">🔔 Email Notifications</div>
-        <button class="btn btn-secondary btn-sm" onclick="saveNotifPrefs()" id="notif-save-btn"><span class="btn-text">Save</span></button>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="scope-pill scope-all">🌐 All channels</span>
+          <button class="btn btn-secondary btn-sm" onclick="saveNotifPrefs()" id="notif-save-btn"><span class="btn-text">Save</span></button>
+        </div>
       </div>
       <div class="settings-card-body" id="notif-prefs-body">
-        <div style="font-size:11.5px;color:var(--text-3);margin-bottom:14px;padding:8px 10px;background:var(--surface-2);border-radius:8px">
-          💡 Control which emails you receive. Uncheck to silence notifications you don't need.
+        <div class="scope-info">
+          These preferences control notification emails sent to <strong>you as the agent owner</strong>. They apply across all connected channels — a single escalation toggle covers Gmail, WhatsApp, Instagram and Messenger.
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Escalation alerts</div><div class="filter-label-desc">When AI confidence is too low and a message needs manual reply</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Escalation alerts <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">When AI confidence is too low and a message needs manual reply</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="np-escalation" checked><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Offline message alerts</div><div class="filter-label-desc">New WhatsApp / Instagram / Messenger messages when auto-reply is OFF</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Offline message alerts <span class="filter-channel-badge">💬 📸 💙 WA · IG · FB</span></div>
+            <div class="filter-label-desc">New WhatsApp / Instagram / Messenger messages when auto-reply is OFF</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="np-offline" checked><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Channel connected / disconnected</div><div class="filter-label-desc">When a channel is linked or unlinked from an agent</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Channel connected / disconnected <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">When a channel is linked or unlinked from an agent</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="np-channel" checked><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Low token balance</div><div class="filter-label-desc">Alert when AI token balance drops below 20%</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Low token balance <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">Alert when AI token balance drops below 20%</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="np-low-tokens" checked><span class="toggle-slider"></span></label>
         </div>
         <div class="filter-row">
-          <div class="filter-label-wrap"><div class="filter-label-title">Weekly digest</div><div class="filter-label-desc">Weekly summary of inbox, auto-replies, CSAT and escalations</div></div>
+          <div class="filter-label-wrap">
+            <div class="filter-label-title">Weekly digest <span class="filter-channel-badge">🌐 All channels</span></div>
+            <div class="filter-label-desc">Weekly summary of inbox, auto-replies, CSAT and escalations</div>
+          </div>
           <label class="toggle-switch"><input type="checkbox" id="np-weekly" checked><span class="toggle-slider"></span></label>
         </div>
       </div>
