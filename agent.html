@@ -1237,7 +1237,7 @@ async function loadSources() {
     }
     list.innerHTML = sources.map(s => {
       const tokens   = Math.ceil((s.extracted_text || s.content || '').length / 4)
-      const preview  = (s.extracted_text || s.content || '').slice(0, 160).trim()
+      const fullText = (s.extracted_text || s.content || '').trim()
       const typeIcon = s.type === 'url' ? '🌐' : s.type === 'file' ? '📄' : '✍️'
       const srcId    = escAttr(s._id)
       return `
@@ -1248,13 +1248,17 @@ async function loadSources() {
             <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title || s.content?.slice(0,60) || t('labelUntitled'))}</div>
             <div class="source-meta">${tokens.toLocaleString()} tokens${s.source_url ? ' · <a href="'+escAttr(s.source_url)+'" target="_blank" style="color:var(--accent)">view page</a>' : ''}</div>
           </div>
+          <button class="btn-icon" data-edit-id="${srcId}" data-edit-title="${escAttr(s.title||'')}" data-edit-text="${escAttr(fullText)}" title="Edit source">✏️</button>
           <button class="btn-icon" data-src-id="${srcId}" title="Delete source">🗑️</button>
         </div>
-        ${preview ? `<div style="margin-top:7px;padding:8px 10px;background:var(--surface-3);border-radius:8px;font-size:11.5px;color:var(--text-3);line-height:1.6;cursor:pointer" onclick="toggleSrcPreview(this)">${esc(preview)}${(s.extracted_text||'').length > 160 ? '… <span style="color:var(--accent)">show more</span>' : ''}<div style="display:none;margin-top:6px;white-space:pre-wrap">${esc((s.extracted_text||'').slice(160,2000))}${(s.extracted_text||'').length>2000?'\n…[truncated]':''}</div></div>` : ''}
+        ${fullText ? `<div style="margin-top:7px;padding:8px 10px;background:var(--surface-3);border-radius:8px;font-size:11.5px;color:var(--text-3);line-height:1.6;white-space:pre-wrap;max-height:200px;overflow-y:auto">${esc(fullText)}</div>` : ''}
       </div>`
     }).join('')
     list.querySelectorAll('[data-src-id]').forEach(btn => {
       btn.addEventListener('click', () => delSrc(btn.dataset.srcId))
+    })
+    list.querySelectorAll('[data-edit-id]').forEach(btn => {
+      btn.addEventListener('click', () => openEditSrc(btn.dataset.editId, btn.dataset.editTitle, btn.dataset.editText))
     })
   } catch(e) { toast(e.message, 'error') }
 }
@@ -1308,16 +1312,68 @@ async function delSrc(id) {
   catch(e) { toast(e.message, 'error') }
 }
 
-function toggleSrcPreview(el) {
-  const more = el.querySelector('div[style*="display:none"], div[style*="display: none"]')
-  if (!more) return
-  const span = el.querySelector('span[style*="color:var(--accent)"]')
-  if (more.style.display === 'none' || !more.style.display) {
-    more.style.display = 'block'
-    if (span) span.textContent = 'show less'
-  } else {
-    more.style.display = 'none'
-    if (span) span.textContent = 'show more'
+function openEditSrc(id, title, text) {
+  // Build or reuse edit modal
+  let modal = document.getElementById('src-edit-modal')
+  if (!modal) {
+    modal = document.createElement('div')
+    modal.id = 'src-edit-modal'
+    modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px'
+    modal.innerHTML = `
+      <div style="background:var(--surface-1);border-radius:16px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.3)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)">
+          <div style="font-size:15px;font-weight:700">Edit Knowledge Source</div>
+          <button onclick="closeEditSrc()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3)">✕</button>
+        </div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Title</label>
+            <input id="src-edit-title" type="text" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font-size:13px;box-sizing:border-box">
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column">
+            <label style="font-size:12px;font-weight:600;color:var(--text-3);display:block;margin-bottom:4px">Content</label>
+            <textarea id="src-edit-text" style="width:100%;min-height:300px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font-size:13px;line-height:1.6;resize:vertical;box-sizing:border-box;font-family:inherit"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border)">
+          <button class="btn btn-secondary btn-sm" onclick="closeEditSrc()">Cancel</button>
+          <button class="btn btn-primary btn-sm" id="src-edit-save-btn" onclick="saveEditSrc()">Save Changes</button>
+        </div>
+      </div>`
+    document.body.appendChild(modal)
+  }
+  modal._editId = id
+  document.getElementById('src-edit-title').value = title || ''
+  document.getElementById('src-edit-text').value  = text  || ''
+  modal.style.display = 'flex'
+}
+
+function closeEditSrc() {
+  const modal = document.getElementById('src-edit-modal')
+  if (modal) modal.style.display = 'none'
+}
+
+async function saveEditSrc() {
+  const modal = document.getElementById('src-edit-modal')
+  if (!modal) return
+  const id    = modal._editId
+  const title = document.getElementById('src-edit-title').value.trim()
+  const text  = document.getElementById('src-edit-text').value
+  if (!text.trim()) { toast('Content cannot be empty', 'warning'); return }
+  const btn = document.getElementById('src-edit-save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
+  try {
+    await apiFetch(`/agents/${AGENT_ID}/sources/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title, extracted_text: text, content: text })
+    })
+    toast('Source updated!', 'success')
+    closeEditSrc()
+    loadSources()
+  } catch(e) {
+    toast(e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Changes'
   }
 }
 
@@ -1644,7 +1700,7 @@ async function publishAgent() {
   const btn = document.getElementById('publish-btn')
   btn.disabled = true; btn.innerHTML = '<span class="spin-anim">⟳</span> ' + t('saving')
   try {
-    await apiFetch(`/agents/${AGENT_ID}/publish`, { method: 'POST' })
+    const pubResult = await apiFetch(`/agents/${AGENT_ID}/publish`, { method: 'POST' })
     const [updatedAgent, sources] = await Promise.all([
       apiFetch(`/agents/${AGENT_ID}`),
       apiFetch(`/agents/${AGENT_ID}/sources`),
@@ -1655,7 +1711,23 @@ async function publishAgent() {
     document.getElementById('pub-badge').innerHTML = t('labelLive')
     document.getElementById('preview-btn').style.display = 'flex'
     markStep(3)
-    toast(t('toastAgentPublished'), 'success')
+
+    // Show embedding result
+    if (pubResult?.rag) {
+      const rag = pubResult.rag
+      if (rag.enabled && rag.chunks > 0) {
+        toast(`✅ Published! ${rag.chunks} KB chunks embedded successfully.`, 'success')
+      } else if (rag.error) {
+        toast(`⚠️ Published but embeddings failed: ${rag.error}`, 'warning')
+        console.error('[publish] rag error:', rag.error)
+      } else if (rag.skipped) {
+        toast('⚠️ Published but embeddings were skipped. Check KB sources.', 'warning')
+      } else {
+        toast(t('toastAgentPublished'), 'success')
+      }
+    } else {
+      toast(t('toastAgentPublished'), 'success')
+    }
   } catch(e) { toast(e.message, 'error') }
   finally { btn.disabled = false; btn.innerHTML = t('labelPublishAgent') }
 }
