@@ -449,6 +449,7 @@
                 <div class="src-tab-bar">
                   <button class="src-tab active" onclick="switchSrcTab('text',this)">✍️ Text / FAQ</button>
                   <button class="src-tab" onclick="switchSrcTab('file',this)">📄 File</button>
+                  <button class="src-tab" onclick="switchSrcTab('url',this)">🌐 Website</button>
                 </div>
                 <div id="src-text" class="src-panel active">
                   <div class="field-hint" style="margin-bottom:12px">Paste FAQs, return policies, company info — anything to help the AI answer better.</div>
@@ -467,17 +468,30 @@
                 </div>
 
                 <div id="src-file" class="src-panel">
-                  <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, text files, or images (screenshots). Content is extracted automatically.</div>
+                  <div class="field-hint" style="margin-bottom:10px">Upload PDFs, Word docs, PowerPoint slides, text files, or images. All content is extracted by AI automatically.</div>
                   <div class="file-drop" id="file-drop" onclick="document.getElementById('file-inp').click()"
                     ondragover="event.preventDefault();this.classList.add('drag')"
                     ondragleave="this.classList.remove('drag')"
                     ondrop="handleKBFileDrop(event)">
                     <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24" style="color:var(--text-3);margin:0 auto 6px;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <div style="font-size:13px">Drop files or <strong>browse</strong></div>
-                    <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF, DOCX, TXT, JPG, PNG</div>
+                    <div style="font-size:11px;color:var(--text-3);margin-top:4px">PDF, DOCX, PPTX, TXT, JPG, PNG</div>
                   </div>
-                  <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.gif" onchange="handleKBFiles(this.files)"/>
+                  <input type="file" id="file-inp" style="display:none" multiple accept=".pdf,.docx,.pptx,.ppt,.txt,.jpg,.jpeg,.png,.webp,.gif" onchange="handleKBFiles(this.files)"/>
                 </div>
+
+                <div id="src-url" class="src-panel">
+                  <div class="field-hint" style="margin-bottom:12px">Enter your website URL and we'll crawl all pages (up to 20 pages). Works best on standard business sites.</div>
+                  <div class="src-add-row">
+                    <div>
+                      <div class="src-field-label">Website URL *</div>
+                      <input class="inp" type="url" id="src-url-inp" placeholder="https://yourwebsite.com"/>
+                    </div>
+                    <button class="btn btn-primary btn-sm" style="align-self:flex-start" onclick="addUrlSrc()">🌐 Crawl Website</button>
+                  </div>
+                  <div id="url-crawl-status" style="display:none;margin-top:12px;padding:10px 14px;background:var(--surface-2);border-radius:10px;font-size:13px;color:var(--text-2)"></div>
+                </div>
+
                 <div id="sources-list" style="margin-top:16px"></div>
               </div>
             </div>
@@ -1218,18 +1232,27 @@ async function loadSources() {
 
     const list = document.getElementById('sources-list')
     if (!sources.length) {
-      list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px">No extra sources yet. Add text, URLs, or files above.</div>'
+      list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-3);font-size:13px">No knowledge sources yet. Add text, upload files, or crawl your website above.</div>'
       return
     }
-    list.innerHTML = sources.map(s => `
-      <div class="source-item">
-        <span class="source-badge">${esc(s.type)}</span>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title || s.content?.slice(0,60) || t('labelUntitled'))}</div>
-          <div class="source-meta">${Math.ceil((s.extracted_text || s.content || '').length / 4)} ${t('labelTokens')}</div>
+    list.innerHTML = sources.map(s => {
+      const tokens   = Math.ceil((s.extracted_text || s.content || '').length / 4)
+      const preview  = (s.extracted_text || s.content || '').slice(0, 160).trim()
+      const typeIcon = s.type === 'url' ? '🌐' : s.type === 'file' ? '📄' : '✍️'
+      const srcId    = escAttr(s._id)
+      return `
+      <div class="source-item" style="flex-direction:column;align-items:stretch;gap:0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="source-badge">${typeIcon} ${esc(s.type)}</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.title || s.content?.slice(0,60) || t('labelUntitled'))}</div>
+            <div class="source-meta">${tokens.toLocaleString()} tokens${s.source_url ? ' · <a href="'+escAttr(s.source_url)+'" target="_blank" style="color:var(--accent)">view page</a>' : ''}</div>
+          </div>
+          <button class="btn-icon" data-src-id="${srcId}" title="Delete source">🗑️</button>
         </div>
-        <button class="btn-icon" data-src-id="${escAttr(s._id)}">🗑️</button>
-      </div>`).join('')
+        ${preview ? `<div style="margin-top:7px;padding:8px 10px;background:var(--surface-3);border-radius:8px;font-size:11.5px;color:var(--text-3);line-height:1.6;cursor:pointer" onclick="toggleSrcPreview(this)">${esc(preview)}${(s.extracted_text||'').length > 160 ? '… <span style="color:var(--accent)">show more</span>' : ''}<div style="display:none;margin-top:6px;white-space:pre-wrap">${esc((s.extracted_text||'').slice(160,2000))}${(s.extracted_text||'').length>2000?'\n…[truncated]':''}</div></div>` : ''}
+      </div>`
+    }).join('')
     list.querySelectorAll('[data-src-id]').forEach(btn => {
       btn.addEventListener('click', () => delSrc(btn.dataset.srcId))
     })
@@ -1283,6 +1306,50 @@ async function delSrc(id) {
   if (!ok) return
   try { await apiFetch(`/agents/${AGENT_ID}/sources/${id}`, { method: 'DELETE' }); toast(t('toastDeleted'), 'success'); loadSources() }
   catch(e) { toast(e.message, 'error') }
+}
+
+function toggleSrcPreview(el) {
+  const more = el.querySelector('div[style*="display:none"], div[style*="display: none"]')
+  if (!more) return
+  const span = el.querySelector('span[style*="color:var(--accent)"]')
+  if (more.style.display === 'none' || !more.style.display) {
+    more.style.display = 'block'
+    if (span) span.textContent = 'show less'
+  } else {
+    more.style.display = 'none'
+    if (span) span.textContent = 'show more'
+  }
+}
+
+async function addUrlSrc() {
+  const url    = document.getElementById('src-url-inp').value.trim()
+  const status = document.getElementById('url-crawl-status')
+  if (!url || !url.startsWith('http')) {
+    toast('Please enter a valid URL starting with https://', 'warning')
+    document.getElementById('src-url-inp').focus()
+    return
+  }
+  status.style.display = 'block'
+  status.innerHTML = '⏳ Crawling website… this may take up to 30 seconds'
+  try {
+    const result = await apiFetch(`/agents/${AGENT_ID}/sources/url`, { method: 'POST', body: JSON.stringify({ url }) })
+    let msg = `✅ Done! Saved <strong>${result.pages_saved}</strong> page${result.pages_saved !== 1 ? 's' : ''} from this website.`
+    if (result.pages_failed > 0) {
+      msg += ` <span style="color:var(--text-3)">(${result.pages_failed} page${result.pages_failed !== 1 ? 's' : ''} failed)</span>`
+      if (result.failed?.length) {
+        msg += '<div style="margin-top:8px;font-size:11.5px;color:var(--text-3)">'
+        msg += result.failed.slice(0,5).map(f => `❌ ${esc(f.url.slice(0,60))} — ${esc(f.reason)}`).join('<br>')
+        if (result.failed.length > 5) msg += `<br>… and ${result.failed.length - 5} more`
+        msg += '</div>'
+      }
+    }
+    status.innerHTML = msg
+    document.getElementById('src-url-inp').value = ''
+    loadSources()
+  } catch(e) {
+    status.innerHTML = `❌ ${esc(e.message)}`
+    toast(e.message, 'error')
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
