@@ -517,6 +517,39 @@
                 </div>
               </div>
             </div>
+            <!-- Session Memory — only shown for sales agents -->
+            <div class="card" style="margin-bottom:16px;display:none" id="session-memory-card">
+              <div class="card-header">
+                <div class="card-title">🧠 User Identification &amp; Session Memory</div>
+                <span class="badge badge-accent">Sales Only</span>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:10px">
+                  When enabled, the chat widget shows a pre-chat form collecting the customer's name and identifier before the first message. Returning customers are recognised and greeted by name.
+                </div>
+                <div class="field">
+                  <label>Identifier Type</label>
+                  <select class="inp" id="f-identifier-type" onchange="onIdentifierTypeChange(this.value)">
+                    <option value="">None — anonymous sessions</option>
+                    <option value="phone">📱 Phone Number</option>
+                    <option value="email">✉️ Email Address</option>
+                    <option value="custom">✏️ Custom</option>
+                  </select>
+                  <div class="field-hint">How customers will be identified across sessions. Leave as None for anonymous chat (default behaviour).</div>
+                </div>
+                <div class="field" id="identifier-label-field" style="display:none">
+                  <label>Custom Identifier Label</label>
+                  <input class="inp" type="text" id="f-identifier-label" placeholder="e.g. Loyalty Card Number, Member ID"/>
+                  <div class="field-hint">This label is shown to the customer in the pre-chat form.</div>
+                </div>
+                <div class="field">
+                  <label>Session Memory (days)</label>
+                  <input class="inp" type="number" id="f-session-memory-days" min="1" max="365" value="30"/>
+                  <div class="field-hint">How many days to remember a returning customer's preferences and interests. Default: 30 days.</div>
+                </div>
+              </div>
+            </div>
+
             <div class="card" style="margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">💳 Razorpay Credentials</div>
@@ -907,6 +940,14 @@ function fillForm(a) {
   }
   document.getElementById('shopping-toggle').checked = !!a.shopping_enabled
 
+  // Populate session memory fields
+  const idTypeEl = document.getElementById('f-identifier-type')
+  if (idTypeEl) { idTypeEl.value = a.identifier_type || ''; onIdentifierTypeChange(a.identifier_type || '') }
+  const idLabelEl = document.getElementById('f-identifier-label')
+  if (idLabelEl) idLabelEl.value = a.identifier_label || ''
+  const memDaysEl = document.getElementById('f-session-memory-days')
+  if (memDaysEl) memDaysEl.value = a.session_memory_days || 30
+
   // Populate agent type selector
   const agentTypeEl = document.getElementById('f-agent-type')
   if (agentTypeEl) agentTypeEl.value = a.agent_type || a.type || 'support'
@@ -976,6 +1017,10 @@ function applyAgentTypeTabs(type) {
       document.querySelector('.tab-btn[data-tab="general"]').classList.add('active')
     }
   }
+
+  // Show/hide session memory card (sales only)
+  const sessionCard = document.getElementById('session-memory-card')
+  if (sessionCard) sessionCard.style.display = isSales ? 'block' : 'none'
 }
 
 function markStep(n) {
@@ -1048,6 +1093,11 @@ const AGENT_TYPE_PROMPTS = {
   general: 'You are a helpful AI assistant. Be friendly, concise, and accurate.',
 }
 
+function onIdentifierTypeChange(val) {
+  const labelField = document.getElementById('identifier-label-field')
+  if (labelField) labelField.style.display = val === 'custom' ? 'block' : 'none'
+}
+
 function onAgentTypeChange(type) {
   // Switch tab visibility immediately
   applyAgentTypeTabs(type)
@@ -1071,8 +1121,11 @@ async function saveGeneral() {
       logo_base64:      logoBase64,
       system_prompt:    document.getElementById('f-system-prompt').value,
       theme:            document.getElementById('f-theme').value,
-      shopping_enabled: document.getElementById('shopping-toggle').checked,
-      agent_type:       newAgentType,
+      shopping_enabled:   document.getElementById('shopping-toggle').checked,
+      agent_type:         newAgentType,
+      identifier_type:    document.getElementById('f-identifier-type')?.value || null,
+      identifier_label:   document.getElementById('f-identifier-label')?.value || '',
+      session_memory_days: parseInt(document.getElementById('f-session-memory-days')?.value) || 30,
     })})
     // Re-apply tab visibility based on new type
     if (newAgentType) applyAgentTypeTabs(newAgentType)
