@@ -521,15 +521,19 @@
   <div id="pre-chat-screen" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;gap:0">
     <div id="pre-chat-avatar" style="width:56px;height:56px;border-radius:14px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:14px;overflow:hidden;box-shadow:0 4px 16px var(--brand-glow)"></div>
     <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px;text-align:center" id="pre-chat-title">Before we start</div>
-    <div style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:22px;line-height:1.6" id="pre-chat-sub">Enter your mobile number so we can follow up with you.</div>
-    <div style="width:100%;max-width:280px">
-      <input id="pre-chat-mobile" type="tel" placeholder="+91 98765 43210" autocomplete="tel"
-        style="width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border2);border-radius:12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;text-align:center;letter-spacing:.02em;transition:border-color .15s"
+    <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:22px;line-height:1.6" id="pre-chat-sub">Tell us a bit about yourself to get started.</div>
+    <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px">
+      <input id="pre-chat-name" type="text" placeholder="Your name" autocomplete="name"
+        style="width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border2);border-radius:12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;letter-spacing:.01em;transition:border-color .15s"
+        onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border2)'"
+        onkeydown="if(event.key==='Enter')document.getElementById('pre-chat-identifier').focus()">
+      <input id="pre-chat-identifier" type="text" placeholder="Phone / Email" autocomplete="on"
+        style="width:100%;height:44px;padding:0 14px;border:1.5px solid var(--border2);border-radius:12px;font-family:var(--font);font-size:14px;color:var(--text);background:var(--surface);outline:none;letter-spacing:.01em;transition:border-color .15s"
         onfocus="this.style.borderColor='var(--brand)'" onblur="this.style.borderColor='var(--border2)'"
         onkeydown="if(event.key==='Enter')startChatFromPreCapture()">
-      <div id="pre-chat-err" style="font-size:12px;color:#E05252;text-align:center;margin-top:6px;display:none">Please enter a valid mobile number</div>
+      <div id="pre-chat-err" style="font-size:12px;color:#E05252;text-align:center;margin-top:2px;display:none">Please fill in all fields.</div>
       <button onclick="startChatFromPreCapture()" id="pre-chat-btn"
-        style="width:100%;margin-top:12px;height:44px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s"
+        style="width:100%;height:44px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s"
         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px var(--brand-glow)'"
         onmouseout="this.style.transform='';this.style.boxShadow=''">
         Start Chat →
@@ -753,6 +757,9 @@
     return vid
   }())
 
+  // USER_IDENTIFIER — set after pre-chat form or restored from localStorage
+  let USER_IDENTIFIER = null
+
   // Other state (sessionId removed — replaced by SESSION_ID const above)
   let agent      = null
   let allProds   = []
@@ -819,18 +826,63 @@
       setupColors(agent); setupHeader(agent)
       document.getElementById('loading-screen').style.display  = 'none'
 
-      // Pre-chat capture — show mobile entry screen if enabled
-      if (agent.pre_chat_enabled) {
-        const preChatAv = document.getElementById('pre-chat-avatar')
-        if (agent.logo_base64 && /^data:image\//.test(agent.logo_base64)) {
-          preChatAv.innerHTML = `<img src="${agent.logo_base64}" alt="" style="width:100%;height:100%;object-fit:cover">`
+      // Pre-chat capture — show identifier form if agent has identifier_type configured
+      if (agent.identifier_type) {
+        // Check if we already have a stored identifier for this agent
+        const storedIdentifier = localStorage.getItem('sg_uid_' + AGENT_ID)
+        const storedCustomer   = (() => { try { return JSON.parse(localStorage.getItem('sg_customer_' + AGENT_ID) || 'null') } catch { return null } })()
+
+        if (storedIdentifier) {
+          // Returning visitor on same device — try to resume session
+          USER_IDENTIFIER = storedIdentifier
+          try {
+            const sRes = await fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(storedIdentifier)}`)
+            if (sRes.ok) {
+              const sData = await sRes.json()
+              if (sData.found && sData.session) {
+                // Session found — restore customer name and go straight to chat
+                window._customerName = sData.session.customer?.name || storedCustomer?.name || ''
+                showChatUI()
+              } else {
+                showChatUI()
+              }
+            } else {
+              showChatUI()
+            }
+          } catch {
+            showChatUI()
+          }
         } else {
-          preChatAv.textContent = (agent.name?.[0] || 'S').toUpperCase()
+          // New visitor — show pre-chat form
+          const preChatAv = document.getElementById('pre-chat-avatar')
+          if (agent.logo_base64 && /^data:image\//.test(agent.logo_base64)) {
+            preChatAv.innerHTML = `<img src="${agent.logo_base64}" alt="" style="width:100%;height:100%;object-fit:cover">`
+          } else {
+            preChatAv.textContent = (agent.name?.[0] || 'S').toUpperCase()
+          }
+          document.getElementById('pre-chat-title').textContent = `Chat with ${agent.name || 'us'}`
+          // Set identifier input label/placeholder/type based on identifier_type
+          const idInput = document.getElementById('pre-chat-identifier')
+          if (idInput) {
+            if (agent.identifier_type === 'phone') {
+              idInput.type = 'tel'; idInput.placeholder = 'Phone number'; idInput.autocomplete = 'tel'
+            } else if (agent.identifier_type === 'email') {
+              idInput.type = 'email'; idInput.placeholder = 'Email address'; idInput.autocomplete = 'email'
+            } else if (agent.identifier_type === 'custom') {
+              idInput.type = 'text'; idInput.placeholder = agent.identifier_label || 'Identifier'; idInput.autocomplete = 'off'
+            }
+          }
+          // Update subtitle
+          const subEl = document.getElementById('pre-chat-sub')
+          if (subEl) {
+            if (agent.identifier_type === 'phone') subEl.textContent = 'Enter your name and phone number so we can remember you.'
+            else if (agent.identifier_type === 'email') subEl.textContent = 'Enter your name and email so we can remember you.'
+            else subEl.textContent = `Enter your name and ${agent.identifier_label || 'identifier'} to get started.`
+          }
+          document.getElementById('chat-header').style.display  = 'flex'
+          document.getElementById('pre-chat-screen').style.display = 'flex'
+          document.getElementById('pre-chat-name').focus()
         }
-        document.getElementById('pre-chat-title').textContent = `Chat with ${agent.name || 'us'}`
-        document.getElementById('chat-header').style.display  = 'flex'
-        document.getElementById('pre-chat-screen').style.display = 'flex'
-        document.getElementById('pre-chat-mobile').focus()
       } else {
         showChatUI()
       }
@@ -858,30 +910,43 @@
     document.getElementById('chat-input-wrap').style.display = 'block'
     document.getElementById('chat-header').style.display     = 'flex'
     addDateSeparator()
-    addWelcomeMsg(agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant'))
+    // Personalise welcome for returning customers
+    let welcomeText = agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant')
+    if (window._customerName) {
+      welcomeText = `Welcome back, ${window._customerName}! 👋 ${welcomeText}`
+    }
+    addWelcomeMsg(welcomeText)
     if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
     if (agent.shopping_enabled || agentType === 'sales') loadProducts()
   }
 
   // ── PRE-CHAT CAPTURE SUBMIT ─────────────────────────────────────────────
   async function startChatFromPreCapture() {
-    const mobile = (document.getElementById('pre-chat-mobile')?.value || '').trim()
-    const errEl  = document.getElementById('pre-chat-err')
-    if (mobile.length < 6) { errEl.style.display = 'block'; return }
+    const name       = (document.getElementById('pre-chat-name')?.value || '').trim()
+    const identifier = (document.getElementById('pre-chat-identifier')?.value || '').trim()
+    const errEl      = document.getElementById('pre-chat-err')
+
+    if (!name || identifier.length < 3) {
+      errEl.textContent = name ? 'Please enter a valid identifier.' : 'Please fill in all fields.'
+      errEl.style.display = 'block'; return
+    }
     errEl.style.display = 'none'
 
     const btn = document.getElementById('pre-chat-btn')
     btn.disabled = true; btn.textContent = 'Starting…'
 
-    // Save lead in background — don't block chat on failure
-    fetch(`${API}/leads/${AGENT_ID}`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ mobile, source: 'chat', referrer: document.referrer }),
-    }).catch(() => {})
+    // Persist identifier and customer name locally
+    USER_IDENTIFIER = identifier
+    window._customerName = name
+    try { localStorage.setItem('sg_uid_' + AGENT_ID, identifier) } catch {}
+    try { localStorage.setItem('sg_customer_' + AGENT_ID, JSON.stringify({ name })) } catch {}
 
-    // Store mobile for this session (passed as context to AI)
-    window._visitorMobile = mobile
+    // Create / update session on server (fire-and-forget; don't block UI)
+    fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ customer: { name }, interests: '' }),
+    }).catch(() => {})
 
     showChatUI()
   }
@@ -1227,6 +1292,7 @@
           history:          buildHistoryForServer(),
           session_id:       SESSION_ID,          // ← always set, never undefined
           visitor_id:       VISITOR_ID,          // ← persistent browser identity
+          user_identifier:  USER_IDENTIFIER || undefined,  // ← sales session identity
           suggested_prompt: suggestedPrompt || undefined,
         }),
       })
@@ -1319,6 +1385,7 @@
           history:          buildHistoryForServer(),
           session_id:       SESSION_ID,          // ← always set
           visitor_id:       VISITOR_ID,          // ← always set
+          user_identifier:  USER_IDENTIFIER || undefined,  // ← sales session identity
           suggested_prompt: suggestedPrompt || undefined,
         }),
       })
