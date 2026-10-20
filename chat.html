@@ -1018,25 +1018,32 @@
         const storedCustomer   = (() => { try { return JSON.parse(localStorage.getItem('sg_customer_' + AGENT_ID) || 'null') } catch { return null } })()
 
         if (storedIdentifier) {
-          // Returning visitor on same device — try to resume session
+          // Returning visitor on same device — restore from DB first
           USER_IDENTIFIER = storedIdentifier
           try {
-            const sRes = await fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(storedIdentifier)}`)
+            const [sRes, cRes] = await Promise.all([
+              fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(storedIdentifier)}`),
+              fetch(`${API}/agents/${AGENT_ID}/customers/${encodeURIComponent(storedIdentifier)}`),
+            ])
+            // Restore customer profile (name + addresses) from DB
+            if (cRes.ok) {
+              const cData = await cRes.json()
+              if (cData.found && cData.customer) {
+                window._customerName = cData.customer.name || storedCustomer?.name || ''
+                // Sync addresses from DB to localStorage cache
+                try { localStorage.setItem('sg_addrs_' + AGENT_ID, JSON.stringify(cData.customer.addresses || [])) } catch {}
+                const def = (cData.customer.addresses || []).find(a => a.isDefault) || (cData.customer.addresses || [])[0] || null
+                try { localStorage.setItem('sg_addr_' + AGENT_ID, def ? JSON.stringify(def) : 'null') } catch {}
+              }
+            }
             if (sRes.ok) {
               const sData = await sRes.json()
-              if (sData.found && sData.session) {
-                // Session found — restore customer name and go straight to chat
+              if (sData.found && sData.session && !window._customerName) {
                 window._customerName = sData.session.customer?.name || storedCustomer?.name || ''
-                showChatUI()
-              } else {
-                showChatUI()
               }
-            } else {
-              showChatUI()
             }
-          } catch {
-            showChatUI()
-          }
+          } catch { /* silent — fall through with whatever we have */ }
+          showChatUI()
         } else {
           // New visitor — show pre-chat form
           const preChatAv = document.getElementById('pre-chat-avatar')
@@ -1123,18 +1130,23 @@
     const btn = document.getElementById('pre-chat-btn')
     btn.disabled = true; btn.textContent = 'Starting…'
 
-    // Persist identifier and customer name locally
+    // Persist identifier locally (only the lookup key stays in localStorage)
     USER_IDENTIFIER = identifier
     window._customerName = name
     try { localStorage.setItem('sg_uid_' + AGENT_ID, identifier) } catch {}
-    try { localStorage.setItem('sg_customer_' + AGENT_ID, JSON.stringify({ name })) } catch {}
+    try { localStorage.setItem('sg_customer_' + AGENT_ID, JSON.stringify({ name })) } catch {} // fallback cache
 
-    // Create / update session on server (fire-and-forget; don't block UI)
-    fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
-      method:  'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ customer: { name }, interests: '' }),
-    }).catch(() => {})
+    // Save customer profile to DB + create/update session (fire-and-forget)
+    Promise.all([
+      fetch(`${API}/agents/${AGENT_ID}/customers`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, name }),
+      }),
+      fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customer: { name }, interests: '' }),
+      }),
+    ]).catch(() => {})
 
     showChatUI()
   }
@@ -1148,10 +1160,17 @@
     try { return JSON.parse(localStorage.getItem('sg_addrs_' + AGENT_ID) || '[]') } catch { return [] }
   }
   function saveAddresses(list) {
+    // 1. Update localStorage cache immediately (fast, local)
     try { localStorage.setItem('sg_addrs_' + AGENT_ID, JSON.stringify(list)) } catch {}
-    // keep legacy key in sync with default
     const def = list.find(a => a.isDefault) || list[0] || null
     try { localStorage.setItem('sg_addr_' + AGENT_ID, def ? JSON.stringify(def) : 'null') } catch {}
+    // 2. Persist to DB (fire-and-forget) — only if we have an identifier
+    if (USER_IDENTIFIER) {
+      fetch(`${API}/agents/${AGENT_ID}/customers/${encodeURIComponent(USER_IDENTIFIER)}/addresses`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addresses: list }),
+      }).catch(() => {})
+    }
   }
   function loadSavedAddress() {
     // returns the default address (or first) for checkout
