@@ -100,6 +100,126 @@
     .powered-by a{color:var(--brand);font-weight:700;text-decoration:none;transition:opacity .15s;}
     .powered-by a:hover{opacity:.7;}
 
+    /* ── ACCOUNT INFO BAR (shopping) ── */
+    .acct-bar{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+      padding:7px 14px 5px;border-bottom:1px solid var(--border);
+      background:var(--surface2);flex-shrink:0;
+    }
+    .acct-pill{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:3px 10px;border-radius:20px;
+      border:1px solid var(--border2);background:var(--surface-solid);
+      font-size:10.5px;font-weight:600;color:var(--text2);
+      white-space:nowrap;
+    }
+    .acct-pill .acct-icon{font-size:11px;}
+    .acct-addr-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:3px 10px;border-radius:20px;
+      border:1.5px dashed var(--brand);background:transparent;
+      font-size:10.5px;font-weight:600;color:var(--brand);
+      cursor:pointer;white-space:nowrap;
+      transition:background .15s,color .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .acct-addr-btn:hover{background:var(--brand-dim);}
+    .acct-addr-set{border-style:solid;color:var(--text2);border-color:var(--border2);background:var(--surface-solid);}
+
+    /* ── ADDRESS MANAGER MODAL ── */
+    .addr-modal-overlay{
+      position:fixed;inset:0;z-index:200;
+      background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+      display:flex;align-items:flex-end;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .22s ease;
+    }
+    .addr-modal-overlay.open{opacity:1;pointer-events:auto;}
+    .addr-modal{
+      width:100%;max-width:480px;
+      background:var(--surface-solid);border-radius:22px 22px 0 0;
+      padding:20px 18px 28px;max-height:88vh;overflow-y:auto;
+      transform:translateY(100%);transition:transform .28s cubic-bezier(.22,1,.36,1);
+    }
+    .addr-modal-overlay.open .addr-modal{transform:translateY(0);}
+    .addr-modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 16px;}
+    .addr-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    .addr-modal-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;}
+    .addr-add-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;
+      border:1.5px solid var(--brand);background:var(--brand-dim);color:var(--brand);
+      font-size:11px;font-weight:700;font-family:var(--font);cursor:pointer;
+      transition:background .15s;-webkit-tap-highlight-color:transparent;}
+    .addr-add-btn:hover{background:var(--brand);color:#fff;}
+
+    /* saved address cards */
+    .addr-card{
+      border:1.5px solid var(--border2);border-radius:14px;
+      padding:12px 14px;margin-bottom:10px;
+      background:var(--surface2);cursor:pointer;
+      transition:border-color .15s,background .15s;position:relative;
+    }
+    .addr-card.default{border-color:var(--brand);background:var(--brand-dim);}
+    .addr-card-top{display:flex;align-items:flex-start;gap:10px;}
+    .addr-card-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);
+      flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;
+      transition:border-color .15s,background .15s;}
+    .addr-card.default .addr-card-radio{border-color:var(--brand);background:var(--brand);}
+    .addr-card.default .addr-card-radio::after{content:'';width:7px;height:7px;border-radius:50%;background:#fff;}
+    .addr-card-body{flex:1;min-width:0;}
+    .addr-card-line{font-size:12.5px;color:var(--text);line-height:1.55;word-break:break-word;}
+    .addr-card-line.muted{color:var(--text3);font-size:11.5px;}
+    .addr-card-actions{display:flex;gap:8px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);}
+    .addr-card-act{font-size:11px;font-weight:700;color:var(--brand);background:none;border:none;
+      padding:0;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+    .addr-card-act.del{color:var(--red);}
+    .addr-default-badge{font-size:10px;font-weight:700;color:var(--brand);
+      background:var(--brand-dim);border-radius:20px;padding:2px 8px;
+      display:inline-block;margin-bottom:5px;}
+
+    /* add / edit form inside the same sheet */
+    .addr-form-wrap{border-top:1px solid var(--border);padding-top:16px;margin-top:6px;}
+    .addr-form-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:11px;}
+    .addr-field{width:100%;padding:10px 13px;border-radius:12px;border:1.5px solid var(--border2);
+      background:var(--surface2);color:var(--text);font-size:13px;font-family:var(--font);
+      outline:none;box-sizing:border-box;margin-bottom:9px;transition:border-color .15s;}
+    .addr-field:focus{border-color:var(--brand);}
+    .addr-form-row{display:flex;gap:8px;}
+    .addr-form-row .addr-field{flex:1;}
+    .addr-save-btn{
+      width:100%;padding:12px;border:none;border-radius:13px;
+      background:linear-gradient(135deg,var(--brand),var(--brand-dark));
+      color:#fff;font-size:13.5px;font-weight:700;font-family:var(--font);
+      cursor:pointer;transition:opacity .15s;margin-top:2px;
+    }
+    .addr-save-btn:hover{opacity:.88;}
+    .addr-cancel-link{display:block;text-align:center;margin-top:10px;font-size:12px;
+      color:var(--text3);cursor:pointer;font-weight:600;}
+    .addr-cancel-link:hover{color:var(--text2);}
+
+    /* ── CART CHIP (persistent above input) ── */
+    .cart-chip-wrap{
+      padding:5px 14px 3px;flex-shrink:0;
+      display:none;
+    }
+    .cart-chip-btn{
+      display:inline-flex;align-items:center;gap:7px;
+      padding:7px 14px;border-radius:30px;
+      border:1.5px solid var(--brand);
+      background:var(--brand-dim);color:var(--brand);
+      font-size:12px;font-weight:700;font-family:var(--font);
+      cursor:pointer;transition:all .18s cubic-bezier(.22,1,.36,1);
+      box-shadow:var(--sh-sm);white-space:nowrap;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .cart-chip-btn:hover{background:var(--brand);color:#fff;box-shadow:var(--sh-brand);transform:translateY(-1px);}
+    .cart-chip-btn:active{transform:scale(.97);}
+    .cart-chip-count{
+      background:var(--brand);color:#fff;
+      border-radius:50%;width:18px;height:18px;
+      font-size:10px;font-weight:800;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .cart-chip-btn:hover .cart-chip-count{background:#fff;color:var(--brand);}
+
     .msg-timing{
       display:inline-flex;align-items:center;gap:6px;
       font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.02em;
@@ -561,9 +681,26 @@
     </div>
   </div>
 
+  <!-- Account info bar (shopping agents only) -->
+  <div class="acct-bar" id="acct-bar" style="display:none;">
+    <span class="acct-pill" id="acct-name-pill" style="display:none;"><span class="acct-icon">👤</span><span id="acct-name-text"></span></span>
+    <span class="acct-pill" id="acct-id-pill" style="display:none;"><span class="acct-icon" id="acct-id-icon">📱</span><span id="acct-id-text"></span></span>
+    <button class="acct-addr-btn" id="acct-addr-btn" onclick="openAddressModal()" style="display:none;">
+      <span>📍</span><span id="acct-addr-label">Add address</span>
+    </button>
+  </div>
+
   <div class="chat-messages" id="chat-messages" style="display:none;"></div>
   <div class="topics-wrap" id="topics-wrap"></div>
   <div class="category-chips-wrap" id="category-chips-wrap" style="display:none;"></div>
+
+  <!-- Cart chip above input -->
+  <div class="cart-chip-wrap" id="cart-chip-wrap">
+    <button class="cart-chip-btn" onclick="openCart()">
+      🛒 <span id="cart-chip-label">View Cart</span>
+      <span class="cart-chip-count" id="cart-chip-count">0</span>
+    </button>
+  </div>
 
   <button id="cart-fab" onclick="openCart()" title="View cart" aria-label="View cart">
     🛒
@@ -603,6 +740,33 @@
     </div>
   </div>
 
+</div>
+
+<!-- Address manager modal -->
+<div class="addr-modal-overlay" id="addr-modal-overlay" onclick="if(event.target===this)closeAddressModal()">
+  <div class="addr-modal" id="addr-modal-inner">
+    <div class="addr-modal-handle"></div>
+    <div class="addr-modal-header">
+      <div class="addr-modal-title">📍 Delivery Addresses</div>
+      <button class="addr-add-btn" id="addr-add-btn" onclick="showAddressForm()">＋ Add new</button>
+    </div>
+    <!-- saved addresses list -->
+    <div id="addr-list"></div>
+    <!-- add / edit form (hidden by default) -->
+    <div class="addr-form-wrap" id="addr-form-wrap" style="display:none;">
+      <div class="addr-form-title" id="addr-form-title">New Address</div>
+      <input class="addr-field" id="addr-line1" type="text" placeholder="Door / Flat no., Building name" autocomplete="address-line1">
+      <input class="addr-field" id="addr-line2" type="text" placeholder="Street / Area / Locality" autocomplete="address-line2">
+      <div class="addr-form-row">
+        <input class="addr-field" id="addr-city"  type="text" placeholder="City"  autocomplete="address-level2">
+        <input class="addr-field" id="addr-state" type="text" placeholder="State" autocomplete="address-level1">
+      </div>
+      <input class="addr-field" id="addr-pin" type="text" placeholder="PIN code" inputmode="numeric" maxlength="10" autocomplete="postal-code">
+      <input type="hidden" id="addr-edit-idx" value="">
+      <button class="addr-save-btn" onclick="saveAddress()">Save Address</button>
+      <span class="addr-cancel-link" onclick="hideAddressForm()">Cancel</span>
+    </div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="cart-overlay" onclick="if(event.target===this)closeCart()">
@@ -938,7 +1102,10 @@
     }
     addWelcomeMsg(welcomeText)
     if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
-    if (agent.shopping_enabled || agentType === 'sales') loadProducts()
+    if (agent.shopping_enabled || agentType === 'sales') {
+      loadProducts()
+      renderAccountBar()
+    }
   }
 
   // ── PRE-CHAT CAPTURE SUBMIT ─────────────────────────────────────────────
@@ -970,6 +1137,174 @@
     }).catch(() => {})
 
     showChatUI()
+  }
+
+  // ── ACCOUNT BAR & ADDRESS ────────────────────────────────────────────────
+  // ── MULTI-ADDRESS SYSTEM ─────────────────────────────────────────────────
+  // Storage: sg_addrs_<agentId> = [ { id, line1, line2, city, state, pin, isDefault } ]
+  // sg_addr_<agentId> kept in sync with the current default for checkout
+
+  function loadAddresses() {
+    try { return JSON.parse(localStorage.getItem('sg_addrs_' + AGENT_ID) || '[]') } catch { return [] }
+  }
+  function saveAddresses(list) {
+    try { localStorage.setItem('sg_addrs_' + AGENT_ID, JSON.stringify(list)) } catch {}
+    // keep legacy key in sync with default
+    const def = list.find(a => a.isDefault) || list[0] || null
+    try { localStorage.setItem('sg_addr_' + AGENT_ID, def ? JSON.stringify(def) : 'null') } catch {}
+  }
+  function loadSavedAddress() {
+    // returns the default address (or first) for checkout
+    const list = loadAddresses()
+    return list.find(a => a.isDefault) || list[0] || null
+  }
+
+  function renderAccountBar() {
+    const bar      = document.getElementById('acct-bar');      if (!bar) return
+    const namePill = document.getElementById('acct-name-pill')
+    const idPill   = document.getElementById('acct-id-pill')
+    const addrBtn  = document.getElementById('acct-addr-btn')
+    const nameText = document.getElementById('acct-name-text')
+    const idText   = document.getElementById('acct-id-text')
+    const idIcon   = document.getElementById('acct-id-icon')
+    const addrLbl  = document.getElementById('acct-addr-label')
+
+    let hasContent = false
+    if (window._customerName) {
+      nameText.textContent = window._customerName
+      namePill.style.display = 'inline-flex'; hasContent = true
+    }
+    if (USER_IDENTIFIER) {
+      idText.textContent = USER_IDENTIFIER
+      idIcon.textContent = agent?.identifier_type === 'email' ? '✉️' : '📱'
+      idPill.style.display = 'inline-flex'; hasContent = true
+    }
+    const def = loadSavedAddress()
+    if (def) {
+      addrLbl.textContent = [def.line1, def.city].filter(Boolean).join(', ').slice(0, 28) || 'Address saved'
+      addrBtn.classList.add('acct-addr-set')
+    } else {
+      addrLbl.textContent = 'Add address'
+      addrBtn.classList.remove('acct-addr-set')
+    }
+    addrBtn.style.display = 'inline-flex'; hasContent = true
+    bar.style.display = hasContent ? 'flex' : 'none'
+  }
+
+  function openAddressModal(autoCheckout) {
+    window._addrAutoCheckout = !!autoCheckout
+    hideAddressForm()
+    renderAddressList()
+    document.getElementById('addr-modal-overlay').classList.add('open')
+  }
+  function closeAddressModal() {
+    document.getElementById('addr-modal-overlay').classList.remove('open')
+    window._addrAutoCheckout = false
+  }
+
+  function renderAddressList() {
+    const list = loadAddresses()
+    const el   = document.getElementById('addr-list')
+    if (!list.length) {
+      el.innerHTML = '<div style="font-size:12.5px;color:var(--text3);text-align:center;padding:10px 0 4px;">No saved addresses yet.</div>'
+      // auto-open form if empty
+      showAddressForm(); return
+    }
+    el.innerHTML = list.map((a, i) => `
+      <div class="addr-card${a.isDefault?' default':''}" onclick="setDefaultAddress(${i})">
+        ${a.isDefault ? '<div class="addr-default-badge">✓ Default</div>' : ''}
+        <div class="addr-card-top">
+          <div class="addr-card-radio"></div>
+          <div class="addr-card-body">
+            <div class="addr-card-line">${esc(a.line1)}${a.line2?', '+esc(a.line2):''}</div>
+            <div class="addr-card-line muted">${[a.city,a.state,a.pin].filter(Boolean).map(esc).join(', ')}</div>
+          </div>
+        </div>
+        <div class="addr-card-actions">
+          ${!a.isDefault?`<button class="addr-card-act" onclick="event.stopPropagation();setDefaultAddress(${i})">Set as default</button>`:''}
+          <button class="addr-card-act" onclick="event.stopPropagation();editAddress(${i})">Edit</button>
+          <button class="addr-card-act del" onclick="event.stopPropagation();deleteAddress(${i})">Delete</button>
+        </div>
+      </div>`).join('')
+  }
+
+  function showAddressForm(editIdx) {
+    const formWrap = document.getElementById('addr-form-wrap')
+    const titleEl  = document.getElementById('addr-form-title')
+    const editIdxEl = document.getElementById('addr-edit-idx')
+    // clear fields
+    ;['addr-line1','addr-line2','addr-city','addr-state','addr-pin'].forEach(id => { document.getElementById(id).value = '' })
+    if (editIdx !== undefined) {
+      const a = loadAddresses()[editIdx]
+      if (a) {
+        document.getElementById('addr-line1').value = a.line1 || ''
+        document.getElementById('addr-line2').value = a.line2 || ''
+        document.getElementById('addr-city').value  = a.city  || ''
+        document.getElementById('addr-state').value = a.state || ''
+        document.getElementById('addr-pin').value   = a.pin   || ''
+      }
+      titleEl.textContent = 'Edit Address'
+      editIdxEl.value = String(editIdx)
+    } else {
+      titleEl.textContent = 'New Address'
+      editIdxEl.value = ''
+    }
+    formWrap.style.display = 'block'
+    setTimeout(() => document.getElementById('addr-line1').focus(), 200)
+  }
+  function hideAddressForm() {
+    document.getElementById('addr-form-wrap').style.display = 'none'
+  }
+  function editAddress(idx) { showAddressForm(idx) }
+
+  function setDefaultAddress(idx) {
+    const list = loadAddresses()
+    list.forEach((a,i) => { a.isDefault = (i === idx) })
+    saveAddresses(list)
+    renderAddressList()
+    renderAccountBar()
+    // if opened from checkout gate, proceed now
+    if (window._addrAutoCheckout) { closeAddressModal(); checkout() }
+  }
+
+  function deleteAddress(idx) {
+    const list = loadAddresses()
+    list.splice(idx, 1)
+    // if we deleted the default, make first one default
+    if (list.length && !list.some(a => a.isDefault)) list[0].isDefault = true
+    saveAddresses(list)
+    renderAddressList()
+    renderAccountBar()
+  }
+
+  function saveAddress() {
+    const addr = {
+      id:    Date.now(),
+      line1: document.getElementById('addr-line1').value.trim(),
+      line2: document.getElementById('addr-line2').value.trim(),
+      city:  document.getElementById('addr-city').value.trim(),
+      state: document.getElementById('addr-state').value.trim(),
+      pin:   document.getElementById('addr-pin').value.trim(),
+    }
+    if (!addr.line1) { document.getElementById('addr-line1').focus(); return }
+    const list     = loadAddresses()
+    const editIdx  = document.getElementById('addr-edit-idx').value
+    if (editIdx !== '') {
+      const i = parseInt(editIdx, 10)
+      addr.isDefault = list[i]?.isDefault || false
+      addr.id        = list[i]?.id || addr.id
+      list[i] = addr
+    } else {
+      addr.isDefault = list.length === 0   // first address is default automatically
+      list.push(addr)
+    }
+    saveAddresses(list)
+    hideAddressForm()
+    renderAddressList()
+    renderAccountBar()
+    showToast('Address saved ✓')
+    // if opened from checkout gate and this is now the only/default, proceed
+    if (window._addrAutoCheckout && loadSavedAddress()) { closeAddressModal(); checkout() }
   }
 
   // ── HEADER & COLORS ─────────────────────────────────────────────────────
@@ -1482,6 +1817,15 @@
     const badge = document.getElementById('cart-fab-badge')
     badge.textContent = total
     fab.classList.toggle('show', total > 0)
+    // Cart chip above input
+    const chipWrap  = document.getElementById('cart-chip-wrap')
+    const chipCount = document.getElementById('cart-chip-count')
+    const chipLabel = document.getElementById('cart-chip-label')
+    if (chipWrap && chipCount) {
+      chipCount.textContent = total
+      chipLabel.textContent = total > 0 ? `View Cart (${total} item${total>1?'s':''})` : 'View Cart'
+      chipWrap.style.display = total > 0 ? 'block' : 'none'
+    }
     document.querySelectorAll('[data-pid]').forEach(el => { if (el._refresh) el._refresh() })
   }
 
@@ -1544,6 +1888,11 @@
   async function checkout() {
     if (!cart.length) return
     if (checkout._running) return
+    // Option B: gate — require a default address before proceeding
+    if (!loadSavedAddress()) {
+      openAddressModal(true)   // true = auto-proceed after default is set
+      return
+    }
     checkout._running = true
     closeCart()
     const msgs = document.getElementById('chat-messages')
@@ -1552,9 +1901,17 @@
     prepBub.innerHTML='<p style="margin:0;color:var(--text2);">⏳ Preparing your order…</p>'
     prep.appendChild(prepBub); msgs.appendChild(prep); msgs.scrollTop=msgs.scrollHeight
     try {
+      const savedAddr = loadSavedAddress()
       const res = await fetch(`${API}/chat/${AGENT_ID}/checkout`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({items:cart.map(i=>({product_id:i._id,qty:i.qty})),customer:{}})
+        body:JSON.stringify({
+          items: cart.map(i=>({product_id:i._id,qty:i.qty})),
+          customer: {
+            name: window._customerName || '',
+            identifier: USER_IDENTIFIER || '',
+            ...(savedAddr ? { delivery_address: savedAddr } : {})
+          }
+        })
       })
       const d = await res.json(); prep.remove()
       if (!res.ok||d.error) { checkout._running=false; showChatMsg(`❌ ${d.error||'Unable to create order.'}`); return }
