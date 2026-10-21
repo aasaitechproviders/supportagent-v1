@@ -80,6 +80,18 @@
       background-size:250% 100%;animation:hdr-shimmer 5s linear infinite;
     }
     @keyframes hdr-shimmer{0%{background-position:0% 0%}100%{background-position:250% 0%}}
+    /* ── Offline banner ──────────────────────────────────────────────── */
+    #offline-banner{
+      display:none;position:sticky;top:0;z-index:50;
+      background:var(--red,#ef4444);color:#fff;
+      font-size:12.5px;font-weight:600;letter-spacing:.01em;
+      text-align:center;padding:7px 16px;gap:7px;
+      align-items:center;justify-content:center;
+      box-shadow:0 2px 8px rgba(239,68,68,.35);
+      animation:bannerDrop .25s cubic-bezier(.22,1,.36,1);
+    }
+    #offline-banner.show{display:flex;}
+    @keyframes bannerDrop{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
     .agent-avatar{
       width:42px;height:42px;border-radius:13px;
       background:linear-gradient(135deg,var(--brand),var(--brand-2));
@@ -640,6 +652,11 @@
 <body>
 
 <div id="app-shell">
+
+  <!-- Offline / connection-lost banner -->
+  <div id="offline-banner" role="alert" aria-live="assertive">
+    <span>📵</span><span id="offline-banner-text">You're offline — messages will send when reconnected</span>
+  </div>
 
   <div class="chat-header" id="chat-header" style="display:none;">
     <div class="agent-avatar" id="hdr-avatar">✦</div>
@@ -1945,7 +1962,11 @@
   async function streamResponse(question, suggestedPrompt) {
     let typingEl=null,group=null,renderer=null,salesGroup=null,salesTextBubble=null,salesRawText=''
     if (agentType === 'sales') { typingEl = showTyping() }
-    else { const created = createAgentBubble(); group = created.group; renderer = new StreamRenderer(created.bubble) }
+    else {
+      // Show typing dots while waiting for the first SSE chunk
+      typingEl = showTyping()
+      // The real bubble + renderer are created on first chunk arrival below
+    }
     const clientSendTime = Date.now(); let clientFirstChunkTime = null
     console.log(`[stream:send] q:"${(question||'').slice(0,80)}" session_id:${SESSION_ID} visitor_id:${VISITOR_ID} user_identifier:${USER_IDENTIFIER||'NONE'} agentType:${agentType}`)
     let res
@@ -2002,7 +2023,12 @@
               const msgs=document.getElementById('chat-messages')
               if (msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<140) msgs.scrollTop=msgs.scrollHeight
             }
-            if (evt.type==='chunk' && evt.html && renderer) {
+            if (evt.type==='chunk' && evt.html) {
+              // Lazy-create the renderer on first non-sales chunk (removes typing dots)
+              if (!renderer) {
+                if (typingEl) { typingEl.remove(); typingEl=null }
+                const created = createAgentBubble(); group = created.group; renderer = new StreamRenderer(created.bubble)
+              }
               if (clientFirstChunkTime===null) { clientFirstChunkTime=Date.now(); console.log(`[stream:sse] first chunk at +${clientFirstChunkTime-clientSendTime}ms`) }
               renderer.push(evt.html)
             }
@@ -2045,10 +2071,11 @@
         }
       }
     } finally { reader.releaseLock() }
+    // Safety: if no chunks were ever received for non-sales path, remove leftover typing dots
+    if (typingEl) { typingEl.remove(); typingEl=null }
     const clientTotal=Date.now()-clientSendTime, clientFirst=clientFirstChunkTime?clientFirstChunkTime-clientSendTime:clientTotal
     console.log(`[stream:complete] gotDone:${gotDone} isSales:${!!salesData} clientFirst:${clientFirst}ms clientTotal:${clientTotal}ms`)
     if (salesData) {
-      if (typingEl) { typingEl.remove(); typingEl=null }
       const finalGroup=finalizeSalesResponse(salesData,salesGroup,salesTextBubble)
       const productNames=(salesData.products||[]).map(id=>prodMap[id]?.name).filter(Boolean)
       msgHistory.push({role:'assistant',content:salesData.message||salesRawText||'',products:productNames})
@@ -2430,6 +2457,65 @@
     btn.title=on?'Recording — tap to stop & send':'Voice input'
     if (langBtn) langBtn.classList.toggle('recording',on)
   }
+
+  // ── OFFLINE BANNER ──────────────────────────────────────────────────────
+  ;(function initOfflineBanner() {
+    const banner  = document.getElementById('offline-banner')
+    const bannerTxt = document.getElementById('offline-banner-text')
+    function setOnline(online) {
+      if (!banner) return
+      banner.classList.toggle('show', !online)
+      if (bannerTxt) bannerTxt.textContent = online
+        ? '✅ Back online'
+        : "📵 You're offline — messages will send when reconnected"
+      if (online) setTimeout(() => banner.classList.remove('show'), 2500)
+    }
+    window.addEventListener('online',  () => setOnline(true))
+    window.addEventListener('offline', () => setOnline(false))
+    if (!navigator.onLine) setOnline(false)
+  })()
+
+  // ── CART LOCALSTORAGE PERSISTENCE ────────────────────────────────────────
+  const _CART_KEY = () => `sg_cart_${AGENT_ID}`
+  function saveCart() {
+    try { localStorage.setItem(_CART_KEY(), JSON.stringify(cart)) } catch {}
+  }
+  function restoreCart() {
+    try {
+      const stored = localStorage.getItem(_CART_KEY())
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed) && parsed.length) {
+          cart = parsed
+          updateCartBar()
+        }
+      }
+    } catch {}
+  }
+  // Patch addToCart and cart qty change to auto-save
+  const _origAddToCart = addToCart
+  window.addToCart = function(product, silent=false) {
+    _origAddToCart(product, silent)
+    saveCart()
+  }
+  // Patch checkout success to clear persisted cart
+  const _origUpdateCartBar = updateCartBar
+  // Hook: clear persisted cart when cart array is emptied externally (checkout)
+  const _cartProxy = new Proxy(cart, {
+    set(target, prop, value) {
+      target[prop] = value
+      if (prop === 'length' && value === 0) try { localStorage.removeItem(_CART_KEY()) } catch {}
+      return true
+    }
+  })
+  // Simpler approach: patch the qty change path in openCart
+  // We patch updateCartBar to save after every update
+  window.updateCartBar = function() {
+    _origUpdateCartBar()
+    saveCart()
+  }
+  // Restore cart on page load
+  restoreCart()
 
   // BOOT
   init()
