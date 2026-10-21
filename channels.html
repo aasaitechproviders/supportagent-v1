@@ -2182,6 +2182,8 @@ function renderConvList(platform) {
         <div class="msg-badges" style="margin-top:4px">
           ${c.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700;font-size:9.5px;padding:1px 6px">⚠️ Escalated</span>`:''}
           ${c.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;font-size:9.5px;padding:1px 6px">🤝 Human</span>`:''}
+          ${c.ticket_id?`<span class="badge-pill" style="background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;font-size:9.5px;padding:1px 6px">🎫 Ticket Raised</span>`:''}
+          ${c.thread_status==='escalated'&&!c.ticket_id?`<span class="badge-pill" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-size:9.5px;padding:1px 6px">🔴 CTA Shown</span>`:''}
           ${c.auto_replied&&c.status==='replied'?`<span class="badge-pill" style="background:linear-gradient(135deg,#ede9fe,#d1fae5);color:#059669;border:1px solid #a7f3d0;font-size:9.5px;padding:1px 6px">✦ AI replied</span>`:''}
           ${!c.auto_replied&&c.status==='replied'?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);font-size:9.5px;padding:1px 6px">✅ Replied</span>`:''}
           ${c.status==='failed'?`<span class="badge-pill" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);font-size:9.5px;padding:1px 6px">❌ Failed</span>`:''}
@@ -2281,6 +2283,7 @@ function renderChatPane(platform, data) {
   const isEsc       = data.human_handling && data.thread_status === 'escalated'
   const isHuman     = data.human_handling
   const hasFollowup = data.has_followup
+  const hasTicket   = !!data.ticket_id
 
   // Build contextual action buttons — shown at bottom after messages
   const actionBtns = `
@@ -2290,6 +2293,7 @@ function renderChatPane(platform, data) {
         ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)">⚠️ Escalated</span>`
         : `<button class="btn btn-sm" style="background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','escalate')">🔴 Escalate</button>`
       }
+      ${hasTicket ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd">🎫 Ticket #${(data.ticket_id||'').slice(-8).toUpperCase()}</span>` : ''}
       ${hasFollowup ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">📌 Followup ${fmtRelTime(data.followup_due)}</span>` : ''}
       <button class="btn btn-sm" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','confirm')">🤝 Confirmed</button>
       <button class="btn btn-sm" style="background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md);height:28px" onclick="threadAction('${platform}','${esc(data.thread_id)}','close')">✅ Close</button>
