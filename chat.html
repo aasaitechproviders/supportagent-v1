@@ -1525,6 +1525,15 @@
     sep.textContent = new Date().toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})
     msgs.appendChild(sep)
   }
+  function addBotMsg(html) {
+    const msgs = document.getElementById('chat-messages')
+    const group = document.createElement('div'); group.className = 'msg-group agent'
+    const bubble = document.createElement('div'); bubble.className = 'msg-bubble-agent'
+    bubble.innerHTML = html || ''
+    group.appendChild(bubble)
+    const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
+    group.appendChild(timeEl); msgs.appendChild(group); msgs.scrollTop = msgs.scrollHeight
+  }
   function addWelcomeMsg(text) {
     const msgs = document.getElementById('chat-messages')
     const group = document.createElement('div'); group.className = 'msg-group agent'
