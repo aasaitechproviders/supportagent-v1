@@ -1663,6 +1663,9 @@
   }
   async function sendMessageText(question, suggestedPrompt) {
     document.getElementById('topics-wrap').innerHTML = ''
+    // Show category chips now that topics are cleared
+    const catWrap = document.getElementById('category-chips-wrap')
+    if (catWrap && catWrap.children.length > 0) catWrap.style.display = 'flex'
     addUserMsg(question)
     msgHistory.push({ role: 'user', content: question })
     isTyping = true; document.getElementById('send-btn').disabled = true
@@ -1859,7 +1862,12 @@
       })
       wrap.appendChild(btn)
     })
-    wrap.style.display = 'flex'
+    // Only show category chips if topics are already gone (after first interaction)
+    const topicsWrap = document.getElementById('topics-wrap')
+    if (!topicsWrap || !topicsWrap.innerHTML.trim()) {
+      wrap.style.display = 'flex'
+    }
+    // else keep hidden — will be shown when topics are cleared (sendTopicChip / first message)
   }
 
   // ── CART ────────────────────────────────────────────────────────────────
