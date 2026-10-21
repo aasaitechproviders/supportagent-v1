@@ -675,9 +675,11 @@
       <button onclick="startChatFromPreCapture()" id="pre-chat-btn"
         style="width:100%;height:44px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s"
         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 16px var(--brand-glow)'"
-        onmouseout="this.style.transform='';this.style.boxShadow=''">
-        Start Chat →
-      </button>
+        onmouseout="this.style.transform='';this.style.boxShadow=''">Start Chat →</button>
+      <button onclick="browseAsGuest()" id="pre-chat-guest-btn"
+        style="width:100%;height:38px;border:1.5px solid var(--border2);border-radius:12px;background:transparent;color:var(--text2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s"
+        onmouseover="this.style.borderColor='var(--brand)';this.style.color='var(--brand)'"
+        onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">Browse as Guest</button>
     </div>
   </div>
 
@@ -740,6 +742,29 @@
     </div>
   </div>
 
+</div>
+
+<!-- Guest checkout capture modal -->
+<div class="addr-modal-overlay" id="guest-capture-overlay" onclick="if(event.target===this)closeGuestCapture()">
+  <div class="addr-modal" id="guest-capture-inner">
+    <div class="addr-modal-handle"></div>
+    <div class="addr-modal-header">
+      <div class="addr-modal-title">🛒 Almost there!</div>
+      <button onclick="closeGuestCapture()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2);line-height:1;">×</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin:0 0 16px;line-height:1.6;">Please enter your details to complete your order. We'll use this to confirm your delivery.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <input id="guest-name" type="text" placeholder="Your name" autocomplete="name"
+        class="addr-field" onkeydown="if(event.key==='Enter')document.getElementById('guest-identifier').focus()">
+      <input id="guest-identifier" type="tel" placeholder="Phone number" autocomplete="tel"
+        class="addr-field" id="guest-identifier" onkeydown="if(event.key==='Enter')submitGuestCapture()">
+      <div id="guest-capture-err" style="font-size:12px;color:#E05252;display:none;text-align:center;">Please fill in all fields.</div>
+      <button onclick="submitGuestCapture()" id="guest-capture-btn"
+        style="width:100%;height:44px;border:none;border-radius:12px;background:var(--brand);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;">
+        Confirm & Place Order →
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Address manager modal -->
@@ -1107,7 +1132,28 @@
           document.getElementById('pre-chat-name').focus()
         }
       } else {
-        console.log('[init] no identifier_type configured — skipping pre-chat form, going straight to chat UI')
+        // No identifier_type configured — use device session key for history
+        console.log('[init] no identifier_type configured — using device session key for history')
+        const deviceKey = (() => {
+          try {
+            let k = localStorage.getItem('sg_device_' + AGENT_ID)
+            if (!k) { k = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sg_device_' + AGENT_ID, k) }
+            return k
+          } catch { return null }
+        })()
+        if (deviceKey) {
+          USER_IDENTIFIER = deviceKey
+          try {
+            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(deviceKey)}`)
+            if (hRes.ok) {
+              const hData = await hRes.json()
+              if (hData.messages && hData.messages.length) {
+                console.log(`[init:history] device session — loaded ${hData.messages.length} past messages`)
+                window._historyToRender = hData.messages
+              }
+            }
+          } catch (e) { console.warn('[init:history:device]', e.message) }
+        }
         showChatUI()
       }
 
@@ -1157,10 +1203,78 @@
     if (agent.shopping_enabled || agentType === 'sales') {
       loadProducts()
     }
-    // Show account bar for ANY agent that has identifier_type configured
-    if (agent.identifier_type && USER_IDENTIFIER) {
+    // Show account bar for agents with identifier_type OR shopping agents with device key
+    if (USER_IDENTIFIER && (agent.identifier_type || agent.shopping_enabled || agentType === 'sales')) {
       renderAccountBar()
     }
+  }
+
+  // ── BROWSE AS GUEST ──────────────────────────────────────────────────────
+  function browseAsGuest() {
+    // Generate a device key so history still works within this device session
+    const deviceKey = (() => {
+      try {
+        let k = localStorage.getItem('sg_device_' + AGENT_ID)
+        if (!k) { k = 'dev_' + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem('sg_device_' + AGENT_ID, k) }
+        return k
+      } catch { return 'guest_' + Date.now() }
+    })()
+    USER_IDENTIFIER = deviceKey
+    window._isGuest = true
+    console.log('[guest] browsing as guest, device key:', deviceKey)
+    showChatUI()
+  }
+
+  // ── GUEST CHECKOUT CAPTURE ───────────────────────────────────────────────
+  function openGuestCapture() {
+    // Update placeholder based on identifier_type
+    const idInput = document.getElementById('guest-identifier')
+    if (idInput && agent?.identifier_type === 'email') {
+      idInput.type = 'email'; idInput.placeholder = 'Email address'
+    } else if (idInput) {
+      idInput.type = 'tel'; idInput.placeholder = 'Phone number'
+    }
+    document.getElementById('guest-capture-overlay').classList.add('open')
+    setTimeout(() => document.getElementById('guest-name')?.focus(), 100)
+  }
+  function closeGuestCapture() {
+    document.getElementById('guest-capture-overlay').classList.remove('open')
+    window._guestCheckoutPending = false
+  }
+  async function submitGuestCapture() {
+    const name       = (document.getElementById('guest-name')?.value || '').trim()
+    const identifier = (document.getElementById('guest-identifier')?.value || '').trim()
+    const errEl      = document.getElementById('guest-capture-err')
+    if (!name || !identifier) { errEl.style.display = 'block'; return }
+    errEl.style.display = 'none'
+    const btn = document.getElementById('guest-capture-btn')
+    btn.disabled = true; btn.textContent = 'Saving…'
+    // Upgrade guest to real identified user
+    USER_IDENTIFIER = identifier
+    window._customerName = name
+    window._isGuest = false
+    try { localStorage.setItem('sg_uid_' + AGENT_ID, identifier) } catch {}
+    try { localStorage.setItem('sg_customer_' + AGENT_ID, JSON.stringify({ name })) } catch {}
+    // Remove old device key so they're now properly identified
+    try { localStorage.removeItem('sg_device_' + AGENT_ID) } catch {}
+    // Save to DB
+    try {
+      await Promise.all([
+        fetch(`${API}/agents/${AGENT_ID}/customers`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier, name }),
+        }),
+        fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer: { name }, interests: '' }),
+        }),
+      ])
+    } catch (e) { console.warn('[guest-capture] DB save error:', e.message) }
+    renderAccountBar()
+    btn.disabled = false; btn.textContent = 'Confirm & Place Order →'
+    closeGuestCapture()
+    // Now proceed to checkout
+    checkout()
   }
 
   // ── PRE-CHAT CAPTURE SUBMIT ─────────────────────────────────────────────
@@ -1243,9 +1357,10 @@
       nameText.textContent = window._customerName
       namePill.style.display = 'inline-flex'; hasContent = true
     }
-    if (USER_IDENTIFIER) {
+    // Only show identifier pill when it's a real user-entered identifier (not device key)
+    if (USER_IDENTIFIER && agent?.identifier_type) {
       idText.textContent = USER_IDENTIFIER
-      idIcon.textContent = agent?.identifier_type === 'email' ? '✉️' : '📱'
+      idIcon.textContent = agent.identifier_type === 'email' ? '✉️' : '📱'
       idPill.style.display = 'inline-flex'; hasContent = true
     }
     const def = loadSavedAddress()
@@ -1981,7 +2096,10 @@
   async function checkout() {
     if (!cart.length) return
     if (checkout._running) return
-    // Option B: gate — require a default address before proceeding
+    // Gate 1 — guest user must provide name + contact before checkout
+    const isAnonymous = window._isGuest || USER_IDENTIFIER?.startsWith('dev_')
+    if (isAnonymous) { window._guestCheckoutPending = true; openGuestCapture(); return }
+    // Gate 2 — require a default address before proceeding
     if (!loadSavedAddress()) {
       openAddressModal(true)   // true = auto-proceed after default is set
       return
