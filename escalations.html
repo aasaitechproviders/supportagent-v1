@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Escalations — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── Escalations layout ───────────────────────────────────────── */
+.esc-wrap {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: calc(100vh - 109px);
+  min-height: 480px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+}
+@media (max-width: 700px) {
+  .esc-wrap { grid-template-columns: 1fr; height: auto; }
+  .esc-detail-panel { display: none; }
+  .esc-wrap.detail-open .esc-list-panel { display: none; }
+  .esc-wrap.detail-open .esc-detail-panel { display: flex; }
+}
+
+/* ── Left — ticket list ──────────────────────────────────────── */
+.esc-list-panel {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  min-height: 0;
+  background: var(--surface);
+}
+.esc-list-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+.esc-list-hdr-title { font-size: 11.5px; font-weight: 700; color: var(--text); letter-spacing: .04em; text-transform: uppercase; }
+.esc-filter-bar {
+  display: flex;
+  gap: 5px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.esc-filter-bar::-webkit-scrollbar { display: none; }
+.filter-pill {
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--t);
+}
+.filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-pill:hover:not(.active) { background: var(--surface-3); }
+
+.ticket-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-4) transparent;
+}
+.ticket-card {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .12s;
+}
+.ticket-card:hover { background: var(--surface-2); }
+.ticket-card.active { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+.ticket-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+.ticket-short {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+  color: var(--accent);
+  letter-spacing: .04em;
+}
+.ticket-time {
+  font-size: 10.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.ticket-issue {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+.ticket-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.ticket-source {
+  font-size: 10.5px;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+/* ── Status badges ───────────────────────────────────────────── */
+.badge-status {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.badge-open      { background: #fef3c7; color: #92400e; }
+.badge-escalated { background: #fee2e2; color: #991b1b; }
+.badge-resolved  { background: #d1fae5; color: #065f46; }
+[data-theme="dark"] .badge-open      { background: #78350f40; color: #fbbf24; }
+[data-theme="dark"] .badge-escalated { background: #7f1d1d40; color: #f87171; }
+[data-theme="dark"] .badge-resolved  { background: #064e3b40; color: #34d399; }
+
+/* ── Right — detail panel ───────────────────────────────────── */
+.esc-detail-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+}
+.esc-detail-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 12px;
+}
+.esc-detail-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--text);
+}
+.esc-detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.esc-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  gap: 10px;
+}
+.esc-empty-icon { font-size: 40px; }
+.esc-empty-label { font-size: 13px; font-weight: 600; }
+
+/* ── Detail info block ───────────────────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 900px) { .info-grid { grid-template-columns: 1fr; } }
+.info-row {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 13px;
+}
+.info-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+}
+.issue-block {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.issue-block-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.issue-text {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+/* ── Actions ─────────────────────────────────────────────────── */
+.esc-actions {
+  border-top: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  background: var(--surface-2);
+}
+.note-wrap { display: flex; gap: 8px; flex: 1; min-width: 200px; }
+.note-inp {
+  flex: 1;
+  padding: 8px 11px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-md);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12.5px;
+  outline: none;
+  transition: var(--t);
+  resize: none;
+  min-height: 38px;
+}
+.note-inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.btn-sm { font-size: 12px; padding: 7px 13px; }
+.btn-resolve  { background: var(--green, #10b981); color: #fff; }
+.btn-resolve:hover  { opacity: .9; }
+.btn-escalate { background: #ef4444; color: #fff; }
+.btn-escalate:hover { opacity: .9; }
+.status-sel {
+  padding: 7px 11px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-md);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: var(--t);
+}
+.status-sel:focus { border-color: var(--accent); }
+
+/* ── Empty/loading states ────────────────────────────────────── */
+.list-skeleton {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.skel-row { display: flex; gap: 8px; align-items: center; }
+</style>
+<script>
+;(function(){
+  var p = new URLSearchParams(location.search), t = p.get('token');
+  if (t) { localStorage.setItem('sg_token', t); history.replaceState({}, '', location.pathname); }
+  var dark = localStorage.getItem('sg_theme') === 'dark';
+  document.documentElement[dark ? 'setAttribute' : 'removeAttribute']('data-theme', 'dark');
+  document.documentElement.style.background = dark ? '#07080D' : '#F2F3F9';
+})();
+</script>
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()">
+      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
+    </button>
+    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle"></button></div>
+</div>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
+
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:12px;width:160px;border-radius:4px"></div>
+    <div class="skel" style="height:32px;width:160px;border-radius:var(--r-sm)"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel" style="height:min(600px, calc(100vh - 109px));border-radius:var(--r-lg)"></div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title">🎫 Escalations</div>
+        <div class="topbar-subtitle" id="esc-sub">Loading…</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
+        <option value="">— Select agent —</option>
+      </select>
+      <button class="theme-toggle"></button>
+    </div>
+  </div>
+
+  <div class="content" id="page-content" style="display:none;padding-top:20px">
+    <div class="esc-wrap" id="esc-wrap">
+
+      <!-- LEFT: ticket list -->
+      <div class="esc-list-panel">
+        <div class="esc-list-hdr">
+          <span class="esc-list-hdr-title">Tickets</span>
+          <span class="badge badge-gray" id="ticket-count">0</span>
+        </div>
+        <div class="esc-filter-bar" id="filter-bar">
+          <button class="filter-pill active" data-status="all"   onclick="setFilter('all')">All</button>
+          <button class="filter-pill"        data-status="Open"      onclick="setFilter('Open')">🔴 Open</button>
+          <button class="filter-pill"        data-status="Escalated" onclick="setFilter('Escalated')">🟠 Escalated</button>
+          <button class="filter-pill"        data-status="Resolved"  onclick="setFilter('Resolved')">🟢 Resolved</button>
+        </div>
+        <div class="ticket-list" id="ticket-list">
+          <div class="list-skeleton" id="list-skel">
+            ${Array.from({length:5}).map(()=>`<div class="skel-row"><div class="skel" style="height:64px;flex:1;border-radius:8px"></div></div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: ticket detail -->
+      <div class="esc-detail-panel" id="detail-panel">
+        <div class="esc-empty" id="detail-empty">
+          <div class="esc-empty-icon">🎫</div>
+          <div class="esc-empty-label">Select a ticket to view details</div>
+        </div>
+        <div id="detail-content" style="display:none;flex:1;display:flex;flex-direction:column;min-height:0;">
+          <div class="esc-detail-hdr">
+            <div>
+              <div class="esc-detail-title" id="det-short">#XXXXXXXX</div>
+            </div>
+            <span class="badge-status" id="det-badge">Open</span>
+          </div>
+          <div class="esc-detail-body" id="det-body">
+            <div class="issue-block">
+              <div class="issue-block-label">Issue reported</div>
+              <div class="issue-text" id="det-issue">—</div>
+            </div>
+            <div class="info-grid" id="det-grid"></div>
+            <div id="det-note-block" style="display:none;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+              <div class="issue-block-label" style="margin-bottom:6px;">Agent Note</div>
+              <div class="issue-text" id="det-note-text" style="color:var(--text-2);font-size:13px;"></div>
+            </div>
+          </div>
+          <div class="esc-actions">
+            <div class="note-wrap">
+              <textarea class="note-inp" id="note-inp" placeholder="Add a note for your team…" rows="1"
+                oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+              <button class="btn btn-sm btn-secondary" onclick="saveNote()">Save note</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select class="status-sel" id="status-sel" onchange="updateStatus(this.value)">
+                <option value="Open">Open</option>
+                <option value="Escalated">Escalated</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /content -->
+</div><!-- /main-wrap -->
+
+<script>
+var _agentId   = null
+var _tickets   = []
+var _activeId  = null
+var _filter    = 'all'
+
+// ── Init ─────────────────────────────────────────────────────────
+async function init() {
+  const { user } = await renderNav('escalations')
+  if (!user) return
+  await loadAgents()
+  document.getElementById('page-skeleton').style.display = 'none'
+  document.getElementById('page-content').style.display  = 'block'
+}
+
+async function loadAgents() {
+  try {
+    const d = await apiFetch('/agents')
+    const sel = document.getElementById('agent-sel')
+    sel.innerHTML = '<option value="">— Select agent —</option>'
+    ;(d.agents || []).forEach(a => {
+      const o = document.createElement('option')
+      o.value = a._id; o.textContent = a.name || 'Unnamed agent'
+      sel.appendChild(o)
+    })
+    // Auto-select stored or first agent
+    const stored = localStorage.getItem('sg_esc_agent')
+    if (stored) sel.value = stored
+    if (!sel.value && d.agents && d.agents.length) sel.value = d.agents[0]._id
+    if (sel.value) { _agentId = sel.value; loadTickets() }
+  } catch(e) { console.error('[loadAgents]', e.message) }
+}
+
+function onAgentChange() {
+  _agentId = document.getElementById('agent-sel').value
+  if (_agentId) { localStorage.setItem('sg_esc_agent', _agentId); loadTickets() }
+}
+
+function setFilter(status) {
+  _filter = status
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.status === status))
+  renderTicketList()
+}
+
+// ── Load tickets ──────────────────────────────────────────────────
+async function loadTickets() {
+  if (!_agentId) return
+  document.getElementById('list-skel').style.display = 'block'
+  try {
+    const d = await apiFetch(`/agents/${_agentId}/tickets?limit=200`)
+    _tickets = d.tickets || []
+    document.getElementById('esc-sub').textContent = `${_tickets.length} ticket${_tickets.length !== 1 ? 's' : ''}`
+    renderTicketList()
+  } catch(e) {
+    toast('Failed to load tickets: ' + e.message, 'error')
+    document.getElementById('esc-sub').textContent = 'Error loading'
+  } finally {
+    document.getElementById('list-skel').style.display = 'none'
+  }
+}
+
+function renderTicketList() {
+  const list = document.getElementById('ticket-list')
+  const filtered = _filter === 'all' ? _tickets : _tickets.filter(t => t.status === _filter)
+  document.getElementById('ticket-count').textContent = filtered.length
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="esc-empty" style="padding:40px 16px;"><div class="esc-empty-icon">🎫</div><div class="esc-empty-label">No ${_filter === 'all' ? '' : _filter + ' '}tickets</div></div>`
+    return
+  }
+
+  list.innerHTML = filtered.map(t => {
+    const short = t.ticket_short || (t._id || '').slice(-8).toUpperCase()
+    const dt    = t.created_at ? fmtAgo(new Date(t.created_at)) : ''
+    const src   = sourceLabel(t.source || t.channel || 'chat')
+    const badgeCls = t.status === 'Resolved' ? 'badge-resolved' : t.status === 'Escalated' ? 'badge-escalated' : 'badge-open'
+    return `<div class="ticket-card ${t._id === _activeId ? 'active' : ''}" onclick="openTicket('${t._id}')">
+      <div class="ticket-card-top">
+        <span class="ticket-short">#${short}</span>
+        <span class="ticket-time">${dt}</span>
+      </div>
+      <div class="ticket-issue">${esc(t.issue || '(no description)')}</div>
+      <div class="ticket-meta">
+        <span class="badge-status ${badgeCls}">${t.status || 'Open'}</span>
+        <span class="ticket-source">${src}</span>
+        ${t.user_identifier ? `<span class="ticket-source">👤 ${esc(t.user_identifier)}</span>` : ''}
+      </div>
+    </div>`
+  }).join('')
+}
+
+function sourceLabel(src) {
+  return { whatsapp:'WhatsApp 📱', gmail:'Gmail 📧', instagram:'Instagram 📸', facebook:'Facebook 📘', chat:'Widget 💬' }[src] || src
+}
+
+// ── Open ticket detail ────────────────────────────────────────────
+function openTicket(id) {
+  _activeId = id
+  renderTicketList() // re-render to update active highlight
+  const t = _tickets.find(x => x._id === id)
+  if (!t) return
+  document.getElementById('detail-empty').style.display   = 'none'
+  document.getElementById('detail-content').style.display = 'flex'
+
+  const short = t.ticket_short || (t._id || '').slice(-8).toUpperCase()
+  document.getElementById('det-short').textContent = '#' + short
+  document.getElementById('det-issue').textContent = t.issue || '(no description)'
+
+  const badge = document.getElementById('det-badge')
+  badge.textContent = t.status || 'Open'
+  badge.className   = 'badge-status ' + (t.status === 'Resolved' ? 'badge-resolved' : t.status === 'Escalated' ? 'badge-escalated' : 'badge-open')
+
+  document.getElementById('status-sel').value = t.status || 'Open'
+  document.getElementById('note-inp').value    = ''
+
+  // Note block
+  const noteBlock = document.getElementById('det-note-block')
+  if (t.agent_note) {
+    document.getElementById('det-note-text').textContent = t.agent_note
+    noteBlock.style.display = 'block'
+  } else { noteBlock.style.display = 'none' }
+
+  // Info grid
+  const rows = [
+    { label: 'Source',         value: sourceLabel(t.source || t.channel || 'chat') },
+    { label: 'Contact',        value: t.user_identifier || '—' },
+    { label: 'Created',        value: t.created_at ? new Date(t.created_at).toLocaleString() : '—' },
+    { label: 'Resolved at',    value: t.resolved_at ? new Date(t.resolved_at).toLocaleString() : '—' },
+    { label: 'Thread / Session', value: t.thread_id || t.session_id || '—' },
+    { label: 'Ticket ID',      value: t._id || '—' },
+  ]
+  document.getElementById('det-grid').innerHTML = rows.map(r =>
+    `<div class="info-row"><div class="info-label">${r.label}</div><div class="info-value">${esc(String(r.value))}</div></div>`
+  ).join('')
+
+  // Mobile: show detail panel
+  document.getElementById('esc-wrap').classList.add('detail-open')
+}
+
+// ── Update status ─────────────────────────────────────────────────
+async function updateStatus(newStatus) {
+  if (!_agentId || !_activeId) return
+  try {
+    const d = await apiFetch(`/agents/${_agentId}/tickets/${_activeId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: newStatus })
+    })
+    const updated = d.ticket
+    const idx = _tickets.findIndex(t => t._id === _activeId)
+    if (idx !== -1) _tickets[idx] = updated
+    openTicket(_activeId)
+    renderTicketList()
+    toast('Status updated to ' + newStatus, 'success')
+  } catch(e) { toast('Failed to update: ' + e.message, 'error') }
+}
+
+// ── Save note ─────────────────────────────────────────────────────
+async function saveNote() {
+  if (!_agentId || !_activeId) return
+  const note = document.getElementById('note-inp').value.trim()
+  if (!note) return
+  try {
+    const d = await apiFetch(`/agents/${_agentId}/tickets/${_activeId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ note })
+    })
+    const updated = d.ticket
+    const idx = _tickets.findIndex(t => t._id === _activeId)
+    if (idx !== -1) _tickets[idx] = updated
+    openTicket(_activeId)
+    toast('Note saved', 'success')
+  } catch(e) { toast('Failed to save note: ' + e.message, 'error') }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+function fmtAgo(date) {
+  const diff = Date.now() - date.getTime()
+  if (diff < 60000)   return 'just now'
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago'
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago'
+  return Math.floor(diff/86400000) + 'd ago'
+}
+function toast(msg, type='info', dur=2500) {
+  const c = document.getElementById('toast-container')
+  if (!c) return
+  const el = document.createElement('div')
+  el.className = `toast toast-${type}`
+  el.textContent = msg
+  c.appendChild(el)
+  requestAnimationFrame(() => el.classList.add('show'))
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300) }, dur)
+}
+
+init()
+</script>
+</body>
+</html>
