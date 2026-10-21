@@ -1131,6 +1131,9 @@
     if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
     if (agent.shopping_enabled || agentType === 'sales') {
       loadProducts()
+    }
+    // Show account bar for ANY agent that has identifier_type configured
+    if (agent.identifier_type && USER_IDENTIFIER) {
       renderAccountBar()
     }
   }
