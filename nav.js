@@ -21,7 +21,8 @@ const _NAV_SECTIONS = [
   {
     labelKey: 'navSettings',
     items: [
-      { page:'channels', href:'channels.html', labelKey:'navChannels', icon:'📡' },
+      { page:'channels',     href:'channels.html',     labelKey:'navChannels', icon:'📡' },
+      { page:'escalations',  href:'escalations.html',  label:'Escalations',    icon:'🎫' },
     ]
   },
   {
