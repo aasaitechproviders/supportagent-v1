@@ -190,7 +190,6 @@
       color:#fff;font-size:13.5px;font-weight:700;font-family:var(--font);
       cursor:pointer;transition:opacity .15s;margin-top:2px;
     }
-    
     .addr-save-btn:hover{opacity:.88;}
     .addr-cancel-link{display:block;text-align:center;margin-top:10px;font-size:12px;
       color:var(--text3);cursor:pointer;font-weight:600;}
@@ -927,6 +926,9 @@
         ? crypto.randomUUID()
         : 'sid_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9)
       sessionStorage.setItem(key, sid)
+      console.log(`[identity:SESSION_ID] NEW generated — key:${key} sid:${sid}`)
+    } else {
+      console.log(`[identity:SESSION_ID] RESTORED from sessionStorage — key:${key} sid:${sid}`)
     }
     return sid
   }())
@@ -939,6 +941,9 @@
         ? crypto.randomUUID()
         : 'vid_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9)
       localStorage.setItem(key, vid)
+      console.log(`[identity:VISITOR_ID] NEW generated — key:${key} vid:${vid}`)
+    } else {
+      console.log(`[identity:VISITOR_ID] RESTORED from localStorage — key:${key} vid:${vid}`)
     }
     return vid
   }())
@@ -994,11 +999,13 @@
   async function init() {
     if (!AGENT_ID) { showError(ct('noAgentUrl')); return }
     try {
+      console.log(`[init] fetching config for AGENT_ID:${AGENT_ID} SESSION_ID:${SESSION_ID} VISITOR_ID:${VISITOR_ID}`)
       const res = await fetch(`${API}/chat/${AGENT_ID}/config`)
       if (!res.ok) throw new Error(`${ct('agentNotFound')} (${res.status})`)
       agent     = await res.json()
       agentType = agent.agent_type || 'general'
       chatLang  = _resolveLang(agent.ui_lang)
+      console.log(`[init:config] agent:"${agent.name}" agent_type:${agentType} identifier_type:${agent.identifier_type||'none'} pre_chat:${!!agent.identifier_type} shopping_enabled:${!!agent.shopping_enabled} ui_lang:${chatLang}`)
 
       document.documentElement.lang = chatLang
       document.getElementById('loading-label') && (document.getElementById('loading-label').textContent = ct('loadingAgent'))
@@ -1021,6 +1028,8 @@
         if (storedIdentifier) {
           // Returning visitor on same device — restore from DB first
           USER_IDENTIFIER = storedIdentifier
+          console.log(`[identity:USER_IDENTIFIER] RESTORED from localStorage — key:sg_uid_${AGENT_ID} identifier:"${storedIdentifier}"`)
+          console.log(`[init:returning] fetching session + customer for identifier:"${storedIdentifier}"`)
           try {
             const [sRes, cRes] = await Promise.all([
               fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(storedIdentifier)}`),
@@ -1029,6 +1038,7 @@
             // Restore customer profile (name + addresses) from DB
             if (cRes.ok) {
               const cData = await cRes.json()
+              console.log(`[init:customer] status:${cRes.status} found:${cData.found} name:"${cData.customer?.name||''}" addresses:${(cData.customer?.addresses||[]).length}`)
               if (cData.found && cData.customer) {
                 window._customerName = cData.customer.name || storedCustomer?.name || ''
                 // Sync addresses from DB to localStorage cache
@@ -1036,17 +1046,25 @@
                 const def = (cData.customer.addresses || []).find(a => a.isDefault) || (cData.customer.addresses || [])[0] || null
                 try { localStorage.setItem('sg_addr_' + AGENT_ID, def ? JSON.stringify(def) : 'null') } catch {}
               }
+            } else {
+              console.warn(`[init:customer] fetch failed status:${cRes.status}`)
             }
             if (sRes.ok) {
               const sData = await sRes.json()
+              console.log(`[init:session] status:${sRes.status} found:${sData.found} customer_name:"${sData.session?.customer?.name||''}"`)
               if (sData.found && sData.session && !window._customerName) {
                 window._customerName = sData.session.customer?.name || storedCustomer?.name || ''
               }
+            } else {
+              console.warn(`[init:session] fetch failed status:${sRes.status}`)
             }
-          } catch { /* silent — fall through with whatever we have */ }
+          } catch (e) {
+            console.warn('[init:returning] session/customer fetch error:', e.message)
+          }
           showChatUI()
         } else {
           // New visitor — show pre-chat form
+          console.log(`[identity:USER_IDENTIFIER] NOT found in localStorage — showing pre-chat form (identifier_type:${agent.identifier_type})`)
           const preChatAv = document.getElementById('pre-chat-avatar')
           if (agent.logo_base64 && /^data:image\//.test(agent.logo_base64)) {
             preChatAv.innerHTML = `<img src="${agent.logo_base64}" alt="" style="width:100%;height:100%;object-fit:cover">`
@@ -1077,6 +1095,7 @@
           document.getElementById('pre-chat-name').focus()
         }
       } else {
+        console.log('[init] no identifier_type configured — skipping pre-chat form, going straight to chat UI')
         showChatUI()
       }
 
@@ -1134,6 +1153,8 @@
     // Persist identifier locally (only the lookup key stays in localStorage)
     USER_IDENTIFIER = identifier
     window._customerName = name
+    console.log(`[pre-chat:submit] name:"${name}" identifier:"${identifier}" identifier_type:${agent.identifier_type} → USER_IDENTIFIER set`)
+    console.log(`[identity:USER_IDENTIFIER] NEW from pre-chat form — saving to localStorage key:sg_uid_${AGENT_ID}`)
     try { localStorage.setItem('sg_uid_' + AGENT_ID, identifier) } catch {}
     try { localStorage.setItem('sg_customer_' + AGENT_ID, JSON.stringify({ name })) } catch {} // fallback cache
 
@@ -1658,6 +1679,7 @@
     if (agentType === 'sales') { typingEl = showTyping() }
     else { const created = createAgentBubble(); group = created.group; renderer = new StreamRenderer(created.bubble) }
     const clientSendTime = Date.now(); let clientFirstChunkTime = null
+    console.log(`[stream:send] q:"${(question||'').slice(0,80)}" session_id:${SESSION_ID} visitor_id:${VISITOR_ID} user_identifier:${USER_IDENTIFIER||'NONE'} agentType:${agentType}`)
     let res
     try {
       res = await fetch(`${API}/chat/${AGENT_ID}/stream`, {
@@ -1673,15 +1695,18 @@
         }),
       })
     } catch(e) {
+      console.error('[stream:send] network error:', e.message)
       if (renderer) renderer.error('Network error.')
       else { if (typingEl) typingEl.remove(); showChatMsg('⚠️ Network error. Please check your connection.') }
       throw e
     }
     if (!res.ok || !res.body) {
+      console.error(`[stream:send] server error status:${res.status}`)
       if (renderer) renderer.error(`Server error (${res.status}).`)
       else { if (typingEl) typingEl.remove(); showChatMsg(`⚠️ Server error (${res.status}).`) }
       throw new Error(`HTTP ${res.status}`)
     }
+    console.log(`[stream:connected] status:${res.status} — reading SSE...`)
     const reader=res.body.getReader(), decoder=new TextDecoder()
     let lineBuffer='',finalAnswer='',gotDone=false,salesData=null,serverTiming=null,tokenCount=null
     try {
@@ -1696,7 +1721,7 @@
             if (!line.startsWith('data: ')) continue
             let evt; try { evt=JSON.parse(line.slice(6)) } catch { continue }
             if (evt.type==='sales_chunk' && evt.text) {
-              if (clientFirstChunkTime===null) clientFirstChunkTime=Date.now()
+              if (clientFirstChunkTime===null) { clientFirstChunkTime=Date.now(); console.log(`[stream:sse] first sales_chunk at +${clientFirstChunkTime-clientSendTime}ms`) }
               if (!salesGroup) {
                 if (typingEl) { typingEl.remove(); typingEl=null }
                 salesGroup=document.createElement('div'); salesGroup.className='msg-group agent'
@@ -1709,16 +1734,22 @@
               if (msgs.scrollHeight-msgs.scrollTop-msgs.clientHeight<140) msgs.scrollTop=msgs.scrollHeight
             }
             if (evt.type==='chunk' && evt.html && renderer) {
-              if (clientFirstChunkTime===null) clientFirstChunkTime=Date.now()
+              if (clientFirstChunkTime===null) { clientFirstChunkTime=Date.now(); console.log(`[stream:sse] first chunk at +${clientFirstChunkTime-clientSendTime}ms`) }
               renderer.push(evt.html)
             }
             if (evt.type==='done') {
               // NOTE: we do NOT overwrite SESSION_ID here — it's a const
               // evt.session_id from server is ignored; we own our identity
               finalAnswer=evt.answer||''; gotDone=true; serverTiming=evt.timing||null; tokenCount=evt.tokens||null
+              console.log(`[stream:sse] done — answerLen:${finalAnswer.length} tokens:${JSON.stringify(tokenCount)} server_timing:${JSON.stringify(serverTiming)} client_total:+${Date.now()-clientSendTime}ms`)
             }
-            if (evt.type==='sales_response') { salesData=evt; gotDone=true; serverTiming=evt.timing||null; tokenCount=evt.tokens||null; if (clientFirstChunkTime===null) clientFirstChunkTime=Date.now() }
+            if (evt.type==='sales_response') {
+              if (clientFirstChunkTime===null) clientFirstChunkTime=Date.now()
+              salesData=evt; gotDone=true; serverTiming=evt.timing||null; tokenCount=evt.tokens||null
+              console.log(`[stream:sse] sales_response — products:${(evt.products||[]).length} msgLen:${(evt.message||'').length} tokens:${JSON.stringify(tokenCount)}`)
+            }
             if (evt.type==='error') {
+              console.error(`[stream:sse] error event — message:"${evt.message}"`)
               if (renderer) renderer.error(evt.message)
               else { if (typingEl) typingEl.remove(); showChatMsg(`⚠️ ${evt.message}`) }
               return true
@@ -1728,6 +1759,7 @@
       }
     } finally { reader.releaseLock() }
     const clientTotal=Date.now()-clientSendTime, clientFirst=clientFirstChunkTime?clientFirstChunkTime-clientSendTime:clientTotal
+    console.log(`[stream:complete] gotDone:${gotDone} isSales:${!!salesData} clientFirst:${clientFirst}ms clientTotal:${clientTotal}ms`)
     if (salesData) {
       if (typingEl) { typingEl.remove(); typingEl=null }
       const finalGroup=finalizeSalesResponse(salesData,salesGroup,salesTextBubble)
@@ -1752,6 +1784,8 @@
   // ══════════════════════════════════════════════════════════════════════
   async function nonStreamResponse(question, suggestedPrompt) {
     const typEl = showTyping()
+    const t0 = Date.now()
+    console.log(`[nonstream:send] q:"${(question||'').slice(0,80)}" session_id:${SESSION_ID} visitor_id:${VISITOR_ID} user_identifier:${USER_IDENTIFIER||'NONE'} agentType:${agentType}`)
     try {
       const res = await fetch(`${API}/chat/${AGENT_ID}`, {
         method: 'POST',
@@ -1766,7 +1800,9 @@
         }),
       })
       const d = await res.json(); typEl.remove()
+      console.log(`[nonstream:recv] status:${res.status} type:${d.type||'answer'} answerLen:${(d.answer||d.message||'').length} took:${Date.now()-t0}ms`)
       if (d.type==='sales_response') {
+        console.log(`[nonstream:recv] sales_response — products:${(d.products||[]).length} msgLen:${(d.message||'').length}`)
         const uniqueIds=[...new Set((d.products||[]).map(String))]
         const g=finalizeSalesResponse({...d,products:uniqueIds},null,null)
         const productNames=uniqueIds.map(id=>prodMap[id]?.name).filter(Boolean)
@@ -1779,6 +1815,7 @@
       document.getElementById('chat-messages').scrollTop=999999
       msgHistory.push({role:'assistant',content:(d.answer||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,600)})
     } catch(e) {
+      console.error(`[nonstream:error] ${e.message} took:${Date.now()-t0}ms`)
       typEl.remove()
       const {bubble}=createAgentBubble()
       bubble.innerHTML=`<p style="color:var(--red);margin:0;">${ct('sorryError')}</p>`
