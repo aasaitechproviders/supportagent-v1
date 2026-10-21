@@ -977,13 +977,21 @@
   let USER_IDENTIFIER = null
 
   // Other state (sessionId removed — replaced by SESSION_ID const above)
-  let agent      = null
-  let allProds   = []
-  let prodMap    = {}
-  let cart       = []
-  let msgHistory = []
-  let isTyping   = false
-  let agentType  = 'general'
+  let agent             = null
+  let allProds          = []
+  let prodMap           = {}
+  let cart              = []
+  let msgHistory        = []
+  let isTyping          = false
+  let agentType         = 'general'
+  let escalationCtaShown = false   // true after server sends escalation_cta_shown
+  let lastQuestion      = ''       // for retry
+
+  // ── Retry last message (wired to error card button) ──────────────────────
+  window.__sgRetryLast = function () {
+    if (!lastQuestion || isTyping) return
+    sendMessageText(lastQuestion, '')
+  }
 
   // ── StreamRenderer ──────────────────────────────────────────────────────
   class StreamRenderer {
@@ -1863,6 +1871,7 @@
     // Show category chips now that topics are cleared
     const catWrap = document.getElementById('category-chips-wrap')
     if (catWrap && catWrap.children.length > 0) catWrap.style.display = 'flex'
+    lastQuestion = question
     addUserMsg(question)
     msgHistory.push({ role: 'user', content: question })
     isTyping = true; document.getElementById('send-btn').disabled = true
@@ -1872,6 +1881,62 @@
     } catch(e) { console.warn('[send]', e); await nonStreamResponse(question, suggestedPrompt) }
     isTyping = false; document.getElementById('send-btn').disabled = false
     document.getElementById('chat-input').focus()
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // TICKET FORM — in-chat form to raise a support ticket manually
+  // ══════════════════════════════════════════════════════════════════════
+  function showTicketFormLink() {
+    if (agentType !== 'support') return
+    const msgs = document.getElementById('chat-messages')
+    const wrap = document.createElement('div')
+    wrap.style.cssText = 'display:flex;justify-content:center;padding:6px 0 2px;'
+    wrap.innerHTML = `<button onclick="showTicketForm()" style="font-size:12px;color:var(--brand);background:none;border:none;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">Raise a support ticket</button>`
+    msgs.appendChild(wrap); msgs.scrollTop = msgs.scrollHeight
+  }
+
+  function showTicketForm() {
+    const msgs = document.getElementById('chat-messages')
+    const existing = document.getElementById('sg-ticket-form')
+    if (existing) { existing.remove(); return }
+    const formWrap = document.createElement('div')
+    formWrap.id = 'sg-ticket-form'
+    formWrap.style.cssText = 'padding:14px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;margin:8px 0;'
+    formWrap.innerHTML = `<p style="margin:0 0 10px;font-size:13.5px;font-weight:600;color:var(--text);">📝 Raise a Support Ticket</p><input id="sg-ticket-name" placeholder="Your name (optional)" style="width:100%;padding:8px 10px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;" /><input id="sg-ticket-email" placeholder="Email (optional)" style="width:100%;padding:8px 10px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;" /><textarea id="sg-ticket-issue" placeholder="Describe your issue…" rows="3" style="width:100%;padding:8px 10px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;"></textarea><div style="display:flex;gap:8px;"><button onclick="submitTicketForm()" style="flex:1;padding:9px 0;border-radius:9px;background:var(--brand);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">Submit Ticket</button><button onclick="document.getElementById('sg-ticket-form').remove()" style="padding:9px 14px;border-radius:9px;background:var(--surface3);color:var(--text2);border:1px solid var(--border);cursor:pointer;font-size:13px;font-family:inherit;">Cancel</button></div><p id="sg-ticket-msg" style="display:none;margin:8px 0 0;font-size:12.5px;color:var(--green);"></p>`
+    // Pre-fill issue from last user message
+    const issueEl = formWrap.querySelector('#sg-ticket-issue')
+    if (issueEl && lastQuestion) issueEl.value = lastQuestion
+    msgs.appendChild(formWrap); msgs.scrollTop = msgs.scrollHeight
+  }
+
+  async function submitTicketForm() {
+    const name  = (document.getElementById('sg-ticket-name')?.value  || '').trim()
+    const email = (document.getElementById('sg-ticket-email')?.value || '').trim()
+    const issue = (document.getElementById('sg-ticket-issue')?.value || '').trim()
+    const msgEl = document.getElementById('sg-ticket-msg')
+    if (!issue) { if (msgEl) { msgEl.style.color='var(--red)'; msgEl.style.display='block'; msgEl.textContent='Please describe your issue.' }; return }
+    const btns = document.querySelectorAll('#sg-ticket-form button')
+    btns.forEach(b => b.disabled = true)
+    const submitBtn = btns[0]; if (submitBtn) submitBtn.textContent = 'Submitting…'
+    try {
+      const res  = await fetch(`${API}/chat/${AGENT_ID}/ticket`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, issue, session_id: SESSION_ID, visitor_id: VISITOR_ID, user_identifier: window.USER_IDENTIFIER || null }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) throw new Error(data.error || 'Failed')
+      const formEl = document.getElementById('sg-ticket-form')
+      if (formEl) formEl.remove()
+      const confirmHtml = `<div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin:4px 0;"><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">✅</span><strong style="font-size:13.5px;color:var(--text);">Ticket raised!</strong></div><p style="margin:0;font-size:13px;color:var(--text2);line-height:1.7;">Our support team will reach out soon. Ticket ref: <strong>#${data.ticket_short}</strong></p></div>`
+      const msgs = document.getElementById('chat-messages')
+      const div  = document.createElement('div'); div.className = 'msg-group agent'
+      const bub  = document.createElement('div'); bub.className = 'msg-bubble-agent'; bub.innerHTML = confirmHtml
+      div.appendChild(bub); msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight
+    } catch (e) {
+      if (msgEl) { msgEl.style.color='var(--red)'; msgEl.style.display='block'; msgEl.textContent='Failed to submit. Please try again.' }
+      btns.forEach(b => b.disabled = false); if (submitBtn) submitBtn.textContent = 'Submit Ticket'
+    }
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -1894,6 +1959,7 @@
           session_id:       SESSION_ID,          // ← always set, never undefined
           visitor_id:       VISITOR_ID,          // ← persistent browser identity
           user_identifier:  USER_IDENTIFIER || undefined,  // ← sales session identity
+          user_name:        window._customerName || undefined,  // ← personalization
           suggested_prompt: suggestedPrompt || undefined,
         }),
       })
@@ -1957,6 +2023,24 @@
               else { if (typingEl) typingEl.remove(); showChatMsg(`⚠️ ${evt.message}`) }
               return true
             }
+            // Escalation CTA was shown — flag so next user reply triggers consent flow
+            if (evt.type==='escalation_cta_shown') {
+              escalationCtaShown = true
+              console.log('[stream:sse] escalation_cta_shown — next consent reply will create ticket')
+            }
+            // Escalation ticket confirmed by backend
+            if (evt.type==='escalation_confirmed') {
+              escalationCtaShown = false
+              console.log(`[stream:sse] escalation_confirmed ticket_id:${evt.ticket_id} short:#${evt.ticket_short}`)
+              // Optionally append raise-another-ticket link below confirmation card
+              setTimeout(() => showTicketFormLink(), 800)
+            }
+            // Stream error with retry button (sent by backend catch block)
+            if (evt.type==='stream_error') {
+              console.error(`[stream:sse] stream_error — message:"${evt.message}"`)
+              if (renderer) { renderer.finalize(evt.html || `<p style="margin:0;color:var(--text-2);font-size:13.5px;">⚠️ ${evt.message}</p>`); gotDone = true }
+              else { if (typingEl) { typingEl.remove(); typingEl=null } showChatMsg(evt.html || `⚠️ ${evt.message}`) }
+            }
           }
         }
       }
@@ -1999,6 +2083,7 @@
           session_id:       SESSION_ID,          // ← always set
           visitor_id:       VISITOR_ID,          // ← always set
           user_identifier:  USER_IDENTIFIER || undefined,  // ← sales session identity
+          user_name:        window._customerName || undefined,  // ← personalization
           suggested_prompt: suggestedPrompt || undefined,
         }),
       })
