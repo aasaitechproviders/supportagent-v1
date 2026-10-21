@@ -813,7 +813,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  console.log("aktest")
   const CHAT_STRINGS = {
     en: {
       loadingAgent:'Loading agent…',online:'Online',poweredBy:'Powered by',askAnything:'Ask anything…',
@@ -1182,10 +1181,32 @@
     document.getElementById('chat-header').style.display     = 'flex'
     addDateSeparator()
     // Render past history for returning user BEFORE welcome message
-    if (window._historyToRender && window._historyToRender.length) {
+    // Shopping agents wait until prodMap is loaded (handled after loadProducts below)
+    const _isShopping = agent.shopping_enabled || agentType === 'sales'
+    if (!_isShopping && window._historyToRender && window._historyToRender.length) {
       window._historyToRender.forEach(msg => {
         addUserMsg(msg.question || '')
-        addBotMsg(msg.answer || '')
+        // If this response had product cards, render them inside a sales group
+        const shownIds = msg.products_shown || []
+        if (shownIds.length && typeof prodMap !== 'undefined' && typeof renderProductCards === 'function') {
+          const resolved = shownIds.map(id => prodMap[String(id)]).filter(Boolean)
+          if (resolved.length) {
+            const msgs2 = document.getElementById('chat-messages')
+            const salesGroup = document.createElement('div'); salesGroup.className = 'msg-group agent'
+            if (msg.answer) {
+              const bubble = document.createElement('div'); bubble.className = 'msg-bubble-sales'; bubble.textContent = msg.answer
+              salesGroup.appendChild(bubble)
+            }
+            salesGroup.appendChild(renderProductCards(resolved))
+            const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
+            salesGroup.appendChild(timeEl)
+            msgs2.appendChild(salesGroup); msgs2.scrollTop = msgs2.scrollHeight
+          } else {
+            addBotMsg(msg.answer || '')
+          }
+        } else {
+          addBotMsg(msg.answer || '')
+        }
         // Also push into msgHistory so context is available for next message
         msgHistory.push({ role: 'user', content: msg.question || '' })
         msgHistory.push({ role: 'assistant', content: (msg.answer || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 600) })
@@ -1202,7 +1223,33 @@
     addWelcomeMsg(welcomeText)
     if (agent.cached_topics?.length) renderTopics(agent.cached_topics)
     if (agent.shopping_enabled || agentType === 'sales') {
-      loadProducts()
+      await loadProducts()
+      // Now that prodMap is populated, render history with product cards
+      if (window._historyToRender && window._historyToRender.length) {
+        window._historyToRender.forEach(msg => {
+          addUserMsg(msg.question || '')
+          const shownIds = msg.products_shown || []
+          const resolved = shownIds.map(id => prodMap[String(id)]).filter(Boolean)
+          if (resolved.length) {
+            const msgs2 = document.getElementById('chat-messages')
+            const salesGroup = document.createElement('div'); salesGroup.className = 'msg-group agent'
+            if (msg.answer) {
+              const bubble = document.createElement('div'); bubble.className = 'msg-bubble-sales'; bubble.textContent = msg.answer
+              salesGroup.appendChild(bubble)
+            }
+            salesGroup.appendChild(renderProductCards(resolved))
+            const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
+            salesGroup.appendChild(timeEl)
+            msgs2.appendChild(salesGroup); msgs2.scrollTop = msgs2.scrollHeight
+          } else {
+            addBotMsg(msg.answer || '')
+          }
+          msgHistory.push({ role: 'user', content: msg.question || '' })
+          msgHistory.push({ role: 'assistant', content: (msg.answer || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 600) })
+        })
+        window._historyToRender = null
+        addDateSeparator()
+      }
     }
     // Show account bar for agents with identifier_type OR shopping agents with device key
     if (USER_IDENTIFIER && (agent.identifier_type || agent.shopping_enabled || agentType === 'sales')) {
@@ -2304,5 +2351,4 @@
 </script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
-  
 </html>
