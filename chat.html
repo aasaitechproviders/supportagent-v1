@@ -1088,7 +1088,7 @@
           }
           // Load and render past conversation history for returning user
           try {
-            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(storedIdentifier)}`)
+            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(storedIdentifier)}&session_id=${encodeURIComponent(SESSION_ID)}`)
             if (hRes.ok) {
               const hData = await hRes.json()
               if (hData.messages && hData.messages.length) {
@@ -1144,7 +1144,7 @@
         if (deviceKey) {
           USER_IDENTIFIER = deviceKey
           try {
-            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(deviceKey)}`)
+            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(deviceKey)}&session_id=${encodeURIComponent(SESSION_ID)}`)
             if (hRes.ok) {
               const hData = await hRes.json()
               if (hData.messages && hData.messages.length) {
