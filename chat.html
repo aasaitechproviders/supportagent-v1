@@ -1061,6 +1061,18 @@
           } catch (e) {
             console.warn('[init:returning] session/customer fetch error:', e.message)
           }
+          // Load and render past conversation history for returning user
+          try {
+            const hRes = await fetch(`${API}/chat/${AGENT_ID}/history?identifier=${encodeURIComponent(storedIdentifier)}`)
+            if (hRes.ok) {
+              const hData = await hRes.json()
+              if (hData.messages && hData.messages.length) {
+                console.log(`[init:history] loaded ${hData.messages.length} past messages`)
+                // Render history into chat before showChatUI opens
+                window._historyToRender = hData.messages
+              }
+            }
+          } catch (e) { console.warn('[init:history]', e.message) }
           showChatUI()
         } else {
           // New visitor — show pre-chat form
@@ -1122,6 +1134,19 @@
     document.getElementById('chat-input-wrap').style.display = 'block'
     document.getElementById('chat-header').style.display     = 'flex'
     addDateSeparator()
+    // Render past history for returning user BEFORE welcome message
+    if (window._historyToRender && window._historyToRender.length) {
+      window._historyToRender.forEach(msg => {
+        addUserMsg(msg.question || '')
+        addBotMsg(msg.answer || '')
+        // Also push into msgHistory so context is available for next message
+        msgHistory.push({ role: 'user', content: msg.question || '' })
+        msgHistory.push({ role: 'assistant', content: (msg.answer || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 600) })
+      })
+      window._historyToRender = null
+      // Add separator before new session
+      addDateSeparator()
+    }
     // Personalise welcome for returning customers
     let welcomeText = agent.welcome_message || ct('defaultWelcome').replace('{name}', agent.name || 'your assistant')
     if (window._customerName) {
