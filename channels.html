@@ -1472,7 +1472,7 @@ async function loadLiveChatThread(key) {
         <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
           ${STATE.lcThread.map(m => `
             ${m.question ? `<div style="display:flex;justify-content:flex-end"><div style="max-width:75%;background:var(--accent);color:#fff;padding:8px 12px;border-radius:12px 12px 2px 12px;font-size:12.5px;line-height:1.5">${esc(m.question)}</div></div>` : ''}
-            ${m.answer ? `<div style="display:flex;justify-content:flex-start"><div style="max-width:75%;background:var(--surface);border:1px solid var(--border);padding:8px 12px;border-radius:12px 12px 12px 2px;font-size:12.5px;line-height:1.5;color:var(--text)">${esc(m.answer)}</div></div>` : ''}
+            ${m.answer ? `<div style="display:flex;justify-content:flex-start"><div class="conv-ai-bubble" style="max-width:75%;background:var(--surface);border:1px solid var(--border);padding:8px 12px;border-radius:12px 12px 12px 2px;font-size:12.5px;line-height:1.5;color:var(--text)">${m.answer}</div></div>` : ''}
             ${m.created_at ? `<div style="text-align:center;font-size:10px;color:var(--text-3)">${new Date(m.created_at).toLocaleString()}</div>` : ''}
           `).join('')}
         </div>
