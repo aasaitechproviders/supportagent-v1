@@ -535,6 +535,91 @@
     body.account-suspended .chat-send-btn,body.account-suspended #btn-send,
     body.account-suspended .reply-composer-actions .btn-primary{opacity:.35;cursor:not-allowed;pointer-events:none}
     body.account-suspended .auto-reply-banner{display:none!important}
+
+    /* ── Hub 3-tab navigation ───────────────────────────────────────────────── */
+    .hub-tabs-bar{display:flex;align-items:center;gap:2px;margin-bottom:24px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:5px;width:fit-content}
+    .hub-tab{
+      display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 22px;
+      font-size:13.5px;font-weight:700;cursor:pointer;border:none;background:transparent;
+      color:var(--text-3);font-family:var(--font);border-radius:12px;
+      transition:background var(--dur-base),color var(--dur-base),box-shadow var(--dur-base),transform var(--dur-fast) var(--ease-spring);
+      white-space:nowrap;letter-spacing:-.01em;
+    }
+    .hub-tab:hover{background:var(--surface-2);color:var(--text-2);transform:translateY(-1px)}
+    .hub-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 14px var(--accent-glow)}
+    .hub-tab .ht-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.22);color:inherit;line-height:1.6}
+    .hub-tab:not(.active) .ht-badge{background:var(--surface-3);color:var(--text-3)}
+    .hub-tab .ht-badge.esc-alert{background:var(--amber);color:#fff;animation:esc-pulse 1.5s ease-in-out infinite}
+    .hub-tab:not(.active) .ht-badge.esc-alert{background:var(--amber);color:#fff}
+    .hub-content{display:none;animation:panel-enter var(--dur-slow) var(--ease-out)}
+    .hub-content.active{display:block}
+
+    /* ── Live Chat platform card & panel ────────────────────────────────────── */
+    .ch-livechat::before{background:linear-gradient(90deg,var(--accent),#7c3aed)}
+    .webchat-embed-box{background:var(--surface-2);border:1.5px solid var(--border-md);border-radius:12px;padding:14px 16px}
+    .webchat-embed-box pre{font-size:11.5px;line-height:1.7;color:var(--text-2);white-space:pre-wrap;word-break:break-all;margin:0;font-family:'Courier New',monospace}
+    .webchat-url-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .webchat-url-input{flex:1;height:34px;padding:0 12px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-size:12.5px;outline:none;font-family:var(--font);transition:border-color var(--dur-base),box-shadow var(--dur-base)}
+    .webchat-url-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+
+    /* ── Channel sub-tabs bar inside Channels hub tab ───────────────────────── */
+    .ch-subtabs-bar{display:flex;align-items:center;gap:5px;margin-bottom:20px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:5px;width:fit-content;flex-wrap:wrap}
+    .ch-subtab{
+      display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;
+      font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;
+      color:var(--text-3);font-family:var(--font);border-radius:10px;
+      transition:background var(--dur-base),color var(--dur-base),box-shadow var(--dur-base),transform var(--dur-fast) var(--ease-spring);
+      white-space:nowrap;
+    }
+    .ch-subtab:hover{background:var(--surface-2);color:var(--text-2);transform:translateY(-1px)}
+    .ch-subtab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px var(--accent-glow)}
+    .ch-subtab .cst-badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;background:rgba(255,255,255,.2);color:inherit;line-height:1.6}
+    .ch-subtab:not(.active) .cst-badge{background:var(--surface-3);color:var(--text-3)}
+    .ch-subtab .cst-soon{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:5px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe;line-height:1.5}
+    [data-theme="dark"] .ch-subtab .cst-soon{background:rgba(124,111,255,.15);border-color:rgba(124,111,255,.3)}
+    .ch-subtab .cst-ai{font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);animation:ai-tag-glow 2s ease-in-out infinite alternate}
+    .ch-panel{display:none;animation:panel-enter var(--dur-slow) var(--ease-out)}
+    .ch-panel.active{display:block}
+
+    /* ── Escalations tab ────────────────────────────────────────────────────── */
+    .esc-ticket-list{display:flex;flex-direction:column;gap:0}
+    .esc-ticket{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);transition:background var(--dur-fast);cursor:pointer;position:relative}
+    .esc-ticket:last-child{border-bottom:none}
+    .esc-ticket:hover{background:var(--surface-2)}
+    .esc-ticket.open-esc{background:var(--accent-dim)}
+    .esc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+    .esc-right{flex:1;min-width:0}
+    .esc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+    .esc-name{font-size:13px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .esc-time{font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+    .esc-channel-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+    .ecb-livechat{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    .ecb-email{background:#fce7f3;color:#be185d;border:1px solid #fbcfe8}
+    [data-theme="dark"] .ecb-email{background:#3b0e2a;color:#f0abfc;border-color:#a21caf}
+    .ecb-whatsapp{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+    [data-theme="dark"] .ecb-whatsapp{background:#052e16;color:#4ade80;border-color:#166534}
+    .ecb-instagram{background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8}
+    [data-theme="dark"] .ecb-instagram{background:#3b0e2a;color:#f472b6;border-color:#9d174d}
+    .ecb-messenger{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd}
+    [data-theme="dark"] .ecb-messenger{background:#0c2d3f;color:#38bdf8;border-color:#0284c7}
+    .esc-snippet{font-size:12px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;line-height:1.4}
+    .esc-actions{display:flex;gap:6px;flex-wrap:wrap}
+    .esc-reply-wrap{background:var(--surface-2);border-top:1px solid var(--border);padding:14px 18px;animation:panel-enter .2s var(--ease-out)}
+    .esc-reply-wrap textarea{width:100%;min-height:90px;padding:10px 13px;border:1.5px solid var(--border-md);border-radius:10px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;resize:vertical;outline:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);box-sizing:border-box}
+    .esc-reply-wrap textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .esc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:64px 24px;color:var(--text-3);text-align:center}
+    .esc-empty-icon{font-size:40px;animation:float-icon 3s ease-in-out infinite}
+
+    /* ── Settings tab ───────────────────────────────────────────────────────── */
+    .settings-hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:800px){.settings-hub-grid{grid-template-columns:1fr}}
+    .scope-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
+    .scope-all{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
+    .scope-perchannel{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
+    .scope-info{font-size:11px;color:var(--text-3);padding:7px 10px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;line-height:1.5}
+    .scope-info strong{color:var(--text-2)}
+    .filter-channel-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);margin-left:4px;vertical-align:middle}
+    .webchat-settings-card{grid-column:1/-1}
   </style>
   <script>(function(){var d=localStorage.getItem('sg_theme')==='dark';document.documentElement[d?'setAttribute':'removeAttribute']('data-theme','dark');document.documentElement.style.background=d?'#07080D':'#F2F3F9'})();</script>
   <!-- Facebook JS SDK for Embedded Signup -->
@@ -570,6 +655,9 @@
 const STATE = {
   agents:[], agentId:null,
   channels:{}, autoReplySettings:{}, channelEmail:null,
+  // Hub tab: 'channels' | 'settings' | 'escalations'
+  hubTab: 'channels',
+  // Channel sub-tab: 'livechat' | 'email' | 'whatsapp' | 'instagram' | 'messenger'
   platform:'email',
   bucket:       {email:'inbox',whatsapp:'inbox',instagram:'inbox',messenger:'inbox'},
   intentFilter: {email:'all', whatsapp:'all', instagram:'all', messenger:'all'},
@@ -598,6 +686,8 @@ const STATE = {
   filterSettings: null,
   quickReplies:   [],
   pollingTimer:   null,
+  // Escalations
+  escTickets: [], escLoading: false, escOpenId: null,
 }
 const PAGE_SIZE = 20
 const INTENT_CFG = {
@@ -766,6 +856,7 @@ function renderPage() {
   const inboxCnt = gmail?.inbox_count||0, waCnt = wa?.inbox_count||0, igCnt = ig?.inbox_count||0, fbCnt = fb?.inbox_count||0
 
   document.getElementById('pageBody').innerHTML = `
+  <!-- ── Metrics bar ── -->
   <div class="metrics-bar">
     <div class="metric-card mc-inbox reveal"><div class="metric-card-glow"></div><div class="metric-label">📬 Open Inbox</div><div class="metric-value" id="m-inbox">${inboxCnt||'—'}</div><div class="metric-sub"><span class="poll-dot"></span>Live sync</div></div>
     <div class="metric-card mc-noise reveal reveal-delay-1"><div class="metric-card-glow"></div><div class="metric-label">🔕 Auto-Filtered</div><div class="metric-value" id="m-noise"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">Zero AI tokens</div></div>
@@ -773,148 +864,252 @@ function renderPage() {
     <div class="metric-card mc-time reveal reveal-delay-3"><div class="metric-card-glow"></div><div class="metric-label">⏱ Avg Response</div><div class="metric-value" id="m-time"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">hrs to first reply</div></div>
     <div class="metric-card mc-rate reveal reveal-delay-4"><div class="metric-card-glow"></div><div class="metric-label">😊 CSAT Score</div><div class="metric-value" id="m-csat"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub" id="m-csat-sub">customer satisfaction</div></div>
   </div>
-  <div class="section-label reveal">Connected Channels</div>
-  ${!waOn&&!igOn&&!fbOn?`<div class="meta-connect-banner reveal"><div class="meta-connect-banner-left"><div class="meta-connect-banner-icons">💬&nbsp;📸</div><div class="meta-connect-banner-text"><strong>Connect WhatsApp, Instagram &amp; Messenger</strong><p>One tap — Meta Embedded Signup connects all three channels simultaneously.</p></div></div><button class="btn btn-meta" onclick="connectMeta(this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg><span class="btn-text">Connect via Meta</span></button></div>`:''}
-  <div class="channels-grid">
-    <div class="channel-card ch-gmail reveal ${STATE.platform==='email'&&gmailOn?'active-platform':''}" onclick="switchPlatform('email')">
-      <div class="channel-card-inner">
-        <div class="channel-card-top">
-          <div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div><div><div class="channel-name">Gmail / Workspace</div><div class="channel-desc">Smart inbox with AI drafts</div></div></div>
-          <div class="status-badge ${gmailOn?'badge-live':'badge-disconnected'}">${gmailOn?'Live':'Disconnected'}</div>
-        </div>
-        ${gmailOn?`
-        <div onclick="event.stopPropagation()">
-          <div class="auto-reply-row"><div class="auto-reply-label">✦ AI Auto-Reply <span class="toggle-badge ${arGmail?'on':'off'}" id="ar-badge-gmail">${arGmail?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arGmail?'checked':''} onchange="toggleAutoReply('gmail',this.checked)"><span class="toggle-slider"></span></label></div>
-          <div class="channel-info-row" style="margin-top:8px"><span style="font-size:13px">📬</span><span class="channel-info-text" title="${esc(gmail.email)}">${esc(gmail.email)}</span><span class="inbox-badge ${inboxCnt>0?'has-items':'clear'}" onclick="switchPlatform('email')">${inboxCnt>0?'📬 '+inboxCnt:'✓ Clear'}</span></div>
-          <div class="channel-actions" style="margin-top:10px"><button class="btn btn-secondary btn-sm" onclick="syncGmail(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg><span class="btn-text">Sync</span></button><button class="btn btn-danger btn-sm" onclick="disconnectGmail()">✕ <span class="btn-text">Disconnect</span></button></div>
-        </div>`:`
-        <div class="channel-connect-cta" onclick="event.stopPropagation()">
-          <div class="channel-connect-hint">Connect your Gmail or Google Workspace to get AI-powered inbox management</div>
-          <button class="btn btn-primary btn-sm" onclick="connectGmail(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect Gmail</button>
-        </div>`}
-      </div>
-    </div>
-    <div class="channel-card ch-whatsapp reveal reveal-delay-1 ${STATE.platform==='whatsapp'&&waOn?'active-platform':''}" onclick="${waOn?'switchPlatform(\'whatsapp\')':''}">
-      <div class="channel-card-inner">
-        <div class="channel-card-top">
-          <div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div><div><div class="channel-name">WhatsApp Business</div><div class="channel-desc">Real-time conversations</div></div></div>
-          <div class="status-badge ${waOn?'badge-live':'badge-disconnected'}">${waOn?'Live':'Disconnected'}</div>
-        </div>
-        ${waOn?`
-        <div onclick="event.stopPropagation()">
-          <div class="auto-reply-row"><div class="auto-reply-label">✦ AI Auto-Reply <span class="toggle-badge ${arWA?'on':'off'}" id="ar-badge-whatsapp">${arWA?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arWA?'checked':''} onchange="toggleAutoReply('whatsapp',this.checked)"><span class="toggle-slider"></span></label></div>
-          <div class="channel-info-row" style="margin-top:8px"><span style="font-size:13px">📱</span><span class="channel-info-text">${esc(wa.display_account||wa.phone_number||(wa.waba_id?'WA Business ('+wa.waba_id+')':'WhatsApp Business'))}</span><span class="inbox-badge ${waCnt>0?'has-items':'clear'}" onclick="switchPlatform('whatsapp')">${waCnt>0?'💬 '+waCnt:'✓ Clear'}</span></div>
-          <div class="channel-actions" style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('whatsapp')">✕ <span class="btn-text">Disconnect</span></button></div>
-        </div>`:`
-        <div class="channel-connect-cta" onclick="event.stopPropagation()">
-          <div class="channel-connect-hint">Connect WhatsApp Business to handle customer chats with AI auto-reply</div>
-          <button class="btn btn-meta btn-sm" onclick="connectWhatsAppES(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect WhatsApp</button>
-        </div>`}
-      </div>
-    </div>
-    <div class="channel-card ch-instagram reveal reveal-delay-2 ${STATE.platform==='instagram'&&igOn?'active-platform':''}" onclick="${igOn?'switchPlatform(\'instagram\')':''}">
-      <div class="channel-card-inner">
-        <div class="channel-card-top">
-          <div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div><div><div class="channel-name">Instagram DMs</div><div class="channel-desc">Manage DMs at scale</div></div></div>
-          <div class="status-badge ${igOn?'badge-live':'badge-disconnected'}">${igOn?'Live':'Disconnected'}</div>
-        </div>
-        ${igOn?`
-        <div onclick="event.stopPropagation()">
-          <div class="auto-reply-row"><div class="auto-reply-label">✦ AI Auto-Reply <span class="toggle-badge ${arIG?'on':'off'}" id="ar-badge-instagram">${arIG?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arIG?'checked':''} onchange="toggleAutoReply('instagram',this.checked)"><span class="toggle-slider"></span></label></div>
-          <div class="channel-info-row" style="margin-top:8px"><span style="font-size:13px">📸</span><span class="channel-info-text">${esc(ig.display_account||ig.page_name||(ig.ig_user_id?'@'+ig.ig_user_id:'Instagram Business'))}</span><span class="inbox-badge ${igCnt>0?'has-items':'clear'}" onclick="switchPlatform('instagram')">${igCnt>0?'📸 '+igCnt:'✓ Clear'}</span></div>
-          <div class="channel-actions" style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('instagram')">✕ <span class="btn-text">Disconnect</span></button></div>
-        </div>`:`
-        <div class="channel-connect-cta" onclick="event.stopPropagation()">
-          <div class="channel-connect-hint">Connect Instagram Business to reply to DMs with AI automatically</div>
-          <button class="btn btn-meta btn-sm" onclick="connectMeta(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect via Meta</button>
-        </div>`}
-      </div>
-    </div>
-    <div class="channel-card ch-messenger reveal reveal-delay-3 ${STATE.platform==='messenger'&&fbOn?'active-platform':''}" onclick="${fbOn?'switchPlatform(\'messenger\')':''}">
-      <div class="channel-card-inner">
-        <div class="channel-card-top">
-          <div class="channel-card-left"><div class="channel-icon" style="background:linear-gradient(135deg,#0084FF,#00B2FF)">💙</div><div><div class="channel-name">Facebook Messenger</div><div class="channel-desc">Automate conversations</div></div></div>
-          <div class="status-badge ${fbOn?'badge-live':'badge-disconnected'}">${fbOn?'Live':'Disconnected'}</div>
-        </div>
-        ${fbOn?`
-        <div onclick="event.stopPropagation()">
-          <div class="auto-reply-row"><div class="auto-reply-label">✦ AI Auto-Reply <span class="toggle-badge ${arFB?'on':'off'}" id="ar-badge-messenger">${arFB?'ON':'OFF'}</span></div><label class="toggle-switch"><input type="checkbox" ${arFB?'checked':''} onchange="toggleAutoReply('messenger',this.checked)"><span class="toggle-slider"></span></label></div>
-          <div class="channel-info-row" style="margin-top:8px"><span style="font-size:13px">💙</span><span class="channel-info-text">${esc(fb.page_name||'Facebook Page')}</span><span class="inbox-badge ${fbCnt>0?'has-items':'clear'}" onclick="switchPlatform('messenger')">${fbCnt>0?'💙 '+fbCnt:'✓ Clear'}</span></div>
-          <div class="channel-actions" style="margin-top:10px"><button class="btn btn-danger btn-sm" onclick="disconnectChannel('messenger')">✕ <span class="btn-text">Disconnect</span></button></div>
-        </div>`:`
-        <div class="channel-connect-cta" onclick="event.stopPropagation()">
-          <div class="channel-connect-hint">Connect your Facebook Page to automate Messenger chats with AI</div>
-          <button class="btn btn-meta btn-sm" onclick="connectMeta(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect via Meta</button>
-        </div>`}
-      </div>
-    </div>
-  </div>
-  <div class="platform-tabs-bar reveal" id="platformTabsBar">
-    <button class="platform-tab ${STATE.platform==='email'?'active':''}" data-platform="email">
-      <span class="pt-icon">📧</span><span>Email</span>
-      <span class="pt-badge" id="pt-badge-email">${inboxCnt||'—'}</span>
-      ${arGmail?`<span class="pt-ai-tag" id="pt-ai-gmail">AI Auto</span>`:''}
+
+  <!-- ── 3-Tab Hub Navigation ── -->
+  <div class="hub-tabs-bar reveal" id="hubTabsBar">
+    <button class="hub-tab ${STATE.hubTab==='channels'?'active':''}" data-hub="channels">
+      <span>📡</span><span>Channels</span>
     </button>
-    <button class="platform-tab${waOn?'':' disabled'} ${STATE.platform==='whatsapp'?'active':''}" data-platform="whatsapp" ${!waOn?'title="Connect WhatsApp via Meta"':''}>
-      <span class="pt-icon">💬</span><span>WhatsApp</span>
-      ${waOn?`<span class="pt-badge" id="pt-badge-whatsapp">${waCnt||'0'}</span>`:`<span class="pt-soon">Soon</span>`}
-      ${arWA&&waOn?`<span class="pt-ai-tag">AI Auto</span>`:''}
+    <button class="hub-tab ${STATE.hubTab==='settings'?'active':''}" data-hub="settings">
+      <span>⚙️</span><span>Settings</span>
     </button>
-    <button class="platform-tab${igOn?'':' disabled'} ${STATE.platform==='instagram'?'active':''}" data-platform="instagram" ${!igOn?'title="Connect Instagram via Meta"':''}>
-      <span class="pt-icon">📸</span><span>Instagram</span>
-      ${igOn?`<span class="pt-badge" id="pt-badge-instagram">${igCnt||'0'}</span>`:`<span class="pt-soon">Soon</span>`}
-      ${arIG&&igOn?`<span class="pt-ai-tag">AI Auto</span>`:''}
-    </button>
-    <button class="platform-tab${fbOn?'':' disabled'} ${STATE.platform==='messenger'?'active':''}" data-platform="messenger" ${!fbOn?'title="Connect Messenger via Meta"':''}>
-      <span class="pt-icon">💙</span><span>Messenger</span>
-      ${fbOn?`<span class="pt-badge" id="pt-badge-messenger">${fbCnt||'0'}</span>`:`<span class="pt-soon">Soon</span>`}
-      ${arFB&&fbOn?`<span class="pt-ai-tag">AI Auto</span>`:''}
+    <button class="hub-tab ${STATE.hubTab==='escalations'?'active':''}" data-hub="escalations">
+      <span>🚨</span><span>Escalations</span>
+      <span class="ht-badge" id="esc-hub-badge" style="display:none">0</span>
     </button>
   </div>
-  <div class="platform-panel ${STATE.platform==='email'?'active':''}" id="panel-email">
-    ${gmailOn?renderInboxPanel('email'):renderSetupGuide()}
-  </div>
-  <div class="platform-panel ${STATE.platform==='whatsapp'?'active':''}" id="panel-whatsapp">
-    ${waOn?renderConvPanel('whatsapp'):renderComingSoonPanel('WhatsApp Business','💬','Connect via Meta Embedded Signup to handle customer conversations with AI.')}
-  </div>
-  <div class="platform-panel ${STATE.platform==='instagram'?'active':''}" id="panel-instagram">
-    ${igOn?renderConvPanel('instagram'):renderComingSoonPanel('Instagram DMs','📸','Handle Instagram DMs with AI-powered inbox management.')}
-  </div>
-  <div class="platform-panel ${STATE.platform==='messenger'?'active':''}" id="panel-messenger">
-    ${fbOn?renderConvPanel('messenger'):renderComingSoonPanel('Facebook Messenger','💙','Connect via Meta Embedded Signup to automate Messenger conversations with AI.')}
-  </div>
-  <!-- ── Followup Queue Panel ── -->
-  <div class="section-label reveal" style="margin-top:24px">📌 Followup Queue</div>
-  <div class="reveal" style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:24px;box-shadow:var(--sh-sm)">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface-2);flex-wrap:wrap;gap:10px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:13px;font-weight:700;color:var(--text)">⏰ Followup Queue</span>
-        <span id="followup-count-badge" style="font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);display:none"></span>
-      </div>
-      <div style="display:flex;align-items:center;gap:4px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:3px">
-        <button id="fq-tab-today"    class="subnav-tab active" onclick="switchFollowupTab('today')">Today</button>
-        <button id="fq-tab-pending"  class="subnav-tab"        onclick="switchFollowupTab('pending')">All Pending</button>
-        <button id="fq-tab-resolved" class="subnav-tab"        onclick="switchFollowupTab('resolved')">Resolved</button>
+
+  <!-- ══════════════════════════════════════════════════
+       HUB TAB 1: CHANNELS
+  ═══════════════════════════════════════════════════ -->
+  <div class="hub-content ${STATE.hubTab==='channels'?'active':''}" id="hub-channels">
+
+    <!-- Channel sub-tabs: Live Chat · Gmail · WhatsApp · Instagram · Facebook -->
+    <div class="ch-subtabs-bar" id="chSubtabsBar">
+      <button class="ch-subtab ${STATE.platform==='livechat'?'active':''}" data-ch="livechat">
+        <span>🌐</span><span>Live Chat</span>
+        <span class="cst-soon">Soon</span>
+      </button>
+      <button class="ch-subtab ${STATE.platform==='email'?'active':''}" data-ch="email">
+        <span>📧</span><span>Gmail</span>
+        <span class="cst-badge" id="cst-badge-email">${inboxCnt||'—'}</span>
+        ${arGmail?`<span class="cst-ai">AI Auto</span>`:''}
+      </button>
+      <button class="ch-subtab ${STATE.platform==='whatsapp'?'active':''}" data-ch="whatsapp">
+        <span>💬</span><span>WhatsApp</span>
+        ${waOn?`<span class="cst-badge" id="cst-badge-whatsapp">${waCnt||'0'}</span>${arWA?`<span class="cst-ai">AI Auto</span>`:''}`:
+               `<span class="cst-soon">Connect</span>`}
+      </button>
+      <button class="ch-subtab ${STATE.platform==='instagram'?'active':''}" data-ch="instagram">
+        <span>📸</span><span>Instagram</span>
+        ${igOn?`<span class="cst-badge" id="cst-badge-instagram">${igCnt||'0'}</span>${arIG?`<span class="cst-ai">AI Auto</span>`:''}`:
+               `<span class="cst-soon">Connect</span>`}
+      </button>
+      <button class="ch-subtab ${STATE.platform==='messenger'?'active':''}" data-ch="messenger">
+        <span>💙</span><span>Facebook</span>
+        ${fbOn?`<span class="cst-badge" id="cst-badge-messenger">${fbCnt||'0'}</span>${arFB?`<span class="cst-ai">AI Auto</span>`:''}`:
+               `<span class="cst-soon">Connect</span>`}
+      </button>
+    </div>
+
+    <!-- ── Live Chat panel ── -->
+    <div class="ch-panel ${STATE.platform==='livechat'?'active':''}" id="ch-panel-livechat">
+      <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--sh-sm)">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.12)">🌐</div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">Live Chat Widget</div><div style="font-size:12px;color:var(--text-3)">Embed the chat widget on your website to capture and reply to visitor queries in real time.</div></div>
+          <span style="margin-left:auto;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe">Coming Soon</span>
+        </div>
+        <div style="padding:24px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">🔧 How it works</div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
+            ${[
+              ['1','Get your Web Chat URL','Once connected, you\'ll receive a unique chat URL and a snippet to embed on your site.'],
+              ['2','Embed the widget','Paste the snippet into your site\'s HTML before the </body> tag — live in seconds.'],
+              ['3','AI-powered replies','Visitors chat in real time; AI auto-replies from your knowledge base, escalating complex queries to you.'],
+            ].map(([n,t,d])=>`<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${n}</div><div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${t}</div><div style="font-size:12px;color:var(--text-3);line-height:1.6">${d}</div></div></div>`).join('')}
+          </div>
+          <div style="background:linear-gradient(135deg,var(--accent-soft),rgba(124,111,255,.04));border:1.5px dashed var(--accent-glow);border-radius:14px;padding:20px;text-align:center">
+            <div style="font-size:24px;margin-bottom:8px">🚀</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">Live Chat is launching soon</div>
+            <div style="font-size:12px;color:var(--text-3);line-height:1.6;max-width:340px;margin:0 auto">We're building this now — your Web Chat URL and embed snippet will appear here once the feature is live.</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="followup-queue-list" style="min-height:80px;padding:4px 0">
-      <div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">Loading…</div>
+
+    <!-- ── Gmail panel ── -->
+    <div class="ch-panel ${STATE.platform==='email'?'active':''}" id="ch-panel-email">
+      ${_renderChannelCardRow('email', gmail, gmailOn, arGmail, inboxCnt)}
+      ${gmailOn ? renderInboxPanel('email') : renderSetupGuide()}
+    </div>
+
+    <!-- ── WhatsApp panel ── -->
+    <div class="ch-panel ${STATE.platform==='whatsapp'?'active':''}" id="ch-panel-whatsapp">
+      ${_renderChannelCardRow('whatsapp', wa, waOn, arWA, waCnt)}
+      ${waOn ? renderConvPanel('whatsapp') : renderComingSoonPanel('WhatsApp Business','💬','Connect WhatsApp Business via Embedded Signup to handle customer conversations with AI.')}
+    </div>
+
+    <!-- ── Instagram panel ── -->
+    <div class="ch-panel ${STATE.platform==='instagram'?'active':''}" id="ch-panel-instagram">
+      ${_renderChannelCardRow('instagram', ig, igOn, arIG, igCnt)}
+      ${igOn ? renderConvPanel('instagram') : renderComingSoonPanel('Instagram DMs','📸','Connect Instagram via Meta Embedded Signup to handle DMs with AI auto-reply.')}
+    </div>
+
+    <!-- ── Facebook Messenger panel ── -->
+    <div class="ch-panel ${STATE.platform==='messenger'?'active':''}" id="ch-panel-messenger">
+      ${_renderChannelCardRow('messenger', fb, fbOn, arFB, fbCnt)}
+      ${fbOn ? renderConvPanel('messenger') : renderComingSoonPanel('Facebook Messenger','💙','Connect your Facebook Page via Meta Embedded Signup to automate Messenger chats with AI.')}
+    </div>
+
+    <!-- ── Followup Queue ── -->
+    <div style="margin-top:24px;background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:8px;box-shadow:var(--sh-sm)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface-2);flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:13px;font-weight:700;color:var(--text)">⏰ Followup Queue</span>
+          <span id="followup-count-badge" style="font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border);display:none"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:3px">
+          <button id="fq-tab-today"    class="subnav-tab active" onclick="switchFollowupTab('today')">Today</button>
+          <button id="fq-tab-pending"  class="subnav-tab"        onclick="switchFollowupTab('pending')">All Pending</button>
+          <button id="fq-tab-resolved" class="subnav-tab"        onclick="switchFollowupTab('resolved')">Resolved</button>
+        </div>
+      </div>
+      <div id="followup-queue-list" style="min-height:80px;padding:4px 0">
+        <div style="text-align:center;color:var(--text-3);font-size:12px;padding:24px">Loading…</div>
+      </div>
     </div>
   </div>
 
-  <div class="section-label reveal" style="margin-top:4px">⚙️ Channel Settings</div>
+  <!-- ══════════════════════════════════════════════════
+       HUB TAB 2: SETTINGS (universal)
+  ═══════════════════════════════════════════════════ -->
+  <div class="hub-content ${STATE.hubTab==='settings'?'active':''}" id="hub-settings">
+    ${renderSettingsTab()}
+  </div>
 
-  <!-- Scope legend pill styles -->
-  <style>
-    .scope-pill{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
-    .scope-all{background:var(--surface-3);color:var(--text-2);border:1px solid var(--border-md)}
-    .scope-perchannel{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-glow)}
-    .scope-info{font-size:11px;color:var(--text-3);padding:7px 10px;background:var(--surface-2);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;line-height:1.5}
-    .scope-info strong{color:var(--text-2)}
-    .filter-channel-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border);margin-left:4px;vertical-align:middle}
-  </style>
+  <!-- ══════════════════════════════════════════════════
+       HUB TAB 3: ESCALATIONS
+  ═══════════════════════════════════════════════════ -->
+  <div class="hub-content ${STATE.hubTab==='escalations'?'active':''}" id="hub-escalations">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">🚨 Escalated Conversations</div>
+        <div style="font-size:12px;color:var(--text-3)">Messages across all channels that need your manual attention — AI confidence was too low to auto-reply.</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="loadEscalations(true)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span class="btn-text">Refresh</span>
+      </button>
+    </div>
+    <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--sh-sm)">
+      <div id="esc-ticket-list-wrap">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:48px 20px;color:var(--text-3)">
+          <div class="dots-loader"><span></span><span></span><span></span></div>
+          <div style="font-size:12px">Loading escalations…</div>
+        </div>
+      </div>
+    </div>
+  </div>`
 
-  <div class="settings-grid reveal">
+  // Wire hub tab clicks
+  document.getElementById('hubTabsBar').addEventListener('click', e => {
+    const btn = e.target.closest('.hub-tab')
+    if (!btn) return
+    switchHubTab(btn.dataset.hub)
+  })
+  // Wire channel sub-tab clicks
+  document.getElementById('chSubtabsBar').addEventListener('click', e => {
+    const btn = e.target.closest('.ch-subtab')
+    if (!btn) return
+    switchPlatform(btn.dataset.ch)
+  })
+
+  requestAnimationFrame(() => triggerReveals())
+  if (gmailOn)  { loadInbox('email'); loadBucketCounts('email'); loadTokenUsage(); loadMetrics() }
+  if (waOn)     { loadConversations('whatsapp') }
+  if (igOn)     { loadConversations('instagram') }
+  if (fbOn)     { loadConversations('messenger') }
+  // Load escalations in background
+  loadEscalations(false)
+}
+
+// ── HUB TAB SWITCHER ──────────────────────────────────────────────────────────
+function switchHubTab(tab) {
+  STATE.hubTab = tab
+  document.querySelectorAll('.hub-tab').forEach(b => b.classList.toggle('active', b.dataset.hub === tab))
+  document.querySelectorAll('.hub-content').forEach(p => p.classList.toggle('active', p.id === 'hub-' + tab))
+  if (tab === 'escalations') loadEscalations(false)
+  if (tab === 'settings') {
+    // Re-wire settings after mount
+    requestAnimationFrame(() => {
+      loadFilterSettings().catch(()=>{})
+      loadQuickReplies().catch(()=>{})
+      loadNotifPrefs().catch(()=>{})
+    })
+  }
+}
+
+// ── CHANNEL CARD ROW (header card per channel sub-tab) ────────────────────────
+function _renderChannelCardRow(platform, ch, isOn, arOn, cnt) {
+  const cfg = {
+    livechat: { icon:'🌐', bg:'linear-gradient(135deg,var(--accent),#7c3aed)', name:'Live Chat', desc:'Embed on your website' },
+    email:    { icon:'📧', bg:'linear-gradient(135deg,#EA4335,#FBBC05)', name:'Gmail / Workspace', desc:'Smart inbox with AI drafts' },
+    whatsapp: { icon:'💬', bg:'linear-gradient(135deg,#25D366,#128C7E)', name:'WhatsApp Business', desc:'Real-time conversations' },
+    instagram:{ icon:'📸', bg:'linear-gradient(135deg,#E1306C,#F77737,#FCAF45)', name:'Instagram DMs', desc:'Manage DMs at scale' },
+    messenger:{ icon:'💙', bg:'linear-gradient(135deg,#0084FF,#00B2FF)', name:'Facebook Messenger', desc:'Automate conversations' },
+  }[platform] || {}
+
+  const connectBtn = platform === 'email'
+    ? `<button class="btn btn-primary btn-sm" onclick="connectGmail(this)">Connect Gmail</button>`
+    : platform === 'whatsapp'
+    ? `<button class="btn btn-meta btn-sm" onclick="connectWhatsAppES(this)">💬 Connect WhatsApp</button>`
+    : (platform === 'instagram' || platform === 'messenger')
+    ? `<button class="btn btn-meta btn-sm" onclick="connectMeta(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>Connect via Meta</button>`
+    : ''
+
+  // For Meta: show both Instagram + Facebook connected status if applicable
+  let connectedInfo = ''
+  if (platform === 'instagram' || platform === 'messenger') {
+    const ig = STATE.channels.instagram, fb = STATE.channels.messenger
+    const igOn = ig?.status === 'active', fbOn = fb?.status === 'active'
+    if (igOn || fbOn) {
+      connectedInfo = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${igOn?`<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8">✅ Instagram Connected</span>`:''} ${fbOn?`<span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd">✅ Facebook Connected</span>`:''}</div>`
+    }
+  }
+
+  const channelType = platform === 'email' ? 'gmail' : platform
+  const cntLabel = {email:'📬',whatsapp:'💬',instagram:'📸',messenger:'💙',livechat:'🌐'}[platform]||'📬'
+
+  return `<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:var(--sh-sm)">
+    <div style="width:44px;height:44px;border-radius:12px;background:${cfg.bg};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.12)">${cfg.icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px">${cfg.name}</div>
+      <div style="font-size:12px;color:var(--text-3)">${cfg.desc}</div>
+      ${connectedInfo}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      ${isOn ? `
+        <span class="status-badge badge-live">Live</span>
+        ${cnt>0?`<span class="inbox-badge has-items">${cntLabel} ${cnt} inbox</span>`:''}
+        <div class="auto-reply-row" style="margin:0;padding:6px 10px"><div class="auto-reply-label">✦ AI Auto-Reply <span class="toggle-badge ${arOn?'on':'off'}" id="ar-badge-${platform}">${arOn?'ON':'OFF'}</span></div><label class="toggle-switch" style="margin-left:8px"><input type="checkbox" ${arOn?'checked':''} onchange="toggleAutoReply('${channelType}',this.checked)"><span class="toggle-slider"></span></label></div>
+        ${platform==='email'?`<button class="btn btn-secondary btn-sm" onclick="syncGmail(this)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Sync</button>`:''}
+        <button class="btn btn-danger btn-sm" onclick="${platform==='email'?'disconnectGmail()':'disconnectChannel(\''+channelType+'\')'}" >✕ Disconnect</button>
+      ` : `
+        <span class="status-badge badge-disconnected">Not connected</span>
+        ${connectBtn}
+      `}
+    </div>
+  </div>`
+}
+
+// ── SETTINGS TAB (universal) ──────────────────────────────────────────────────
+function renderSettingsTab() {
+  return `<div style="margin-bottom:20px">
+    <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">⚙️ Universal Settings</div>
+    <div style="font-size:12px;color:var(--text-3)">These settings apply across all connected channels for this agent.</div>
+  </div>
+  <div class="settings-hub-grid">
     <!-- Smart Filters -->
     <div class="settings-card">
       <div class="settings-card-header">
@@ -925,9 +1120,8 @@ function renderPage() {
         </div>
       </div>
       <div class="settings-card-body" id="filter-settings-body">
-        <!-- Scope explanation -->
         <div class="scope-info">
-          These filters apply to <strong>all connected channels</strong> — Gmail, WhatsApp, Instagram and Messenger — for this agent. Email-specific filters (domain blocking) only take effect on Gmail; keyword and message-type filters work across all channels.
+          Filters apply to <strong>all connected channels</strong>. Email-specific filters (domain blocking) only take effect on Gmail; keyword and message-type filters work across all channels.
         </div>
         <div class="filter-row">
           <div class="filter-label-wrap">
@@ -946,13 +1140,12 @@ function renderPage() {
         <div class="filter-row">
           <div class="filter-label-wrap">
             <div class="filter-label-title">Smart business reply filter <span class="filter-channel-badge">🌐 All channels</span></div>
-            <div class="filter-label-desc">Only auto-reply to real customer messages needing support — skip non-business messages</div>
+            <div class="filter-label-desc">Only auto-reply to real customer messages — skip non-business messages</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="flt-smart" onchange="saveFilterSettings()"><span class="toggle-slider"></span></label>
         </div>
         <div style="margin-top:14px">
           <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:4px">Blocked Domains <span class="filter-channel-badge">📧 Gmail only</span></div>
-          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Messages from these domains are silently filtered — no auto-reply, no inbox noise.</div>
           <div id="flt-domains-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
           <div style="display:flex;gap:6px">
             <input class="search-input" type="text" id="flt-domain-inp" placeholder="e.g. amazon.com" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedDomain();event.preventDefault()}"/>
@@ -961,7 +1154,6 @@ function renderPage() {
         </div>
         <div style="margin-top:12px">
           <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:4px">Blocked Keywords <span class="filter-channel-badge">🌐 All channels</span></div>
-          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Messages containing these words are blocked across all channels — Gmail, WhatsApp, Instagram and Messenger.</div>
           <div id="flt-keywords-wrap" style="min-height:28px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:2px"></div>
           <div style="display:flex;gap:6px">
             <input class="search-input" type="text" id="flt-kw-inp" placeholder="e.g. unsubscribe" style="flex:1;height:32px" onkeydown="if(event.key==='Enter'){addBlockedKeyword();event.preventDefault()}"/>
@@ -978,10 +1170,7 @@ function renderPage() {
         <span class="scope-pill scope-perchannel">📌 Filter per channel</span>
       </div>
       <div class="settings-card-body">
-        <div class="scope-info">
-          Templates are shared across this agent. Use the <strong>channel selector</strong> when adding a template to control where it appears — pick a specific channel or leave it as "All channels" to show it everywhere.
-        </div>
-        <!-- Add template form -->
+        <div class="scope-info">Templates are shared across all channels. Use the channel selector to control where each template appears.</div>
         <div style="background:var(--surface-2);border-radius:10px;padding:12px;margin-bottom:14px">
           <input class="search-input" type="text" id="qr-title-inp" placeholder="Template name (e.g. Greeting)" style="height:32px;width:100%;margin-bottom:8px;box-sizing:border-box"/>
           <textarea id="qr-body-inp" style="width:100%;min-height:60px;padding:8px 10px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:12.5px;resize:vertical;outline:none;box-sizing:border-box" placeholder="Template message body…"></textarea>
@@ -996,15 +1185,30 @@ function renderPage() {
             <button class="btn btn-primary btn-sm" onclick="addQuickReply()" style="margin-left:auto">Add Template</button>
           </div>
         </div>
-        <!-- Templates list -->
         <div id="quick-replies-list" style="max-height:280px;overflow-y:auto">
           <div style="text-align:center;color:var(--text-3);font-size:12px;padding:16px">Loading templates…</div>
         </div>
       </div>
     </div>
 
-    <!-- Followup Queue — moved to standalone panel above settings -->
-    <div class="settings-card" id="followup-settings-placeholder" style="display:none"></div>
+    <!-- Web Chat URL (Live Chat settings placeholder) -->
+    <div class="settings-card webchat-settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">🌐 Web Chat Configuration</div>
+        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe">Coming Soon</span>
+      </div>
+      <div class="settings-card-body">
+        <div class="scope-info">Once Live Chat is enabled, your unique Web Chat URL and embed snippet will appear here. Paste the snippet anywhere on your site to add the chat widget.</div>
+        <div class="webchat-url-row" style="opacity:.4;pointer-events:none">
+          <input class="webchat-url-input" readonly placeholder="https://chat.yourdomain.com/agent/…" />
+          <button class="btn btn-secondary btn-sm">Copy URL</button>
+        </div>
+        <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px;margin-top:4px;opacity:.4">Embed Snippet</div>
+        <div class="webchat-embed-box" style="opacity:.4">
+          <pre>&lt;script src="https://cdn.supportgent.com/widget.js" data-agent="YOUR_AGENT_ID" async&gt;&lt;/script&gt;</pre>
+        </div>
+      </div>
+    </div>
 
     <!-- Email Notification Preferences -->
     <div class="settings-card">
@@ -1016,9 +1220,7 @@ function renderPage() {
         </div>
       </div>
       <div class="settings-card-body" id="notif-prefs-body">
-        <div class="scope-info">
-          These preferences control notification emails sent to <strong>you as the agent owner</strong>. They apply across all connected channels — a single escalation toggle covers Gmail, WhatsApp, Instagram and Messenger.
-        </div>
+        <div class="scope-info">Notification emails go to <strong>you as the agent owner</strong> — they apply across all connected channels.</div>
         <div class="filter-row">
           <div class="filter-label-wrap">
             <div class="filter-label-title">Escalation alerts <span class="filter-channel-badge">🌐 All channels</span></div>
@@ -1028,7 +1230,7 @@ function renderPage() {
         </div>
         <div class="filter-row">
           <div class="filter-label-wrap">
-            <div class="filter-label-title">Offline message alerts <span class="filter-channel-badge">💬 📸 💙 WA · IG · FB</span></div>
+            <div class="filter-label-title">Offline message alerts <span class="filter-channel-badge">💬 📸 💙</span></div>
             <div class="filter-label-desc">New WhatsApp / Instagram / Messenger messages when auto-reply is OFF</div>
           </div>
           <label class="toggle-switch"><input type="checkbox" id="np-offline" checked><span class="toggle-slider"></span></label>
@@ -1057,17 +1259,149 @@ function renderPage() {
       </div>
     </div>
   </div>`
+}
 
-  document.getElementById('platformTabsBar').addEventListener('click', e => {
-    const tab = e.target.closest('.platform-tab')
-    if (!tab || tab.classList.contains('disabled')) return
-    switchPlatform(tab.dataset.platform)
+// ── ESCALATIONS TAB ───────────────────────────────────────────────────────────
+const ESC_CHANNEL_CFG = {
+  gmail:    { label:'📧 Email',     cls:'ecb-email' },
+  whatsapp: { label:'💬 WhatsApp',  cls:'ecb-whatsapp' },
+  instagram:{ label:'📸 Instagram', cls:'ecb-instagram' },
+  messenger:{ label:'💙 Facebook',  cls:'ecb-messenger' },
+  livechat: { label:'🌐 Live Chat', cls:'ecb-livechat' },
+}
+
+async function loadEscalations(forceRefresh = false) {
+  if (STATE.escLoading) return
+  const wrap = document.getElementById('esc-ticket-list-wrap')
+  if (!wrap) return
+  STATE.escLoading = true
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/tickets`).catch(() => ({ tickets: [] }))
+    STATE.escTickets = data.tickets || data || []
+    renderEscalationsList()
+    // Update badge count
+    const cnt = STATE.escTickets.filter(t => t.status !== 'resolved').length
+    const badge = document.getElementById('esc-hub-badge')
+    if (badge) {
+      if (cnt > 0) { badge.textContent = cnt; badge.style.display = ''; badge.classList.toggle('esc-alert', cnt > 0) }
+      else { badge.style.display = 'none' }
+    }
+  } catch (e) {
+    if (wrap) wrap.innerHTML = `<div class="esc-empty"><div class="esc-empty-icon">😕</div><div style="font-size:13px;font-weight:700;color:var(--text-2)">Couldn't load escalations</div><div style="font-size:12px">${esc(e.message)}</div></div>`
+  } finally {
+    STATE.escLoading = false
+  }
+}
+
+function renderEscalationsList() {
+  const wrap = document.getElementById('esc-ticket-list-wrap')
+  if (!wrap) return
+  const tickets = STATE.escTickets
+  if (!tickets.length) {
+    wrap.innerHTML = `<div class="esc-empty"><div class="esc-empty-icon">🎉</div><div style="font-size:14px;font-weight:700;color:var(--text-2)">No escalations right now</div><div style="font-size:12px;max-width:260px;text-align:center;line-height:1.7">All messages have been handled by AI — nothing needs your manual attention.</div></div>`
+    return
+  }
+  wrap.innerHTML = `<div class="esc-ticket-list">${tickets.map(t => {
+    const ch = ESC_CHANNEL_CFG[t.channel_type || t.channel || 'gmail'] || ESC_CHANNEL_CFG.gmail
+    const name = esc(t.from_name || t.customer_name || t.contact_name || t.from || 'Unknown')
+    const snippet = esc(cleanBody(t.last_message || t.body || t.subject || '', 120))
+    const time = fmtRelTime(t.created_at || t.escalated_at || t.updated_at)
+    const av = avatarColor(name)
+    const isOpen = STATE.escOpenId === (t._id || t.id)
+    const tid = t._id || t.id || ''
+    const isResolved = t.status === 'resolved'
+    return `<div class="esc-ticket${isOpen?' open-esc':''}" onclick="toggleEscTicket('${tid}')">
+      <div class="esc-avatar" style="background:${av}">${name[0]?.toUpperCase()||'?'}</div>
+      <div class="esc-right">
+        <div class="esc-top">
+          <span class="esc-name">${name}</span>
+          <span class="esc-channel-badge ${ch.cls}">${ch.label}</span>
+          ${isResolved?`<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`:''}
+          <span class="esc-time">${time}</span>
+        </div>
+        ${t.subject?`<div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.subject)}</div>`:''}
+        <div class="esc-snippet">${snippet}</div>
+        <div class="esc-actions" onclick="event.stopPropagation()">
+          ${!isResolved?`<button class="btn btn-primary btn-sm" onclick="openEscReply('${tid}')">Reply</button>`:''}
+          ${!isResolved?`<button class="btn btn-secondary btn-sm" onclick="resolveEscTicket('${tid}',this)">✓ Mark Resolved</button>`:''}
+          <button class="btn btn-secondary btn-sm" onclick="jumpToChannelInbox('${t.channel_type||t.channel}','${t.thread_id||t.conversation_id||tid}')">↗ View in Inbox</button>
+        </div>
+        ${isOpen?renderEscReplyBox(tid, t):''}
+      </div>
+    </div>`
+  }).join('')}</div>`
+}
+
+function toggleEscTicket(tid) {
+  STATE.escOpenId = STATE.escOpenId === tid ? null : tid
+  renderEscalationsList()
+}
+
+function renderEscReplyBox(tid, ticket) {
+  const ch = ticket.channel_type || ticket.channel || 'gmail'
+  return `<div class="esc-reply-wrap" id="esc-reply-${tid}" onclick="event.stopPropagation()">
+    <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✦ Reply via ${(ESC_CHANNEL_CFG[ch]||{}).label||ch}</div>
+    <textarea id="esc-ta-${tid}" placeholder="Type your reply…"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
+      <button class="btn btn-secondary btn-sm" onclick="toggleEscTicket('${tid}')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="sendEscReply('${tid}',this)"><span class="btn-text">Send Reply</span></button>
+    </div>
+  </div>`
+}
+
+async function openEscReply(tid) {
+  STATE.escOpenId = tid
+  renderEscalationsList()
+  requestAnimationFrame(() => {
+    const ta = document.getElementById('esc-ta-' + tid)
+    if (ta) ta.focus()
   })
-  requestAnimationFrame(() => triggerReveals())
-  if (gmailOn)  { loadInbox('email'); loadBucketCounts('email'); loadTokenUsage(); loadMetrics() }
-  if (waOn)     { loadConversations('whatsapp') }
-  if (igOn)     { loadConversations('instagram') }
-  if (fbOn)     { loadConversations('messenger') }
+}
+
+async function sendEscReply(tid, btn) {
+  const ta = document.getElementById('esc-ta-' + tid)
+  if (!ta || !ta.value.trim()) return
+  const ticket = STATE.escTickets.find(t => (t._id||t.id) === tid)
+  if (!ticket) return
+  btn.classList.add('loading')
+  try {
+    const ch = ticket.channel_type || ticket.channel || 'gmail'
+    const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
+    if (ch === 'gmail') {
+      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, 'POST', { reply: ta.value.trim() })
+    } else {
+      await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/reply/${msgId}`, 'POST', { message: ta.value.trim() })
+    }
+    showToast('Reply sent ✓', 'success')
+    STATE.escOpenId = null
+    ta.value = ''
+    await loadEscalations(true)
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error')
+  } finally { btn.classList.remove('loading') }
+}
+
+async function resolveEscTicket(tid, btn) {
+  const ticket = STATE.escTickets.find(t => (t._id||t.id) === tid)
+  if (!ticket) return
+  btn.classList.add('loading')
+  try {
+    const ch = ticket.channel_type || ticket.channel || 'gmail'
+    const threadId = ticket.thread_id || ticket.conversation_id || tid
+    await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/threads/${threadId}/resolve`, 'PUT')
+    showToast('Marked as resolved ✓', 'success')
+    await loadEscalations(true)
+  } catch (e) {
+    showToast('Failed: ' + e.message, 'error')
+  } finally { btn.classList.remove('loading') }
+}
+
+function jumpToChannelInbox(channel, threadId) {
+  // Switch to Channels tab, then to correct sub-tab
+  const platform = channel === 'gmail' ? 'email' : (channel || 'email')
+  switchHubTab('channels')
+  setTimeout(() => switchPlatform(platform), 100)
+  showToast('Switched to ' + platform + ' inbox', 'info')
 }
 
 // ── RENDER INBOX PANEL (unified) ──────────────────────────────────────────────
@@ -1576,16 +1910,12 @@ const CONV_STALE_MS = 60_000  // re-fetch if data older than 60s
 
 function switchPlatform(platform) {
   STATE.platform = platform
-  document.querySelectorAll('.platform-tab').forEach(t => t.classList.toggle('active', t.dataset.platform === platform))
-  document.querySelectorAll('.platform-panel').forEach(p => p.classList.toggle('active', p.id === `panel-${platform}`))
+  // Update channel sub-tab buttons
+  document.querySelectorAll('.ch-subtab').forEach(t => t.classList.toggle('active', t.dataset.ch === platform))
+  // Update channel panels
+  document.querySelectorAll('.ch-panel').forEach(p => p.classList.toggle('active', p.id === `ch-panel-${platform}`))
 
-  // Update channel card highlight — maps platform name to card CSS class
-  const cardMap = { email: 'ch-gmail', whatsapp: 'ch-whatsapp', instagram: 'ch-instagram', messenger: 'ch-messenger' }
-  document.querySelectorAll('.channel-card').forEach(card => {
-    const isActive = Object.entries(cardMap).some(([plat, cls]) => plat === platform && card.classList.contains(cls))
-    card.classList.toggle('active-platform', isActive)
-  })
-
+  if (platform === 'livechat') return // no data to load — static "coming soon" panel
   if (platform === 'email') {
     if (!STATE.loaded[platform]) {
       const ch = STATE.channels.gmail
