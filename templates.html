@@ -415,13 +415,50 @@
   async function loadTemplates() {
     if (!currentAgent) return
     try {
+      // First check if this agent has WhatsApp connected
+      let waConnected = false
+      try {
+        const channels = await apiFetch(`/agents/${currentAgent}/channels`)
+        waConnected = Array.isArray(channels)
+          ? channels.some(c => c.platform === 'whatsapp' && c.status === 'active')
+          : false
+      } catch (_) { waConnected = false }
+
+      if (!waConnected) {
+        allTemplates = []
+        renderStats()
+        showEmptyState('no-wa')
+        return
+      }
+
       const res  = await tplFetch(`/templates?agent_id=${currentAgent}`)
       allTemplates = res.templates || []
       renderStats()
       renderTemplates()
     } catch (e) {
-      showToast('Failed to load templates', 'error')
+      showToast('Failed to load templates: ' + e.message, 'error')
     }
+  }
+
+  function showEmptyState(type) {
+    const grid  = document.getElementById('tplGrid')
+    const empty = document.getElementById('emptyState')
+    grid.innerHTML = ''
+    if (type === 'no-wa') {
+      empty.innerHTML = `
+        <div class="icon">📱</div>
+        <h3>WhatsApp not connected</h3>
+        <p>This agent doesn't have a WhatsApp channel connected.<br>Connect WhatsApp first to manage templates.</p>
+        <a href="channels.html?agent=${currentAgent}" class="btn btn-primary">→ Connect WhatsApp</a>`
+    } else {
+      empty.innerHTML = `
+        <div class="icon">📋</div>
+        <h3>No templates yet</h3>
+        <p>Create your first WhatsApp template to start sending<br>appointment reminders and follow-up messages.</p>
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Create Template</button>`
+    }
+    grid.appendChild(empty)
+    empty.style.display = 'block'
   }
 
   // ── Stats ──────────────────────────────────────────────────────────────────
@@ -439,9 +476,7 @@
     const empty    = document.getElementById('emptyState')
 
     if (!filtered.length) {
-      grid.innerHTML = ''
-      grid.appendChild(empty)
-      empty.style.display = 'block'
+      showEmptyState('no-templates')
       return
     }
     empty.style.display = 'none'
