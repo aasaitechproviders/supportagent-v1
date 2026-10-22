@@ -478,7 +478,8 @@
       showEmptyState('no-templates')
       return
     }
-    empty.style.display = 'none'
+    if (empty) empty.style.display = 'none'
+    if (!grid) return
 
     grid.innerHTML = filtered.map(t => `
       <div class="tpl-card">
@@ -704,6 +705,16 @@
   async function saveAndSubmit() {
     const payload = buildPayload(true)
     if (!payload) return
+    // Verify WhatsApp is connected before attempting Meta submission
+    try {
+      const res2   = await apiFetch(`/agents/${currentAgent}/channels`)
+      const chList = res2.channels || (Array.isArray(res2) ? res2 : [])
+      const hasWa  = chList.some(c => c.type === 'whatsapp' && c.status === 'active')
+      if (!hasWa) {
+        showFormError('This agent has no WhatsApp channel connected. Connect WhatsApp first, or use "Save Draft" instead.')
+        return
+      }
+    } catch (_) { /* let server handle it */ }
     await saveTemplate(payload, 'Template submitted to Meta for approval!')
   }
 
@@ -715,10 +726,14 @@
     try {
       const url    = editingId ? `/templates/${editingId}` : '/templates'
       const method = editingId ? 'PUT' : 'POST'
-      await apiFetch(url, { method, body: JSON.stringify(payload) })
-      showToast(successMsg, 'success')
+      const result = await apiFetch(url, { method, body: JSON.stringify(payload) })
       closeModal('createModal')
       await loadTemplates()
+      if (result.meta_error) {
+        showToast('Saved as Draft — Meta submission failed: ' + result.meta_error, 'error')
+      } else {
+        showToast(successMsg, 'success')
+      }
     } catch (e) {
       showFormError(e.message || 'Save failed')
     } finally {
