@@ -600,7 +600,6 @@
     .esc-ticket{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);transition:background var(--dur-fast);cursor:pointer;position:relative}
     .esc-ticket:last-child{border-bottom:none}
     .esc-ticket:hover{background:var(--surface-2)}
-    .esc-ticket.open-esc{background:var(--accent-dim)}
     .esc-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.14)}
     .esc-right{flex:1;min-width:0}
     .esc-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
@@ -618,11 +617,35 @@
     [data-theme="dark"] .ecb-messenger{background:#0c2d3f;color:#38bdf8;border-color:#0284c7}
     .esc-snippet{font-size:12px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px;line-height:1.4}
     .esc-actions{display:flex;gap:6px;flex-wrap:wrap}
-    .esc-reply-wrap{background:var(--surface-2);border-top:1px solid var(--border);padding:14px 18px;animation:panel-enter .2s var(--ease-out)}
-    .esc-reply-wrap textarea{width:100%;min-height:90px;padding:10px 13px;border:1.5px solid var(--border-md);border-radius:10px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;resize:vertical;outline:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);box-sizing:border-box}
-    .esc-reply-wrap textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
     .esc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:64px 24px;color:var(--text-3);text-align:center}
     .esc-empty-icon{font-size:40px;animation:float-icon 3s ease-in-out infinite}
+    /* Ticket detail modal */
+    .esc-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fade-in .15s ease}
+    .esc-modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.3);animation:modal-slide-up .2s var(--ease-out)}
+    @keyframes modal-slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .esc-modal-header{display:flex;align-items:center;gap:12px;padding:18px 20px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .esc-modal-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0}
+    .esc-modal-title{flex:1;min-width:0}
+    .esc-modal-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0}
+    .esc-info-row{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+    .esc-info-cell{padding:12px 20px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--border)}
+    .esc-info-cell:last-child{border-right:none}
+    .esc-info-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3)}
+    .esc-info-value{font-size:13px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .esc-issue-box{padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .esc-issue-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:6px}
+    .esc-issue-text{font-size:13px;color:var(--text-2);line-height:1.6;background:var(--surface-2);padding:10px 14px;border-radius:10px;border:1px solid var(--border)}
+    .esc-steps-box{padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+    .esc-convo-section{flex:1;display:flex;flex-direction:column;min-height:0}
+    .esc-convo-header{padding:12px 20px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px}
+    .esc-convo-scroll{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:280px}
+    .esc-msg-user{align-self:flex-end;max-width:75%;background:var(--accent);color:#fff;padding:8px 13px;border-radius:14px 14px 2px 14px;font-size:12.5px;line-height:1.5;word-break:break-word}
+    .esc-msg-ai{align-self:flex-start;max-width:80%;background:var(--surface-2);border:1px solid var(--border);padding:8px 13px;border-radius:14px 14px 14px 2px;font-size:12.5px;line-height:1.5;color:var(--text);word-break:break-word}
+    .esc-msg-label{font-size:10px;color:var(--text-3);margin-bottom:3px;font-weight:600}
+    .esc-modal-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+    .esc-reply-ta{width:100%;min-height:80px;padding:10px 13px;border:1.5px solid var(--border-md);border-radius:10px;background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;resize:vertical;outline:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);box-sizing:border-box}
+    .esc-reply-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .esc-modal-footer-actions{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 
     /* ── Settings tab ───────────────────────────────────────────────────────── */
     .settings-hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -1491,8 +1514,7 @@ async function loadEscalations(forceRefresh = false) {
     const data = await apiFetch(`/agents/${STATE.agentId}/tickets`).catch(() => ({ tickets: [] }))
     STATE.escTickets = data.tickets || data || []
     renderEscalationsList()
-    // Update badge count
-    const cnt = STATE.escTickets.filter(t => t.status !== 'resolved').length
+    const cnt = STATE.escTickets.filter(t => (t.status||'Open') !== 'Resolved').length
     const badge = document.getElementById('esc-hub-badge')
     if (badge) {
       if (cnt > 0) { badge.textContent = cnt; badge.style.display = ''; badge.classList.toggle('esc-alert', cnt > 0) }
@@ -1510,102 +1532,198 @@ function renderEscalationsList() {
   if (!wrap) return
   const tickets = STATE.escTickets
   if (!tickets.length) {
-    wrap.innerHTML = `<div class="esc-empty"><div class="esc-empty-icon">🎉</div><div style="font-size:14px;font-weight:700;color:var(--text-2)">No escalations right now</div><div style="font-size:12px;max-width:260px;text-align:center;line-height:1.7">All messages have been handled by AI — nothing needs your manual attention.</div></div>`
+    wrap.innerHTML = `<div class="esc-empty"><div class="esc-empty-icon">🎉</div><div style="font-size:14px;font-weight:700;color:var(--text-2)">No escalations right now</div><div style="font-size:12px;max-width:260px;text-align:center;line-height:1.7">All chats handled by AI — nothing needs manual attention.</div></div>`
     return
   }
   wrap.innerHTML = `<div class="esc-ticket-list">${tickets.map(t => {
-    const ch = ESC_CHANNEL_CFG[t.channel_type || t.channel || t.source || 'gmail'] || ESC_CHANNEL_CFG.gmail
-    const name = esc(t.from_name || t.customer_name || t.contact_name || t.from || 'Unknown')
-    const snippet = esc(cleanBody(t.last_message || t.body || t.subject || '', 120))
+    const ch = ESC_CHANNEL_CFG[t.channel_type || t.channel || t.source || 'chat_escalation'] || ESC_CHANNEL_CFG.chat_escalation
+    const rawName = t.customer_name || t.from_name || t.contact_name || t.from || t.user_identifier || 'Unknown'
+    const name = esc(rawName)
+    const issueText = esc(cleanBody(t.issue || t.last_message || t.body || t.subject || '', 100))
     const time = fmtRelTime(t.created_at || t.escalated_at || t.updated_at)
-    const av = avatarColor(name)
-    const isOpen = STATE.escOpenId === (t._id || t.id)
+    const av = avatarColor(rawName)
     const tid = t._id || t.id || ''
-    const isResolved = t.status === 'resolved'
-    return `<div class="esc-ticket${isOpen?' open-esc':''}" onclick="toggleEscTicket('${tid}')">
-      <div class="esc-avatar" style="background:${av}">${name[0]?.toUpperCase()||'?'}</div>
+    const status = t.status || 'Open'
+    const isResolved = status === 'Resolved'
+    const shortId = tid.slice(-8).toUpperCase()
+    return `<div class="esc-ticket" onclick="openTicketModal('${tid}')">
+      <div class="esc-avatar" style="background:${av}">${rawName[0]?.toUpperCase()||'?'}</div>
       <div class="esc-right">
         <div class="esc-top">
           <span class="esc-name">${name}</span>
           <span class="esc-channel-badge ${ch.cls}">${ch.label}</span>
-          ${isResolved?`<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`:''}
+          ${isResolved
+            ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`
+            : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔴 Open</span>`}
           <span class="esc-time">${time}</span>
         </div>
-        ${t.subject?`<div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.subject)}</div>`:''}
-        <div class="esc-snippet">${snippet}</div>
+        <div class="esc-snippet">🎫 #${shortId} — ${issueText || 'No issue summary'}</div>
         <div class="esc-actions" onclick="event.stopPropagation()">
-          ${!isResolved?`<button class="btn btn-primary btn-sm" onclick="openEscReply('${tid}')">Reply</button>`:''}
-          ${!isResolved?`<button class="btn btn-secondary btn-sm" onclick="resolveEscTicket('${tid}',this)">✓ Mark Resolved</button>`:''}
-          <button class="btn btn-secondary btn-sm" onclick="jumpToChannelInbox('${t.channel_type||t.channel||t.source}','${t.thread_id||t.conversation_id||tid}')">↗ View in Inbox</button>
+          <button class="btn btn-primary btn-sm" onclick="openTicketModal('${tid}')">View Details</button>
+          ${!isResolved?`<button class="btn btn-secondary btn-sm" onclick="quickResolveTicket('${tid}',this)">✓ Resolve</button>`:''}
         </div>
-        ${isOpen?renderEscReplyBox(tid, t):''}
       </div>
     </div>`
   }).join('')}</div>`
 }
 
-function toggleEscTicket(tid) {
-  STATE.escOpenId = STATE.escOpenId === tid ? null : tid
-  renderEscalationsList()
+async function openTicketModal(tid) {
+  const ticket = STATE.escTickets.find(t => (t._id||t.id) === tid)
+  if (!ticket) return
+  document.getElementById('esc-detail-modal')?.remove()
+  const ch = ESC_CHANNEL_CFG[ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation'] || ESC_CHANNEL_CFG.chat_escalation
+  const rawName = ticket.customer_name || ticket.from_name || ticket.user_identifier || 'Unknown'
+  const av = avatarColor(rawName)
+  const status = ticket.status || 'Open'
+  const isResolved = status === 'Resolved'
+  const shortId = tid.slice(-8).toUpperCase()
+  const modal = document.createElement('div')
+  modal.className = 'esc-modal-overlay'
+  modal.id = 'esc-detail-modal'
+  modal.innerHTML = `
+    <div class="esc-modal" onclick="event.stopPropagation()">
+      <div class="esc-modal-header">
+        <div class="esc-modal-avatar" style="background:${av}">${rawName[0]?.toUpperCase()||'?'}</div>
+        <div class="esc-modal-title">
+          <div style="font-size:15px;font-weight:800;color:var(--text)">${esc(rawName)}</div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:3px;flex-wrap:wrap">
+            <span class="esc-channel-badge ${ch.cls}">${ch.label}</span>
+            <span style="font-size:11px;font-weight:700;color:var(--text-3)">#${shortId}</span>
+            ${isResolved
+              ? `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`
+              : `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔴 Open</span>`}
+          </div>
+        </div>
+        <button onclick="closeTicketModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3);padding:4px;line-height:1;border-radius:6px">✕</button>
+      </div>
+      <div class="esc-modal-body" id="esc-modal-body-${tid}">
+        <div class="esc-info-row">
+          <div class="esc-info-cell">
+            <span class="esc-info-label">Customer</span>
+            <span class="esc-info-value" title="${esc(rawName)}">${esc(rawName)}</span>
+          </div>
+          <div class="esc-info-cell">
+            <span class="esc-info-label">Contact</span>
+            <span class="esc-info-value">${ticket.contact
+              ? (ticket.contact.includes('@')
+                ? `<a href="mailto:${esc(ticket.contact)}" style="color:var(--accent);text-decoration:none">${esc(ticket.contact)}</a>`
+                : esc(ticket.contact))
+              : '<span style="color:var(--text-3)">—</span>'}</span>
+          </div>
+        </div>
+        <div class="esc-info-row">
+          <div class="esc-info-cell">
+            <span class="esc-info-label">Agent Type</span>
+            <span class="esc-info-value">${esc(ticket.agent_type || 'general')}</span>
+          </div>
+          <div class="esc-info-cell">
+            <span class="esc-info-label">Raised At</span>
+            <span class="esc-info-value">${ticket.created_at ? new Date(ticket.created_at).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : '—'}</span>
+          </div>
+        </div>
+        ${ticket.issue ? `<div class="esc-issue-box">
+          <div class="esc-issue-label">Issue / What Customer Said</div>
+          <div class="esc-issue-text">${esc(ticket.issue)}</div>
+        </div>` : ''}
+        ${ticket.steps_tried?.length ? `<div class="esc-steps-box">
+          <div class="esc-issue-label" style="margin-bottom:6px">Steps AI Already Tried</div>
+          <div style="display:flex;flex-direction:column;gap:5px">${ticket.steps_tried.map((s,i)=>`<div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;padding-top:1px">${i+1}.</span><span style="font-size:12.5px;color:var(--text-2);line-height:1.5">${esc(s)}</span></div>`).join('')}</div>
+        </div>` : ''}
+        <div class="esc-convo-section">
+          <div class="esc-convo-header">
+            💬 Conversation History
+            <span id="esc-convo-loading-${tid}" style="font-size:10px;color:var(--text-3);font-weight:400;margin-left:4px">Loading…</span>
+          </div>
+          <div class="esc-convo-scroll" id="esc-convo-scroll-${tid}">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text-3);font-size:12px;padding:20px">
+              <div class="dots-loader"><span></span><span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="esc-modal-footer">
+        ${!isResolved ? `<textarea class="esc-reply-ta" id="esc-modal-ta-${tid}" placeholder="Add a note or reply to send to the customer…"></textarea>` : ''}
+        <div class="esc-modal-footer-actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${!isResolved ? `<button class="btn btn-primary" onclick="sendTicketReply('${tid}',this)"><span class="btn-text">📤 Send Reply</span></button>` : ''}
+            ${!isResolved ? `<button class="btn btn-secondary" onclick="resolveTicketFromModal('${tid}',this)"><span class="btn-text">✓ Mark Resolved</span></button>` : ''}
+          </div>
+          <button class="btn btn-secondary" onclick="closeTicketModal()">Close</button>
+        </div>
+      </div>
+    </div>`
+  modal.addEventListener('click', e => { if (e.target === modal) closeTicketModal() })
+  document.body.appendChild(modal)
+  loadTicketConversations(tid)
 }
 
-function renderEscReplyBox(tid, ticket) {
-  const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
-  return `<div class="esc-reply-wrap" id="esc-reply-${tid}" onclick="event.stopPropagation()">
-    <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✦ Reply via ${(ESC_CHANNEL_CFG[ch]||{}).label||ch}</div>
-    <textarea id="esc-ta-${tid}" placeholder="Type your reply…"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end">
-      <button class="btn btn-secondary btn-sm" onclick="toggleEscTicket('${tid}')">Cancel</button>
-      <button class="btn btn-primary btn-sm" onclick="sendEscReply('${tid}',this)"><span class="btn-text">Send Reply</span></button>
-    </div>
-  </div>`
+async function loadTicketConversations(tid) {
+  const scroll = document.getElementById(`esc-convo-scroll-${tid}`)
+  const loadingLabel = document.getElementById(`esc-convo-loading-${tid}`)
+  if (!scroll) return
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}/conversations`)
+    if (loadingLabel) loadingLabel.remove()
+    const convs = data.conversations || []
+    if (!convs.length) {
+      scroll.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:12px;padding:20px">No conversation history found</div>`
+      return
+    }
+    scroll.innerHTML = convs.map(c => {
+      const parts = []
+      if (c.question) parts.push(`<div><div class="esc-msg-label" style="text-align:right">Customer</div><div class="esc-msg-user">${esc(c.question)}</div></div>`)
+      if (c.answer) parts.push(`<div><div class="esc-msg-label">AI Agent</div><div class="esc-msg-ai">${c.answer}</div></div>`)
+      return parts.join('')
+    }).join('')
+    scroll.scrollTop = scroll.scrollHeight
+  } catch (e) {
+    if (loadingLabel) loadingLabel.textContent = 'Failed'
+    if (scroll) scroll.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:12px;padding:20px">Could not load: ${esc(e.message)}</div>`
+  }
 }
 
-async function openEscReply(tid) {
-  STATE.escOpenId = tid
-  renderEscalationsList()
-  requestAnimationFrame(() => {
-    const ta = document.getElementById('esc-ta-' + tid)
-    if (ta) ta.focus()
-  })
-}
+function closeTicketModal() { document.getElementById('esc-detail-modal')?.remove() }
 
-async function sendEscReply(tid, btn) {
-  const ta = document.getElementById('esc-ta-' + tid)
-  if (!ta || !ta.value.trim()) return
+async function sendTicketReply(tid, btn) {
+  const ta = document.getElementById(`esc-modal-ta-${tid}`)
+  if (!ta || !ta.value.trim()) { showToast('Type a reply first', 'error'); return }
   const ticket = STATE.escTickets.find(t => (t._id||t.id) === tid)
   if (!ticket) return
   btn.classList.add('loading')
   try {
-    const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
+    const ch = ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation'
     const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
     if (ch === 'gmail') {
       await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, 'POST', { reply: ta.value.trim() })
+    } else if (ch === 'chat_escalation') {
+      await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { note: ta.value.trim() })
     } else {
       await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/reply/${msgId}`, 'POST', { message: ta.value.trim() })
     }
-    showToast('Reply sent ✓', 'success')
-    STATE.escOpenId = null
+    showToast('Reply saved ✓', 'success')
     ta.value = ''
-    await loadEscalations(true)
   } catch (e) {
     showToast('Failed: ' + e.message, 'error')
   } finally { btn.classList.remove('loading') }
 }
 
-async function resolveEscTicket(tid, btn) {
-  const ticket = STATE.escTickets.find(t => (t._id||t.id) === tid)
-  if (!ticket) return
+async function resolveTicketFromModal(tid, btn) {
   btn.classList.add('loading')
   try {
-    const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
-    const threadId = ticket.thread_id || ticket.conversation_id || tid
-    await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/threads/${threadId}/resolve`, 'PUT')
+    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { status: 'Resolved' })
     showToast('Marked as resolved ✓', 'success')
+    closeTicketModal()
     await loadEscalations(true)
-  } catch (e) {
-    showToast('Failed: ' + e.message, 'error')
-  } finally { btn.classList.remove('loading') }
+  } catch (e) { showToast('Failed: ' + e.message, 'error') } finally { btn.classList.remove('loading') }
+}
+
+async function quickResolveTicket(tid, btn) {
+  btn.classList.add('loading')
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { status: 'Resolved' })
+    showToast('Resolved ✓', 'success')
+    await loadEscalations(true)
+  } catch (e) { showToast('Failed: ' + e.message, 'error') } finally { btn.classList.remove('loading') }
 }
 
 function jumpToChannelInbox(channel, threadId) {
