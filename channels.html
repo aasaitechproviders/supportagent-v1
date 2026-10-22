@@ -1378,10 +1378,12 @@ function renderSettingsTab() {
 
 // ── ESCALATIONS TAB ───────────────────────────────────────────────────────────
 const ESC_CHANNEL_CFG = {
-  gmail:    { label:'📧 Email',     cls:'ecb-email' },
-  whatsapp: { label:'💬 WhatsApp',  cls:'ecb-whatsapp' },
-  instagram:{ label:'📸 Instagram', cls:'ecb-instagram' },
-  messenger:{ label:'💙 Facebook',  cls:'ecb-messenger' },
+  gmail:          { label:'📧 Email',     cls:'ecb-email' },
+  whatsapp:       { label:'💬 WhatsApp',  cls:'ecb-whatsapp' },
+  instagram:      { label:'📸 Instagram', cls:'ecb-instagram' },
+  messenger:      { label:'💙 Facebook',  cls:'ecb-messenger' },
+  livechat:       { label:'🌐 Live Chat', cls:'ecb-livechat' },
+  chat_escalation:{ label:'🌐 Live Chat', cls:'ecb-livechat' },
   livechat: { label:'🌐 Live Chat', cls:'ecb-livechat' },
 }
 
@@ -1488,7 +1490,7 @@ function renderEscalationsList() {
     return
   }
   wrap.innerHTML = `<div class="esc-ticket-list">${tickets.map(t => {
-    const ch = ESC_CHANNEL_CFG[t.channel_type || t.channel || 'gmail'] || ESC_CHANNEL_CFG.gmail
+    const ch = ESC_CHANNEL_CFG[t.channel_type || t.channel || t.source || 'gmail'] || ESC_CHANNEL_CFG.gmail
     const name = esc(t.from_name || t.customer_name || t.contact_name || t.from || 'Unknown')
     const snippet = esc(cleanBody(t.last_message || t.body || t.subject || '', 120))
     const time = fmtRelTime(t.created_at || t.escalated_at || t.updated_at)
@@ -1510,7 +1512,7 @@ function renderEscalationsList() {
         <div class="esc-actions" onclick="event.stopPropagation()">
           ${!isResolved?`<button class="btn btn-primary btn-sm" onclick="openEscReply('${tid}')">Reply</button>`:''}
           ${!isResolved?`<button class="btn btn-secondary btn-sm" onclick="resolveEscTicket('${tid}',this)">✓ Mark Resolved</button>`:''}
-          <button class="btn btn-secondary btn-sm" onclick="jumpToChannelInbox('${t.channel_type||t.channel}','${t.thread_id||t.conversation_id||tid}')">↗ View in Inbox</button>
+          <button class="btn btn-secondary btn-sm" onclick="jumpToChannelInbox('${t.channel_type||t.channel||t.source}','${t.thread_id||t.conversation_id||tid}')">↗ View in Inbox</button>
         </div>
         ${isOpen?renderEscReplyBox(tid, t):''}
       </div>
@@ -1524,7 +1526,7 @@ function toggleEscTicket(tid) {
 }
 
 function renderEscReplyBox(tid, ticket) {
-  const ch = ticket.channel_type || ticket.channel || 'gmail'
+  const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
   return `<div class="esc-reply-wrap" id="esc-reply-${tid}" onclick="event.stopPropagation()">
     <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✦ Reply via ${(ESC_CHANNEL_CFG[ch]||{}).label||ch}</div>
     <textarea id="esc-ta-${tid}" placeholder="Type your reply…"></textarea>
@@ -1551,7 +1553,7 @@ async function sendEscReply(tid, btn) {
   if (!ticket) return
   btn.classList.add('loading')
   try {
-    const ch = ticket.channel_type || ticket.channel || 'gmail'
+    const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
     const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
     if (ch === 'gmail') {
       await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, 'POST', { reply: ta.value.trim() })
@@ -1572,7 +1574,7 @@ async function resolveEscTicket(tid, btn) {
   if (!ticket) return
   btn.classList.add('loading')
   try {
-    const ch = ticket.channel_type || ticket.channel || 'gmail'
+    const ch = ticket.channel_type || ticket.channel || ticket.source || 'gmail'
     const threadId = ticket.thread_id || ticket.conversation_id || tid
     await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/threads/${threadId}/resolve`, 'PUT')
     showToast('Marked as resolved ✓', 'success')
@@ -1584,7 +1586,10 @@ async function resolveEscTicket(tid, btn) {
 
 function jumpToChannelInbox(channel, threadId) {
   // Switch to Channels tab, then to correct sub-tab
-  const platform = channel === 'gmail' ? 'email' : (channel || 'email')
+  // live chat escalations use source='chat_escalation' — map to livechat panel
+  const platform = channel === 'gmail' ? 'email'
+    : (channel === 'chat_escalation' || channel === 'livechat') ? 'livechat'
+    : (channel || 'email')
   switchHubTab('channels')
   setTimeout(() => switchPlatform(platform), 100)
   showToast('Switched to ' + platform + ' inbox', 'info')
