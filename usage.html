@@ -88,7 +88,7 @@
     @media(max-width:700px){
       .page-body{padding:12px 12px 40px}
       .stat-grid{grid-template-columns:1fr 1fr}
-      .req-table th:nth-child(n+5),.req-table td:nth-child(n+5){display:none}
+      .req-table th:nth-child(n+4),.req-table td:nth-child(n+4){display:none}
     }
   </style>
 </head>
@@ -196,7 +196,7 @@ function setPeriod(days, btn) {
 }
 
 function renderUsage(data, days) {
-  const { totals, daily, by_source, by_channel, by_agent, recent_rows, user_tokens } = data
+  const { totals, daily, by_source, by_channel, by_agent, by_model, recent_rows, user_tokens } = data
   const totalCost = estimateCost(totals.tokens_in || 0, totals.tokens_out || 0)
 
   // Quota
@@ -245,6 +245,19 @@ function renderUsage(data, days) {
     </div>`
   }).join('')
 
+  // By model rows
+  const maxMdl = Math.max(...(by_model||[]).map(m => m.tokens_total), 1)
+  const mdlRows = (by_model||[]).map(m => {
+    const pct  = Math.round(m.tokens_total / maxMdl * 100)
+    const name = m._id || 'unknown'
+    return `<div class="bk-row">
+      <div class="bk-label" style="font-family:monospace;font-size:12px">${esc(name)}</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%;background:#7c3aed"></div></div>
+      <div class="bk-val">${fmtNum(m.tokens_total)}</div>
+      <div class="bk-cnt">${m.requests} req</div>
+    </div>`
+  }).join('')
+
   // By agent rows — initial avatar, clean name
   const maxAg = Math.max(...by_agent.map(a => a.tokens_total), 1)
   const agRows = by_agent.slice(0,8).map(a => {
@@ -263,10 +276,12 @@ function renderUsage(data, days) {
   // Recent requests table
   const reqRows = recent_rows.map(r => {
     const cost = estimateCost(r.tokens_in || 0, r.tokens_out || 0)
+    const modelShort = (r.model || '—').replace('gemini-', '').replace('-latest','')
     return `<tr>
       <td>${fmtDate(r.created_at)} <span style="color:var(--text-3)">${fmtTime(r.created_at)}</span></td>
       <td>${srcBadge(r.source)}</td>
       <td>${chDot(r.channel)}</td>
+      <td><span style="font-size:10px;font-family:monospace;color:var(--text-3)">${esc(modelShort)}</span></td>
       <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_in||0)}</td>
       <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_out||0)}</td>
       <td style="text-align:right;font-weight:700;color:var(--text)">${fmtNum(r.tokens_total||0)}</td>
@@ -346,6 +361,17 @@ function renderUsage(data, days) {
       </div>
     </div>
 
+    <!-- ── Model breakdown ── -->
+    <div class="two-col" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-head"><div class="card-title">🧠 By Model</div></div>
+        <div class="card-body">
+          ${mdlRows || '<div style="color:var(--text-3);font-size:12px;padding:10px 0">No data</div>'}
+        </div>
+      </div>
+      <div style=""></div>
+    </div>
+
     <!-- ── Recent requests table ── -->
     <div class="card" style="margin-bottom:0">
       <div class="card-head">
@@ -355,7 +381,7 @@ function renderUsage(data, days) {
       <div style="overflow-x:auto">
         ${reqRows ? `<table class="req-table">
           <thead><tr>
-            <th>Time</th><th>Type</th><th>Channel</th>
+            <th>Time</th><th>Type</th><th>Channel</th><th>Model</th>
             <th style="text-align:right">Tokens In</th><th style="text-align:right">Tokens Out</th>
             <th style="text-align:right">Total</th><th style="text-align:right">Est. Cost</th>
           </tr></thead>
