@@ -537,6 +537,20 @@
     body.account-suspended .auto-reply-banner{display:none!important}
 
     /* ── Hub 3-tab navigation ───────────────────────────────────────────────── */
+    /* Channel status cards bar (replaces metrics bar) */
+    .ch-status-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+    @media(max-width:900px){.ch-status-bar{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:600px){.ch-status-bar{grid-template-columns:1fr 1fr}}
+    .ch-status-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color var(--dur-base),box-shadow var(--dur-base),transform var(--dur-fast) var(--ease-spring);cursor:default}
+    .ch-status-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+    .ch-status-card.csc-live{border-color:var(--accent-glow);background:var(--accent-soft)}
+    .csc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+    .csc-body{flex:1;min-width:0}
+    .csc-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .csc-detail{font-size:10.5px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .csc-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+    .csc-badge-live{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+    .csc-badge-off{background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)}
     .hub-tabs-bar{display:flex;align-items:center;gap:2px;margin-bottom:24px;background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:5px;width:fit-content}
     .hub-tab{
       display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 22px;
@@ -688,6 +702,8 @@ const STATE = {
   pollingTimer:   null,
   // Escalations
   escTickets: [], escLoading: false, escOpenId: null,
+  // Live Chat sessions
+  lcSessions: [], lcLoading: false, lcOpenKey: null, lcThread: [],
 }
 const PAGE_SIZE = 20
 const INTENT_CFG = {
@@ -854,15 +870,69 @@ function renderPage() {
   const gmailOn = gmail?.status === 'active', waOn = wa?.status === 'active', igOn = ig?.status === 'active', fbOn = fb?.status === 'active'
   const arGmail = !!STATE.autoReplySettings.gmail, arWA = !!STATE.autoReplySettings.whatsapp, arIG = !!STATE.autoReplySettings.instagram, arFB = !!STATE.autoReplySettings.messenger
   const inboxCnt = gmail?.inbox_count||0, waCnt = wa?.inbox_count||0, igCnt = ig?.inbox_count||0, fbCnt = fb?.inbox_count||0
+  const agentObj = STATE.agents.find(a => a._id === STATE.agentId) || {}
+  const subURL = agentObj.subdomain_url && !agentObj.subdomain_url.includes('://undefined') ? agentObj.subdomain_url : null
 
   document.getElementById('pageBody').innerHTML = `
-  <!-- ── Metrics bar ── -->
-  <div class="metrics-bar">
-    <div class="metric-card mc-inbox reveal"><div class="metric-card-glow"></div><div class="metric-label">📬 Open Inbox</div><div class="metric-value" id="m-inbox">${inboxCnt||'—'}</div><div class="metric-sub"><span class="poll-dot"></span>Live sync</div></div>
-    <div class="metric-card mc-noise reveal reveal-delay-1"><div class="metric-card-glow"></div><div class="metric-label">🔕 Auto-Filtered</div><div class="metric-value" id="m-noise"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">Zero AI tokens</div></div>
-    <div class="metric-card mc-replied reveal reveal-delay-2"><div class="metric-card-glow"></div><div class="metric-label">✅ Replied (30d)</div><div class="metric-value" id="m-replied"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub" id="m-auto-sub">AI + manual replies</div></div>
-    <div class="metric-card mc-time reveal reveal-delay-3"><div class="metric-card-glow"></div><div class="metric-label">⏱ Avg Response</div><div class="metric-value" id="m-time"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub">hrs to first reply</div></div>
-    <div class="metric-card mc-rate reveal reveal-delay-4"><div class="metric-card-glow"></div><div class="metric-label">😊 CSAT Score</div><div class="metric-value" id="m-csat"><span class="dots-loader"><span></span><span></span><span></span></span></div><div class="metric-sub" id="m-csat-sub">customer satisfaction</div></div>
+  <!-- ── Channel Status Cards (replaces old metrics bar) ── -->
+  <div class="ch-status-bar reveal">
+    <!-- Live Chat -->
+    <div class="ch-status-card ${subURL?'csc-live':''}" onclick="switchPlatform('livechat');switchHubTab('channels')" style="cursor:pointer">
+      <div class="csc-icon" style="background:linear-gradient(135deg,var(--accent),#7c3aed)">🌐</div>
+      <div class="csc-body">
+        <div class="csc-name">Live Chat</div>
+        <div class="csc-detail">${subURL?`<a href="${subURL}" target="_blank" style="color:var(--accent);font-size:10.5px;word-break:break-all;text-decoration:none">${subURL.replace('https://','')}</a>`:'Not published yet'}</div>
+      </div>
+      <span class="csc-badge ${subURL?'csc-badge-live':'csc-badge-off'}">${subURL?'Live':'—'}</span>
+    </div>
+    <!-- Gmail -->
+    <div class="ch-status-card ${gmailOn?'csc-live':''}" onclick="switchPlatform('email');switchHubTab('channels')" style="cursor:pointer">
+      <div class="csc-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div>
+      <div class="csc-body">
+        <div class="csc-name">Gmail</div>
+        <div class="csc-detail">${gmailOn?esc(gmail.email||'Connected'):'Not connected'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="csc-badge ${gmailOn?'csc-badge-live':'csc-badge-off'}">${gmailOn?'Live':'—'}</span>
+        ${gmailOn?`<span style="font-size:10px;color:var(--text-3)">${inboxCnt} inbox</span>`:`<button class="btn btn-primary btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectGmail(this)">Connect</button>`}
+      </div>
+    </div>
+    <!-- WhatsApp -->
+    <div class="ch-status-card ${waOn?'csc-live':''}" onclick="${waOn?`switchPlatform('whatsapp');switchHubTab('channels')`:'connectWhatsAppES(this)'}" style="cursor:pointer">
+      <div class="csc-icon" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
+      <div class="csc-body">
+        <div class="csc-name">WhatsApp</div>
+        <div class="csc-detail">${waOn?esc(wa.display_account||wa.phone_number||'Connected'):'Not connected'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="csc-badge ${waOn?'csc-badge-live':'csc-badge-off'}">${waOn?'Live':'—'}</span>
+        ${waOn?`<span style="font-size:10px;color:var(--text-3)">${waCnt} chats</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectWhatsAppES(this)">Connect</button>`}
+      </div>
+    </div>
+    <!-- Instagram -->
+    <div class="ch-status-card ${igOn?'csc-live':''}" onclick="${igOn?`switchPlatform('instagram');switchHubTab('channels')`:'connectMeta(this)'}" style="cursor:pointer">
+      <div class="csc-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div>
+      <div class="csc-body">
+        <div class="csc-name">Instagram</div>
+        <div class="csc-detail">${igOn?esc(ig.display_account||ig.page_name||'Connected'):'Not connected'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="csc-badge ${igOn?'csc-badge-live':'csc-badge-off'}">${igOn?'Live':'—'}</span>
+        ${igOn?`<span style="font-size:10px;color:var(--text-3)">${igCnt} DMs</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`}
+      </div>
+    </div>
+    <!-- Facebook -->
+    <div class="ch-status-card ${fbOn?'csc-live':''}" onclick="${fbOn?`switchPlatform('messenger');switchHubTab('channels')`:'connectMeta(this)'}" style="cursor:pointer">
+      <div class="csc-icon" style="background:linear-gradient(135deg,#0084FF,#00B2FF)">💙</div>
+      <div class="csc-body">
+        <div class="csc-name">Facebook</div>
+        <div class="csc-detail">${fbOn?esc(fb.page_name||'Connected'):'Not connected'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="csc-badge ${fbOn?'csc-badge-live':'csc-badge-off'}">${fbOn?'Live':'—'}</span>
+        ${fbOn?`<span style="font-size:10px;color:var(--text-3)">${fbCnt} chats</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`}
+      </div>
+    </div>
   </div>
 
   <!-- ── 3-Tab Hub Navigation ── -->
@@ -915,25 +985,70 @@ function renderPage() {
     <!-- ── Live Chat panel ── -->
     <div class="ch-panel ${STATE.platform==='livechat'?'active':''}" id="ch-panel-livechat">
       <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:var(--sh-sm)">
-        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:14px">
-          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.12)">🌐</div>
-          <div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">Live Chat Widget</div><div style="font-size:12px;color:var(--text-3)">Embed the chat widget on your website to capture and reply to visitor queries in real time.</div></div>
-          <span style="margin-left:auto;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe">Coming Soon</span>
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);background:var(--surface-2);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.12);flex-shrink:0">🌐</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">Live Chat Widget</div>
+            <div style="font-size:12px;color:var(--text-3)">Your agent is live — embed it on your website or share the chat link directly.</div>
+          </div>
+          ${subURL
+            ? `<span style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Published</span>`
+            : `<span style="font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">Not published</span>`}
         </div>
         <div style="padding:24px">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:16px">🔧 How it works</div>
-          <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:24px">
-            ${[
-              ['1','Get your Web Chat URL','Once connected, you\'ll receive a unique chat URL and a snippet to embed on your site.'],
-              ['2','Embed the widget','Paste the snippet into your site\'s HTML before the </body> tag — live in seconds.'],
-              ['3','AI-powered replies','Visitors chat in real time; AI auto-replies from your knowledge base, escalating complex queries to you.'],
-            ].map(([n,t,d])=>`<div style="display:flex;gap:12px;align-items:flex-start"><div style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${n}</div><div><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">${t}</div><div style="font-size:12px;color:var(--text-3);line-height:1.6">${d}</div></div></div>`).join('')}
+          ${subURL ? `
+          <!-- Chat URL row -->
+          <div style="margin-bottom:20px">
+            <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px">🔗 Your Web Chat URL</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px;background:var(--surface-2);border:1.5px solid var(--border-md);border-radius:10px;padding:9px 14px;font-size:12.5px;color:var(--accent);font-family:var(--font);word-break:break-all">${subURL}</div>
+              <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${subURL}').then(()=>showToast('URL copied','success'))">Copy URL</button>
+              <a href="${subURL}" target="_blank" class="btn btn-primary btn-sm">Open ↗</a>
+            </div>
           </div>
-          <div style="background:linear-gradient(135deg,var(--accent-soft),rgba(124,111,255,.04));border:1.5px dashed var(--accent-glow);border-radius:14px;padding:20px;text-align:center">
-            <div style="font-size:24px;margin-bottom:8px">🚀</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">Live Chat is launching soon</div>
-            <div style="font-size:12px;color:var(--text-3);line-height:1.6;max-width:340px;margin:0 auto">We're building this now — your Web Chat URL and embed snippet will appear here once the feature is live.</div>
+          <!-- Embed snippet -->
+          <div style="margin-bottom:20px">
+            <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px">📋 Embed Snippet</div>
+            <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">Paste this before your site's <code style="background:var(--surface-3);padding:1px 5px;border-radius:4px">&lt;/body&gt;</code> tag to show the chat bubble on every page.</div>
+            <div class="webchat-embed-box">
+              <pre id="lc-embed-snippet">&lt;iframe src="${subURL}" width="420" height="640" frameborder="0" allow="microphone" style="position:fixed;bottom:24px;right:24px;border:none;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:9999"&gt;&lt;/iframe&gt;</pre>
+            </div>
+            <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="navigator.clipboard.writeText(document.getElementById('lc-embed-snippet').textContent).then(()=>showToast('Snippet copied','success'))">Copy Snippet</button>
           </div>
+          <!-- Quick tips -->
+          <div style="background:var(--surface-2);border-radius:12px;padding:14px 16px;margin-bottom:24px">
+            <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:10px">💡 Quick tips</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${[
+                ['Share the link','Send your Web Chat URL directly to customers via WhatsApp, email or SMS — no website needed.'],
+                ['Embed on your site','Paste the snippet and a chat bubble appears on every page. Visitors can start chatting instantly.'],
+                ['AI handles replies','Your agent auto-replies from your knowledge base. Complex queries get escalated to you.'],
+              ].map(([t,d])=>`<div style="display:flex;gap:10px"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div><div><span style="font-size:12px;font-weight:600;color:var(--text)">${t} — </span><span style="font-size:12px;color:var(--text-3)">${d}</span></div></div>`).join('')}
+            </div>
+          </div>
+          <!-- Live Chat Conversations -->
+          <div id="lc-conv-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <div style="font-size:13px;font-weight:700;color:var(--text)">💬 Recent Conversations</div>
+              <button class="btn btn-secondary btn-sm" onclick="loadLiveChatSessions(true)">↻ Refresh</button>
+            </div>
+            <div id="lc-sessions-wrap" style="display:flex;gap:16px;min-height:300px">
+              <!-- session list + thread pane injected by JS -->
+              <div id="lc-sessions-list" style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;max-height:520px;overflow-y:auto"></div>
+              <div id="lc-thread-pane" style="flex:1;min-width:0;background:var(--surface-2);border-radius:14px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:12.5px;padding:20px">
+                Select a conversation to view messages
+              </div>
+            </div>
+          </div>
+          ` : `
+          <!-- Not published state -->
+          <div style="text-align:center;padding:32px 20px">
+            <div style="font-size:36px;margin-bottom:12px">🚀</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:8px">Publish your agent to get your chat link</div>
+            <div style="font-size:12px;color:var(--text-3);line-height:1.7;max-width:360px;margin:0 auto 20px">Go to the <strong>Agent</strong> page, fill in your agent's details and knowledge base, then hit <strong>Publish</strong>. Your Web Chat URL and embed snippet will appear here.</div>
+            <a href="agent.html" class="btn btn-primary btn-sm">Go to Agent Page ↗</a>
+          </div>
+          `}
         </div>
       </div>
     </div>
@@ -1268,6 +1383,77 @@ const ESC_CHANNEL_CFG = {
   instagram:{ label:'📸 Instagram', cls:'ecb-instagram' },
   messenger:{ label:'💙 Facebook',  cls:'ecb-messenger' },
   livechat: { label:'🌐 Live Chat', cls:'ecb-livechat' },
+}
+
+// ── Live Chat Conversations ───────────────────────────────────────────────────
+async function loadLiveChatSessions(forceRefresh = false) {
+  if (STATE.lcLoading) return
+  STATE.lcLoading = true
+  const listEl = document.getElementById('lc-sessions-list')
+  if (listEl) listEl.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-3);font-size:12px">Loading conversations…</div>`
+  try {
+    const data = await apiFetch(`/agents/${STATE.agentId}/conversations`)
+    STATE.lcSessions = data.sessions || []
+    renderLiveChatSessions()
+  } catch(e) {
+    if (listEl) listEl.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-3);font-size:12px">Failed to load. <button class="btn btn-secondary btn-sm" onclick="loadLiveChatSessions(true)">Retry</button></div>`
+  } finally {
+    STATE.lcLoading = false
+  }
+}
+
+function renderLiveChatSessions() {
+  const listEl = document.getElementById('lc-sessions-list')
+  if (!listEl) return
+  const sessions = STATE.lcSessions
+  if (!sessions.length) {
+    listEl.innerHTML = `<div style="text-align:center;padding:28px 16px;color:var(--text-3);font-size:12.5px">No conversations yet.<br>Visitors who chat on your website will appear here.</div>`
+    return
+  }
+  listEl.innerHTML = sessions.map(s => {
+    const key = s.session_id || s.visitor_id || s.visitor_ip || s._id
+    const label = s.visitor_id && !s.visitor_id.startsWith('anon') ? s.visitor_id : (s.visitor_ip ? `IP ${s.visitor_ip.split('.').slice(0,3).join('.')}.*` : 'Anonymous')
+    const firstQ = (s.first_question || '').slice(0,60) + ((s.first_question||'').length > 60 ? '…' : '')
+    const ago = s.last_active ? fmtRelTime(s.last_active) : ''
+    const msgCount = s.message_count || 0
+    const isOpen = STATE.lcOpenKey === key
+    return `
+      <div onclick="loadLiveChatThread('${esc(key)}')" style="cursor:pointer;padding:10px 12px;border-radius:10px;background:${isOpen ? 'var(--accent-dim)' : 'var(--surface)'};border:1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border)'};transition:border-color .15s,background .15s">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">
+          <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">👤 ${esc(label)}</div>
+          <div style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0">${ago}</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--text-2);line-height:1.4;margin-bottom:5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(firstQ) || '<em style="color:var(--text-3)">No message</em>'}</div>
+        <div style="font-size:10.5px;color:var(--text-3)">${msgCount} message${msgCount!==1?'s':''}</div>
+      </div>`
+  }).join('')
+}
+
+async function loadLiveChatThread(key) {
+  STATE.lcOpenKey = key
+  renderLiveChatSessions() // re-render list to show active highlight
+  const pane = document.getElementById('lc-thread-pane')
+  if (!pane) return
+  pane.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">Loading…</div>`
+  try {
+    const msgs = await apiFetch(`/agents/${STATE.agentId}/conversations/${encodeURIComponent(key)}`)
+    STATE.lcThread = Array.isArray(msgs) ? msgs : (msgs.messages || [])
+    pane.innerHTML = `
+      <div style="display:flex;flex-direction:column;height:100%;max-height:520px">
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);flex-shrink:0">
+          Conversation · ${STATE.lcThread.length} message${STATE.lcThread.length!==1?'s':''}
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
+          ${STATE.lcThread.map(m => `
+            ${m.question ? `<div style="display:flex;justify-content:flex-end"><div style="max-width:75%;background:var(--accent);color:#fff;padding:8px 12px;border-radius:12px 12px 2px 12px;font-size:12.5px;line-height:1.5">${esc(m.question)}</div></div>` : ''}
+            ${m.answer ? `<div style="display:flex;justify-content:flex-start"><div style="max-width:75%;background:var(--surface);border:1px solid var(--border);padding:8px 12px;border-radius:12px 12px 12px 2px;font-size:12.5px;line-height:1.5;color:var(--text)">${esc(m.answer)}</div></div>` : ''}
+            ${m.created_at ? `<div style="text-align:center;font-size:10px;color:var(--text-3)">${new Date(m.created_at).toLocaleString()}</div>` : ''}
+          `).join('')}
+        </div>
+      </div>`
+  } catch(e) {
+    pane.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">Failed to load thread. <button class="btn btn-secondary btn-sm" onclick="loadLiveChatThread('${esc(key)}')">Retry</button></div>`
+  }
 }
 
 async function loadEscalations(forceRefresh = false) {
@@ -1915,7 +2101,7 @@ function switchPlatform(platform) {
   // Update channel panels
   document.querySelectorAll('.ch-panel').forEach(p => p.classList.toggle('active', p.id === `ch-panel-${platform}`))
 
-  if (platform === 'livechat') return // no data to load — static "coming soon" panel
+  if (platform === 'livechat') { loadLiveChatSessions(); return }
   if (platform === 'email') {
     if (!STATE.loaded[platform]) {
       const ch = STATE.channels.gmail
