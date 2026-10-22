@@ -379,14 +379,14 @@
 
   // ── Theme ──────────────────────────────────────────────────────────────────
   function initTheme() {
-    const saved = localStorage.getItem('sg-theme') || 'light'
+    const saved = localStorage.getItem('sg_theme') || 'light'
     document.documentElement.setAttribute('data-theme', saved)
     document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙'
   }
   function toggleTheme() {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
     document.documentElement.setAttribute('data-theme', next)
-    localStorage.setItem('sg-theme', next)
+    localStorage.setItem('sg_theme', next)
     document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙'
   }
 
@@ -430,7 +430,7 @@
         return
       }
 
-      const res  = await tplFetch(`/templates?agent_id=${currentAgent}`)
+      const res  = await apiFetch(`/templates?agent_id=${currentAgent}`)
       allTemplates = res.templates || []
       renderStats()
       renderTemplates()
@@ -715,7 +715,7 @@
     try {
       const url    = editingId ? `/templates/${editingId}` : '/templates'
       const method = editingId ? 'PUT' : 'POST'
-      await tplFetch(url, { method, body: JSON.stringify(payload) })
+      await apiFetch(url, { method, body: JSON.stringify(payload) })
       showToast(successMsg, 'success')
       closeModal('createModal')
       await loadTemplates()
@@ -730,7 +730,7 @@
   // ── Submit to Meta (from card) ─────────────────────────────────────────────
   async function submitToMeta(id) {
     try {
-      await tplFetch(`/templates/${id}/submit`, { method: 'POST' })
+      await apiFetch(`/templates/${id}/submit`, { method: 'POST' })
       showToast('Submitted to Meta — status will update shortly', 'success')
       await loadTemplates()
     } catch (e) {
@@ -744,7 +744,7 @@
     btn.disabled = true
     btn.textContent = '⏳ Syncing…'
     try {
-      const res = await tplFetch(`/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
+      const res = await apiFetch(`/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
       showToast(`Synced ${res.updated || 0} template(s) from Meta`, 'success')
       await loadTemplates()
     } catch (e) {
@@ -768,7 +768,7 @@
     btn.disabled = true
     btn.textContent = 'Deleting…'
     try {
-      await tplFetch(`/templates/${deleteTargetId}`, { method: 'DELETE' })
+      await apiFetch(`/templates/${deleteTargetId}`, { method: 'DELETE' })
       showToast('Template deleted', 'success')
       closeModal('confirmModal')
       deleteTargetId = null
@@ -806,18 +806,6 @@
       el.classList.add('removing')
       el.addEventListener('animationend', () => el.remove())
     }, 3500)
-  }
-
-  // ── API fetch (templates-local, for /templates/* endpoints) ──────────────
-  async function tplFetch(url, opts = {}) {
-    const token = localStorage.getItem('sg-token') || sessionStorage.getItem('sg-token')
-    const res   = await fetch(API + url, {
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      ...opts,
-    })
-    const data = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`)
-    return data
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
