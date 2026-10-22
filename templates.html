@@ -222,15 +222,16 @@
         <button class="tab-btn" data-tab="draft" onclick="filterTab(this,'draft')">📝 Draft</button>
       </div>
 
-      <!-- Template grid -->
-      <div class="tpl-grid" id="tplGrid">
-        <div class="empty-state" id="emptyState" style="display:none">
-          <div class="icon">📋</div>
-          <h3>No templates yet</h3>
-          <p>Create your first WhatsApp template to start sending<br>appointment reminders and follow-up messages.</p>
-          <button class="btn btn-primary" onclick="openCreateModal()">+ Create Template</button>
-        </div>
+      <!-- Empty state (outside grid so grid.innerHTML='' never destroys it) -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="icon">📋</div>
+        <h3>No templates yet</h3>
+        <p>Create your first WhatsApp template to start sending<br>appointment reminders and follow-up messages.</p>
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Create Template</button>
       </div>
+
+      <!-- Template grid -->
+      <div class="tpl-grid" id="tplGrid"></div>
 
     </div>
   </div>
@@ -442,7 +443,8 @@
   function showEmptyState(type) {
     const grid  = document.getElementById('tplGrid')
     const empty = document.getElementById('emptyState')
-    grid.innerHTML = ''
+    if (grid)  grid.innerHTML = ''
+    if (!empty) return
     if (type === 'no-wa') {
       empty.innerHTML = `
         <div class="icon">📱</div>
@@ -456,7 +458,6 @@
         <p>Create your first WhatsApp template to start sending<br>appointment reminders and follow-up messages.</p>
         <button class="btn btn-primary" onclick="openCreateModal()">+ Create Template</button>`
     }
-    grid.appendChild(empty)
     empty.style.display = 'block'
   }
 
