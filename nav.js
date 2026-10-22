@@ -27,6 +27,7 @@ const _NAV_SECTIONS = [
     labelKey: 'navAccount',
     items: [
       { page:'payments', href:'payments.html', labelKey:'navBilling',     icon:'⚡' },
+      { page:'usage',    href:'usage.html',    labelKey:'navUsage',       icon:'📊' },
       { page:'account',  href:'account.html',  labelKey:'navAccountPage', icon:'👤' },
     ]
   }
