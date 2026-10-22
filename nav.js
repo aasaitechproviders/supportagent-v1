@@ -15,6 +15,8 @@ const _NAV_SECTIONS = [
       { page:'forms',         href:'forms.html',         label:'Form Builder',        icon:'📋' },
       { page:'campaigns',     href:'campaigns.html',     label:'Campaigns',           icon:'📣' },
       { page:'templates',     href:'templates.html',     label:'WA Templates',        icon:'📋' },
+      { page:'appointments',  href:'appointments.html',  label:'Appointments',         icon:'📅' },
+      { page:'automations',   href:'automations.html',   label:'Automations',          icon:'⚡' },
       { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
   },
