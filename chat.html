@@ -1643,7 +1643,7 @@
       `<span class="timing-sep"></span>`,
       `⏱ <span class="${ttClass}">Total: ${(totalTime/1000).toFixed(2)}s</span>`,
     ]
-    if (tokens) { parts.push(`<span class="timing-sep"></span>`); parts.push(`🔢 ${tokens.toLocaleString()} tokens`) }
+    // tokens intentionally not shown here — visible only in Usage & Costs page
     badge.innerHTML = parts.join('')
     const timeEl = group.querySelector('.msg-time')
     if (timeEl) group.insertBefore(badge, timeEl); else group.appendChild(badge)
