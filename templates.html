@@ -176,7 +176,8 @@
     <div class="loader-text">Loading Templates…</div>
   </div>
 
-  <div id="navContainer"></div>
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+  <div class="sidebar" id="sidebar"></div>
 
   <div class="main-wrap">
     <div class="topbar">
@@ -352,8 +353,9 @@
   <!-- ── TOAST ─────────────────────────────────────────────────────────────── -->
   <div class="toast-wrap" id="toastWrap"></div>
 
-  <script src="nav.js"></script>
+  <script src="api.js"></script>
   <script src="i18n.js"></script>
+  <script src="nav.js"></script>
   <script>
   // ── State ──────────────────────────────────────────────────────────────────
   const API = window.SG_API || ''
@@ -366,6 +368,8 @@
   // ── Init ───────────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', async () => {
     initTheme()
+    const nav = await renderNav('templates')
+    if (!nav) return
     await loadAgents()
     hideLoader()
   })
@@ -390,7 +394,7 @@
   // ── Agents ─────────────────────────────────────────────────────────────────
   async function loadAgents() {
     try {
-      const res  = await apiFetch('/api/agents')
+      const res  = await apiFetch('/agents')
       const list = res.agents || []
       const sel  = document.getElementById('agentSelect')
       sel.innerHTML = list.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
@@ -412,7 +416,7 @@
   async function loadTemplates() {
     if (!currentAgent) return
     try {
-      const res  = await apiFetch(`/api/templates?agent_id=${currentAgent}`)
+      const res  = await tplFetch(`/templates?agent_id=${currentAgent}`)
       allTemplates = res.templates || []
       renderStats()
       renderTemplates()
@@ -676,9 +680,9 @@
     btn.textContent = '⏳ Saving…'
     hideFormError()
     try {
-      const url    = editingId ? `/api/templates/${editingId}` : '/api/templates'
+      const url    = editingId ? `/templates/${editingId}` : '/templates'
       const method = editingId ? 'PUT' : 'POST'
-      await apiFetch(url, { method, body: JSON.stringify(payload) })
+      await tplFetch(url, { method, body: JSON.stringify(payload) })
       showToast(successMsg, 'success')
       closeModal('createModal')
       await loadTemplates()
@@ -693,7 +697,7 @@
   // ── Submit to Meta (from card) ─────────────────────────────────────────────
   async function submitToMeta(id) {
     try {
-      await apiFetch(`/api/templates/${id}/submit`, { method: 'POST' })
+      await tplFetch(`/templates/${id}/submit`, { method: 'POST' })
       showToast('Submitted to Meta — status will update shortly', 'success')
       await loadTemplates()
     } catch (e) {
@@ -707,7 +711,7 @@
     btn.disabled = true
     btn.textContent = '⏳ Syncing…'
     try {
-      const res = await apiFetch(`/api/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
+      const res = await tplFetch(`/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
       showToast(`Synced ${res.updated || 0} template(s) from Meta`, 'success')
       await loadTemplates()
     } catch (e) {
@@ -731,7 +735,7 @@
     btn.disabled = true
     btn.textContent = 'Deleting…'
     try {
-      await apiFetch(`/api/templates/${deleteTargetId}`, { method: 'DELETE' })
+      await tplFetch(`/templates/${deleteTargetId}`, { method: 'DELETE' })
       showToast('Template deleted', 'success')
       closeModal('confirmModal')
       deleteTargetId = null
@@ -771,8 +775,8 @@
     }, 3500)
   }
 
-  // ── API fetch ──────────────────────────────────────────────────────────────
-  async function apiFetch(url, opts = {}) {
+  // ── API fetch (templates-local, for /templates/* endpoints) ──────────────
+  async function tplFetch(url, opts = {}) {
     const token = localStorage.getItem('sg-token') || sessionStorage.getItem('sg-token')
     const res   = await fetch(API + url, {
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
