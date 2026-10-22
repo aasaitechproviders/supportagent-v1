@@ -132,18 +132,6 @@
 const LAMBDA_API = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
 let _currentDays = 7
 
-// ── Token cost estimate (Gemini Flash pricing in INR, rough)
-// ~₹0.07 per 1M input tokens, ~₹0.28 per 1M output tokens (at ~85 INR/USD)
-const INR_PER_1M_IN  = 0.07
-const INR_PER_1M_OUT = 0.28
-
-function estimateCost(tokensIn, tokensOut) {
-  return ((tokensIn / 1_000_000) * INR_PER_1M_IN + (tokensOut / 1_000_000) * INR_PER_1M_OUT)
-}
-function fmtCost(inr) {
-  if (inr < 0.01) return '< ₹0.01'
-  return '₹' + inr.toFixed(inr < 1 ? 3 : 2)
-}
 function fmtNum(n) {
   if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M'
   if (n >= 1_000)     return (n/1_000).toFixed(1) + 'K'
@@ -197,7 +185,6 @@ function setPeriod(days, btn) {
 
 function renderUsage(data, days) {
   const { totals, daily, by_source, by_channel, by_agent, by_model, recent_rows, user_tokens } = data
-  const totalCost = estimateCost(totals.tokens_in || 0, totals.tokens_out || 0)
 
   // Quota
   const used = user_tokens?.monthly_used || 0
@@ -210,8 +197,7 @@ function renderUsage(data, days) {
   const maxTok = Math.max(...(daily.map(d => d.tokens_total)), 1)
   const barCols = daily.map(d => {
     const h = Math.max(4, Math.round((d.tokens_total / maxTok) * 76))
-    const cost = estimateCost(d.tokens_in || 0, d.tokens_out || 0)
-    return `<div class="bar-col" title="${d._id}: ${fmtNum(d.tokens_total)} tokens · ${fmtCost(cost)} · ${d.requests} req">
+    return `<div class="bar-col" title="${d._id}: ${fmtNum(d.tokens_total)} tokens · ${d.requests} req">
       <div class="bar-fill" style="height:${h}px"></div>
       <div class="bar-label">${d._id.slice(5)}</div>
     </div>`
@@ -275,7 +261,6 @@ function renderUsage(data, days) {
 
   // Recent requests table
   const reqRows = recent_rows.map(r => {
-    const cost = estimateCost(r.tokens_in || 0, r.tokens_out || 0)
     const modelShort = (r.model || '—').replace('gemini-', '').replace('-latest','')
     return `<tr>
       <td>${fmtDate(r.created_at)} <span style="color:var(--text-3)">${fmtTime(r.created_at)}</span></td>
@@ -285,7 +270,6 @@ function renderUsage(data, days) {
       <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_in||0)}</td>
       <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_out||0)}</td>
       <td style="text-align:right;font-weight:700;color:var(--text)">${fmtNum(r.tokens_total||0)}</td>
-      <td style="text-align:right;color:var(--accent)">${fmtCost(cost)}</td>
     </tr>`
   }).join('')
 
@@ -298,10 +282,9 @@ function renderUsage(data, days) {
       </div>
       <div class="quota-bar-wrap"><div class="quota-bar-fill ${barCls}" style="width:${pct}%"></div></div>
       <div class="quota-sub">
-        <span>🔋 Monthly: ${fmtNum(cap - used)} remaining</span>
-        ${topup ? `<span>⚡ Top-up balance: ${fmtNum(topup)}</span>` : ''}
+        <span>🔋 Remaining: ${fmtNum(cap - used)} tokens</span>
+        ${topup ? `<span>⚡ Top-up balance: ${fmtNum(topup)} tokens</span>` : ''}
         <span>📦 Plan: <strong>${esc(user_tokens?.plan_label || user_tokens?.plan || 'Starter')}</strong></span>
-        <a href="payments.html" style="color:var(--accent);font-size:11px;text-decoration:none;margin-left:auto">Buy more tokens →</a>
       </div>
     </div>
 
@@ -313,19 +296,19 @@ function renderUsage(data, days) {
         <div class="st-sub">${fmtNum(totals.tokens_in||0)} in · ${fmtNum(totals.tokens_out||0)} out</div>
       </div>
       <div class="stat-tile">
-        <div class="st-label">Est. AI Cost (${days}d)</div>
-        <div class="st-value" style="color:var(--accent)">${fmtCost(totalCost)}</div>
-        <div class="st-sub">Gemini Flash · INR pricing</div>
-      </div>
-      <div class="stat-tile">
         <div class="st-label">Total Requests</div>
         <div class="st-value">${fmtNum(totals.requests || 0)}</div>
         <div class="st-sub">${totals.requests ? fmtNum(Math.round((totals.tokens_total||0) / totals.requests)) + ' avg tokens/req' : '—'}</div>
       </div>
       <div class="stat-tile">
-        <div class="st-label">Avg / Day</div>
+        <div class="st-label">Avg Tokens / Day</div>
         <div class="st-value">${fmtNum(Math.round((totals.tokens_total||0) / (days||1)))}</div>
-        <div class="st-sub">${fmtCost(totalCost / (days||1))} / day</div>
+        <div class="st-sub">over ${days} days</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-label">Tokens Remaining</div>
+        <div class="st-value" style="color:var(--accent)">${fmtNum(Math.max(0, (user_tokens?.monthly_cap||0) - (user_tokens?.monthly_used||0)))}</div>
+        <div class="st-sub">of ${fmtNum(user_tokens?.monthly_cap||0)} monthly cap</div>
       </div>
     </div>
 
@@ -383,7 +366,7 @@ function renderUsage(data, days) {
           <thead><tr>
             <th>Time</th><th>Type</th><th>Channel</th><th>Model</th>
             <th style="text-align:right">Tokens In</th><th style="text-align:right">Tokens Out</th>
-            <th style="text-align:right">Total</th><th style="text-align:right">Est. Cost</th>
+            <th style="text-align:right">Total</th>
           </tr></thead>
           <tbody>${reqRows}</tbody>
         </table>` : '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">No requests in this period</div>'}
