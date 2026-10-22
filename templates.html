@@ -593,7 +593,7 @@
     const hints = {
       UTILITY:        '✅ Fastest approval. Use for appointment reminders & follow-ups.',
       MARKETING:      '⚠️ Slower approval. For promotional content. Requires opt-in.',
-      AUTHENTICATION: '🔐 For OTP / verification codes only.',
+      AUTHENTICATION: '⚠️ Cannot be submitted via API. Create authentication templates directly in Meta Business Manager.',
     }
     document.getElementById('catHint').textContent = hints[cat] || ''
   }
@@ -706,6 +706,11 @@
   async function saveAndSubmit() {
     const payload = buildPayload(true)
     if (!payload) return
+    // AUTHENTICATION templates cannot be submitted via API — Meta requires special flow
+    if (payload.category === 'AUTHENTICATION') {
+      showFormError('AUTHENTICATION templates cannot be submitted via API. Use UTILITY category for OTP/verification messages instead, or create authentication templates directly in Meta Business Manager.')
+      return
+    }
     // Verify WhatsApp is connected before attempting Meta submission
     try {
       const res2   = await apiFetch(`/agents/${currentAgent}/channels`)
@@ -745,6 +750,11 @@
 
   // ── Submit to Meta (from card) ─────────────────────────────────────────────
   async function submitToMeta(id) {
+    const tpl = allTemplates.find(t => String(t._id) === String(id))
+    if (tpl && tpl.category === 'AUTHENTICATION') {
+      showToast('AUTHENTICATION templates must be created in Meta Business Manager directly. Use UTILITY category for OTP messages via API.', 'error')
+      return
+    }
     try {
       await apiFetch(`/templates/${id}/submit`, { method: 'POST' })
       showToast('Submitted to Meta — status will update shortly', 'success')
