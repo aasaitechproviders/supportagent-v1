@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Usage & Costs — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;backdrop-filter:blur(16px)}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background .12s}
+    .theme-toggle:hover{background:var(--surface-2)}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .page-body{padding:20px 24px 48px;flex:1;max-width:1400px;width:100%;box-sizing:border-box;animation:page-enter .35s cubic-bezier(0,0,.2,1)}
+    @keyframes page-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Period selector ── */
+    .period-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .period-btn{padding:6px 16px;border-radius:20px;border:1.5px solid var(--border-md);background:var(--surface);color:var(--text-2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+    .period-btn.active,.period-btn:hover{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+    .period-label{font-size:12px;color:var(--text-3);margin-left:auto}
+
+    /* ── Stat tiles ── */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+    .stat-tile{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s}
+    .stat-tile:hover{box-shadow:var(--sh-sm)}
+    .st-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+    .st-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
+    .st-sub{font-size:11px;color:var(--text-3)}
+    .st-icon{font-size:20px;margin-bottom:2px}
+
+    /* ── Token quota bar ── */
+    .quota-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:24px}
+    .quota-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+    .quota-title{font-size:13px;font-weight:700;color:var(--text)}
+    .quota-nums{font-size:12px;color:var(--text-3)}
+    .quota-bar-wrap{height:10px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
+    .quota-bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--accent),#7c3aed);transition:width .4s}
+    .quota-bar-fill.warn{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+    .quota-bar-fill.danger{background:linear-gradient(90deg,#ef4444,#dc2626)}
+    .quota-sub{font-size:11px;color:var(--text-3);display:flex;gap:16px;flex-wrap:wrap}
+
+    /* ── Two-col layout ── */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    @media(max-width:860px){.two-col{grid-template-columns:1fr}}
+
+    /* ── Card ── */
+    .card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;overflow:hidden}
+    .card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .card-title{font-size:13px;font-weight:700;color:var(--text)}
+    .card-body{padding:14px 18px}
+
+    /* ── Mini bar chart ── */
+    .bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 2px}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default}
+    .bar-col:hover .bar-fill{opacity:.8}
+    .bar-fill{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--accent),#7c3aed);min-height:2px;transition:height .3s}
+    .bar-label{font-size:8px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32px;text-align:center}
+
+    /* ── Breakdown rows ── */
+    .bk-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+    .bk-row:last-child{border-bottom:none}
+    .bk-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+    .bk-label{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bk-bar-wrap{width:100px;height:6px;background:var(--border);border-radius:6px;overflow:hidden;flex-shrink:0}
+    .bk-bar{height:100%;border-radius:6px;background:var(--accent)}
+    .bk-val{font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap;flex-shrink:0;min-width:60px;text-align:right}
+    .bk-cnt{font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+
+    /* ── Requests table ── */
+    .req-table{width:100%;border-collapse:collapse;font-size:12px}
+    .req-table th{text-align:left;padding:8px 10px;font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+    .req-table td{padding:8px 10px;color:var(--text-2);border-bottom:1px solid var(--border);vertical-align:middle}
+    .req-table tr:last-child td{border-bottom:none}
+    .req-table tr:hover td{background:var(--surface-2)}
+    .src-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;white-space:nowrap}
+    .src-chat{background:var(--accent-dim);color:var(--accent)}
+    .src-channel{background:#dcfce7;color:#166534}
+    [data-theme="dark"] .src-channel{background:#14532d;color:#86efac}
+    .src-history{background:#fce7f3;color:#be185d}
+    [data-theme="dark"] .src-history{background:#3b0e2a;color:#f0abfc}
+    .src-other{background:var(--surface-3);color:var(--text-3)}
+    .ch-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+    /* ── Loader ── */
+    .usage-loading{text-align:center;padding:48px;color:var(--text-3);font-size:13px}
+    .spin{display:inline-block;width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:10px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:700px){
+      .page-body{padding:12px 12px 40px}
+      .stat-grid{grid-template-columns:1fr 1fr}
+      .req-table th:nth-child(n+5),.req-table td:nth-child(n+5){display:none}
+    }
+  </style>
+</head>
+<body>
+<div id="sidebar"></div>
+<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mob-menu-btn" id="mob-menu-btn">☰</button>
+      <div class="topbar-title">⚡ Usage &amp; Costs</div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="toggleTheme();this.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'☀️':'🌙'">🌙</button>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <!-- Period selector -->
+    <div class="period-bar">
+      <button class="period-btn active" data-days="7"  onclick="setPeriod(7,this)">7 days</button>
+      <button class="period-btn"        data-days="14" onclick="setPeriod(14,this)">14 days</button>
+      <button class="period-btn"        data-days="30" onclick="setPeriod(30,this)">30 days</button>
+      <button class="period-btn"        data-days="90" onclick="setPeriod(90,this)">90 days</button>
+      <span class="period-label" id="period-label"></span>
+    </div>
+
+    <div id="usage-root">
+      <div class="usage-loading"><div class="spin"></div><br>Loading usage data…</div>
+    </div>
+  </div>
+</div>
+
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
+<script>
+const LAMBDA_API = 'https://fypouhme3gqldqk6sk75b75udy0ltonb.lambda-url.ap-southeast-2.on.aws'
+let _currentDays = 7
+
+// ── Token cost estimate (Gemini Flash pricing in INR, rough)
+// ~₹0.07 per 1M input tokens, ~₹0.28 per 1M output tokens (at ~85 INR/USD)
+const INR_PER_1M_IN  = 0.07
+const INR_PER_1M_OUT = 0.28
+
+function estimateCost(tokensIn, tokensOut) {
+  return ((tokensIn / 1_000_000) * INR_PER_1M_IN + (tokensOut / 1_000_000) * INR_PER_1M_OUT)
+}
+function fmtCost(inr) {
+  if (inr < 0.01) return '< ₹0.01'
+  return '₹' + inr.toFixed(inr < 1 ? 3 : 2)
+}
+function fmtNum(n) {
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M'
+  if (n >= 1_000)     return (n/1_000).toFixed(1) + 'K'
+  return String(n)
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short' })
+}
+function fmtTime(d) {
+  return new Date(d).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true })
+}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+function srcBadge(source) {
+  const s = source || ''
+  if (s.startsWith('chat_tier')) return `<span class="src-badge src-chat">${esc(s)}</span>`
+  if (s.startsWith('channel_') || s.startsWith('gmail') || s.startsWith('whatsapp')) return `<span class="src-badge src-channel">${esc(s)}</span>`
+  if (s.startsWith('history')) return `<span class="src-badge src-history">${esc(s)}</span>`
+  return `<span class="src-badge src-other">${esc(s)}</span>`
+}
+
+const CH_COLORS = {
+  chat:'#8b5cf6', email:'#ea4335', gmail:'#ea4335',
+  whatsapp:'#25d366', instagram:'#e1306c', messenger:'#0084ff', livechat:'#8b5cf6'
+}
+const CH_ICONS  = { chat:'🌐', email:'📧', gmail:'📧', whatsapp:'💬', instagram:'📸', messenger:'💙', livechat:'🌐' }
+
+function chDot(channel) {
+  const c = CH_COLORS[channel] || '#9ea3bb'
+  return `<span class="ch-dot" style="background:${c}"></span>${esc(channel||'chat')}`
+}
+
+// ── Main load ──────────────────────────────────────────────────────────────────
+async function loadUsage(days) {
+  document.getElementById('period-label').textContent = `Showing last ${days} days`
+  const root = document.getElementById('usage-root')
+  root.innerHTML = `<div class="usage-loading"><div class="spin"></div><br>Loading…</div>`
+  try {
+    const data = await apiFetch(`/usage/summary?days=${days}`)
+    renderUsage(data, days)
+  } catch(e) {
+    root.innerHTML = `<div class="usage-loading" style="color:var(--text-2)">⚠️ Failed to load usage data.<br><small>${esc(e.message)}</small><br><br><button class="btn btn-secondary btn-sm" onclick="loadUsage(${days})">Retry</button></div>`
+  }
+}
+
+function setPeriod(days, btn) {
+  _currentDays = days
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b === btn))
+  loadUsage(days)
+}
+
+function renderUsage(data, days) {
+  const { totals, daily, by_source, by_channel, by_agent, recent_rows, user_tokens } = data
+  const totalCost = estimateCost(totals.tokens_in || 0, totals.tokens_out || 0)
+
+  // Quota
+  const used = user_tokens?.monthly_used || 0
+  const cap  = user_tokens?.monthly_cap  || 1
+  const pct  = Math.min(100, Math.round(used / cap * 100))
+  const barCls = pct >= 90 ? 'danger' : pct >= 70 ? 'warn' : ''
+  const topup  = user_tokens?.topup_balance || 0
+
+  // Daily bar chart
+  const maxTok = Math.max(...(daily.map(d => d.tokens_total)), 1)
+  const barCols = daily.map(d => {
+    const h = Math.max(4, Math.round((d.tokens_total / maxTok) * 76))
+    const cost = estimateCost(d.tokens_in || 0, d.tokens_out || 0)
+    return `<div class="bar-col" title="${d._id}: ${fmtNum(d.tokens_total)} tokens · ${fmtCost(cost)} · ${d.requests} req">
+      <div class="bar-fill" style="height:${h}px"></div>
+      <div class="bar-label">${d._id.slice(5)}</div>
+    </div>`
+  }).join('')
+
+  // By source rows
+  const maxSrc = Math.max(...by_source.map(s => s.tokens_total), 1)
+  const srcRows = by_source.slice(0,10).map(s => {
+    const pct = Math.round(s.tokens_total / maxSrc * 100)
+    return `<div class="bk-row">
+      <div class="bk-icon" style="background:var(--accent-dim)">${srcBadge(s._id)}</div>
+      <div class="bk-label" style="padding-left:4px">${esc(s._id || 'unknown')}</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%"></div></div>
+      <div class="bk-val">${fmtNum(s.tokens_total)}</div>
+      <div class="bk-cnt">${s.requests} req</div>
+    </div>`
+  }).join('')
+
+  // By channel rows
+  const maxCh = Math.max(...by_channel.map(c => c.tokens_total), 1)
+  const chRows = by_channel.map(c => {
+    const pct = Math.round(c.tokens_total / maxCh * 100)
+    const col = CH_COLORS[c._id] || '#9ea3bb'
+    const ico = CH_ICONS[c._id] || '📡'
+    return `<div class="bk-row">
+      <div class="bk-icon" style="background:${col}22;font-size:15px">${ico}</div>
+      <div class="bk-label">${chDot(c._id)}</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%;background:${col}"></div></div>
+      <div class="bk-val">${fmtNum(c.tokens_total)}</div>
+      <div class="bk-cnt">${c.requests} req</div>
+    </div>`
+  }).join('')
+
+  // By agent rows
+  const maxAg = Math.max(...by_agent.map(a => a.tokens_total), 1)
+  const agRows = by_agent.slice(0,8).map(a => {
+    const pct = Math.round(a.tokens_total / maxAg * 100)
+    return `<div class="bk-row">
+      <div class="bk-icon" style="background:var(--surface-3)">🤖</div>
+      <div class="bk-label">${esc(a.agent_name || 'Agent')}</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%"></div></div>
+      <div class="bk-val">${fmtNum(a.tokens_total)}</div>
+      <div class="bk-cnt">${a.requests} req</div>
+    </div>`
+  }).join('')
+
+  // Recent requests table
+  const reqRows = recent_rows.map(r => {
+    const cost = estimateCost(r.tokens_in || 0, r.tokens_out || 0)
+    return `<tr>
+      <td>${fmtDate(r.created_at)} <span style="color:var(--text-3)">${fmtTime(r.created_at)}</span></td>
+      <td>${srcBadge(r.source)}</td>
+      <td>${chDot(r.channel)}</td>
+      <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_in||0)}</td>
+      <td style="text-align:right;font-family:monospace">${fmtNum(r.tokens_out||0)}</td>
+      <td style="text-align:right;font-weight:700;color:var(--text)">${fmtNum(r.tokens_total||0)}</td>
+      <td style="text-align:right;color:var(--accent)">${fmtCost(cost)}</td>
+    </tr>`
+  }).join('')
+
+  document.getElementById('usage-root').innerHTML = `
+    <!-- ── Quota bar ── -->
+    <div class="quota-card">
+      <div class="quota-header">
+        <div class="quota-title">📊 Monthly Token Quota</div>
+        <div class="quota-nums">${fmtNum(used)} used of ${fmtNum(cap)} · <strong>${pct}%</strong> · Resets 1st of next month</div>
+      </div>
+      <div class="quota-bar-wrap"><div class="quota-bar-fill ${barCls}" style="width:${pct}%"></div></div>
+      <div class="quota-sub">
+        <span>🔋 Monthly: ${fmtNum(cap - used)} remaining</span>
+        ${topup ? `<span>⚡ Top-up balance: ${fmtNum(topup)}</span>` : ''}
+        <span>📦 Plan: <strong>${esc(user_tokens?.plan_label || user_tokens?.plan || 'Starter')}</strong></span>
+        <a href="payments.html" style="color:var(--accent);font-size:11px;text-decoration:none;margin-left:auto">Buy more tokens →</a>
+      </div>
+    </div>
+
+    <!-- ── Stat tiles ── -->
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <div class="st-icon">⚡</div>
+        <div class="st-label">Total Tokens (${days}d)</div>
+        <div class="st-value">${fmtNum(totals.tokens_total || 0)}</div>
+        <div class="st-sub">${fmtNum(totals.tokens_in||0)} in · ${fmtNum(totals.tokens_out||0)} out</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-icon">💰</div>
+        <div class="st-label">Est. AI Cost (${days}d)</div>
+        <div class="st-value">${fmtCost(totalCost)}</div>
+        <div class="st-sub">Gemini Flash pricing in INR</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-icon">🔢</div>
+        <div class="st-label">Total Requests</div>
+        <div class="st-value">${fmtNum(totals.requests || 0)}</div>
+        <div class="st-sub">${totals.requests ? fmtNum(Math.round((totals.tokens_total||0) / totals.requests)) + ' avg tokens/req' : '—'}</div>
+      </div>
+      <div class="stat-tile">
+        <div class="st-icon">📅</div>
+        <div class="st-label">Avg / Day</div>
+        <div class="st-value">${fmtNum(Math.round((totals.tokens_total||0) / (days||1)))}</div>
+        <div class="st-sub">${fmtCost(totalCost / (days||1))} / day</div>
+      </div>
+    </div>
+
+    <!-- ── Daily chart + channel breakdown ── -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">📈 Daily Token Usage</div></div>
+        <div class="card-body">
+          ${daily.length ? `<div class="bar-chart">${barCols}</div>` : '<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">No data for this period</div>'}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">📡 By Channel</div></div>
+        <div class="card-body">
+          ${chRows || '<div style="color:var(--text-3);font-size:12px;padding:10px 0">No data</div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Source breakdown + agent breakdown ── -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head"><div class="card-title">🔍 By Request Type</div></div>
+        <div class="card-body">
+          ${srcRows || '<div style="color:var(--text-3);font-size:12px;padding:10px 0">No data</div>'}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">🤖 By Agent</div></div>
+        <div class="card-body">
+          ${agRows || '<div style="color:var(--text-3);font-size:12px;padding:10px 0">No data</div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Recent requests table ── -->
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head">
+        <div class="card-title">🕐 Recent Requests (last 100)</div>
+        <div style="font-size:11px;color:var(--text-3)">Most recent first</div>
+      </div>
+      <div style="overflow-x:auto">
+        ${reqRows ? `<table class="req-table">
+          <thead><tr>
+            <th>Time</th><th>Type</th><th>Channel</th>
+            <th style="text-align:right">Tokens In</th><th style="text-align:right">Tokens Out</th>
+            <th style="text-align:right">Total</th><th style="text-align:right">Est. Cost</th>
+          </tr></thead>
+          <tbody>${reqRows}</tbody>
+        </table>` : '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">No requests in this period</div>'}
+      </div>
+    </div>
+  `
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+;(async () => {
+  const nav = await renderNav('usage')
+  if (!nav) return
+  loadUsage(_currentDays)
+})()
+</script>
+</body>
+</html>
