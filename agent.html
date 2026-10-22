@@ -329,6 +329,26 @@
               </div>
               <input type="file" id="logo-inp" accept="image/*" style="display:none" onchange="handleLogo(this)"/>
             </div>
+            <!-- ── Quality Tier ── -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">⚡ Response Quality</div>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:10px">
+                  Controls which AI model is used for this agent's responses and how tokens are billed. Higher quality uses a more capable model and bills more tokens from your balance.
+                </div>
+                <div class="field">
+                  <label>Quality Tier</label>
+                  <select class="inp" id="f-quality-tier">
+                    <option value="low">⚡ Low — Fast &amp; efficient · 1× tokens billed</option>
+                    <option value="medium">🔥 Medium — Balanced quality · 2× tokens billed</option>
+                    <option value="high">🚀 High — Best quality · 3× tokens billed</option>
+                  </select>
+                  <div class="field-hint">Low is the default. Medium and High use more capable models and bill 2× or 3× the actual tokens used — your customers get better answers, and more tokens are deducted from your balance per request.</div>
+                </div>
+              </div>
+            </div>
           </div>
 
 
@@ -583,26 +603,6 @@
               </div>
             </div>
 
-            <!-- ── Quality Tier ── -->
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-header">
-                <div class="card-title">⚡ Response Quality</div>
-              </div>
-              <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:10px">
-                  Controls which AI model is used for this agent's responses and how tokens are billed. Higher quality uses a more capable model and bills more tokens from your balance.
-                </div>
-                <div class="field">
-                  <label>Quality Tier</label>
-                  <select class="inp" id="f-quality-tier">
-                    <option value="low">⚡ Low — Fast &amp; efficient · 1× tokens billed</option>
-                    <option value="medium">🔥 Medium — Balanced quality · 2× tokens billed</option>
-                    <option value="high">🚀 High — Best quality · 3× tokens billed</option>
-                  </select>
-                  <div class="field-hint">Low is the default. Medium and High use more capable models and bill 2× or 3× the actual tokens used — your customers get better answers, and more tokens are deducted from your balance per request.</div>
-                </div>
-              </div>
-            </div>
 
             <div class="card" style="margin-bottom:16px">
               <div class="card-header">
