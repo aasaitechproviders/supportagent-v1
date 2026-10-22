@@ -10,7 +10,6 @@ const _NAV_SECTIONS = [
     items: [
       { page:'dashboard',     href:'home.html',          labelKey:'navDashboard',     icon:'🏠' },
       { page:'agents',        href:'agents.html',        labelKey:'navMyAgents',      icon:'🤖' },
-      { page:'conversations', href:'conversations.html', labelKey:'navConversations', icon:'💬' },
       { page:'contacts',      href:'contacts.html',      label:'Contacts',            icon:'👥' },
       { page:'leads-forms',   href:'leads-forms.html',   label:'Leads & Forms',       icon:'🎯' },
       { page:'forms',         href:'forms.html',         label:'Form Builder',        icon:'📋' },
@@ -22,7 +21,6 @@ const _NAV_SECTIONS = [
     labelKey: 'navSettings',
     items: [
       { page:'channels',     href:'channels.html',     labelKey:'navChannels', icon:'📡' },
-      { page:'escalations',  href:'escalations.html',  label:'Escalations',    icon:'🎫' },
     ]
   },
   {
