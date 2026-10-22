@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Templates — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);
+      --ease-smooth:cubic-bezier(.4,0,.2,1);
+      --ease-out:cubic-bezier(0,0,.2,1);
+      --dur-fast:120ms;--dur-base:200ms;--dur-slow:350ms;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background var(--dur-fast),transform var(--dur-fast) var(--ease-spring)}
+    .theme-toggle:hover{background:var(--surface-2);transform:rotate(20deg) scale(1.1)}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    .agent-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .page-body{padding:20px 24px 48px;flex:1;max-width:1200px;width:100%;box-sizing:border-box;animation:page-enter var(--dur-slow) var(--ease-out)}
+    @keyframes page-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Page loader ─────────────────────────────────────────────────────── */
+    .page-loader{position:fixed;inset:0;z-index:9998;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity var(--dur-slow),visibility var(--dur-slow)}
+    .page-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .loader-logo{font-size:36px;animation:logo-bounce 1s var(--ease-spring) infinite alternate}
+    @keyframes logo-bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-10px) scale(1.06)}}
+    .loader-track{width:200px;height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+    .loader-bar{height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed,var(--accent));background-size:200% 100%;border-radius:3px;animation:ldr 1.2s var(--ease-smooth) infinite}
+    @keyframes ldr{0%{background-position:200% 0;width:30%}50%{background-position:-200% 0;width:70%}100%{background-position:200% 0;width:30%}}
+    .loader-text{font-size:12.5px;font-weight:600;color:var(--text-3);letter-spacing:.04em;animation:lpulse 1.2s ease-in-out infinite alternate}
+    @keyframes lpulse{from{opacity:.4}to{opacity:1}}
+
+    /* ── Section header ──────────────────────────────────────────────────── */
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+    .section-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+    .section-sub{font-size:13px;color:var(--text-3);margin-top:2px}
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all var(--dur-fast) var(--ease-out);white-space:nowrap}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+    .btn-danger{background:transparent;color:#ef4444;border:1px solid #ef444433}
+    .btn-danger:hover{background:#ef44440d}
+    .btn-sm{height:30px;padding:0 12px;font-size:12px}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;filter:none!important}
+
+    /* ── Stats bar ───────────────────────────────────────────────────────── */
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+    .stat-label{font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+    .stat-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.04em;line-height:1}
+    .stat-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+
+    /* ── Template grid ───────────────────────────────────────────────────── */
+    .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+    .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;gap:12px;transition:box-shadow var(--dur-base),border-color var(--dur-base)}
+    .tpl-card:hover{box-shadow:var(--shadow-md);border-color:var(--border-md)}
+    .tpl-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .tpl-name{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.02em;word-break:break-all}
+    .tpl-actions{display:flex;gap:6px;flex-shrink:0}
+    .tpl-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .tpl-body{font-size:13px;color:var(--text-2);line-height:1.7;background:var(--surface-2);border-radius:8px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;max-height:120px;overflow:hidden;position:relative}
+    .tpl-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:32px;background:linear-gradient(transparent,var(--surface-2));border-radius:0 0 8px 8px}
+    .tpl-vars{display:flex;flex-wrap:wrap;gap:6px}
+    .tpl-var-chip{font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:2px 8px}
+    .tpl-footer{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+
+    /* ── Status badges ───────────────────────────────────────────────────── */
+    .badge{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;letter-spacing:.02em}
+    .badge-approved{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+    .badge-pending{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+    .badge-rejected{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+    .badge-draft{background:var(--surface-2);color:var(--text-3);border:1px solid var(--border)}
+    [data-theme="dark"] .badge-approved{background:#052e16;color:#4ade80;border-color:#166534}
+    [data-theme="dark"] .badge-pending{background:#2d1f00;color:#fbbf24;border-color:#92400e}
+    [data-theme="dark"] .badge-rejected{background:#2d0a0a;color:#f87171;border-color:#7f1d1d}
+
+    .cat-badge{font-size:11px;font-weight:600;color:var(--text-3);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px}
+
+    /* ── Empty state ─────────────────────────────────────────────────────── */
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
+    .empty-state .icon{font-size:40px;margin-bottom:12px}
+    .empty-state h3{font-size:15px;font-weight:700;color:var(--text-2);margin:0 0 6px}
+    .empty-state p{font-size:13px;margin:0 0 20px;line-height:1.6}
+
+    /* ── Modal backdrop ──────────────────────────────────────────────────── */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity var(--dur-base),visibility var(--dur-base)}
+    .modal-backdrop.open{opacity:1;visibility:visible}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-xl);transform:scale(.96) translateY(12px);transition:transform var(--dur-slow) var(--ease-spring);overflow:hidden}
+    .modal-backdrop.open .modal{transform:scale(1) translateY(0)}
+    .modal-header{padding:20px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0}
+    .modal-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.03em}
+    .modal-sub{font-size:13px;color:var(--text-3);margin-top:4px}
+    .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);padding:0;line-height:1;flex-shrink:0;transition:color var(--dur-fast)}
+    .modal-close:hover{color:var(--text)}
+    .modal-body{padding:20px 24px;overflow-y:auto;flex:1}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+
+    /* ── Form ────────────────────────────────────────────────────────────── */
+    .form-group{margin-bottom:16px}
+    .form-label{display:block;font-size:12.5px;font-weight:700;color:var(--text-2);margin-bottom:6px;letter-spacing:.01em}
+    .form-label span{font-weight:400;color:var(--text-3);margin-left:4px}
+    .form-input,.form-select,.form-textarea{width:100%;box-sizing:border-box;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13.5px;outline:none;transition:border-color var(--dur-base),box-shadow var(--dur-base)}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .form-textarea{height:auto;padding:10px 12px;resize:vertical;line-height:1.6}
+    .form-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .form-hint{font-size:12px;color:var(--text-3);margin-top:5px;line-height:1.5}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-error{font-size:12px;color:#ef4444;margin-top:5px}
+
+    /* ── Variable builder ────────────────────────────────────────────────── */
+    .var-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .var-row{display:grid;grid-template-columns:80px 1fr 32px;gap:8px;align-items:center}
+    .var-index{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:4px 8px;text-align:center;font-family:monospace}
+    .var-remove{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:0;line-height:1;transition:color var(--dur-fast)}
+    .var-remove:hover{color:#ef4444}
+    .add-var-btn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;margin-top:6px;transition:filter var(--dur-fast)}
+    .add-var-btn:hover{filter:brightness(1.1)}
+
+    /* ── Preview box ─────────────────────────────────────────────────────── */
+    .preview-box{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:13.5px;color:var(--text-2);line-height:1.7;white-space:pre-wrap;word-break:break-word;min-height:60px}
+    .preview-var{background:var(--accent-dim);color:var(--accent);border-radius:4px;padding:0 4px;font-weight:600;font-family:monospace;font-size:12.5px}
+
+    /* ── Info banner ─────────────────────────────────────────────────────── */
+    .info-banner{display:flex;gap:10px;padding:12px 14px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:10px;margin-bottom:20px}
+    .info-banner p{margin:0;font-size:13px;color:var(--text-2);line-height:1.6}
+
+    /* ── Confirm modal ───────────────────────────────────────────────────── */
+    .confirm-modal{max-width:420px}
+
+    /* ── Toast ───────────────────────────────────────────────────────────── */
+    .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast{padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:600;color:#fff;box-shadow:0 4px 24px rgba(0,0,0,.18);pointer-events:auto;animation:toast-in .3s var(--ease-spring);max-width:340px;line-height:1.5}
+    .toast.removing{animation:toast-out .25s var(--ease-out) forwards}
+    .toast-success{background:#16a34a}
+    .toast-error{background:#dc2626}
+    .toast-info{background:var(--accent)}
+    @keyframes toast-in{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes toast-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(8px)}}
+
+    /* ── Tabs ────────────────────────────────────────────────────────────── */
+    .tabs{display:flex;gap:2px;background:var(--surface-2);border-radius:10px;padding:3px;margin-bottom:24px;width:fit-content}
+    .tab-btn{padding:7px 18px;border-radius:8px;border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--text-3);cursor:pointer;transition:all var(--dur-base)}
+    .tab-btn.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .tab-btn:hover:not(.active){color:var(--text-2)}
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media(max-width:768px){
+      .main-wrap{margin-left:0}
+      .mob-menu-btn{display:flex}
+      .stats-bar{grid-template-columns:repeat(2,1fr)}
+      .tpl-grid{grid-template-columns:1fr}
+      .form-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-logo">📋</div>
+    <div class="loader-track"><div class="loader-bar"></div></div>
+    <div class="loader-text">Loading Templates…</div>
+  </div>
+
+  <div id="navContainer"></div>
+
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mob-menu-btn" onclick="window.openMobileNav?.()">☰</button>
+        <div class="topbar-title">📋 WhatsApp Templates</div>
+      </div>
+      <div class="topbar-right">
+        <div class="agent-select-wrap">
+          <select class="agent-select" id="agentSelect" onchange="onAgentChange()">
+            <option value="">Loading agents…</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="syncFromMeta()" id="syncBtn" title="Sync approval status from Meta">🔄 Sync Status</button>
+        <button class="btn btn-primary btn-sm" onclick="openCreateModal()">+ New Template</button>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+
+      <!-- Info banner -->
+      <div class="info-banner">
+        <span style="font-size:18px;flex-shrink:0">ℹ️</span>
+        <p>WhatsApp templates must be approved by Meta before use. <strong>UTILITY</strong> templates (appointment reminders, follow-ups) are approved faster than MARKETING ones. After creating a template here, click <strong>Submit to Meta</strong> — approval usually takes a few minutes to a few hours.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">templates</div></div>
+        <div class="stat-card"><div class="stat-label">✅ Approved</div><div class="stat-value" id="statApproved">—</div><div class="stat-sub">ready to send</div></div>
+        <div class="stat-card"><div class="stat-label">⏳ Pending</div><div class="stat-value" id="statPending">—</div><div class="stat-sub">awaiting Meta</div></div>
+        <div class="stat-card"><div class="stat-label">❌ Rejected</div><div class="stat-value" id="statRejected">—</div><div class="stat-sub">needs fix</div></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="all" onclick="filterTab(this,'all')">All</button>
+        <button class="tab-btn" data-tab="approved" onclick="filterTab(this,'approved')">✅ Approved</button>
+        <button class="tab-btn" data-tab="pending" onclick="filterTab(this,'pending')">⏳ Pending</button>
+        <button class="tab-btn" data-tab="rejected" onclick="filterTab(this,'rejected')">❌ Rejected</button>
+        <button class="tab-btn" data-tab="draft" onclick="filterTab(this,'draft')">📝 Draft</button>
+      </div>
+
+      <!-- Template grid -->
+      <div class="tpl-grid" id="tplGrid">
+        <div class="empty-state" id="emptyState" style="display:none">
+          <div class="icon">📋</div>
+          <h3>No templates yet</h3>
+          <p>Create your first WhatsApp template to start sending<br>appointment reminders and follow-up messages.</p>
+          <button class="btn btn-primary" onclick="openCreateModal()">+ Create Template</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CREATE / EDIT MODAL ───────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="createModal" onclick="onBackdropClick(event,'createModal')">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalTitle">New Template</div>
+          <div class="modal-sub">Define your message template. Variables like {{1}} will be filled when sending.</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('createModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Template Name <span>(lowercase, underscores only)</span></label>
+            <input class="form-input" id="fName" placeholder="e.g. dental_followup_reminder" oninput="sanitizeName(this)"/>
+            <div class="form-hint">Used internally and with Meta API. Cannot be changed after submission.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <select class="form-select" id="fLang">
+              <option value="en">English</option>
+              <option value="en_US">English (US)</option>
+              <option value="ta">Tamil</option>
+              <option value="hi">Hindi</option>
+              <option value="ar">Arabic</option>
+              <option value="ml">Malayalam</option>
+              <option value="te">Telugu</option>
+              <option value="kn">Kannada</option>
+              <option value="mr">Marathi</option>
+              <option value="bn">Bengali</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="fCategory" onchange="onCategoryChange()">
+              <option value="UTILITY">UTILITY — Reminders, follow-ups, confirmations</option>
+              <option value="MARKETING">MARKETING — Promotions, offers</option>
+              <option value="AUTHENTICATION">AUTHENTICATION — OTP, verification</option>
+            </select>
+            <div class="form-hint" id="catHint">✅ Fastest approval. Use for appointment reminders & follow-ups.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Use Case <span>(internal label)</span></label>
+            <select class="form-select" id="fUseCase">
+              <option value="review_request">⭐ Review Request (after service)</option>
+              <option value="followup_reminder">📅 Follow-up Reminder (due date)</option>
+              <option value="booking_confirmation">✅ Booking Confirmation</option>
+              <option value="appointment_reminder">🔔 Appointment Reminder (day before)</option>
+              <option value="general">💬 General</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Header <span>(optional — text shown above the message)</span></label>
+          <input class="form-input" id="fHeader" placeholder="e.g. Thank you for visiting us! 🦷"/>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Message Body <span>(use {{1}}, {{2}}, … for variables)</span></label>
+          <textarea class="form-textarea" id="fBody" rows="5" placeholder="Hi {{1}}, thank you for visiting {{2}}! How was your experience? We'd love your feedback." oninput="onBodyInput()"></textarea>
+          <div class="form-hint">Keep under 1024 characters. Variables {{1}}, {{2}} etc. will be replaced when the message is sent.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Footer <span>(optional — small text below the message)</span></label>
+          <input class="form-input" id="fFooter" placeholder="e.g. Reply STOP to unsubscribe"/>
+        </div>
+
+        <!-- Variable labels -->
+        <div class="form-group" id="varSection" style="display:none">
+          <label class="form-label">Variable Labels <span>(helps agents know what to fill)</span></label>
+          <div class="var-list" id="varList"></div>
+          <div class="form-hint">Label each variable so agents know what value to enter when sending.</div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="form-group">
+          <label class="form-label">Preview</label>
+          <div class="preview-box" id="previewBox">Your message preview will appear here…</div>
+        </div>
+
+        <div class="form-error" id="formError" style="display:none"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('createModal')">Cancel</button>
+        <button class="btn btn-ghost" onclick="saveDraft()" id="saveDraftBtn">💾 Save Draft</button>
+        <button class="btn btn-primary" onclick="saveAndSubmit()" id="submitBtn">🚀 Save & Submit to Meta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM DELETE MODAL ──────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="confirmModal" onclick="onBackdropClick(event,'confirmModal')">
+    <div class="modal confirm-modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Delete Template?</div>
+          <div class="modal-sub" id="confirmSub">This cannot be undone.</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin:0">Deleting an approved template also removes it from Meta. Any campaigns using this template will stop sending. Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmDelete()" id="confirmDeleteBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ─────────────────────────────────────────────────────────────── -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script src="nav.js"></script>
+  <script src="i18n.js"></script>
+  <script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  const API = window.SG_API || ''
+  let currentAgent   = null
+  let allTemplates   = []
+  let currentFilter  = 'all'
+  let editingId      = null   // null = create, string = edit
+  let deleteTargetId = null
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    initTheme()
+    await loadAgents()
+    hideLoader()
+  })
+
+  function hideLoader() {
+    setTimeout(() => document.getElementById('pageLoader').classList.add('hidden'), 400)
+  }
+
+  // ── Theme ──────────────────────────────────────────────────────────────────
+  function initTheme() {
+    const saved = localStorage.getItem('sg-theme') || 'light'
+    document.documentElement.setAttribute('data-theme', saved)
+    document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙'
+  }
+  function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+    document.documentElement.setAttribute('data-theme', next)
+    localStorage.setItem('sg-theme', next)
+    document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙'
+  }
+
+  // ── Agents ─────────────────────────────────────────────────────────────────
+  async function loadAgents() {
+    try {
+      const res  = await apiFetch('/api/agents')
+      const list = res.agents || []
+      const sel  = document.getElementById('agentSelect')
+      sel.innerHTML = list.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+      if (list.length) {
+        currentAgent = list[0]._id
+        await loadTemplates()
+      }
+    } catch (e) {
+      showToast('Failed to load agents', 'error')
+    }
+  }
+
+  async function onAgentChange() {
+    currentAgent = document.getElementById('agentSelect').value
+    await loadTemplates()
+  }
+
+  // ── Load templates ─────────────────────────────────────────────────────────
+  async function loadTemplates() {
+    if (!currentAgent) return
+    try {
+      const res  = await apiFetch(`/api/templates?agent_id=${currentAgent}`)
+      allTemplates = res.templates || []
+      renderStats()
+      renderTemplates()
+    } catch (e) {
+      showToast('Failed to load templates', 'error')
+    }
+  }
+
+  // ── Stats ──────────────────────────────────────────────────────────────────
+  function renderStats() {
+    document.getElementById('statTotal').textContent    = allTemplates.length
+    document.getElementById('statApproved').textContent = allTemplates.filter(t => t.status === 'approved').length
+    document.getElementById('statPending').textContent  = allTemplates.filter(t => t.status === 'pending').length
+    document.getElementById('statRejected').textContent = allTemplates.filter(t => t.status === 'rejected').length
+  }
+
+  // ── Render grid ────────────────────────────────────────────────────────────
+  function renderTemplates() {
+    const filtered = currentFilter === 'all' ? allTemplates : allTemplates.filter(t => t.status === currentFilter)
+    const grid     = document.getElementById('tplGrid')
+    const empty    = document.getElementById('emptyState')
+
+    if (!filtered.length) {
+      grid.innerHTML = ''
+      grid.appendChild(empty)
+      empty.style.display = 'block'
+      return
+    }
+    empty.style.display = 'none'
+
+    grid.innerHTML = filtered.map(t => `
+      <div class="tpl-card">
+        <div class="tpl-card-top">
+          <div>
+            <div class="tpl-name">${escHtml(t.name)}</div>
+            <div class="tpl-meta" style="margin-top:6px">
+              ${statusBadge(t.status)}
+              <span class="cat-badge">${t.category || 'UTILITY'}</span>
+              ${useCaseLabel(t.use_case)}
+            </div>
+          </div>
+          <div class="tpl-actions">
+            ${t.status !== 'approved' ? `<button class="btn btn-ghost btn-sm" onclick="submitToMeta('${t._id}')">🚀 Submit</button>` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="openEditModal('${t._id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${t._id}','${escHtml(t.name)}')">🗑️</button>
+          </div>
+        </div>
+
+        ${t.header_text ? `<div style="font-size:12.5px;font-weight:700;color:var(--text-2)">${escHtml(t.header_text)}</div>` : ''}
+
+        <div class="tpl-body">${escHtml(bodyText(t))}</div>
+
+        ${(t.variables||[]).length ? `
+        <div class="tpl-vars">
+          ${(t.variables||[]).map((v,i) => `<span class="tpl-var-chip">{{${i+1}}} ${escHtml(v)}</span>`).join('')}
+        </div>` : ''}
+
+        <div class="tpl-footer">
+          <span style="font-size:12px;color:var(--text-3)">${t.language || 'en'} · ${t.use_case ? useCasePlain(t.use_case) : 'General'}</span>
+          <span style="font-size:12px;color:var(--text-3)">${fmtDate(t.created_at)}</span>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  function bodyText(t) {
+    const comp = (t.components || []).find(c => c.type === 'BODY')
+    return comp ? comp.text : (t.body_text || '')
+  }
+
+  function statusBadge(s) {
+    const map = { approved:'badge-approved', pending:'badge-pending', rejected:'badge-rejected', draft:'badge-draft' }
+    const lbl = { approved:'✅ Approved', pending:'⏳ Pending', rejected:'❌ Rejected', draft:'📝 Draft' }
+    return `<span class="badge ${map[s]||'badge-draft'}">${lbl[s]||s}</span>`
+  }
+
+  function useCaseLabel(uc) {
+    const map = { review_request:'⭐ Review', followup_reminder:'📅 Follow-up', booking_confirmation:'✅ Booking', appointment_reminder:'🔔 Reminder', general:'💬 General' }
+    if (!uc) return ''
+    return `<span class="cat-badge">${map[uc]||uc}</span>`
+  }
+
+  function useCasePlain(uc) {
+    const map = { review_request:'Review Request', followup_reminder:'Follow-up Reminder', booking_confirmation:'Booking Confirmation', appointment_reminder:'Appointment Reminder', general:'General' }
+    return map[uc] || uc
+  }
+
+  function filterTab(btn, tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentFilter = tab
+    renderTemplates()
+  }
+
+  // ── Create modal ───────────────────────────────────────────────────────────
+  function openCreateModal() {
+    editingId = null
+    document.getElementById('modalTitle').textContent = 'New Template'
+    clearForm()
+    openModal('createModal')
+  }
+
+  function openEditModal(id) {
+    const t = allTemplates.find(x => x._id === id)
+    if (!t) return
+    editingId = id
+    document.getElementById('modalTitle').textContent = 'Edit Template'
+    clearForm()
+    document.getElementById('fName').value     = t.name || ''
+    document.getElementById('fLang').value     = t.language || 'en'
+    document.getElementById('fCategory').value = t.category || 'UTILITY'
+    document.getElementById('fUseCase').value  = t.use_case || 'general'
+    document.getElementById('fHeader').value   = t.header_text || ''
+    document.getElementById('fFooter').value   = t.footer_text || ''
+    const body = bodyText(t)
+    document.getElementById('fBody').value = body
+    onCategoryChange()
+    // rebuild var list from existing variables
+    const vars = t.variables || []
+    vars.forEach(v => addVarRow(v))
+    updatePreview()
+    openModal('createModal')
+  }
+
+  function clearForm() {
+    ;['fName','fHeader','fBody','fFooter'].forEach(id => document.getElementById(id).value = '')
+    document.getElementById('fLang').value     = 'en'
+    document.getElementById('fCategory').value = 'UTILITY'
+    document.getElementById('fUseCase').value  = 'review_request'
+    document.getElementById('varList').innerHTML = ''
+    document.getElementById('varSection').style.display = 'none'
+    document.getElementById('formError').style.display  = 'none'
+    document.getElementById('previewBox').textContent   = 'Your message preview will appear here…'
+    onCategoryChange()
+  }
+
+  function onCategoryChange() {
+    const cat   = document.getElementById('fCategory').value
+    const hints = {
+      UTILITY:        '✅ Fastest approval. Use for appointment reminders & follow-ups.',
+      MARKETING:      '⚠️ Slower approval. For promotional content. Requires opt-in.',
+      AUTHENTICATION: '🔐 For OTP / verification codes only.',
+    }
+    document.getElementById('catHint').textContent = hints[cat] || ''
+  }
+
+  // ── Variable builder ───────────────────────────────────────────────────────
+  function onBodyInput() {
+    const body  = document.getElementById('fBody').value
+    const found = [...body.matchAll(/\{\{(\d+)\}\}/g)].map(m => parseInt(m[1])).filter((v,i,a) => a.indexOf(v) === i).sort((a,b)=>a-b)
+    const list  = document.getElementById('varList')
+    const sec   = document.getElementById('varSection')
+
+    if (!found.length) { sec.style.display = 'none'; list.innerHTML = ''; updatePreview(); return }
+    sec.style.display = 'block'
+
+    // Keep existing labels, add missing ones
+    const existing = [...list.querySelectorAll('.var-row')].map(r => ({ idx: parseInt(r.dataset.idx), val: r.querySelector('input').value }))
+    list.innerHTML = ''
+    found.forEach(n => {
+      const prev = existing.find(e => e.idx === n)
+      addVarRow(prev?.val || '', n)
+    })
+    updatePreview()
+  }
+
+  function addVarRow(label = '', idx = null) {
+    const list  = document.getElementById('varList')
+    const sec   = document.getElementById('varSection')
+    sec.style.display = 'block'
+
+    // auto-detect next index if not given
+    if (idx === null) {
+      const rows = list.querySelectorAll('.var-row')
+      idx = rows.length + 1
+      // also insert {{idx}} into body if not present
+      const body = document.getElementById('fBody')
+      if (!body.value.includes(`{{${idx}}}`)) {
+        body.value += (body.value ? ' ' : '') + `{{${idx}}}`
+        updatePreview()
+      }
+    }
+
+    const row = document.createElement('div')
+    row.className = 'var-row'
+    row.dataset.idx = idx
+    row.innerHTML = `
+      <div class="var-index">{{${idx}}}</div>
+      <input class="form-input" placeholder="e.g. Customer Name" value="${escHtml(label)}" oninput="updatePreview()"/>
+      <button class="var-remove" onclick="removeVarRow(this)" title="Remove">✕</button>
+    `
+    list.appendChild(row)
+  }
+
+  function removeVarRow(btn) {
+    btn.closest('.var-row').remove()
+    const list = document.getElementById('varList')
+    if (!list.children.length) document.getElementById('varSection').style.display = 'none'
+    updatePreview()
+  }
+
+  // ── Live preview ───────────────────────────────────────────────────────────
+  function updatePreview() {
+    const body  = document.getElementById('fBody').value || ''
+    const rows  = [...document.querySelectorAll('.var-row')]
+    let preview = body
+    rows.forEach(r => {
+      const idx   = r.dataset.idx
+      const label = r.querySelector('input').value || `{{${idx}}}`
+      preview = preview.replace(new RegExp(`\\{\\{${idx}\\}\\}`, 'g'), `<span class="preview-var">{{${idx}}} ${escHtml(label)}</span>`)
+    })
+    // colour remaining unparsed vars
+    preview = preview.replace(/\{\{(\d+)\}\}/g, '<span class="preview-var">{{$1}}</span>')
+    document.getElementById('previewBox').innerHTML = preview || '<span style="color:var(--text-3)">Your message preview will appear here…</span>'
+  }
+
+  function sanitizeName(input) {
+    input.value = input.value.toLowerCase().replace(/[^a-z0-9_]/g, '_')
+  }
+
+  // ── Save / Submit ──────────────────────────────────────────────────────────
+  function buildPayload(submitToMetaFlag) {
+    const name     = document.getElementById('fName').value.trim()
+    const lang     = document.getElementById('fLang').value
+    const category = document.getElementById('fCategory').value
+    const use_case = document.getElementById('fUseCase').value
+    const header   = document.getElementById('fHeader').value.trim()
+    const body     = document.getElementById('fBody').value.trim()
+    const footer   = document.getElementById('fFooter').value.trim()
+    const varRows  = [...document.querySelectorAll('.var-row')]
+    const variables = varRows.map(r => r.querySelector('input').value.trim() || `var${r.dataset.idx}`)
+
+    if (!name)   { showFormError('Template name is required'); return null }
+    if (!body)   { showFormError('Message body is required'); return null }
+    if (!/^[a-z0-9_]+$/.test(name)) { showFormError('Name must be lowercase letters, numbers and underscores only'); return null }
+
+    // Build Meta components array
+    const components = []
+    if (header) components.push({ type: 'HEADER', format: 'TEXT', text: header })
+    components.push({ type: 'BODY', text: body })
+    if (footer) components.push({ type: 'FOOTER', text: footer })
+
+    return { name, language: lang, category, use_case, header_text: header, body_text: body, footer_text: footer, variables, components, submit_to_meta: !!submitToMetaFlag, agent_id: currentAgent }
+  }
+
+  async function saveDraft() {
+    const payload = buildPayload(false)
+    if (!payload) return
+    await saveTemplate(payload, 'Draft saved')
+  }
+
+  async function saveAndSubmit() {
+    const payload = buildPayload(true)
+    if (!payload) return
+    await saveTemplate(payload, 'Template submitted to Meta for approval!')
+  }
+
+  async function saveTemplate(payload, successMsg) {
+    const btn = document.getElementById('submitBtn')
+    btn.disabled = true
+    btn.textContent = '⏳ Saving…'
+    hideFormError()
+    try {
+      const url    = editingId ? `/api/templates/${editingId}` : '/api/templates'
+      const method = editingId ? 'PUT' : 'POST'
+      await apiFetch(url, { method, body: JSON.stringify(payload) })
+      showToast(successMsg, 'success')
+      closeModal('createModal')
+      await loadTemplates()
+    } catch (e) {
+      showFormError(e.message || 'Save failed')
+    } finally {
+      btn.disabled = false
+      btn.textContent = '🚀 Save & Submit to Meta'
+    }
+  }
+
+  // ── Submit to Meta (from card) ─────────────────────────────────────────────
+  async function submitToMeta(id) {
+    try {
+      await apiFetch(`/api/templates/${id}/submit`, { method: 'POST' })
+      showToast('Submitted to Meta — status will update shortly', 'success')
+      await loadTemplates()
+    } catch (e) {
+      showToast(e.message || 'Submission failed', 'error')
+    }
+  }
+
+  // ── Sync status ────────────────────────────────────────────────────────────
+  async function syncFromMeta() {
+    const btn = document.getElementById('syncBtn')
+    btn.disabled = true
+    btn.textContent = '⏳ Syncing…'
+    try {
+      const res = await apiFetch(`/api/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
+      showToast(`Synced ${res.updated || 0} template(s) from Meta`, 'success')
+      await loadTemplates()
+    } catch (e) {
+      showToast(e.message || 'Sync failed', 'error')
+    } finally {
+      btn.disabled = false
+      btn.textContent = '🔄 Sync Status'
+    }
+  }
+
+  // ── Delete ─────────────────────────────────────────────────────────────────
+  function openDeleteConfirm(id, name) {
+    deleteTargetId = id
+    document.getElementById('confirmSub').textContent = `"${name}" will be permanently deleted.`
+    openModal('confirmModal')
+  }
+
+  async function confirmDelete() {
+    if (!deleteTargetId) return
+    const btn = document.getElementById('confirmDeleteBtn')
+    btn.disabled = true
+    btn.textContent = 'Deleting…'
+    try {
+      await apiFetch(`/api/templates/${deleteTargetId}`, { method: 'DELETE' })
+      showToast('Template deleted', 'success')
+      closeModal('confirmModal')
+      deleteTargetId = null
+      await loadTemplates()
+    } catch (e) {
+      showToast(e.message || 'Delete failed', 'error')
+    } finally {
+      btn.disabled = false
+      btn.textContent = 'Delete'
+    }
+  }
+
+  // ── Modal helpers ──────────────────────────────────────────────────────────
+  function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden' }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = '' }
+  function onBackdropClick(e, id) { if (e.target.id === id) closeModal(id) }
+
+  // ── Form errors ────────────────────────────────────────────────────────────
+  function showFormError(msg) {
+    const el = document.getElementById('formError')
+    el.textContent = msg
+    el.style.display = 'block'
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+  function hideFormError() { document.getElementById('formError').style.display = 'none' }
+
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  function showToast(msg, type = 'info') {
+    const wrap = document.getElementById('toastWrap')
+    const el   = document.createElement('div')
+    el.className = `toast toast-${type}`
+    el.textContent = msg
+    wrap.appendChild(el)
+    setTimeout(() => {
+      el.classList.add('removing')
+      el.addEventListener('animationend', () => el.remove())
+    }, 3500)
+  }
+
+  // ── API fetch ──────────────────────────────────────────────────────────────
+  async function apiFetch(url, opts = {}) {
+    const token = localStorage.getItem('sg-token') || sessionStorage.getItem('sg-token')
+    const res   = await fetch(API + url, {
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      ...opts,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.error || data.message || `Request failed (${res.status})`)
+    return data
+  }
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+  function fmtDate(d) { if (!d) return ''; const dt = new Date(d); return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) }
+
+  // keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal('createModal')
+      closeModal('confirmModal')
+    }
+  })
+  </script>
+</body>
+</html>
