@@ -418,10 +418,9 @@
       // First check if this agent has WhatsApp connected
       let waConnected = false
       try {
-        const channels = await apiFetch(`/agents/${currentAgent}/channels`)
-        waConnected = Array.isArray(channels)
-          ? channels.some(c => c.platform === 'whatsapp' && c.status === 'active')
-          : false
+        const res2 = await apiFetch(`/agents/${currentAgent}/channels`)
+        const chList = res2.channels || (Array.isArray(res2) ? res2 : [])
+        waConnected = chList.some(c => c.type === 'whatsapp' && c.status === 'active')
       } catch (_) { waConnected = false }
 
       if (!waConnected) {
