@@ -1141,7 +1141,7 @@ function renderPage() {
   })
 
   requestAnimationFrame(() => triggerReveals())
-  if (gmailOn)  { loadInbox('email'); loadBucketCounts('email'); loadTokenUsage(); loadMetrics() }
+  if (gmailOn)  { loadInbox('email'); loadBucketCounts('email'); loadMetrics() }
   if (waOn)     { loadConversations('whatsapp') }
   if (igOn)     { loadConversations('instagram') }
   if (fbOn)     { loadConversations('messenger') }
@@ -1620,7 +1620,7 @@ function renderInboxPanel(platform) {
     </div>
     <div class="subnav-right">
       <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="search-${platform}" type="text" placeholder="Search…" value="${esc(STATE.search[platform])}" oninput="handleSearch('${platform}',this.value)"></div>
-      ${isEmail?`<button class="icon-btn" title="Sync inbox" onclick="syncGmail(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button><div class="token-chip" id="tokenChip">⚡ <span id="tokenChipVal"><span class="spin-ring spin-ring-sm spin-ring-dark" style="width:10px;height:10px;margin:0 2px"></span></span></div>`:''}
+      ${isEmail?`<button class="icon-btn" title="Sync inbox" onclick="syncGmail(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>`:''}
     </div>
   </div>
   ${arOn&&bucket==='inbox'?`<div class="auto-reply-banner">✦ AI Auto-Reply is ON — incoming ${label} messages will be replied to automatically<button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="toggleAutoReply('${arKey}',false)"><span class="btn-text">Pause</span></button></div>`:''}
@@ -1638,7 +1638,7 @@ function renderInboxPanel(platform) {
       <div class="msg-list-pane" id="list-${platform}">${renderSkeletonList()}</div>
       <div class="email-read-pane" id="read-${platform}">${renderReadEmpty(platform)}</div>
     </div>
-    ${isEmail?`<div class="token-usage-bar"><span class="token-usage-bar-label">⚡ AI Usage (30d)</span><div class="token-stat"><span class="token-stat-val" id="tu-classify">—</span><span class="token-stat-lbl">classify</span></div><div class="token-stat"><span class="token-stat-val" id="tu-draft">—</span><span class="token-stat-lbl">draft</span></div><div class="token-stat"><span class="token-stat-val" id="tu-total">—</span><span class="token-stat-lbl">total tokens</span></div><div class="token-stat"><span class="token-stat-val" id="tu-calls">—</span><span class="token-stat-lbl">AI calls</span></div><div class="token-stat"><span class="token-stat-val" id="tu-auto">—</span><span class="token-stat-lbl">auto-sent</span></div></div>`:''}
+
   </div>`
 }
 
@@ -1860,7 +1860,6 @@ function renderReadPane(platform, msg) {
       ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated — AI confidence ${msg.confidence_score??'?'}% below threshold</span>`:''}
       ${msg.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd">🤝 Human Handling — AI paused</span>`:''}
       ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive sentiment</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative sentiment</span>`:msg.sentiment==='neutral'?`<span class="sent-neu">😐 Neutral</span>`:''}
-      ${msg.draft_tokens_used?`<span class="token-chip loaded">⚡ ${msg.draft_tokens_used} tokens</span>`:''}
     </div>
   </div>
   <div class="conversation-panel" id="conv-${platform}">${renderConversation(platform,msg)}</div>
@@ -1927,7 +1926,7 @@ function renderComposer(platform, msg, waExpired, isEscalated) {
     <div style="display:flex;gap:8px"><button class="btn btn-danger btn-sm" id="btn-dismiss-exp"><span class="btn-text">🗑 Dismiss</span></button></div>`
   if (!msg.ai_draft) return `
     <div class="generate-reply-cta">
-      <div class="generate-reply-hint">No AI draft yet. Click <strong>Generate Reply</strong> to let AI write a response.<br><span class="token-cost-hint">⚡ ~1,000–2,000 tokens per draft</span></div>
+      <div class="generate-reply-hint">No AI draft yet. Click <strong>Generate Reply</strong> to let AI write a response.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-ai" id="btn-gen-draft">✦ <span class="btn-text">Generate Reply</span></button>
         <button class="btn btn-secondary btn-sm" onclick="openManualReply('${platform}','${esc(msg._id)}')">✏️ <span class="btn-text">Manual Reply</span></button>
@@ -2014,9 +2013,9 @@ async function generateDraft(platform, msgId) {
     const data=await apiFetch(draftEndpoint(platform,msgId),{method:'POST'})
     const msg=STATE.msgMap[platform]?.[msgId]
     if(msg){msg.ai_draft=data.ai_draft;msg.draft_tokens_used=data.tokens_used}
-    showToast(`Draft generated ✦ (${data.tokens_used} tokens)`,'success')
+    showToast(`Draft generated ✦`,'success')
     if(msg) renderReadPane(platform,msg)
-    renderMsgList(platform); loadTokenUsage()
+    renderMsgList(platform)
   } catch(e){showToast('Draft generation failed: '+e.message,'error');setBtnLoading(btn,false)}
 }
 
@@ -2028,7 +2027,7 @@ async function regenDraft(platform, msgId) {
     if(msg){msg.ai_draft=data.ai_draft;msg.draft_tokens_used=data.tokens_used}
     const ta=document.getElementById('reply-text')
     if(ta){ta.style.transition='opacity .2s';ta.style.opacity='0';setTimeout(()=>{ta.value=data.ai_draft||'';ta.style.opacity='1'},200)}
-    showToast(`Regenerated ✦ (${data.tokens_used} tokens)`,'success'); loadTokenUsage()
+    showToast(`Regenerated ✦`,'success')
   } catch(e){showToast('Regenerate failed: '+e.message,'error')}
   finally{setBtnLoading(btn,false)}
 }
@@ -2384,20 +2383,7 @@ async function loadMetrics() {
     if(data.auto_replied_count){const el=document.getElementById('m-auto-sub');if(el) el.textContent=`${data.auto_replied_count} AI auto-replied`}
   } catch{}
 }
-async function loadTokenUsage() {
-  try{
-    const data=await apiFetch(`/agents/${STATE.agentId}/channels/token-usage`)
-    const s=data.summary||{}, total=data.total_tokens_30d||0
-    const fmt=n=>n>=1000?(n/1000).toFixed(1)+'K':String(n)
-    const chip=document.getElementById('tokenChip'); const val=document.getElementById('tokenChipVal')
-    if(val) val.textContent=fmt(total)+' tokens'
-    if(chip&&total>0) chip.classList.add('loaded')
-    const set=(id,v)=>{const el=document.getElementById(id);if(el) el.textContent=v}
-    set('tu-classify',fmt(s['channel_classify']?.tokens||0)); set('tu-draft',fmt(s['channel_draft']?.tokens||0))
-    set('tu-total',fmt(total)); set('tu-calls',(s['channel_classify']?.calls||0)+(s['channel_draft']?.calls||0))
-    set('tu-auto',s['channel_auto_reply']?.calls||'0'); STATE.tokenUsage=s
-  } catch{}
-}
+// token usage display removed — tokens visible only in Usage & Costs page
 
 // ── STATIC PANELS ─────────────────────────────────────────────────────────────
 function renderSetupGuide() {
@@ -2861,7 +2847,7 @@ async function genChatDraft(platform, msgId) {
       ta.style.height = Math.min(ta.scrollHeight, 320) + 'px'
       ta.focus()
     }
-    showToast(`✦ Draft ready (${data.tokens_used} tokens)`, 'success')
+    showToast(`✦ Draft ready`, 'success')
   } catch (e) {
     if (ta) ta.value = ''
     showToast('Draft failed: ' + e.message, 'error')
