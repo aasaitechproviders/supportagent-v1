@@ -111,6 +111,12 @@
   .pill-btn:hover{background:var(--surface-3)}
   .pill-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 
+  /* Toggle switch */
+  .tog-track{position:absolute;inset:0;border-radius:22px;background:var(--border-md);transition:.2s;display:flex;align-items:center}
+  .tog-track.tog-on{background:var(--accent)}
+  .tog-thumb{position:absolute;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:.2s}
+  .tog-track.tog-on .tog-thumb{left:20px}
+
   /* Rule item */
   .rule-item{background:var(--surface-2);border:1px solid var(--border-md);border-radius:12px;padding:13px 15px;margin-bottom:10px;position:relative}
   .rule-item:last-child{margin-bottom:0}
@@ -380,6 +386,33 @@
               </div>
             </div>
 
+            <!-- Notification preferences -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">🔔 Notification Preferences</div>
+              </div>
+              <div class="card-body">
+                <div class="field" style="margin-bottom:14px">
+                  <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+                    <span style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0">
+                      <input type="checkbox" id="b-notify-on-escalation" style="opacity:0;width:0;height:0;position:absolute"
+                        onchange="document.getElementById('b-notify-toggle-track').classList.toggle('tog-on',this.checked)"/>
+                      <span id="b-notify-toggle-track" class="tog-track">
+                        <span class="tog-thumb"></span>
+                      </span>
+                    </span>
+                    <span>Email me when a conversation is escalated</span>
+                  </label>
+                  <div class="field-hint" style="margin-top:6px">Sends an email the moment a visitor triggers escalation (ticket raised or AI confidence drops below threshold).</div>
+                </div>
+                <div class="field">
+                  <label>Notification email address <span style="color:var(--text-3);font-weight:400">(leave blank to use your account email)</span></label>
+                  <input class="inp" type="email" id="b-notification-email" placeholder="alerts@yourcompany.com"/>
+                  <div class="field-hint">Override the destination for escalation alert emails. Useful for routing to a shared inbox or ticketing alias.</div>
+                </div>
+              </div>
+            </div>
+
             <div style="display:flex;justify-content:flex-end;margin-bottom:24px">
               <button class="btn btn-primary" onclick="saveBehaviour()">Save Behaviour Settings</button>
             </div>
@@ -546,6 +579,27 @@
                   <label>Session Memory (days)</label>
                   <input class="inp" type="number" id="f-session-memory-days" min="1" max="365" value="30"/>
                   <div class="field-hint">How many days to remember a returning customer's preferences and interests. Default: 30 days.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── Quality Tier ── -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">⚡ Response Quality</div>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:10px">
+                  Controls which AI model is used for this agent's responses and how tokens are billed. Higher quality uses a more capable model and bills more tokens from your balance.
+                </div>
+                <div class="field">
+                  <label>Quality Tier</label>
+                  <select class="inp" id="f-quality-tier">
+                    <option value="low">⚡ Low — Fast &amp; efficient · 1× tokens billed</option>
+                    <option value="medium">🔥 Medium — Balanced quality · 2× tokens billed</option>
+                    <option value="high">🚀 High — Best quality · 3× tokens billed</option>
+                  </select>
+                  <div class="field-hint">Low is the default. Medium and High use more capable models and bill 2× or 3× the actual tokens used — your customers get better answers, and more tokens are deducted from your balance per request.</div>
                 </div>
               </div>
             </div>
@@ -947,6 +1001,8 @@ function fillForm(a) {
   if (idLabelEl) idLabelEl.value = a.identifier_label || ''
   const memDaysEl = document.getElementById('f-session-memory-days')
   if (memDaysEl) memDaysEl.value = a.session_memory_days || 30
+  const qtEl = document.getElementById('f-quality-tier')
+  if (qtEl) qtEl.value = a.quality_tier || 'low'
 
   // Populate agent type selector
   const agentTypeEl = document.getElementById('f-agent-type')
@@ -1126,6 +1182,7 @@ async function saveGeneral() {
       identifier_type:    document.getElementById('f-identifier-type')?.value || null,
       identifier_label:   document.getElementById('f-identifier-label')?.value || '',
       session_memory_days: parseInt(document.getElementById('f-session-memory-days')?.value) || 30,
+      quality_tier:       document.getElementById('f-quality-tier')?.value || 'low',
     })})
     // Re-apply tab visibility based on new type
     if (newAgentType) applyAgentTypeTabs(newAgentType)
@@ -1164,6 +1221,12 @@ async function loadBehaviour() {
     document.getElementById('personality-desc').textContent = PERSONALITY_DESC[_personality] || ''
     // escalation email
     document.getElementById('b-escalation-email').value = d.escalation_email || ''
+    // notification prefs
+    const notifyOn = d.notify_on_escalation ?? true
+    const notifyChk = document.getElementById('b-notify-on-escalation')
+    notifyChk.checked = notifyOn
+    document.getElementById('b-notify-toggle-track').classList.toggle('tog-on', notifyOn)
+    document.getElementById('b-notification-email').value = d.notification_email || ''
     // threshold
     const thr = d.confidence_threshold ?? 80
     document.getElementById('b-confidence-threshold').value = thr
@@ -1184,9 +1247,11 @@ async function saveBehaviour() {
     await apiFetch(`/agents/${AGENT_ID}/behaviour`, {
       method: 'PUT',
       body: JSON.stringify({
-        personality:           _personality,
-        escalation_email:      document.getElementById('b-escalation-email').value.trim(),
-        confidence_threshold:  parseInt(document.getElementById('b-confidence-threshold').value),
+        personality:            _personality,
+        escalation_email:       document.getElementById('b-escalation-email').value.trim(),
+        confidence_threshold:   parseInt(document.getElementById('b-confidence-threshold').value),
+        notify_on_escalation:   document.getElementById('b-notify-on-escalation').checked,
+        notification_email:     document.getElementById('b-notification-email').value.trim(),
       })
     })
     toast('Behaviour settings saved!', 'success')
