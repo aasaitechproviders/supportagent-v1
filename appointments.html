@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Appointments — SupportGent</title>
+  <link rel="stylesheet" href="shared.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --ease-spring:cubic-bezier(.34,1.56,.64,1);
+      --ease-smooth:cubic-bezier(.4,0,.2,1);
+      --ease-out:cubic-bezier(0,0,.2,1);
+      --dur-fast:120ms;--dur-base:200ms;--dur-slow:350ms;
+    }
+
+    /* ── Layout ──────────────────────────────────────────────────────────── */
+    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .topbar-left{display:flex;align-items:center;gap:12px}
+    .topbar-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background var(--dur-fast),transform var(--dur-fast) var(--ease-spring)}
+    .theme-toggle:hover{background:var(--surface-2);transform:rotate(20deg) scale(1.1)}
+    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
+    .agent-select-wrap{position:relative;display:flex;align-items:center}
+    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
+    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    .agent-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+    .page-body{padding:20px 24px 48px;flex:1;max-width:1100px;width:100%;box-sizing:border-box;animation:page-enter var(--dur-slow) var(--ease-out)}
+    @keyframes page-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ── Page loader ─────────────────────────────────────────────────────── */
+    .page-loader{position:fixed;inset:0;z-index:9998;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity var(--dur-slow),visibility var(--dur-slow)}
+    .page-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .loader-logo{font-size:36px;animation:logo-bounce 1s var(--ease-spring) infinite alternate}
+    @keyframes logo-bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-10px) scale(1.06)}}
+    .loader-track{width:200px;height:3px;background:var(--border);border-radius:3px;overflow:hidden}
+    .loader-bar{height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed,var(--accent));background-size:200% 100%;border-radius:3px;animation:ldr 1.2s var(--ease-smooth) infinite}
+    @keyframes ldr{0%{background-position:200% 0;width:30%}50%{background-position:-200% 0;width:70%}100%{background-position:200% 0;width:30%}}
+    .loader-text{font-size:12.5px;font-weight:600;color:var(--text-3);letter-spacing:.04em;animation:lpulse 1.2s ease-in-out infinite alternate}
+    @keyframes lpulse{from{opacity:.4}to{opacity:1}}
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all var(--dur-fast) var(--ease-out);white-space:nowrap}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+    .btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border-md)}
+    .btn-ghost:hover{background:var(--surface-2);color:var(--text)}
+    .btn-danger{background:transparent;color:#ef4444;border:1px solid #ef444433}
+    .btn-danger:hover{background:#ef44440d}
+    .btn-sm{height:30px;padding:0 12px;font-size:12px}
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;filter:none!important}
+    .icon-btn{width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:transparent;border:1px solid var(--border-md);cursor:pointer;font-size:15px;color:var(--text-2);transition:background var(--dur-fast),color var(--dur-fast)}
+    .icon-btn:hover{background:var(--surface-2);color:var(--text)}
+
+    /* ── Stats bar ───────────────────────────────────────────────────────── */
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;flex-direction:column;gap:4px;transition:box-shadow var(--dur-base)}
+    .stat-card:hover{box-shadow:var(--shadow-sm)}
+    .stat-icon{font-size:20px;margin-bottom:4px}
+    .stat-label{font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+    .stat-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.04em;line-height:1}
+
+    /* ── Toolbar ─────────────────────────────────────────────────────────── */
+    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+    .toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .filter-tabs{display:flex;gap:4px;background:var(--surface-2);border-radius:10px;padding:3px}
+    .ftab{height:30px;padding:0 14px;border-radius:8px;font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text-3);transition:all var(--dur-fast)}
+    .ftab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+    .search-wrap{position:relative}
+    .search-wrap::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+    .search-input{height:34px;padding:0 12px 0 32px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:220px;transition:border-color var(--dur-base),box-shadow var(--dur-base)}
+    .search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+
+    /* ── Table ───────────────────────────────────────────────────────────── */
+    .appt-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+    .appt-table{width:100%;border-collapse:collapse}
+    .appt-table th{padding:10px 16px;text-align:left;font-size:11.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap}
+    .appt-table td{padding:13px 16px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle}
+    .appt-table tr:last-child td{border-bottom:none}
+    .appt-table tbody tr{transition:background var(--dur-fast)}
+    .appt-table tbody tr:hover{background:var(--surface-2)}
+    .customer-cell{display:flex;flex-direction:column;gap:2px}
+    .customer-name{font-weight:700;color:var(--text)}
+    .customer-contact{font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+    .channel-badge{font-size:14px}
+    .service-text{color:var(--text-2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .datetime-cell{display:flex;flex-direction:column;gap:2px}
+    .date-val{font-weight:600}
+    .time-val{font-size:12px;color:var(--text-3)}
+    .sent-badges{display:flex;gap:4px}
+    .sent-chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px}
+    .sent-yes{background:#10b98122;color:#059669}
+    .sent-no{background:var(--surface-2);color:var(--text-3)}
+    .row-actions{display:flex;gap:6px}
+
+    /* ── Status pill ─────────────────────────────────────────────────────── */
+    .status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.01em}
+    .s-pending{background:#f59e0b18;color:#d97706}
+    .s-confirmed{background:#3b82f618;color:#2563eb}
+    .s-completed{background:#10b98118;color:#059669}
+    .s-cancelled{background:#ef444418;color:#dc2626}
+
+    /* ── Empty state ─────────────────────────────────────────────────────── */
+    .empty-state{padding:60px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .empty-icon{font-size:48px;line-height:1}
+    .empty-title{font-size:16px;font-weight:800;color:var(--text)}
+    .empty-sub{font-size:13.5px;color:var(--text-3);max-width:380px;line-height:1.6}
+
+    /* ── Pagination ──────────────────────────────────────────────────────── */
+    .pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:14px 16px;border-top:1px solid var(--border)}
+    .pagination span{font-size:12.5px;color:var(--text-3);font-weight:600}
+
+    /* ── Modal backdrop ──────────────────────────────────────────────────── */
+    .modal-backdrop{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;visibility:hidden;transition:opacity var(--dur-base),visibility var(--dur-base)}
+    .modal-backdrop.open{opacity:1;visibility:visible}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-xl);transform:scale(.96) translateY(8px);transition:transform var(--dur-slow) var(--ease-spring)}
+    .modal-backdrop.open .modal{transform:scale(1) translateY(0)}
+    .modal-head{padding:20px 22px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .modal-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.03em}
+    .modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-3);padding:4px;border-radius:8px;transition:background var(--dur-fast),color var(--dur-fast);line-height:1}
+    .modal-close:hover{background:var(--surface-2);color:var(--text)}
+    .modal-body{padding:16px 22px 22px}
+
+    /* ── Form ────────────────────────────────────────────────────────────── */
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+    .form-label{font-size:12.5px;font-weight:700;color:var(--text-2)}
+    .form-label span{color:var(--text-3);font-weight:500}
+    .form-input,.form-select,.form-textarea{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;box-sizing:border-box;transition:border-color var(--dur-base),box-shadow var(--dur-base)}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
+    .form-textarea{height:80px;padding:10px 12px;resize:vertical}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+    /* ── Toast ───────────────────────────────────────────────────────────── */
+    .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+    .toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;pointer-events:auto;animation:toast-in var(--dur-slow) var(--ease-spring)}
+    @keyframes toast-in{from{opacity:0;transform:translateX(24px) scale(.96)}to{opacity:1;transform:none}}
+    .toast.removing{animation:toast-out var(--dur-base) var(--ease-out) forwards}
+    @keyframes toast-out{to{opacity:0;transform:translateX(24px) scale(.96)}}
+    .toast-success{border-left:3px solid #10b981}
+    .toast-error{border-left:3px solid #ef4444}
+    .toast-info{border-left:3px solid var(--accent)}
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media(max-width:900px){
+      .stats-bar{grid-template-columns:repeat(2,1fr)}
+      .main-wrap{margin-left:0}
+      .mob-menu-btn{display:block}
+      .appt-table th:nth-child(5),.appt-table td:nth-child(5){display:none}
+    }
+    @media(max-width:640px){
+      .stats-bar{grid-template-columns:1fr 1fr}
+      .form-row{grid-template-columns:1fr}
+      .search-input{width:150px}
+    }
+  </style>
+</head>
+<body>
+<!-- ── Page loader ──────────────────────────────────────────────────────── -->
+<div class="page-loader" id="pageLoader">
+  <div class="loader-logo">📅</div>
+  <div class="loader-track"><div class="loader-bar"></div></div>
+  <div class="loader-text">LOADING APPOINTMENTS…</div>
+</div>
+
+<!-- ── Sidebar (injected by nav.js) ────────────────────────────────────── -->
+<div id="sidebar-root"></div>
+
+<!-- ── Main wrap ───────────────────────────────────────────────────────── -->
+<div class="main-wrap">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="mob-menu-btn" onclick="toggleSidebar?.()">☰</button>
+      <div class="topbar-title">📅 Appointments</div>
+    </div>
+    <div class="topbar-right">
+      <div class="agent-select-wrap">
+        <select class="agent-select" id="agentSelect" onchange="onAgentChange()"></select>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+
+  <!-- Page body -->
+  <div class="page-body">
+
+    <!-- Stats bar -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-label">Total</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">Pending</div><div class="stat-value" id="statPending">—</div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">Confirmed</div><div class="stat-value" id="statConfirmed">—</div></div>
+      <div class="stat-card"><div class="stat-icon">🎉</div><div class="stat-label">Completed</div><div class="stat-value" id="statCompleted">—</div></div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="filter-tabs" id="filterTabs">
+          <button class="ftab active" data-filter="all" onclick="setFilter('all')">All</button>
+          <button class="ftab" data-filter="pending" onclick="setFilter('pending')">⏳ Pending</button>
+          <button class="ftab" data-filter="confirmed" onclick="setFilter('confirmed')">✅ Confirmed</button>
+          <button class="ftab" data-filter="completed" onclick="setFilter('completed')">🎉 Completed</button>
+          <button class="ftab" data-filter="cancelled" onclick="setFilter('cancelled')">❌ Cancelled</button>
+        </div>
+        <div class="search-wrap">
+          <input class="search-input" id="searchInput" placeholder="Search customer…" oninput="onSearch()"/>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openCreateModal()">＋ Add Appointment</button>
+    </div>
+
+    <!-- Table -->
+    <div class="appt-table-wrap">
+      <table class="appt-table">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Service</th>
+            <th>Scheduled</th>
+            <th>Status</th>
+            <th>Notifications</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="apptTableBody">
+          <tr><td colspan="6"><div class="empty-state"><div class="loader-bar" style="width:200px;height:3px"></div></div></td></tr>
+        </tbody>
+      </table>
+      <div class="pagination" id="pagination" style="display:none">
+        <span id="paginationInfo"></span>
+        <button class="btn btn-ghost btn-sm" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+        <button class="btn btn-ghost btn-sm" id="nextBtn" onclick="changePage(1)">Next →</button>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+</div><!-- /main-wrap -->
+
+<!-- ── Create/Edit Appointment Modal ───────────────────────────────────── -->
+<div class="modal-backdrop" id="apptModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle">Add Appointment</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Customer Name *</label>
+          <input class="form-input" id="fName" placeholder="e.g. Ravi Kumar"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Channel <span>(how they reached)</span></label>
+          <select class="form-select" id="fChannel">
+            <option value="manual">Manual</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="gmail">Email / Gmail</option>
+            <option value="instagram">Instagram</option>
+            <option value="messenger">Messenger</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">WhatsApp / Phone <span>(optional)</span></label>
+          <input class="form-input" id="fPhone" placeholder="+91 9876543210"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email <span>(optional)</span></label>
+          <input class="form-input" id="fEmail" type="email" placeholder="customer@email.com"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service / Reason</label>
+        <input class="form-input" id="fService" placeholder="e.g. Haircut, Consultation, Demo"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Appointment Date</label>
+          <input class="form-input" id="fDate" type="date"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Appointment Time</label>
+          <input class="form-input" id="fTime" type="time"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="fStatus">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes <span>(optional)</span></label>
+        <textarea class="form-textarea" id="fNotes" placeholder="Any extra details…"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveAppointment()">Save Appointment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Confirm Delete Modal ─────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-head">
+      <div class="modal-title">Delete Appointment?</div>
+      <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin:0 0 20px">This will permanently remove the appointment record. This cannot be undone.</p>
+      <div class="modal-actions" style="margin-top:0;padding-top:0;border-top:none">
+        <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ─────────────────────────────────────────────────────────────── -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="nav.js"></script>
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let currentAgent   = null
+let allAppointments = []
+let filteredAppointments = []
+let currentFilter  = 'all'
+let searchQuery    = ''
+let editingId      = null
+let deleteTargetId = null
+let currentPage    = 0
+const PAGE_SIZE    = 25
+
+// ── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  initTheme()
+  const nav = await renderNav('appointments')
+  if (!nav) return
+  await loadAgents()
+  hideLoader()
+})
+
+function hideLoader() {
+  setTimeout(() => document.getElementById('pageLoader').classList.add('hidden'), 400)
+}
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+function initTheme() {
+  const saved = localStorage.getItem('sg_theme') || 'light'
+  document.documentElement.setAttribute('data-theme', saved)
+  document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙'
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-theme', next)
+  localStorage.setItem('sg_theme', next)
+  document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙'
+}
+
+// ── Agents ─────────────────────────────────────────────────────────────────
+async function loadAgents() {
+  try {
+    const res  = await apiFetch('/agents')
+    const list = Array.isArray(res) ? res : (res.agents || [])
+    const sel  = document.getElementById('agentSelect')
+    sel.innerHTML = list.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+    if (list.length) {
+      currentAgent = list[0]._id
+      await loadAppointments()
+    }
+  } catch (e) { showToast('Failed to load agents', 'error') }
+}
+
+async function onAgentChange() {
+  currentAgent = document.getElementById('agentSelect').value
+  currentPage  = 0
+  await loadAppointments()
+}
+
+// ── Load appointments ──────────────────────────────────────────────────────
+async function loadAppointments() {
+  if (!currentAgent) return
+  try {
+    const res = await apiFetch(`/appointments?agent_id=${currentAgent}&limit=500`)
+    allAppointments = res.appointments || []
+    updateStats()
+    applyFilter()
+  } catch (e) {
+    showToast('Failed to load appointments', 'error')
+    renderEmpty('Could not load appointments. Try refreshing.')
+  }
+}
+
+function updateStats() {
+  const counts = { pending:0, confirmed:0, completed:0, cancelled:0 }
+  allAppointments.forEach(a => { if (counts[a.status] !== undefined) counts[a.status]++ })
+  document.getElementById('statTotal').textContent     = allAppointments.length
+  document.getElementById('statPending').textContent   = counts.pending
+  document.getElementById('statConfirmed').textContent = counts.confirmed
+  document.getElementById('statCompleted').textContent = counts.completed
+}
+
+// ── Filter / Search ────────────────────────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f
+  currentPage   = 0
+  document.querySelectorAll('.ftab').forEach(b => b.classList.toggle('active', b.dataset.filter === f))
+  applyFilter()
+}
+
+function onSearch() {
+  searchQuery = document.getElementById('searchInput').value.toLowerCase().trim()
+  currentPage = 0
+  applyFilter()
+}
+
+function applyFilter() {
+  filteredAppointments = allAppointments.filter(a => {
+    if (currentFilter !== 'all' && a.status !== currentFilter) return false
+    if (searchQuery) {
+      const hay = [a.customer_name, a.customer_phone, a.customer_email, a.service].join(' ').toLowerCase()
+      if (!hay.includes(searchQuery)) return false
+    }
+    return true
+  })
+  renderTable()
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('apptTableBody')
+  const pag   = document.getElementById('pagination')
+
+  if (!filteredAppointments.length) {
+    tbody.innerHTML = `<tr><td colspan="6">${emptyStateHTML()}</td></tr>`
+    pag.style.display = 'none'
+    return
+  }
+
+  const start  = currentPage * PAGE_SIZE
+  const slice  = filteredAppointments.slice(start, start + PAGE_SIZE)
+  const total  = filteredAppointments.length
+
+  tbody.innerHTML = slice.map(appt => {
+    const channelIcon = { whatsapp:'💬', gmail:'📧', instagram:'📸', messenger:'💙', manual:'✏️' }[appt.channel] || '📋'
+    const contact     = appt.customer_phone || appt.customer_email || ''
+    const dtStr       = appt.scheduled_at ? formatDateTime(appt.scheduled_at) : { date:'—', time:'' }
+    const statusClass = { pending:'s-pending', confirmed:'s-confirmed', completed:'s-completed', cancelled:'s-cancelled' }[appt.status] || 's-pending'
+
+    return `<tr>
+      <td>
+        <div class="customer-cell">
+          <span class="customer-name">${esc(appt.customer_name || '—')}</span>
+          ${contact ? `<span class="customer-contact"><span class="channel-badge">${channelIcon}</span>${esc(contact)}</span>` : `<span class="customer-contact">${channelIcon} ${esc(appt.channel)}</span>`}
+        </div>
+      </td>
+      <td><span class="service-text" title="${esc(appt.service || '')}">${esc(appt.service || '—')}</span></td>
+      <td>
+        <div class="datetime-cell">
+          <span class="date-val">${dtStr.date}</span>
+          ${dtStr.time ? `<span class="time-val">${dtStr.time}</span>` : ''}
+        </div>
+      </td>
+      <td><span class="status-pill ${statusClass}">${capitalize(appt.status)}</span></td>
+      <td>
+        <div class="sent-badges">
+          <span class="sent-chip ${appt.reminder_sent ? 'sent-yes' : 'sent-no'}" title="Reminder">🔔 ${appt.reminder_sent ? 'Sent' : 'Pending'}</span>
+          <span class="sent-chip ${appt.followup_sent ? 'sent-yes' : 'sent-no'}" title="Follow-up">📨 ${appt.followup_sent ? 'Sent' : 'Pending'}</span>
+        </div>
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" title="Edit" onclick="openEditModal('${appt._id}')">✏️</button>
+          <button class="icon-btn" title="Delete" onclick="openDeleteModal('${appt._id}')" style="color:#ef4444">🗑️</button>
+        </div>
+      </td>
+    </tr>`
+  }).join('')
+
+  // Pagination
+  if (total > PAGE_SIZE) {
+    pag.style.display = 'flex'
+    const pages = Math.ceil(total / PAGE_SIZE)
+    document.getElementById('paginationInfo').textContent = `${start+1}–${Math.min(start+PAGE_SIZE, total)} of ${total}`
+    document.getElementById('prevBtn').disabled = currentPage === 0
+    document.getElementById('nextBtn').disabled = currentPage >= pages - 1
+  } else {
+    pag.style.display = 'none'
+  }
+}
+
+function changePage(dir) {
+  currentPage = Math.max(0, currentPage + dir)
+  renderTable()
+}
+
+function emptyStateHTML() {
+  const msgs = {
+    all:       { icon:'📅', title:'No appointments yet', sub:'Appointments detected by your AI agents or added manually will appear here.' },
+    pending:   { icon:'⏳', title:'No pending appointments', sub:'All caught up!' },
+    confirmed: { icon:'✅', title:'No confirmed appointments', sub:'Confirm pending appointments to move them here.' },
+    completed: { icon:'🎉', title:'No completed appointments', sub:'Completed appointments will appear here.' },
+    cancelled: { icon:'❌', title:'No cancelled appointments', sub:'' },
+  }
+  const m = msgs[currentFilter] || msgs.all
+  return `<div class="empty-state"><div class="empty-icon">${m.icon}</div><div class="empty-title">${m.title}</div>${m.sub ? `<div class="empty-sub">${m.sub}</div>` : ''}</div>`
+}
+
+function renderEmpty(msg) {
+  document.getElementById('apptTableBody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Error</div><div class="empty-sub">${msg}</div></div></td></tr>`
+}
+
+// ── Modal helpers ──────────────────────────────────────────────────────────
+function openCreateModal() {
+  editingId = null
+  document.getElementById('modalTitle').textContent = 'Add Appointment'
+  document.getElementById('saveBtn').textContent    = 'Save Appointment'
+  clearForm()
+  document.getElementById('apptModal').classList.add('open')
+}
+
+function openEditModal(id) {
+  const appt = allAppointments.find(a => a._id === id)
+  if (!appt) return
+  editingId = id
+  document.getElementById('modalTitle').textContent = 'Edit Appointment'
+  document.getElementById('saveBtn').textContent    = 'Save Changes'
+  document.getElementById('fName').value    = appt.customer_name || ''
+  document.getElementById('fPhone').value   = appt.customer_phone || ''
+  document.getElementById('fEmail').value   = appt.customer_email || ''
+  document.getElementById('fService').value = appt.service || ''
+  document.getElementById('fNotes').value   = appt.notes || ''
+  document.getElementById('fStatus').value  = appt.status || 'pending'
+  document.getElementById('fChannel').value = appt.channel || 'manual'
+  if (appt.scheduled_at) {
+    const d = new Date(appt.scheduled_at)
+    document.getElementById('fDate').value = d.toISOString().slice(0,10)
+    document.getElementById('fTime').value = d.toISOString().slice(11,16)
+  } else {
+    document.getElementById('fDate').value = ''
+    document.getElementById('fTime').value = ''
+  }
+  document.getElementById('apptModal').classList.add('open')
+}
+
+function closeModal() {
+  document.getElementById('apptModal').classList.remove('open')
+  editingId = null
+}
+
+function clearForm() {
+  ['fName','fPhone','fEmail','fService','fNotes','fDate','fTime'].forEach(id => document.getElementById(id).value = '')
+  document.getElementById('fStatus').value  = 'pending'
+  document.getElementById('fChannel').value = 'manual'
+}
+
+function openDeleteModal(id) {
+  deleteTargetId = id
+  document.getElementById('deleteModal').classList.add('open')
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').classList.remove('open')
+  deleteTargetId = null
+}
+
+// ── Save ───────────────────────────────────────────────────────────────────
+async function saveAppointment() {
+  const name = document.getElementById('fName').value.trim()
+  if (!name) { showToast('Customer name is required', 'error'); return }
+
+  const dateVal = document.getElementById('fDate').value
+  const timeVal = document.getElementById('fTime').value
+  let scheduled_at = null
+  if (dateVal) scheduled_at = timeVal ? new Date(`${dateVal}T${timeVal}`).toISOString() : new Date(dateVal).toISOString()
+
+  const body = {
+    agent_id:        currentAgent,
+    customer_name:   name,
+    customer_phone:  document.getElementById('fPhone').value.trim() || null,
+    customer_email:  document.getElementById('fEmail').value.trim() || null,
+    service:         document.getElementById('fService').value.trim(),
+    notes:           document.getElementById('fNotes').value.trim(),
+    status:          document.getElementById('fStatus').value,
+    channel:         document.getElementById('fChannel').value,
+    scheduled_at,
+  }
+
+  const btn = document.getElementById('saveBtn')
+  btn.disabled = true
+
+  try {
+    if (editingId) {
+      await apiFetch(`/appointments/${editingId}`, { method: 'PATCH', body: JSON.stringify(body) })
+      showToast('Appointment updated', 'success')
+    } else {
+      await apiFetch('/appointments', { method: 'POST', body: JSON.stringify(body) })
+      showToast('Appointment created', 'success')
+    }
+    closeModal()
+    await loadAppointments()
+  } catch (e) {
+    showToast(e.message || 'Failed to save', 'error')
+  } finally {
+    btn.disabled = false
+  }
+}
+
+// ── Delete ─────────────────────────────────────────────────────────────────
+async function confirmDelete() {
+  if (!deleteTargetId) return
+  const btn = document.getElementById('confirmDeleteBtn')
+  btn.disabled = true
+  try {
+    await apiFetch(`/appointments/${deleteTargetId}`, { method: 'DELETE' })
+    showToast('Appointment deleted', 'success')
+    closeDeleteModal()
+    await loadAppointments()
+  } catch (e) {
+    showToast(e.message || 'Failed to delete', 'error')
+  } finally {
+    btn.disabled = false
+  }
+}
+
+// ── Utilities ──────────────────────────────────────────────────────────────
+function formatDateTime(iso) {
+  try {
+    const d = new Date(iso)
+    return {
+      date: d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }),
+      time: d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }),
+    }
+  } catch { return { date:'—', time:'' } }
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : '' }
+
+function showToast(msg, type='info') {
+  const wrap = document.getElementById('toastWrap')
+  const el   = document.createElement('div')
+  const icon = { success:'✅', error:'❌', info:'ℹ️' }[type] || 'ℹ️'
+  el.className = `toast toast-${type}`
+  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`
+  wrap.appendChild(el)
+  setTimeout(() => {
+    el.classList.add('removing')
+    el.addEventListener('animationend', () => el.remove())
+  }, 3500)
+}
+</script>
+</body>
+</html>
