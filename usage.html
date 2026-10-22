@@ -9,14 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
   <style>
-    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
-    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;backdrop-filter:blur(16px)}
-    .topbar-left{display:flex;align-items:center;gap:12px}
-    .topbar-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
-    .topbar-right{display:flex;align-items:center;gap:8px}
-    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background .12s}
-    .theme-toggle:hover{background:var(--surface-2)}
-    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
     .page-body{padding:20px 24px 48px;flex:1;max-width:1400px;width:100%;box-sizing:border-box;animation:page-enter .35s cubic-bezier(0,0,.2,1)}
     @keyframes page-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
@@ -30,10 +22,9 @@
     .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
     .stat-tile{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;transition:box-shadow .15s}
     .stat-tile:hover{box-shadow:var(--sh-sm)}
-    .st-label{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
-    .st-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
-    .st-sub{font-size:11px;color:var(--text-3)}
-    .st-icon{font-size:20px;margin-bottom:2px}
+    .st-label{font-size:10.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+    .st-value{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.04em;line-height:1.1}
+    .st-sub{font-size:11px;color:var(--text-3);margin-top:2px}
 
     /* ── Token quota bar ── */
     .quota-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:24px}
@@ -64,14 +55,15 @@
     .bar-label{font-size:8px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:32px;text-align:center}
 
     /* ── Breakdown rows ── */
-    .bk-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+    .bk-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
     .bk-row:last-child{border-bottom:none}
-    .bk-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
     .bk-label{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .bk-bar-wrap{width:100px;height:6px;background:var(--border);border-radius:6px;overflow:hidden;flex-shrink:0}
+    .bk-bar-wrap{width:90px;height:5px;background:var(--border);border-radius:6px;overflow:hidden;flex-shrink:0}
     .bk-bar{height:100%;border-radius:6px;background:var(--accent)}
-    .bk-val{font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap;flex-shrink:0;min-width:60px;text-align:right}
-    .bk-cnt{font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0}
+    .bk-val{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;flex-shrink:0;min-width:52px;text-align:right}
+    .bk-cnt{font-size:10.5px;color:var(--text-3);white-space:nowrap;flex-shrink:0;min-width:42px;text-align:right}
+    .ch-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .ag-avatar{width:26px;height:26px;border-radius:8px;background:var(--accent-dim);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:-.02em}
 
     /* ── Requests table ── */
     .req-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -101,16 +93,19 @@
   </style>
 </head>
 <body>
-<div id="sidebar"></div>
-<div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+<div class="mobile-topbar">
+  <div class="mob-left"><button class="hamburger" onclick="openMobileSidebar()"><svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg></button><a class="mob-logo" href="home.html">Support<span>Gent</span></a></div>
+  <div class="mob-right"><button class="theme-toggle" style="font-size:15px"></button></div>
+</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
 <div class="main-wrap">
   <div class="topbar">
     <div class="topbar-left">
-      <button class="mob-menu-btn" id="mob-menu-btn">☰</button>
       <div class="topbar-title">⚡ Usage &amp; Costs</div>
     </div>
     <div class="topbar-right">
-      <button class="theme-toggle" onclick="toggleTheme();this.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'☀️':'🌙'">🌙</button>
+      <button class="theme-toggle" style="font-size:15px"></button>
     </div>
   </div>
 
@@ -222,13 +217,12 @@ function renderUsage(data, days) {
     </div>`
   }).join('')
 
-  // By source rows
+  // By source rows — icon is just a colored dot, label is the badge, no duplication
   const maxSrc = Math.max(...by_source.map(s => s.tokens_total), 1)
   const srcRows = by_source.slice(0,10).map(s => {
     const pct = Math.round(s.tokens_total / maxSrc * 100)
     return `<div class="bk-row">
-      <div class="bk-icon" style="background:var(--accent-dim)">${srcBadge(s._id)}</div>
-      <div class="bk-label" style="padding-left:4px">${esc(s._id || 'unknown')}</div>
+      <div class="bk-label">${srcBadge(s._id)}</div>
       <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%"></div></div>
       <div class="bk-val">${fmtNum(s.tokens_total)}</div>
       <div class="bk-cnt">${s.requests} req</div>
@@ -240,23 +234,26 @@ function renderUsage(data, days) {
   const chRows = by_channel.map(c => {
     const pct = Math.round(c.tokens_total / maxCh * 100)
     const col = CH_COLORS[c._id] || '#9ea3bb'
-    const ico = CH_ICONS[c._id] || '📡'
+    const CH_LABEL = { chat:'Live Chat', email:'Email', gmail:'Email', whatsapp:'WhatsApp', instagram:'Instagram', messenger:'Messenger', livechat:'Live Chat' }
+    const label = CH_LABEL[c._id] || c._id || 'Unknown'
     return `<div class="bk-row">
-      <div class="bk-icon" style="background:${col}22;font-size:15px">${ico}</div>
-      <div class="bk-label">${chDot(c._id)}</div>
+      <span class="ch-dot" style="background:${col};flex-shrink:0"></span>
+      <div class="bk-label">${esc(label)}</div>
       <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%;background:${col}"></div></div>
       <div class="bk-val">${fmtNum(c.tokens_total)}</div>
       <div class="bk-cnt">${c.requests} req</div>
     </div>`
   }).join('')
 
-  // By agent rows
+  // By agent rows — initial avatar, clean name
   const maxAg = Math.max(...by_agent.map(a => a.tokens_total), 1)
   const agRows = by_agent.slice(0,8).map(a => {
     const pct = Math.round(a.tokens_total / maxAg * 100)
+    const name = a.agent_name || 'Unknown Agent'
+    const initials = name.split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase() || 'AG'
     return `<div class="bk-row">
-      <div class="bk-icon" style="background:var(--surface-3)">🤖</div>
-      <div class="bk-label">${esc(a.agent_name || 'Agent')}</div>
+      <div class="ag-avatar">${initials}</div>
+      <div class="bk-label">${esc(name)}</div>
       <div class="bk-bar-wrap"><div class="bk-bar" style="width:${pct}%"></div></div>
       <div class="bk-val">${fmtNum(a.tokens_total)}</div>
       <div class="bk-cnt">${a.requests} req</div>
@@ -296,25 +293,21 @@ function renderUsage(data, days) {
     <!-- ── Stat tiles ── -->
     <div class="stat-grid">
       <div class="stat-tile">
-        <div class="st-icon">⚡</div>
         <div class="st-label">Total Tokens (${days}d)</div>
         <div class="st-value">${fmtNum(totals.tokens_total || 0)}</div>
         <div class="st-sub">${fmtNum(totals.tokens_in||0)} in · ${fmtNum(totals.tokens_out||0)} out</div>
       </div>
       <div class="stat-tile">
-        <div class="st-icon">💰</div>
         <div class="st-label">Est. AI Cost (${days}d)</div>
-        <div class="st-value">${fmtCost(totalCost)}</div>
-        <div class="st-sub">Gemini Flash pricing in INR</div>
+        <div class="st-value" style="color:var(--accent)">${fmtCost(totalCost)}</div>
+        <div class="st-sub">Gemini Flash · INR pricing</div>
       </div>
       <div class="stat-tile">
-        <div class="st-icon">🔢</div>
         <div class="st-label">Total Requests</div>
         <div class="st-value">${fmtNum(totals.requests || 0)}</div>
         <div class="st-sub">${totals.requests ? fmtNum(Math.round((totals.tokens_total||0) / totals.requests)) + ' avg tokens/req' : '—'}</div>
       </div>
       <div class="stat-tile">
-        <div class="st-icon">📅</div>
         <div class="st-label">Avg / Day</div>
         <div class="st-value">${fmtNum(Math.round((totals.tokens_total||0) / (days||1)))}</div>
         <div class="st-sub">${fmtCost(totalCost / (days||1))} / day</div>
