@@ -855,6 +855,7 @@ async function loadPage() {
     loadFilterSettings().catch(()=>{})
     loadQuickReplies().catch(()=>{})
     loadNotifPrefs().catch(()=>{})
+    loadChannelQualityTier().catch(()=>{})
     setTimeout(() => loadFollowupQueue().catch(()=>{}), 1500)
   } catch (e) {
     document.getElementById('pageBody').innerHTML = `<div style="padding:60px;text-align:center;color:var(--text-3)">😵 ${esc(e.message)}</div>`
@@ -1373,6 +1374,29 @@ function renderSettingsTab() {
         </div>
       </div>
     </div>
+
+    <!-- Response Quality -->
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">⚡ Response Quality</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="scope-pill scope-all">🌐 All channels</span>
+          <button class="btn btn-secondary btn-sm" onclick="saveChannelQualityTier()" id="quality-save-btn"><span class="btn-text">Save</span></button>
+        </div>
+      </div>
+      <div class="settings-card-body">
+        <div class="scope-info">Choose the AI model quality used when generating replies and classifying messages across all channels. Higher quality uses more tokens per request.</div>
+        <div class="filter-row" style="align-items:flex-start;flex-direction:column;gap:10px">
+          <select id="channel-quality-tier" style="height:36px;padding:0 12px;border:1px solid var(--border-md);border-radius:8px;background:var(--surface);color:var(--text);font-size:13px;font-weight:600;outline:none;width:100%;max-width:360px">
+            <option value="low">⚡ Low — Fast &amp; efficient · 1× tokens billed</option>
+            <option value="medium">🔥 Medium — Balanced quality · 2× tokens billed</option>
+            <option value="high">🚀 High — Best quality · 3× tokens billed</option>
+          </select>
+          <div style="font-size:11.5px;color:var(--text-3)">This overrides the quality tier set in Agent Settings for all channel interactions.</div>
+        </div>
+      </div>
+    </div>
+
   </div>`
 }
 
@@ -3451,6 +3475,29 @@ async function saveNotifPrefs() {
       })
     })
     showToast('Notification preferences saved!', 'success')
+  } catch (e) { showToast(e.message, 'error') }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-text">Save</span>' } }
+}
+
+async function loadChannelQualityTier() {
+  try {
+    const d = await apiFetch(`/agents/${STATE.agentId}/channels/quality-tier`).catch(() => null)
+    if (!d) return
+    const el = document.getElementById('channel-quality-tier')
+    if (el) el.value = d.quality_tier || 'low'
+  } catch {}
+}
+
+async function saveChannelQualityTier() {
+  const btn = document.getElementById('quality-save-btn')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin-ring spin-ring-sm spin-ring-dark"></span>' }
+  try {
+    const tier = document.getElementById('channel-quality-tier')?.value || 'low'
+    await apiFetch(`/agents/${STATE.agentId}/channels/quality-tier`, {
+      method: 'PUT',
+      body: JSON.stringify({ quality_tier: tier })
+    })
+    showToast('Response quality saved!', 'success')
   } catch (e) { showToast(e.message, 'error') }
   finally { if (btn) { btn.disabled = false; btn.innerHTML = '<span class="btn-text">Save</span>' } }
 }
