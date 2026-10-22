@@ -294,7 +294,8 @@
 
         <div class="form-group">
           <label class="form-label">Header <span>(optional — text shown above the message)</span></label>
-          <input class="form-input" id="fHeader" placeholder="e.g. Thank you for visiting us! 🦷"/>
+          <input class="form-input" id="fHeader" placeholder="e.g. Thank you for visiting us" oninput="checkHeaderEmoji(this)"/>
+          <div id="headerEmojiWarn" style="display:none;color:#c0392b;font-size:12px;margin-top:4px;">⚠️ Meta does not allow emojis or special characters in headers — they will be removed automatically on submit.</div>
         </div>
 
         <div class="form-group">
@@ -670,6 +671,11 @@
 
   function sanitizeName(input) {
     input.value = input.value.toLowerCase().replace(/[^a-z0-9_]/g, '_')
+  }
+
+  function checkHeaderEmoji(input) {
+    const hasEmoji = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}*_~`]/u.test(input.value)
+    document.getElementById('headerEmojiWarn').style.display = hasEmoji ? 'block' : 'none'
   }
 
   // ── Save / Submit ──────────────────────────────────────────────────────────
