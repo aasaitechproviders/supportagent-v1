@@ -1,481 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Automations — SupportGent</title>
-  <link rel="stylesheet" href="shared.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet"/>
-  <style>
-    :root{
-      --ease-spring:cubic-bezier(.34,1.56,.64,1);
-      --ease-smooth:cubic-bezier(.4,0,.2,1);
-      --ease-out:cubic-bezier(0,0,.2,1);
-      --dur-fast:120ms;--dur-base:200ms;--dur-slow:350ms;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Automations — SupportGent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+/* ── Page layout ──────────────────────────────────────────────── */
+.page-content { padding: 20px 24px 48px; max-width: 820px; }
 
-    /* ── Layout ──────────────────────────────────────────────────────────── */
-    .main-wrap{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh}
-    .topbar{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;gap:12px;flex-shrink:0;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-    .topbar-left{display:flex;align-items:center;gap:12px}
-    .topbar-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.03em;display:flex;align-items:center;gap:8px}
-    .topbar-right{display:flex;align-items:center;gap:8px}
-    .theme-toggle{background:none;border:none;font-size:16px;cursor:pointer;padding:6px;color:var(--text-2);border-radius:8px;transition:background var(--dur-fast),transform var(--dur-fast) var(--ease-spring)}
-    .theme-toggle:hover{background:var(--surface-2);transform:rotate(20deg) scale(1.1)}
-    .mob-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-2);padding:4px}
-    .agent-select-wrap{position:relative;display:flex;align-items:center}
-    .agent-select-wrap::before{content:'🤖';position:absolute;left:10px;font-size:13px;pointer-events:none;z-index:1}
-    .agent-select{height:36px;padding:0 32px 0 30px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;transition:border-color var(--dur-base),box-shadow var(--dur-base);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239EA3BB'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-    .agent-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
-    .page-body{padding:20px 24px 48px;flex:1;max-width:860px;width:100%;box-sizing:border-box;animation:page-enter var(--dur-slow) var(--ease-out)}
-    @keyframes page-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* ── Section cards ────────────────────────────────────────────── */
+.section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.section-head {
+  padding: 18px 22px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.section-title { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -.03em; display: flex; align-items: center; gap: 8px; }
+.section-desc { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.6; }
+.section-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
 
-    /* ── Page loader ─────────────────────────────────────────────────────── */
-    .page-loader{position:fixed;inset:0;z-index:9998;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity var(--dur-slow),visibility var(--dur-slow)}
-    .page-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-    .loader-logo{font-size:36px;animation:logo-bounce 1s var(--ease-spring) infinite alternate}
-    @keyframes logo-bounce{from{transform:translateY(0) scale(1)}to{transform:translateY(-10px) scale(1.06)}}
-    .loader-track{width:200px;height:3px;background:var(--border);border-radius:3px;overflow:hidden}
-    .loader-bar{height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed,var(--accent));background-size:200% 100%;border-radius:3px;animation:ldr 1.2s var(--ease-smooth) infinite}
-    @keyframes ldr{0%{background-position:200% 0;width:30%}50%{background-position:-200% 0;width:70%}100%{background-position:200% 0;width:30%}}
-    .loader-text{font-size:12.5px;font-weight:600;color:var(--text-3);letter-spacing:.04em;animation:lpulse 1.2s ease-in-out infinite alternate}
-    @keyframes lpulse{from{opacity:.4}to{opacity:1}}
+/* ── Toggle row ───────────────────────────────────────────────── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: var(--r);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.toggle-info { display: flex; flex-direction: column; gap: 3px; }
+.toggle-label { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.toggle-sub   { font-size: 12px; color: var(--text-3); line-height: 1.5; }
 
-    /* ── Buttons ─────────────────────────────────────────────────────────── */
-    .btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all var(--dur-fast) var(--ease-out);white-space:nowrap}
-    .btn-primary{background:var(--accent);color:#fff}
-    .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
-    .btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border-md)}
-    .btn-ghost:hover{background:var(--surface-2);color:var(--text)}
-    .btn-sm{height:30px;padding:0 12px;font-size:12px}
-    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;filter:none!important}
+/* ── Toggle switch ────────────────────────────────────────────── */
+.sw-wrap { position: relative; flex-shrink: 0; }
+.sw-wrap input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
+.sw-track {
+  display: block;
+  width: 44px; height: 24px;
+  background: var(--border-md);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .2s;
+  position: relative;
+}
+.sw-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  transition: transform .2s;
+}
+.sw-wrap input:checked + .sw-track { background: var(--accent); }
+.sw-wrap input:checked + .sw-track::after { transform: translateX(20px); }
 
-    /* ── Section card ─────────────────────────────────────────────────────── */
-    .section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:20px;overflow:hidden}
-    .section-card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .section-card-title{font-size:14.5px;font-weight:800;color:var(--text);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
-    .section-card-sub{font-size:12.5px;color:var(--text-3);margin-top:2px;line-height:1.5}
-    .section-card-body{padding:20px}
+/* ── Field grid ───────────────────────────────────────────────── */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field-group { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 12.5px; font-weight: 700; color: var(--text-2); }
+.field-label small { font-weight: 500; color: var(--text-3); margin-left: 4px; }
+.field-input, .field-select {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  transition: var(--t);
+  width: 100%;
+}
+.field-input:focus, .field-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+  background: var(--surface);
+}
+.field-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin-top: 2px; }
 
-    /* ── Toggle switch ────────────────────────────────────────────────────── */
-    .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;background:var(--surface-2);border-radius:var(--r-sm);margin-bottom:20px}
-    .toggle-label{display:flex;flex-direction:column;gap:2px}
-    .toggle-label strong{font-size:13.5px;font-weight:700;color:var(--text)}
-    .toggle-label span{font-size:12.5px;color:var(--text-3)}
-    .toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
-    .toggle-switch input{opacity:0;width:0;height:0}
-    .toggle-track{position:absolute;inset:0;background:var(--border-md);border-radius:12px;cursor:pointer;transition:background var(--dur-base)}
-    .toggle-track::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform var(--dur-base) var(--ease-spring);box-shadow:0 1px 3px rgba(0,0,0,.25)}
-    .toggle-switch input:checked ~ .toggle-track{background:var(--accent)}
-    .toggle-switch input:checked ~ .toggle-track::before{transform:translateX(20px)}
+/* ── Info box ─────────────────────────────────────────────────── */
+.info-box {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: #3b82f610;
+  border: 1px solid #3b82f630;
+}
+.info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.info-text { font-size: 12.5px; color: var(--text-2); line-height: 1.65; }
+.info-text strong { color: var(--text); font-weight: 700; }
 
-    /* ── Form fields ──────────────────────────────────────────────────────── */
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .form-group{display:flex;flex-direction:column;gap:6px}
-    .form-label{font-size:12.5px;font-weight:700;color:var(--text-2)}
-    .form-label-sub{font-size:11.5px;color:var(--text-3);font-weight:500;margin-top:1px}
-    .form-input,.form-select{width:100%;height:38px;padding:0 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);font-family:var(--font);font-size:13px;outline:none;box-sizing:border-box;transition:border-color var(--dur-base),box-shadow var(--dur-base)}
-    .form-input:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);background:var(--surface)}
-    .input-with-unit{display:flex;align-items:center;gap:8px}
-    .input-with-unit .form-input{width:90px;flex-shrink:0;text-align:center;font-weight:700;font-size:15px}
-    .unit-label{font-size:13px;color:var(--text-3);font-weight:600}
+/* ── Last-run status ──────────────────────────────────────────── */
+.run-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.run-status-label { color: var(--text-3); font-weight: 600; }
+.run-status-val   { color: var(--text);   font-weight: 700; font-family: var(--font-mono); font-size: 12px; }
 
-    /* ── Template selector ────────────────────────────────────────────────── */
-    .tpl-select-wrap{position:relative}
-    .tpl-select-wrap select{width:100%}
-    .tpl-preview{margin-top:8px;padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:12.5px;color:var(--text-2);line-height:1.6;display:none;border-left:3px solid var(--accent)}
+/* ── Save bar ─────────────────────────────────────────────────── */
+.save-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.save-bar-note { font-size: 12.5px; color: var(--text-3); }
 
-    /* ── Flow diagram ─────────────────────────────────────────────────────── */
-    .flow-diagram{display:flex;align-items:center;gap:0;margin:24px 0;overflow-x:auto;padding:4px 0}
-    .flow-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;flex-shrink:0}
-    .flow-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700}
-    .flow-icon.fi-blue{background:#3b82f618;border:1.5px solid #3b82f640}
-    .flow-icon.fi-green{background:#10b98118;border:1.5px solid #10b98140}
-    .flow-icon.fi-purple{background:#8b5cf618;border:1.5px solid #8b5cf640}
-    .flow-icon.fi-orange{background:#f59e0b18;border:1.5px solid #f59e0b40}
-    .flow-step-label{font-size:11px;font-weight:700;color:var(--text-3);text-align:center;line-height:1.3;max-width:80px}
-    .flow-arrow{font-size:18px;color:var(--border-md);margin:0 4px;flex-shrink:0;padding-bottom:18px}
+/* ── Channel tag ──────────────────────────────────────────────── */
+.ch-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+}
 
-    /* ── Run button section ───────────────────────────────────────────────── */
-    .run-section{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;background:var(--surface-2);border-radius:var(--r-sm);margin-top:20px;flex-wrap:wrap}
-    .run-info{display:flex;flex-direction:column;gap:2px}
-    .run-info strong{font-size:13px;font-weight:700;color:var(--text)}
-    .run-info span{font-size:12.5px;color:var(--text-3)}
-    .run-result{font-size:12.5px;color:var(--text-3);font-weight:600;display:none}
-
-    /* ── Save bar ─────────────────────────────────────────────────────────── */
-    .save-bar{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--border);margin-top:4px}
-    .save-status{font-size:12.5px;color:var(--text-3);font-weight:600;transition:opacity var(--dur-base)}
-
-    /* ── Info banner ──────────────────────────────────────────────────────── */
-    .info-banner{display:flex;gap:10px;padding:12px 14px;background:var(--accent-dim);border:1px solid var(--accent)22;border-radius:var(--r-sm);margin-bottom:20px}
-    .info-banner-icon{font-size:16px;flex-shrink:0;line-height:1.5}
-    .info-banner-text{font-size:12.5px;color:var(--text-2);line-height:1.6}
-    .info-banner-text strong{color:var(--text)}
-
-    /* ── Toast ───────────────────────────────────────────────────────────── */
-    .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-    .toast{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;pointer-events:auto;animation:toast-in var(--dur-slow) var(--ease-spring)}
-    @keyframes toast-in{from{opacity:0;transform:translateX(24px) scale(.96)}to{opacity:1;transform:none}}
-    .toast.removing{animation:toast-out var(--dur-base) var(--ease-out) forwards}
-    @keyframes toast-out{to{opacity:0;transform:translateX(24px) scale(.96)}}
-    .toast-success{border-left:3px solid #10b981}
-    .toast-error{border-left:3px solid #ef4444}
-    .toast-info{border-left:3px solid var(--accent)}
-
-    /* ── Responsive ──────────────────────────────────────────────────────── */
-    @media(max-width:700px){
-      .form-grid{grid-template-columns:1fr}
-      .main-wrap{margin-left:0}
-      .mob-menu-btn{display:block}
-    }
-  </style>
+@media(max-width:640px) {
+  .field-grid { grid-template-columns: 1fr; }
+  .page-content { padding: 12px 14px 40px; }
+}
+</style>
+<script>
+;(function(){
+  var p = new URLSearchParams(location.search), t = p.get('token');
+  if (t) { localStorage.setItem('sg_token', t); history.replaceState({}, '', location.pathname); }
+  var dark = localStorage.getItem('sg_theme') === 'dark';
+  document.documentElement[dark ? 'setAttribute' : 'removeAttribute']('data-theme', 'dark');
+  document.documentElement.style.background = dark ? '#07080D' : '#F2F3F9';
+})();
+</script>
+<script src="i18n.js"></script>
+<script src="api.js"></script>
+<script src="nav.js"></script>
 </head>
 <body>
-<!-- ── Page loader ──────────────────────────────────────────────────────── -->
-<div class="page-loader" id="pageLoader">
-  <div class="loader-logo">⚡</div>
-  <div class="loader-track"><div class="loader-bar"></div></div>
-  <div class="loader-text">LOADING AUTOMATIONS…</div>
+
+<div id="toast-container"></div>
+
+<div class="mobile-topbar">
+  <div class="mob-left">
+    <button class="hamburger" onclick="openMobileSidebar()">
+      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
+    </button>
+    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
+  </div>
+  <div class="mob-right"><button class="theme-toggle"></button></div>
 </div>
 
-<!-- ── Sidebar (injected by nav.js) ────────────────────────────────────── -->
-<div id="sidebar-root"></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar"></div>
 
-<!-- ── Main wrap ───────────────────────────────────────────────────────── -->
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:12px;width:160px;border-radius:4px"></div>
+    <div class="skel" style="height:32px;width:160px;border-radius:var(--r-sm)"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel" style="height:180px;border-radius:var(--r-lg);margin-bottom:16px"></div>
+    <div class="skel" style="height:260px;border-radius:var(--r-lg)"></div>
+  </div>
+</div>
+
 <div class="main-wrap">
-  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-left">
-      <button class="mob-menu-btn" onclick="toggleSidebar?.()">☰</button>
-      <div class="topbar-title">⚡ Automations</div>
+      <div>
+        <div class="topbar-title">⚡ Automations</div>
+        <div class="topbar-subtitle" id="page-sub">Configure appointment reminders &amp; follow-ups</div>
+      </div>
     </div>
     <div class="topbar-right">
-      <div class="agent-select-wrap">
-        <select class="agent-select" id="agentSelect" onchange="onAgentChange()"></select>
-      </div>
-      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
+        <option value="">— Select agent —</option>
+      </select>
+      <button class="theme-toggle"></button>
     </div>
   </div>
 
-  <!-- Page body -->
-  <div class="page-body">
+  <div class="content page-content" id="page-content" style="display:none">
 
-    <!-- How it works diagram -->
+    <!-- Enable card -->
     <div class="section-card">
-      <div class="section-card-head">
+      <div class="section-head">
         <div>
-          <div class="section-card-title">🔄 How it works</div>
-          <div class="section-card-sub">Your AI detects appointment intent in any conversation — WhatsApp, Email, Instagram, Messenger — and creates the appointment automatically. Then these automations take over.</div>
+          <div class="section-title">🤖 Appointment Automations</div>
+          <div class="section-desc">Automatically send reminders before appointments and follow-ups after — via WhatsApp, Email, Instagram or Messenger.</div>
         </div>
       </div>
-      <div class="section-card-body" style="padding-top:16px;padding-bottom:16px">
-        <div class="flow-diagram">
-          <div class="flow-step"><div class="flow-icon fi-blue">💬</div><div class="flow-step-label">Customer chats via any channel</div></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="flow-icon fi-purple">🤖</div><div class="flow-step-label">AI auto-replies & detects booking</div></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="flow-icon fi-green">📅</div><div class="flow-step-label">Appointment created automatically</div></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="flow-icon fi-orange">🔔</div><div class="flow-step-label">Reminder sent X hrs before</div></div>
-          <div class="flow-arrow">→</div>
-          <div class="flow-step"><div class="flow-icon fi-green">📨</div><div class="flow-step-label">Follow-up sent X hrs after</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enable toggle -->
-    <div class="section-card">
-      <div class="section-card-head">
-        <div>
-          <div class="section-card-title">🎛️ Automation Config</div>
-          <div class="section-card-sub">Configure timing and templates for this agent's appointment automations.</div>
-        </div>
-      </div>
-      <div class="section-card-body">
-
-        <!-- Enable toggle -->
+      <div class="section-body">
         <div class="toggle-row">
-          <div class="toggle-label">
-            <strong>Enable automations for this agent</strong>
-            <span>When enabled, reminders and follow-ups are sent automatically based on appointment schedule.</span>
+          <div class="toggle-info">
+            <div class="toggle-label">Enable Automations</div>
+            <div class="toggle-sub">When on, the system will automatically send reminder &amp; follow-up messages at the configured times.</div>
           </div>
-          <label class="toggle-switch">
-            <input type="checkbox" id="enableToggle" onchange="onToggleChange()"/>
-            <span class="toggle-track"></span>
+          <label class="sw-wrap">
+            <input type="checkbox" id="sw-enabled"/>
+            <span class="sw-track"></span>
           </label>
         </div>
 
-        <!-- Timing section -->
-        <div id="configBody">
-          <div class="info-banner">
-            <span class="info-banner-icon">ℹ️</span>
-            <div class="info-banner-text">
-              <strong>WhatsApp templates are required</strong> to send automated messages. Only <strong>approved</strong> templates from your agent's template library will appear below. Create and get templates approved in the <a href="templates.html" style="color:var(--accent);font-weight:700">Templates</a> page first.
-            </div>
-          </div>
-
-          <!-- Reminder timing -->
-          <div style="margin-bottom:24px">
-            <div style="font-size:13.5px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px">🔔 Appointment Reminder</div>
-            <div class="form-grid">
-              <div class="form-group">
-                <div class="form-label">Send reminder</div>
-                <div class="form-label-sub">How many hours before the appointment?</div>
-                <div class="input-with-unit" style="margin-top:6px">
-                  <input class="form-input" id="reminderHours" type="number" min="1" max="168" value="24"/>
-                  <span class="unit-label">hours before appointment</span>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="form-label">Reminder WhatsApp template</div>
-                <div class="form-label-sub">Must be an approved template</div>
-                <div class="tpl-select-wrap" style="margin-top:6px">
-                  <select class="form-select" id="reminderTemplate" onchange="previewTemplate('reminderTemplate','reminderPreview')">
-                    <option value="">— Select template —</option>
-                  </select>
-                  <div class="tpl-preview" id="reminderPreview"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Follow-up timing -->
-          <div style="margin-bottom:8px">
-            <div style="font-size:13.5px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px">📨 Post-Appointment Follow-up</div>
-            <div class="form-grid">
-              <div class="form-group">
-                <div class="form-label">Send follow-up</div>
-                <div class="form-label-sub">How many hours after the appointment?</div>
-                <div class="input-with-unit" style="margin-top:6px">
-                  <input class="form-input" id="followupHours" type="number" min="1" max="336" value="24"/>
-                  <span class="unit-label">hours after appointment</span>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="form-label">Follow-up WhatsApp template</div>
-                <div class="form-label-sub">Must be an approved template</div>
-                <div class="tpl-select-wrap" style="margin-top:6px">
-                  <select class="form-select" id="followupTemplate" onchange="previewTemplate('followupTemplate','followupPreview')">
-                    <option value="">— Select template —</option>
-                  </select>
-                  <div class="tpl-preview" id="followupPreview"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Manual run -->
-          <div class="run-section">
-            <div class="run-info">
-              <strong>Manual trigger</strong>
-              <span>Run automations now for this agent — useful for testing or catching up on missed sends.</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="run-result" id="runResult"></div>
-              <button class="btn btn-ghost btn-sm" id="runBtn" onclick="runAutomations()">▶ Run Now</button>
-            </div>
-          </div>
-
-          <div class="save-bar">
-            <span class="save-status" id="saveStatus"></span>
-            <button class="btn btn-primary" id="saveBtn" onclick="saveConfig()">💾 Save Config</button>
+        <div class="info-box">
+          <div class="info-icon">💡</div>
+          <div class="info-text">
+            <strong>How it works:</strong> When a customer books an appointment via any channel (WhatsApp, Email, Instagram, Messenger), the AI detects the intent and creates an appointment record automatically. Your configured reminder is then sent before the appointment and a follow-up is sent after — using your WhatsApp template.
           </div>
         </div>
-
       </div>
     </div>
 
-  </div><!-- /page-body -->
+    <!-- Reminder settings -->
+    <div class="section-card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">🔔 Reminder Message</div>
+          <div class="section-desc">Sent before the appointment as a confirmation reminder.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Send reminder <small>(hours before)</small></label>
+            <input class="field-input" id="f-reminder-hours" type="number" min="1" max="72" placeholder="e.g. 24"/>
+            <div class="field-hint">How many hours before the appointment to send the reminder. E.g. 24 = send 1 day before.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">WhatsApp Template</label>
+            <input class="field-input" id="f-reminder-template" placeholder="e.g. appointment_reminder"/>
+            <div class="field-hint">The approved WhatsApp template name to use for the reminder message.</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Template language code <small>(optional)</small></label>
+          <input class="field-input" id="f-reminder-lang" placeholder="en_US" style="max-width:200px"/>
+          <div class="field-hint">WhatsApp template language code. Defaults to en_US.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Follow-up settings -->
+    <div class="section-card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">📨 Follow-up Message</div>
+          <div class="section-desc">Sent after the appointment — thank the customer, collect feedback, or upsell.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field-grid">
+          <div class="field-group">
+            <label class="field-label">Send follow-up <small>(hours after)</small></label>
+            <input class="field-input" id="f-followup-hours" type="number" min="1" max="168" placeholder="e.g. 2"/>
+            <div class="field-hint">How many hours after the appointment to send the follow-up. E.g. 2 = send 2 hours after.</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">WhatsApp Template</label>
+            <input class="field-input" id="f-followup-template" placeholder="e.g. appointment_followup"/>
+            <div class="field-hint">The approved WhatsApp template name to use for the follow-up message.</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Template language code <small>(optional)</small></label>
+          <input class="field-input" id="f-followup-lang" placeholder="en_US" style="max-width:200px"/>
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <div class="save-bar-note" id="last-saved-note">Not saved yet</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-secondary btn-sm" id="run-btn" onclick="runNow()">&#9654; Run Now</button>
+          <button class="btn btn-primary" id="save-btn" onclick="saveAutomations()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status / last run -->
+    <div class="section-card" id="status-card" style="display:none">
+      <div class="section-head">
+        <div>
+          <div class="section-title">📊 Automation Status</div>
+          <div class="section-desc">Last run results for this agent.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="run-status">
+          <span class="run-status-label">Last run</span>
+          <span class="run-status-val" id="stat-last-run">—</span>
+        </div>
+        <div class="run-status">
+          <span class="run-status-label">Reminders sent (total)</span>
+          <span class="run-status-val" id="stat-reminders">—</span>
+        </div>
+        <div class="run-status">
+          <span class="run-status-label">Follow-ups sent (total)</span>
+          <span class="run-status-val" id="stat-followups">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Channels info -->
+    <div class="section-card">
+      <div class="section-head">
+        <div>
+          <div class="section-title">📡 Supported Channels</div>
+          <div class="section-desc">Appointments are auto-detected from conversations on these channels.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="ch-tag">💬 WhatsApp</span>
+          <span class="ch-tag">📧 Email / Gmail</span>
+          <span class="ch-tag">📸 Instagram DM</span>
+          <span class="ch-tag">💙 Facebook Messenger</span>
+          <span class="ch-tag">✏️ Manual entry</span>
+        </div>
+        <div class="info-box" style="background:#10b98110;border-color:#10b98130;">
+          <div class="info-icon">✅</div>
+          <div class="info-text">
+            <strong>Outbound reminders &amp; follow-ups are sent via WhatsApp</strong> using your approved message templates. Make sure your WhatsApp channel is connected and the templates are approved in Meta Business Manager.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
 </div><!-- /main-wrap -->
 
-<!-- ── Toast ─────────────────────────────────────────────────────────────── -->
-<div class="toast-wrap" id="toastWrap"></div>
-
-<script src="api.js"></script>
-<script src="i18n.js"></script>
-<script src="nav.js"></script>
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-let currentAgent   = null
-let approvedTpls   = []
-let currentConfig  = null
+var _agentId = null
+var _config  = null
 
-// ── Init ───────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', async () => {
-  initTheme()
-  const nav = await renderNav('automations')
-  if (!nav) return
+// ── Init ──────────────────────────────────────────────────────────
+async function init() {
+  var nav = await renderNav('automations')
+  if (!nav || !nav.user) return
   await loadAgents()
-  hideLoader()
-})
-
-function hideLoader() {
-  setTimeout(() => document.getElementById('pageLoader').classList.add('hidden'), 400)
+  document.getElementById('page-skeleton').style.display = 'none'
+  document.getElementById('page-content').style.display  = 'block'
 }
 
-// ── Theme ──────────────────────────────────────────────────────────────────
-function initTheme() {
-  const saved = localStorage.getItem('sg_theme') || 'light'
-  document.documentElement.setAttribute('data-theme', saved)
-  document.querySelector('.theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙'
-}
-function toggleTheme() {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
-  document.documentElement.setAttribute('data-theme', next)
-  localStorage.setItem('sg_theme', next)
-  document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙'
-}
-
-// ── Agents ─────────────────────────────────────────────────────────────────
 async function loadAgents() {
   try {
-    const res  = await apiFetch('/agents')
-    const list = Array.isArray(res) ? res : (res.agents || [])
-    const sel  = document.getElementById('agentSelect')
-    sel.innerHTML = list.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
-    if (list.length) {
-      currentAgent = list[0]._id
-      await Promise.all([loadTemplates(), loadConfig()])
+    var d   = await apiFetch('/agents')
+    var sel = document.getElementById('agent-sel')
+    sel.innerHTML = '<option value="">— Select agent —</option>'
+    ;(d.agents || d || []).forEach(function(a) {
+      var o = document.createElement('option')
+      o.value = a._id; o.textContent = a.name || 'Unnamed'
+      sel.appendChild(o)
+    })
+    var stored = localStorage.getItem('sg_auto_agent')
+    if (stored) sel.value = stored
+    if (!sel.value && sel.options.length > 1) sel.value = sel.options[1].value
+    if (sel.value) { _agentId = sel.value; await loadAutomations() }
+  } catch(e) { toast('Failed to load agents: ' + e.message, 'error') }
+}
+
+function onAgentChange() {
+  _agentId = document.getElementById('agent-sel').value
+  if (_agentId) { localStorage.setItem('sg_auto_agent', _agentId); loadAutomations() }
+}
+
+// ── Load ──────────────────────────────────────────────────────────
+async function loadAutomations() {
+  if (!_agentId) return
+  try {
+    var d = await apiFetch('/automations?agent_id=' + _agentId)
+    _config = d.automations || d || {}
+    populateForm(_config)
+    updateStatusCard(_config)
+  } catch(e) {
+    _config = {}
+    populateForm({})
+    if (!e.message || !e.message.includes('404')) {
+      toast('Failed to load automations: ' + e.message, 'error')
     }
-  } catch (e) { showToast('Failed to load agents', 'error') }
-}
-
-async function onAgentChange() {
-  currentAgent = document.getElementById('agentSelect').value
-  await Promise.all([loadTemplates(), loadConfig()])
-}
-
-// ── Load templates (approved only) ────────────────────────────────────────
-async function loadTemplates() {
-  try {
-    const res = await apiFetch(`/templates?agent_id=${currentAgent}`)
-    const all = res.templates || []
-    approvedTpls = all.filter(t => t.status === 'approved')
-    populateTemplateSelect('reminderTemplate', currentConfig?.reminder_template_id)
-    populateTemplateSelect('followupTemplate', currentConfig?.followup_template_id)
-  } catch (e) {
-    console.warn('Failed to load templates:', e)
   }
 }
 
-function populateTemplateSelect(selectId, selectedId) {
-  const sel = document.getElementById(selectId)
-  sel.innerHTML = '<option value="">— Select template —</option>' +
-    approvedTpls.map(t => `<option value="${t._id}" ${t._id === selectedId ? 'selected' : ''}>${t.name} (${t.language})</option>`).join('')
-  const previewId = selectId === 'reminderTemplate' ? 'reminderPreview' : 'followupPreview'
-  if (selectedId) previewTemplate(selectId, previewId)
-}
+function populateForm(cfg) {
+  document.getElementById('sw-enabled').checked          = !!cfg.enabled
+  document.getElementById('f-reminder-hours').value      = cfg.reminder_hours_before  != null ? cfg.reminder_hours_before  : 24
+  document.getElementById('f-reminder-template').value   = cfg.reminder_template_name  || ''
+  document.getElementById('f-reminder-lang').value       = cfg.reminder_template_lang  || 'en_US'
+  document.getElementById('f-followup-hours').value      = cfg.followup_hours_after    != null ? cfg.followup_hours_after    : 2
+  document.getElementById('f-followup-template').value   = cfg.followup_template_name  || ''
+  document.getElementById('f-followup-lang').value       = cfg.followup_template_lang  || 'en_US'
 
-function previewTemplate(selectId, previewId) {
-  const tplId = document.getElementById(selectId).value
-  const tpl   = approvedTpls.find(t => t._id === tplId)
-  const el    = document.getElementById(previewId)
-  if (tpl && tpl.body_text) {
-    el.textContent = tpl.body_text
-    el.style.display = 'block'
-  } else {
-    el.style.display = 'none'
+  if (cfg.updated_at) {
+    var d = new Date(cfg.updated_at)
+    document.getElementById('last-saved-note').textContent = 'Last saved: ' + d.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
   }
 }
 
-// ── Load config ────────────────────────────────────────────────────────────
-async function loadConfig() {
-  try {
-    const res = await apiFetch(`/automations?agent_id=${currentAgent}`)
-    currentConfig = res.config || null
-    applyConfig(currentConfig)
-  } catch (e) { console.warn('Failed to load config:', e) }
+function updateStatusCard(cfg) {
+  var card = document.getElementById('status-card')
+  if (!cfg || !cfg.last_run_at) { card.style.display = 'none'; return }
+  card.style.display = 'block'
+  var lr = new Date(cfg.last_run_at)
+  document.getElementById('stat-last-run').textContent   = lr.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
+  document.getElementById('stat-reminders').textContent  = cfg.total_reminders_sent != null ? cfg.total_reminders_sent : '—'
+  document.getElementById('stat-followups').textContent  = cfg.total_followups_sent != null ? cfg.total_followups_sent : '—'
 }
 
-function applyConfig(cfg) {
-  if (!cfg) {
-    document.getElementById('enableToggle').checked = false
-    document.getElementById('reminderHours').value  = 24
-    document.getElementById('followupHours').value  = 24
-    return
+// ── Save ──────────────────────────────────────────────────────────
+async function saveAutomations() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+
+  var body = {
+    agent_id:               _agentId,
+    enabled:                document.getElementById('sw-enabled').checked,
+    reminder_hours_before:  parseFloat(document.getElementById('f-reminder-hours').value)  || 24,
+    reminder_template_name: document.getElementById('f-reminder-template').value.trim(),
+    reminder_template_lang: document.getElementById('f-reminder-lang').value.trim()   || 'en_US',
+    followup_hours_after:   parseFloat(document.getElementById('f-followup-hours').value)  || 2,
+    followup_template_name: document.getElementById('f-followup-template').value.trim(),
+    followup_template_lang: document.getElementById('f-followup-lang').value.trim()   || 'en_US',
   }
-  document.getElementById('enableToggle').checked  = !!cfg.enabled
-  document.getElementById('reminderHours').value   = cfg.reminder_hours_before || 24
-  document.getElementById('followupHours').value   = cfg.followup_hours_after  || 24
-  // Template selects populated after approvedTpls loaded
-}
 
-function onToggleChange() {
-  // Visual feedback — nothing else needed; save commits it
-}
-
-// ── Save ───────────────────────────────────────────────────────────────────
-async function saveConfig() {
-  const btn = document.getElementById('saveBtn')
-  btn.disabled = true
-  setSaveStatus('Saving…')
+  var btn = document.getElementById('save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
   try {
-    const body = {
-      agent_id:              currentAgent,
-      enabled:               document.getElementById('enableToggle').checked,
-      reminder_hours_before: parseInt(document.getElementById('reminderHours').value) || 24,
-      followup_hours_after:  parseInt(document.getElementById('followupHours').value) || 24,
-      reminder_template_id:  document.getElementById('reminderTemplate').value || null,
-      followup_template_id:  document.getElementById('followupTemplate').value || null,
-    }
-    const res = await apiFetch('/automations', { method: 'PUT', body: JSON.stringify(body) })
-    currentConfig = res.config
-    showToast('Automation config saved!', 'success')
-    setSaveStatus('Saved ✓')
-    setTimeout(() => setSaveStatus(''), 3000)
-  } catch (e) {
-    showToast(e.message || 'Failed to save', 'error')
-    setSaveStatus('')
+    await apiFetch('/automations', { method: 'PUT', body: JSON.stringify(body) })
+    toast('Automation settings saved ✓', 'success')
+    document.getElementById('last-saved-note').textContent = 'Last saved: just now'
+    await loadAutomations()
+  } catch(e) {
+    toast(e.message || 'Failed to save', 'error')
   } finally {
-    btn.disabled = false
+    btn.disabled = false; btn.textContent = 'Save Settings'
   }
 }
 
-function setSaveStatus(msg) {
-  document.getElementById('saveStatus').textContent = msg
-}
-
-// ── Manual run ─────────────────────────────────────────────────────────────
-async function runAutomations() {
-  const btn = document.getElementById('runBtn')
-  const res = document.getElementById('runResult')
-  btn.disabled = true
-  btn.textContent = '⏳ Running…'
-  res.style.display = 'none'
+// ── Run now ───────────────────────────────────────────────────────
+async function runNow() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+  var btn = document.getElementById('run-btn')
+  btn.disabled = true; btn.textContent = '⏳ Running…'
   try {
-    const result = await apiFetch('/automations/run', { method: 'POST', body: JSON.stringify({ agent_id: currentAgent }) })
-    if (result.skipped) {
-      showToast(`Skipped: ${result.skipped}`, 'info')
-      res.textContent = `Skipped: ${result.skipped}`
-    } else {
-      showToast(`Done! ${result.reminders} reminder(s), ${result.followups} follow-up(s) sent.`, 'success')
-      res.textContent = `✅ ${result.reminders} reminder(s), ${result.followups} follow-up(s) sent`
-    }
-    res.style.display = 'block'
-  } catch (e) {
-    showToast(e.message || 'Run failed', 'error')
+    var d = await apiFetch('/automations/run', { method: 'POST', body: JSON.stringify({ agent_id: _agentId }) })
+    var msg = 'Done — ' + (d.reminders_sent || 0) + ' reminder(s), ' + (d.followups_sent || 0) + ' follow-up(s) sent'
+    toast(msg, 'success')
+    await loadAutomations()
+  } catch(e) {
+    toast(e.message || 'Run failed', 'error')
   } finally {
-    btn.disabled = false
-    btn.textContent = '▶ Run Now'
+    btn.disabled = false; btn.textContent = '&#9654; Run Now'
   }
 }
 
-// ── Toast ──────────────────────────────────────────────────────────────────
-function showToast(msg, type='info') {
-  const wrap = document.getElementById('toastWrap')
-  const el   = document.createElement('div')
-  const icon = { success:'✅', error:'❌', info:'ℹ️' }[type] || 'ℹ️'
-  el.className = `toast toast-${type}`
-  el.innerHTML = `<span>${icon}</span><span>${msg}</span>`
-  wrap.appendChild(el)
-  setTimeout(() => {
-    el.classList.add('removing')
-    el.addEventListener('animationend', () => el.remove())
-  }, 3500)
+// ── Utility ───────────────────────────────────────────────────────
+function toast(msg, type) {
+  type = type || 'info'
+  var c  = document.getElementById('toast-container')
+  var el = document.createElement('div')
+  el.className = 'toast toast-' + type
+  el.textContent = msg
+  c.appendChild(el)
+  setTimeout(function(){ el.classList.add('hide'); setTimeout(function(){ el.remove() }, 300) }, 3200)
 }
+
+init()
 </script>
 </body>
 </html>
