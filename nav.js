@@ -42,24 +42,27 @@ function _injectSidebarCollapseStyles() {
   const s = document.createElement('style')
   s.id = 'sg-sidebar-collapse-styles'
   s.textContent = `
-    /* ── Collapse tab button ── */
+    /* ── Collapse tab button — fixed so it's never clipped by sidebar overflow ── */
     .sidebar-collapse-btn {
-      position: absolute; top: 50%; right: -18px;
+      position: fixed;
+      top: 50%;
+      left: var(--sidebar-w, 224px);
       transform: translateY(-50%);
-      width: 18px; height: 56px;
+      width: 16px; height: 48px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-left: none;
       border-radius: 0 8px 8px 0;
-      box-shadow: 3px 0 8px rgba(0,0,0,.10);
-      color: var(--text-2); font-size: 13px;
+      box-shadow: 3px 0 6px rgba(0,0,0,.12);
+      color: var(--text-2); font-size: 12px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      z-index: 310; transition: background .15s, color .15s;
+      z-index: 400; transition: background .15s, color .15s, left .25s;
       padding: 0;
     }
     .sidebar-collapse-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .sidebar-collapse-arrow { display: inline-block; transition: transform .25s; line-height:1; }
+    .sidebar-collapse-arrow { display: inline-block; transition: transform .25s; line-height: 1; }
     body.sidebar-collapsed .sidebar-collapse-arrow { transform: rotate(180deg); }
+    body.sidebar-collapsed .sidebar-collapse-btn { left: 56px; }
 
     /* ── Collapsed sidebar — icons only ── */
     body.sidebar-collapsed .sidebar { overflow: visible; }
