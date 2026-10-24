@@ -1083,7 +1083,7 @@
           try {
             const [sRes, cRes] = await Promise.all([
               fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(storedIdentifier)}`),
-              fetch(`${API}/agents/${AGENT_ID}/customers/${encodeURIComponent(storedIdentifier)}`),
+              fetch(`${API}/agents/${AGENT_ID}/customers/${encodeURIComponent(storedIdentifier)}?session_id=${encodeURIComponent(SESSION_ID)}`),
             ])
             // Restore customer profile (name + addresses) from DB
             if (cRes.ok) {
@@ -1335,7 +1335,7 @@
       await Promise.all([
         fetch(`${API}/agents/${AGENT_ID}/customers`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier, name }),
+          body: JSON.stringify({ identifier, name, session_id: SESSION_ID }),
         }),
         fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -1377,7 +1377,7 @@
     Promise.all([
       fetch(`${API}/agents/${AGENT_ID}/customers`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier, name }),
+        body: JSON.stringify({ identifier, name, session_id: SESSION_ID }),
       }),
       fetch(`${API}/chat/${AGENT_ID}/session/${encodeURIComponent(identifier)}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -1405,7 +1405,7 @@
     if (USER_IDENTIFIER) {
       fetch(`${API}/agents/${AGENT_ID}/customers/${encodeURIComponent(USER_IDENTIFIER)}/addresses`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addresses: list }),
+        body: JSON.stringify({ addresses: list, session_id: SESSION_ID }),
       }).catch(() => {})
     }
   }
