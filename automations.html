@@ -3,158 +3,390 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
-<title>Automations — SupportGent</title>
+<title>Automation Builder — SupportGent</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
-/* ── Page layout ──────────────────────────────────────────────── */
-.page-content { padding: 20px 24px 48px; max-width: 820px; }
-
-/* ── Section cards ────────────────────────────────────────────── */
-.section-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  margin-bottom: 20px;
+/* ── Builder layout — full viewport minus sidebar ───────────────── */
+.builder-wrap {
+  display: flex;
+  height: calc(100vh - 64px);
   overflow: hidden;
+  background: var(--bg);
 }
-.section-head {
-  padding: 18px 22px 16px;
+
+/* ── Top toolbar ────────────────────────────────────────────────── */
+.builder-toolbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-}
-.section-title { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -.03em; display: flex; align-items: center; gap: 8px; }
-.section-desc { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.6; }
-.section-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
-
-/* ── Toggle row ───────────────────────────────────────────────── */
-.toggle-row {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
-  border-radius: var(--r);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  padding: 0 16px;
+  gap: 10px;
+  z-index: 200;
 }
-.toggle-info { display: flex; flex-direction: column; gap: 3px; }
-.toggle-label { font-size: 13.5px; font-weight: 700; color: var(--text); }
-.toggle-sub   { font-size: 12px; color: var(--text-3); line-height: 1.5; }
-
-/* ── Toggle switch ────────────────────────────────────────────── */
-.sw-wrap { position: relative; flex-shrink: 0; }
-.sw-wrap input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
-.sw-track {
-  display: block;
-  width: 44px; height: 24px;
-  background: var(--border-md);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background .2s;
-  position: relative;
+.builder-toolbar .logo-area {
+  display: flex; align-items: center; gap: 10px;
+  margin-right: 8px;
 }
-.sw-track::after {
-  content: '';
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,.25);
-  transition: transform .2s;
+.builder-toolbar .back-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: var(--text-2);
+  text-decoration: none; padding: 6px 10px;
+  border-radius: var(--r-sm);
+  transition: var(--t);
 }
-.sw-wrap input:checked + .sw-track { background: var(--accent); }
-.sw-wrap input:checked + .sw-track::after { transform: translateX(20px); }
-
-/* ── Field grid ───────────────────────────────────────────────── */
-.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.field-group { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-size: 12.5px; font-weight: 700; color: var(--text-2); }
-.field-label small { font-weight: 500; color: var(--text-3); margin-left: 4px; }
-.field-input, .field-select {
-  height: 38px;
-  padding: 0 12px;
+.builder-toolbar .back-btn:hover { background: var(--surface-2); color: var(--text); }
+.wf-name-input {
+  flex: 1; min-width: 0;
+  height: 36px; padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--surface-2);
   color: var(--text);
   font-family: var(--font);
-  font-size: 13px;
-  outline: none;
-  box-sizing: border-box;
-  transition: var(--t);
-  width: 100%;
+  font-size: 13.5px; font-weight: 600;
+  outline: none; transition: var(--t);
+  max-width: 320px;
 }
-.field-input:focus, .field-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim);
+.wf-name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.toolbar-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+.status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-3); white-space: nowrap;
+}
+.status-pill.draft    { background: #f59e0b12; border-color: #f59e0b40; color: #f59e0b; }
+.status-pill.active   { background: #10b98112; border-color: #10b98140; color: #10b981; }
+.status-pill.inactive { background: var(--surface-2); }
+.toolbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* ── Left palette ───────────────────────────────────────────────── */
+.palette {
+  width: 220px; flex-shrink: 0;
   background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 12px 10px;
+  margin-top: 56px;
 }
-.field-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin-top: 2px; }
-
-/* ── Info box ─────────────────────────────────────────────────── */
-.info-box {
-  display: flex;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: var(--r-sm);
-  background: #3b82f610;
-  border: 1px solid #3b82f630;
+.palette-section { margin-bottom: 18px; }
+.palette-label {
+  font-size: 10.5px; font-weight: 800;
+  color: var(--text-3); letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 0 4px; margin-bottom: 6px;
 }
-.info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-.info-text { font-size: 12.5px; color: var(--text-2); line-height: 1.65; }
-.info-text strong { color: var(--text); font-weight: 700; }
+.palette-block {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 10px; border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  cursor: grab; margin-bottom: 6px;
+  transition: var(--t); user-select: none;
+}
+.palette-block:hover { border-color: var(--accent); background: var(--surface); transform: translateX(2px); }
+.palette-block:active { cursor: grabbing; }
+.pb-icon { font-size: 16px; flex-shrink: 0; }
+.pb-text { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.pb-sub  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
 
-/* ── Last-run status ──────────────────────────────────────────── */
-.run-status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
+/* ── Canvas ─────────────────────────────────────────────────────── */
+.canvas-area {
+  flex: 1; position: relative;
+  overflow: hidden; margin-top: 56px;
+  background: var(--bg);
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+#canvas-svg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.canvas-inner {
+  position: absolute; top: 0; left: 0;
+  transform-origin: 0 0;
+}
+
+/* ── Canvas nodes ───────────────────────────────────────────────── */
+.wf-node {
+  position: absolute;
+  width: 200px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  cursor: pointer;
+  user-select: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.wf-node:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(99,102,241,.15); }
+.wf-node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.node-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.node-icon { font-size: 16px; flex-shrink: 0; }
+.node-title { font-size: 12.5px; font-weight: 800; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.node-type-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 6px; border-radius: 20px;
+  background: var(--surface-2); color: var(--text-3);
+  flex-shrink: 0;
+}
+.node-body { padding: 8px 12px 10px; font-size: 11.5px; color: var(--text-3); line-height: 1.5; min-height: 28px; }
+.node-ports { display: flex; flex-direction: column; gap: 4px; padding: 0 12px 10px; }
+.node-port {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-3); cursor: pointer;
+}
+.port-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border-md);
+  background: var(--surface);
+  flex-shrink: 0; transition: var(--t);
+}
+.port-dot:hover, .port-dot.active { border-color: var(--accent); background: var(--accent); }
+.port-dot.out { margin-left: auto; }
+
+/* Node type colours */
+.wf-node[data-type="trigger"]     { border-color: #10b981; }
+.wf-node[data-type="trigger"] .node-header { background: #10b98108; }
+.wf-node[data-type="trigger"] .node-type-badge { background: #10b98115; color: #10b981; }
+
+.wf-node[data-type="message"]     { border-color: #3b82f6; }
+.wf-node[data-type="message"] .node-header { background: #3b82f608; }
+.wf-node[data-type="message"] .node-type-badge { background: #3b82f615; color: #3b82f6; }
+
+.wf-node[data-type="ai"]          { border-color: #8b5cf6; }
+.wf-node[data-type="ai"] .node-header { background: #8b5cf608; }
+.wf-node[data-type="ai"] .node-type-badge { background: #8b5cf615; color: #8b5cf6; }
+
+.wf-node[data-type="action"]      { border-color: #f59e0b; }
+.wf-node[data-type="action"] .node-header { background: #f59e0b08; }
+.wf-node[data-type="action"] .node-type-badge { background: #f59e0b15; color: #f59e0b; }
+
+.wf-node[data-type="condition"]   { border-color: #ec4899; }
+.wf-node[data-type="condition"] .node-header { background: #ec489908; }
+.wf-node[data-type="condition"] .node-type-badge { background: #ec489915; color: #ec4899; }
+
+.wf-node[data-type="notify"]      { border-color: #06b6d4; }
+.wf-node[data-type="notify"] .node-header { background: #06b6d408; }
+.wf-node[data-type="notify"] .node-type-badge { background: #06b6d415; color: #06b6d4; }
+
+.wf-node[data-type="end"]         { border-color: #6b7280; }
+
+/* ── SVG edges ──────────────────────────────────────────────────── */
+.wf-edge { fill: none; stroke: var(--border-md); stroke-width: 2; marker-end: url(#arrow); }
+.wf-edge.active { stroke: var(--accent); }
+.wf-edge-label { font-size: 10.5px; fill: var(--text-3); font-family: var(--font); }
+
+/* ── Right panel ────────────────────────────────────────────────── */
+.settings-panel {
+  width: 300px; flex-shrink: 0;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  margin-top: 56px;
+  display: flex; flex-direction: column;
+}
+.sp-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.sp-icon { font-size: 20px; }
+.sp-title { font-size: 14px; font-weight: 800; color: var(--text); }
+.sp-sub   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.sp-body  { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.sp-empty { display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 1; color: var(--text-3); text-align: center; padding: 32px 24px; gap: 10px; }
+.sp-empty-icon { font-size: 36px; opacity: .4; }
+.sp-empty-text { font-size: 13px; line-height: 1.6; }
+
+/* ── Settings fields ────────────────────────────────────────────── */
+.sf-group { display: flex; flex-direction: column; gap: 5px; }
+.sf-label { font-size: 12px; font-weight: 700; color: var(--text-2); }
+.sf-label small { font-weight: 500; color: var(--text-3); margin-left: 4px; }
+.sf-input, .sf-select, .sf-textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--surface-2);
-  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
   font-size: 12.5px;
+  outline: none; transition: var(--t);
+  width: 100%; box-sizing: border-box;
 }
-.run-status-label { color: var(--text-3); font-weight: 600; }
-.run-status-val   { color: var(--text);   font-weight: 700; font-family: var(--font-mono); font-size: 12px; }
-
-/* ── Save bar ─────────────────────────────────────────────────── */
-.save-bar {
+.sf-textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+.sf-input:focus, .sf-select:focus, .sf-textarea:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
   background: var(--surface);
-  border-top: 1px solid var(--border);
-  padding: 14px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
-.save-bar-note { font-size: 12.5px; color: var(--text-3); }
+.sf-hint { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.sf-divider { height: 1px; background: var(--border); margin: 4px 0; }
+.sf-section-title { font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--text-3); }
+.sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sf-check-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.sf-check-row input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+.sf-check-label { font-size: 12.5px; color: var(--text); cursor: pointer; }
+.sf-tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.sf-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px;
+  background: var(--accent-dim); color: var(--accent);
+  font-size: 11.5px; font-weight: 600; cursor: pointer;
+}
+.sf-tag .rm { opacity: .7; }
+.sf-tag-add {
+  background: var(--surface-2); color: var(--text-3);
+  border: 1px dashed var(--border-md);
+}
+.sp-actions { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+.del-btn { color: #ef4444; background: transparent; border: 1px solid #ef444430;
+  font-size: 12px; padding: 7px 12px; border-radius: var(--r-sm); cursor: pointer;
+  font-family: var(--font); font-weight: 600; transition: var(--t); }
+.del-btn:hover { background: #ef444415; }
 
-/* ── Channel tag ──────────────────────────────────────────────── */
-.ch-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--text-2);
+/* ── Workflow list panel ────────────────────────────────────────── */
+.wf-list-panel {
+  width: 100%; max-width: 860px;
+  margin: 0 auto; padding: 28px 24px 48px;
+}
+.wf-list-title { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.wf-list-sub   { font-size: 13px; color: var(--text-3); margin-bottom: 22px; }
+.wf-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 14px; margin-bottom: 20px; }
+.wf-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); padding: 18px 18px 14px;
+  cursor: pointer; transition: var(--t);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.wf-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(99,102,241,.1); }
+.wf-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.wf-card-name { font-size: 14px; font-weight: 800; color: var(--text); }
+.wf-card-agent { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.wf-card-bottom { display: flex; align-items: center; justify-content: space-between; }
+.wf-card-meta { font-size: 11.5px; color: var(--text-3); }
+.new-wf-card {
+  border: 2px dashed var(--border-md); background: transparent;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 28px; min-height: 120px;
+  color: var(--text-3); font-size: 13px; font-weight: 600;
+  cursor: pointer; border-radius: var(--r-lg); transition: var(--t);
+}
+.new-wf-card:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.new-wf-icon { font-size: 28px; opacity: .6; }
+
+/* ── Execution history ──────────────────────────────────────────── */
+.exec-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.exec-table th { text-align: left; padding: 8px 12px; color: var(--text-3); font-weight: 700;
+  border-bottom: 1px solid var(--border); font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; }
+.exec-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.exec-run { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 700; }
+.exec-run.success { background: #10b98115; color: #10b981; }
+.exec-run.failed  { background: #ef444415; color: #ef4444; }
+.exec-run.running { background: #3b82f615; color: #3b82f6; }
+.exec-run.test    { background: #f59e0b15; color: #f59e0b; }
+
+/* ── Zoom controls ──────────────────────────────────────────────── */
+.zoom-controls {
+  position: absolute; bottom: 16px; right: 16px;
+  display: flex; flex-direction: column; gap: 4px; z-index: 50;
+}
+.zoom-btn {
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--t); font-family: var(--font);
+}
+.zoom-btn:hover { border-color: var(--accent); color: var(--accent); }
+.zoom-label { font-size: 11px; color: var(--text-3); text-align: center; }
+
+/* ── Connecting line preview ────────────────────────────────────── */
+#connecting-line { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 3;
+  fill: none; pointer-events: none; display: none; }
+
+/* ── Mini-map ───────────────────────────────────────────────────── */
+.minimap {
+  position: absolute; bottom: 16px; left: 16px; z-index: 50;
+  width: 120px; height: 80px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); overflow: hidden; opacity: .85;
 }
 
-@media(max-width:640px) {
-  .field-grid { grid-template-columns: 1fr; }
-  .page-content { padding: 12px 14px 40px; }
+/* ── Context menu ───────────────────────────────────────────────── */
+.ctx-menu {
+  position: fixed; z-index: 999;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  padding: 6px; min-width: 160px;
+}
+.ctx-item { padding: 8px 12px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600;
+  color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 8px;
+  transition: var(--t); }
+.ctx-item:hover { background: var(--surface-2); }
+.ctx-item.danger { color: #ef4444; }
+.ctx-item.danger:hover { background: #ef444415; }
+.ctx-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* ── Modal backdrop shared ──────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 900; padding: 16px;
+}
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); width: 100%; max-width: 460px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.2);
+  display: flex; flex-direction: column; max-height: 90vh;
+}
+.modal-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 15px; font-weight: 800; color: var(--text); }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer;
+  color: var(--text-3); padding: 2px 6px; border-radius: var(--r-sm); line-height: 1; }
+.modal-close:hover { background: var(--surface-2); }
+.modal-body { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.modal-foot { padding: 14px 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 8px; }
+.field-group-m { display: flex; flex-direction: column; gap: 5px; }
+.field-label-m { font-size: 12.5px; font-weight: 700; color: var(--text-2); }
+.field-input-m, .field-select-m {
+  height: 38px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  background: var(--surface-2); color: var(--text);
+  font-family: var(--font); font-size: 13px;
+  outline: none; width: 100%; box-sizing: border-box; transition: var(--t);
+}
+.field-input-m:focus, .field-select-m:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+
+/* ── Responsive — hide palette on small screens ─────────────────── */
+@media(max-width: 900px) {
+  .palette { display: none; }
+  .settings-panel { width: 260px; }
+}
+@media(max-width: 640px) {
+  .settings-panel { display: none; }
+  .builder-toolbar { padding: 0 10px; gap: 6px; }
+  .wf-name-input { max-width: 160px; }
 }
 </style>
 <script>
@@ -174,318 +406,1353 @@
 
 <div id="toast-container"></div>
 
-<div class="mobile-topbar">
-  <div class="mob-left">
-    <button class="hamburger" onclick="openMobileSidebar()">
-      <svg viewBox="0 0 16 16"><line x1="1" y1="4" x2="15" y2="4"/><line x1="1" y1="8" x2="15" y2="8"/><line x1="1" y1="12" x2="15" y2="12"/></svg>
-    </button>
-    <a class="mob-logo" href="home.html">Support<span>Gent</span></a>
-  </div>
-  <div class="mob-right"><button class="theme-toggle"></button></div>
-</div>
+<!-- ══ WORKFLOW LIST VIEW ══════════════════════════════════════════ -->
+<div id="list-view" style="display:none">
 
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
-<div class="sidebar" id="sidebar"></div>
-
-<div id="page-skeleton">
-  <div class="skel-topbar">
-    <div class="skel" style="height:12px;width:160px;border-radius:4px"></div>
-    <div class="skel" style="height:32px;width:160px;border-radius:var(--r-sm)"></div>
-  </div>
-  <div class="skel-body">
-    <div class="skel" style="height:180px;border-radius:var(--r-lg);margin-bottom:16px"></div>
-    <div class="skel" style="height:260px;border-radius:var(--r-lg)"></div>
-  </div>
-</div>
-
-<div class="main-wrap">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div>
-        <div class="topbar-title">⚡ Automations</div>
-        <div class="topbar-subtitle" id="page-sub">Configure appointment reminders &amp; follow-ups</div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <select class="agent-sel" id="agent-sel" onchange="onAgentChange()">
+  <!-- Minimal topbar for list view -->
+  <div class="builder-toolbar" style="position:relative;margin-bottom:0">
+    <a class="back-btn" href="home.html">← Home</a>
+    <div class="toolbar-sep"></div>
+    <span style="font-size:14px;font-weight:800;color:var(--text)">⚡ Automation Builder</span>
+    <div class="toolbar-right">
+      <select class="agent-sel" id="list-agent-sel" onchange="onListAgentChange()" style="height:34px;font-size:13px">
         <option value="">— Select agent —</option>
       </select>
       <button class="theme-toggle"></button>
     </div>
   </div>
 
-  <div class="content page-content" id="page-content" style="display:none">
+  <div class="main-wrap" style="padding-top:0">
+    <div class="content" style="max-width:none">
+      <div class="wf-list-panel">
+        <div class="wf-list-title">Workflows</div>
+        <div class="wf-list-sub">Create and manage automated conversation flows for your agent.</div>
 
-    <!-- Enable card -->
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">🤖 Appointment Automations</div>
-          <div class="section-desc">Automatically send reminders before appointments and follow-ups after — via WhatsApp, Email, Instagram or Messenger.</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <div class="toggle-label">Enable Automations</div>
-            <div class="toggle-sub">When on, the system will automatically send reminder &amp; follow-up messages at the configured times.</div>
-          </div>
-          <label class="sw-wrap">
-            <input type="checkbox" id="sw-enabled"/>
-            <span class="sw-track"></span>
-          </label>
-        </div>
-
-        <div class="info-box">
-          <div class="info-icon">💡</div>
-          <div class="info-text">
-            <strong>How it works:</strong> When a customer books an appointment via any channel (WhatsApp, Email, Instagram, Messenger), the AI detects the intent and creates an appointment record automatically. Your configured reminder is then sent before the appointment and a follow-up is sent after — using your WhatsApp template.
+        <div class="wf-cards" id="wf-cards-grid">
+          <div class="new-wf-card" onclick="openNewWfModal()">
+            <div class="new-wf-icon">＋</div>
+            <div>New Workflow</div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Reminder settings -->
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">🔔 Reminder Message</div>
-          <div class="section-desc">Sent before the appointment as a confirmation reminder.</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="field-grid">
-          <div class="field-group">
-            <label class="field-label">Send reminder <small>(hours before)</small></label>
-            <input class="field-input" id="f-reminder-hours" type="number" min="1" max="72" placeholder="e.g. 24"/>
-            <div class="field-hint">How many hours before the appointment to send the reminder. E.g. 24 = send 1 day before.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">WhatsApp Template</label>
-            <input class="field-input" id="f-reminder-template" placeholder="e.g. appointment_reminder"/>
-            <div class="field-hint">The approved WhatsApp template name to use for the reminder message.</div>
-          </div>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Template language code <small>(optional)</small></label>
-          <input class="field-input" id="f-reminder-lang" placeholder="en_US" style="max-width:200px"/>
-          <div class="field-hint">WhatsApp template language code. Defaults to en_US.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Follow-up settings -->
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">📨 Follow-up Message</div>
-          <div class="section-desc">Sent after the appointment — thank the customer, collect feedback, or upsell.</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="field-grid">
-          <div class="field-group">
-            <label class="field-label">Send follow-up <small>(hours after)</small></label>
-            <input class="field-input" id="f-followup-hours" type="number" min="1" max="168" placeholder="e.g. 2"/>
-            <div class="field-hint">How many hours after the appointment to send the follow-up. E.g. 2 = send 2 hours after.</div>
-          </div>
-          <div class="field-group">
-            <label class="field-label">WhatsApp Template</label>
-            <input class="field-input" id="f-followup-template" placeholder="e.g. appointment_followup"/>
-            <div class="field-hint">The approved WhatsApp template name to use for the follow-up message.</div>
-          </div>
-        </div>
-        <div class="field-group">
-          <label class="field-label">Template language code <small>(optional)</small></label>
-          <input class="field-input" id="f-followup-lang" placeholder="en_US" style="max-width:200px"/>
-        </div>
-      </div>
-
-      <div class="save-bar">
-        <div class="save-bar-note" id="last-saved-note">Not saved yet</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="btn btn-secondary btn-sm" id="run-btn" onclick="runNow()">&#9654; Run Now</button>
-          <button class="btn btn-primary" id="save-btn" onclick="saveAutomations()">Save Settings</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Status / last run -->
-    <div class="section-card" id="status-card" style="display:none">
-      <div class="section-head">
-        <div>
-          <div class="section-title">📊 Automation Status</div>
-          <div class="section-desc">Last run results for this agent.</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="run-status">
-          <span class="run-status-label">Last run</span>
-          <span class="run-status-val" id="stat-last-run">—</span>
-        </div>
-        <div class="run-status">
-          <span class="run-status-label">Reminders sent (total)</span>
-          <span class="run-status-val" id="stat-reminders">—</span>
-        </div>
-        <div class="run-status">
-          <span class="run-status-label">Follow-ups sent (total)</span>
-          <span class="run-status-val" id="stat-followups">—</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Channels info -->
-    <div class="section-card">
-      <div class="section-head">
-        <div>
-          <div class="section-title">📡 Supported Channels</div>
-          <div class="section-desc">Appointments are auto-detected from conversations on these channels.</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <span class="ch-tag">💬 WhatsApp</span>
-          <span class="ch-tag">📧 Email / Gmail</span>
-          <span class="ch-tag">📸 Instagram DM</span>
-          <span class="ch-tag">💙 Facebook Messenger</span>
-          <span class="ch-tag">✏️ Manual entry</span>
-        </div>
-        <div class="info-box" style="background:#10b98110;border-color:#10b98130;">
-          <div class="info-icon">✅</div>
-          <div class="info-text">
-            <strong>Outbound reminders &amp; follow-ups are sent via WhatsApp</strong> using your approved message templates. Make sure your WhatsApp channel is connected and the templates are approved in Meta Business Manager.
+        <!-- Execution history -->
+        <div style="margin-top:32px">
+          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px">Recent Executions</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+            <table class="exec-table" id="exec-table">
+              <thead>
+                <tr>
+                  <th>Workflow</th>
+                  <th>Trigger</th>
+                  <th>Status</th>
+                  <th>Contact</th>
+                  <th>Started</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="exec-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Select an agent to view executions</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-  </div><!-- /page-content -->
-</div><!-- /main-wrap -->
+<!-- ══ BUILDER VIEW ════════════════════════════════════════════════ -->
+<div id="builder-view" style="display:none">
+
+  <!-- Toolbar -->
+  <div class="builder-toolbar">
+    <a class="back-btn" onclick="exitBuilder()" style="cursor:pointer">← Back</a>
+    <div class="toolbar-sep"></div>
+    <input class="wf-name-input" id="wf-name-input" value="New Workflow" maxlength="80" placeholder="Workflow name…"/>
+    <span class="status-pill draft" id="wf-status-pill">● Draft</span>
+    <div class="toolbar-right">
+      <button class="btn btn-secondary btn-sm" onclick="testWorkflow()">🧪 Test</button>
+      <button class="btn btn-secondary btn-sm" onclick="saveWorkflow()">💾 Save Draft</button>
+      <button class="btn btn-secondary btn-sm" onclick="validateWorkflow()">✓ Validate</button>
+      <button class="btn btn-primary btn-sm" id="publish-btn" onclick="publishWorkflow()">🚀 Publish</button>
+      <button class="theme-toggle"></button>
+    </div>
+  </div>
+
+  <div class="builder-wrap">
+    <!-- Left palette -->
+    <div class="palette">
+      <div class="palette-section">
+        <div class="palette-label">Triggers</div>
+        <div class="palette-block" draggable="true" data-btype="trigger" data-bsub="form"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">📋</div>
+          <div><div class="pb-text">Form / Webhook</div><div class="pb-sub">Enquiry submitted</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="trigger" data-bsub="inbound"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">💬</div>
+          <div><div class="pb-text">Incoming Message</div><div class="pb-sub">WhatsApp / any channel</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="trigger" data-bsub="record_update"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">🔄</div>
+          <div><div class="pb-text">Record Update</div><div class="pb-sub">Appointment status changed</div></div>
+        </div>
+      </div>
+
+      <div class="palette-section">
+        <div class="palette-label">Conversation</div>
+        <div class="palette-block" draggable="true" data-btype="message" data-bsub="opening"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">👋</div>
+          <div><div class="pb-text">Opening Message</div><div class="pb-sub">First outbound message</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="ai" data-bsub="conversation"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">🤖</div>
+          <div><div class="pb-text">AI Conversation</div><div class="pb-sub">Multi-turn with goal</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="condition" data-bsub="branch"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">🔀</div>
+          <div><div class="pb-text">Branch / Condition</div><div class="pb-sub">Route by outcome</div></div>
+        </div>
+      </div>
+
+      <div class="palette-section">
+        <div class="palette-label">Actions</div>
+        <div class="palette-block" draggable="true" data-btype="action" data-bsub="book_appointment"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">📅</div>
+          <div><div class="pb-text">Book Appointment</div><div class="pb-sub">Create / reschedule</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="action" data-bsub="checkout"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">💳</div>
+          <div><div class="pb-text">Start Checkout</div><div class="pb-sub">Razorpay payment</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="action" data-bsub="send_wa"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">📤</div>
+          <div><div class="pb-text">Send WA Message</div><div class="pb-sub">Template message</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="action" data-bsub="update_record"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">✏️</div>
+          <div><div class="pb-text">Update Record</div><div class="pb-sub">Appointment / lead status</div></div>
+        </div>
+      </div>
+
+      <div class="palette-section">
+        <div class="palette-label">Outcomes</div>
+        <div class="palette-block" draggable="true" data-btype="notify" data-bsub="staff"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">🧑‍💼</div>
+          <div><div class="pb-text">Notify Staff</div><div class="pb-sub">Pause AI + alert team</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="notify" data-bsub="followup"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">⏱️</div>
+          <div><div class="pb-text">Schedule Follow-up</div><div class="pb-sub">Delayed next step</div></div>
+        </div>
+        <div class="palette-block" draggable="true" data-btype="end" data-bsub="success"
+             ondragstart="onPaletteDragStart(event)">
+          <div class="pb-icon">✅</div>
+          <div><div class="pb-text">Finish</div><div class="pb-sub">Mark goal complete</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-area" id="canvas-area"
+         ondragover="event.preventDefault()"
+         ondrop="onCanvasDrop(event)"
+         onmousedown="onCanvasMouseDown(event)"
+         onmousemove="onCanvasMouseMove(event)"
+         onmouseup="onCanvasMouseUp(event)"
+         onwheel="onCanvasWheel(event)"
+         oncontextmenu="event.preventDefault()">
+
+      <svg id="canvas-svg" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--border-md)"/>
+          </marker>
+          <marker id="arrow-active" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="var(--accent)"/>
+          </marker>
+        </defs>
+        <path id="connecting-line"/>
+        <g id="edges-layer"></g>
+      </svg>
+
+      <div class="canvas-inner" id="canvas-inner"></div>
+
+      <!-- Zoom controls -->
+      <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoom(0.1)">＋</button>
+        <div class="zoom-label" id="zoom-label">100%</div>
+        <button class="zoom-btn" onclick="zoom(-0.1)">－</button>
+        <button class="zoom-btn" onclick="resetZoom()" title="Reset zoom">⊙</button>
+      </div>
+
+      <!-- Empty state -->
+      <div id="canvas-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;gap:10px;color:var(--text-3);pointer-events:none">
+        <div style="font-size:48px;opacity:.2">⚡</div>
+        <div style="font-size:14px;font-weight:600">Drag blocks from the left to start building</div>
+        <div style="font-size:12.5px">Begin with a Trigger block</div>
+      </div>
+    </div>
+
+    <!-- Right settings panel -->
+    <div class="settings-panel" id="settings-panel">
+      <div class="sp-empty" id="sp-empty">
+        <div class="sp-empty-icon">👆</div>
+        <div class="sp-empty-text">Click a block on the canvas to configure it</div>
+      </div>
+      <div id="sp-content" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none">
+        <!-- filled dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NEW WORKFLOW MODAL ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="new-wf-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">New Workflow</div>
+      <button class="modal-close" onclick="closeModal('new-wf-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-group-m">
+        <label class="field-label-m">Workflow Name</label>
+        <input class="field-input-m" id="nwf-name" placeholder="e.g. Appointment Booking Flow" maxlength="80"/>
+      </div>
+      <div class="field-group-m">
+        <label class="field-label-m">Description <span style="font-weight:500;color:var(--text-3)">(optional)</span></label>
+        <input class="field-input-m" id="nwf-desc" placeholder="What does this workflow do?" maxlength="200"/>
+      </div>
+      <div class="field-group-m">
+        <label class="field-label-m">Start from template</label>
+        <select class="field-select-m" id="nwf-template">
+          <option value="">Blank canvas</option>
+          <option value="appointment_booking">Appointment Booking Flow</option>
+          <option value="lead_qualification">Lead Qualification Flow</option>
+          <option value="enquiry_response">Enquiry Response Flow</option>
+          <option value="appointment_reminder">Appointment Reminder Flow</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('new-wf-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="createNewWorkflow()">Create Workflow →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEST MODAL ══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="test-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">🧪 Test Workflow</div>
+      <button class="modal-close" onclick="closeModal('test-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#f59e0b12;border:1px solid #f59e0b30;border-radius:var(--r-sm);padding:12px 14px;font-size:12.5px;color:var(--text-2);line-height:1.6">
+        <strong style="color:#f59e0b">Test mode:</strong> Messages will NOT be sent. No real appointments created or payments processed. Execution is logged as "test".
+      </div>
+      <div class="field-group-m">
+        <label class="field-label-m">Simulate trigger type</label>
+        <select class="field-select-m" id="test-trigger">
+          <option value="inbound">Incoming WhatsApp message</option>
+          <option value="form">Form submission</option>
+          <option value="record_update">Record update</option>
+        </select>
+      </div>
+      <div class="field-group-m">
+        <label class="field-label-m">Test contact phone</label>
+        <input class="field-input-m" id="test-phone" placeholder="+91 98765 43210" value="+919000000000"/>
+      </div>
+      <div class="field-group-m">
+        <label class="field-label-m">Opening message <span style="font-weight:500;color:var(--text-3)">(simulated)</span></label>
+        <input class="field-input-m" id="test-message" placeholder="Hi I want to book an appointment" value="Hi I want to book an appointment"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('test-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="runTestMode()">▶ Run Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEST RESULT MODAL ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="test-result-modal" style="display:none">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-head">
+      <div class="modal-title">Test Results</div>
+      <button class="modal-close" onclick="closeModal('test-result-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="test-result-body" style="max-height:60vh;overflow-y:auto">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('test-result-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SKELETON ════════════════════════════════════════════════════ -->
+<div id="page-skeleton">
+  <div class="skel-topbar">
+    <div class="skel" style="height:12px;width:160px;border-radius:4px"></div>
+  </div>
+  <div class="skel-body">
+    <div class="skel" style="height:180px;border-radius:var(--r-lg);margin-bottom:16px"></div>
+    <div class="skel" style="height:120px;border-radius:var(--r-lg)"></div>
+  </div>
+</div>
+
+<!-- Context menu -->
+<div class="ctx-menu" id="ctx-menu" style="display:none">
+  <div class="ctx-item" onclick="ctxDuplicate()">⧉ Duplicate</div>
+  <div class="ctx-item" onclick="ctxAddNote()">📝 Add note</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item danger" onclick="ctxDelete()">🗑 Delete block</div>
+</div>
 
 <script>
-var _agentId = null
-var _config  = null
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+var _agentId   = null
+var _agents    = []
+var _workflows = []
+var _wfId      = null   // current open workflow id
+var _wf = {             // current workflow in builder
+  name: 'New Workflow',
+  description: '',
+  status: 'draft',
+  blocks: [],
+  edges: []
+}
 
-// ── Init ──────────────────────────────────────────────────────────
+// Canvas state
+var _scale     = 1
+var _panX      = 0
+var _panY      = 0
+var _dragging  = null   // { nodeId, startX, startY, origX, origY }
+var _panning   = null   // { startX, startY, origPanX, origPanY }
+var _selected  = null   // selected node id
+var _connecting = null  // { fromId, fromPort }
+var _templates = []     // WA templates for agent
+
+// Block defaults
+var BLOCK_DEFS = {
+  trigger: {
+    form:          { icon:'📋', label:'Form / Webhook',    badge:'trigger',   ports:{ out:['Next'] } },
+    inbound:       { icon:'💬', label:'Incoming Message',  badge:'trigger',   ports:{ out:['Next'] } },
+    record_update: { icon:'🔄', label:'Record Update',     badge:'trigger',   ports:{ out:['Next'] } },
+  },
+  message: {
+    opening: { icon:'👋', label:'Opening Message', badge:'message', ports:{ in:['In'], out:['Reply received','Timeout'] } },
+  },
+  ai: {
+    conversation: { icon:'🤖', label:'AI Conversation', badge:'AI', ports:{ in:['In'], out:['Goal met','Human needed','No response'] } },
+  },
+  condition: {
+    branch: { icon:'🔀', label:'Branch', badge:'condition', ports:{ in:['In'], out:['Success','Failure','No response'] } },
+  },
+  action: {
+    book_appointment: { icon:'📅', label:'Book Appointment',  badge:'action', ports:{ in:['In'], out:['Booked','Failed'] } },
+    checkout:         { icon:'💳', label:'Start Checkout',    badge:'action', ports:{ in:['In'], out:['Paid','Failed'] } },
+    send_wa:          { icon:'📤', label:'Send WA Message',   badge:'action', ports:{ in:['In'], out:['Sent','Failed'] } },
+    update_record:    { icon:'✏️',  label:'Update Record',    badge:'action', ports:{ in:['In'], out:['Done'] } },
+  },
+  notify: {
+    staff:    { icon:'🧑‍💼', label:'Notify Staff',       badge:'notify', ports:{ in:['In'], out:['Done'] } },
+    followup: { icon:'⏱️',  label:'Schedule Follow-up',  badge:'notify', ports:{ in:['In'], out:['Scheduled'] } },
+  },
+  end: {
+    success: { icon:'✅', label:'Finish', badge:'end', ports:{ in:['In'], out:[] } },
+  },
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
 async function init() {
   var nav = await renderNav('automations')
   if (!nav || !nav.user) return
   await loadAgents()
   document.getElementById('page-skeleton').style.display = 'none'
-  document.getElementById('page-content').style.display  = 'block'
+  document.getElementById('list-view').style.display = 'block'
 }
 
 async function loadAgents() {
   try {
-    var d   = await apiFetch('/agents')
-    var sel = document.getElementById('agent-sel')
+    var d = await apiFetch('/agents')
+    _agents = d.agents || d || []
+    populateAgentSelects()
+    var stored = localStorage.getItem('sg_auto_agent')
+    var sel = document.getElementById('list-agent-sel')
+    if (stored) sel.value = stored
+    if (!sel.value && sel.options.length > 1) sel.value = sel.options[1].value
+    if (sel.value) { _agentId = sel.value; await loadWorkflows() }
+  } catch(e) { toast('Failed to load agents: ' + e.message, 'error') }
+}
+
+function populateAgentSelects() {
+  ;['list-agent-sel'].forEach(function(id) {
+    var sel = document.getElementById(id)
+    if (!sel) return
     sel.innerHTML = '<option value="">— Select agent —</option>'
-    ;(d.agents || d || []).forEach(function(a) {
+    _agents.forEach(function(a) {
       var o = document.createElement('option')
       o.value = a._id; o.textContent = a.name || 'Unnamed'
       sel.appendChild(o)
     })
-    var stored = localStorage.getItem('sg_auto_agent')
-    if (stored) sel.value = stored
-    if (!sel.value && sel.options.length > 1) sel.value = sel.options[1].value
-    if (sel.value) { _agentId = sel.value; await loadAutomations() }
-  } catch(e) { toast('Failed to load agents: ' + e.message, 'error') }
+  })
 }
 
-function onAgentChange() {
-  _agentId = document.getElementById('agent-sel').value
-  if (_agentId) { localStorage.setItem('sg_auto_agent', _agentId); loadAutomations() }
+async function onListAgentChange() {
+  _agentId = document.getElementById('list-agent-sel').value
+  if (_agentId) {
+    localStorage.setItem('sg_auto_agent', _agentId)
+    await loadWorkflows()
+    await loadTemplates()
+  }
 }
 
-// ── Load ──────────────────────────────────────────────────────────
-async function loadAutomations() {
+// ══════════════════════════════════════════════════════════════════
+// WORKFLOW LIST
+// ══════════════════════════════════════════════════════════════════
+async function loadWorkflows() {
   if (!_agentId) return
   try {
-    var d = await apiFetch('/automations?agent_id=' + _agentId)
-    _config = d.automations || d || {}
-    populateForm(_config)
-    updateStatusCard(_config)
+    var d = await apiFetch('/workflows?agent_id=' + _agentId)
+    _workflows = d.workflows || []
+    renderWorkflowCards()
+    await loadExecutions()
+  } catch(e) { _workflows = []; renderWorkflowCards() }
+}
+
+function renderWorkflowCards() {
+  var grid = document.getElementById('wf-cards-grid')
+  grid.innerHTML = ''
+
+  // New workflow button
+  var newCard = document.createElement('div')
+  newCard.className = 'new-wf-card'
+  newCard.onclick = openNewWfModal
+  newCard.innerHTML = '<div class="new-wf-icon">＋</div><div>New Workflow</div>'
+  grid.appendChild(newCard)
+
+  _workflows.forEach(function(wf) {
+    var card = document.createElement('div')
+    card.className = 'wf-card'
+    var statusPill = wf.status === 'active'
+      ? '<span class="status-pill active">● Active</span>'
+      : wf.status === 'draft'
+        ? '<span class="status-pill draft">● Draft</span>'
+        : '<span class="status-pill inactive">○ Inactive</span>'
+    card.innerHTML = [
+      '<div class="wf-card-top">',
+      '  <div>',
+      '    <div class="wf-card-name">' + esc(wf.name) + '</div>',
+      '    <div class="wf-card-agent">' + esc(wf.description || '') + '</div>',
+      '  </div>',
+      statusPill,
+      '</div>',
+      '<div class="wf-card-bottom">',
+      '  <span class="wf-card-meta">' + (wf.blocks ? wf.blocks.length : 0) + ' blocks</span>',
+      '  <span class="wf-card-meta">' + fmtDate(wf.updated_at) + '</span>',
+      '</div>',
+    ].join('')
+    card.onclick = function() { openBuilder(wf) }
+    grid.appendChild(card)
+  })
+}
+
+async function loadExecutions() {
+  if (!_agentId) return
+  try {
+    var d = await apiFetch('/workflows/executions?agent_id=' + _agentId + '&limit=20')
+    var execs = d.executions || []
+    var tbody = document.getElementById('exec-tbody')
+    if (!execs.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">No executions yet</td></tr>'
+      return
+    }
+    tbody.innerHTML = execs.map(function(e) {
+      var cls = e.status === 'success' ? 'success' : e.status === 'failed' ? 'failed' : e.status === 'test' ? 'test' : 'running'
+      var dur = e.duration_ms ? (e.duration_ms / 1000).toFixed(1) + 's' : '—'
+      return '<tr>' +
+        '<td>' + esc(e.workflow_name || '—') + '</td>' +
+        '<td>' + esc(e.trigger_type || '—') + '</td>' +
+        '<td><span class="exec-run ' + cls + '">' + esc(e.status) + '</span></td>' +
+        '<td>' + esc(e.contact_phone || '—') + '</td>' +
+        '<td>' + fmtDate(e.started_at) + '</td>' +
+        '<td>' + dur + '</td>' +
+        '</tr>'
+    }).join('')
   } catch(e) {
-    _config = {}
-    populateForm({})
-    if (!e.message || !e.message.includes('404')) {
-      toast('Failed to load automations: ' + e.message, 'error')
+    document.getElementById('exec-tbody').innerHTML =
+      '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Could not load executions</td></tr>'
+  }
+}
+
+async function loadTemplates() {
+  if (!_agentId) return
+  try {
+    var d = await apiFetch('/templates?agent_id=' + _agentId)
+    _templates = (d.templates || []).filter(function(t) { return t.status === 'APPROVED' })
+  } catch(e) { _templates = [] }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NEW WORKFLOW MODAL
+// ══════════════════════════════════════════════════════════════════
+function openNewWfModal() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+  document.getElementById('nwf-name').value = ''
+  document.getElementById('nwf-desc').value = ''
+  document.getElementById('nwf-template').value = ''
+  document.getElementById('new-wf-modal').style.display = 'flex'
+  setTimeout(function() { document.getElementById('nwf-name').focus() }, 50)
+}
+
+async function createNewWorkflow() {
+  var name = document.getElementById('nwf-name').value.trim()
+  if (!name) { toast('Enter a workflow name', 'error'); return }
+  var tpl = document.getElementById('nwf-template').value
+  var wf = {
+    name: name,
+    description: document.getElementById('nwf-desc').value.trim(),
+    status: 'draft',
+    blocks: tpl ? getTemplateBlocks(tpl) : [],
+    edges: tpl ? getTemplateEdges(tpl) : [],
+  }
+  closeModal('new-wf-modal')
+  openBuilder(wf)
+}
+
+// ── Template presets ──────────────────────────────────────────────
+function getTemplateBlocks(tpl) {
+  var presets = {
+    appointment_booking: [
+      { id:'b1', type:'trigger', subtype:'inbound', x:80, y:80, config:{} },
+      { id:'b2', type:'message', subtype:'opening', x:80, y:220, config:{ message:'Hi! How can I help you today?' } },
+      { id:'b3', type:'ai', subtype:'conversation', x:80, y:370, config:{ goal:'Book an appointment', intents:['appointments'] } },
+      { id:'b4', type:'action', subtype:'book_appointment', x:80, y:520, config:{} },
+      { id:'b5', type:'notify', subtype:'followup', x:320, y:520, config:{ delay_hours:24, message:'Follow up on appointment' } },
+      { id:'b6', type:'notify', subtype:'staff', x:320, y:370, config:{ message:'Customer needs human help' } },
+      { id:'b7', type:'end', subtype:'success', x:80, y:670, config:{} },
+    ],
+    lead_qualification: [
+      { id:'b1', type:'trigger', subtype:'form', x:80, y:80, config:{} },
+      { id:'b2', type:'message', subtype:'opening', x:80, y:220, config:{ message:"Thanks for your enquiry! Let me get a few details." } },
+      { id:'b3', type:'ai', subtype:'conversation', x:80, y:370, config:{ goal:'Qualify lead', intents:['qualification','sales'] } },
+      { id:'b4', type:'condition', subtype:'branch', x:80, y:520, config:{ condition:'lead_score > 70' } },
+      { id:'b5', type:'notify', subtype:'staff', x:320, y:520, config:{ message:'Hot lead - needs follow up' } },
+      { id:'b6', type:'end', subtype:'success', x:80, y:670, config:{} },
+    ],
+    enquiry_response: [
+      { id:'b1', type:'trigger', subtype:'inbound', x:80, y:80, config:{} },
+      { id:'b2', type:'ai', subtype:'conversation', x:80, y:220, config:{ goal:'Answer enquiry', intents:['general','sales'] } },
+      { id:'b3', type:'condition', subtype:'branch', x:80, y:380, config:{} },
+      { id:'b4', type:'notify', subtype:'staff', x:300, y:380, config:{} },
+      { id:'b5', type:'end', subtype:'success', x:80, y:520, config:{} },
+    ],
+    appointment_reminder: [
+      { id:'b1', type:'trigger', subtype:'record_update', x:80, y:80, config:{ record_type:'appointment', field:'scheduled_at' } },
+      { id:'b2', type:'action', subtype:'send_wa', x:80, y:230, config:{ timing:'24h_before', template:'appointment_reminder' } },
+      { id:'b3', type:'notify', subtype:'followup', x:80, y:380, config:{ delay_hours:2, trigger:'after_appointment' } },
+      { id:'b4', type:'end', subtype:'success', x:80, y:520, config:{} },
+    ],
+  }
+  return presets[tpl] || []
+}
+
+function getTemplateEdges(tpl) {
+  var edges = {
+    appointment_booking: [
+      { id:'e1', from:'b1', fromPort:'Next',     to:'b2', toPort:'In',  label:'' },
+      { id:'e2', from:'b2', fromPort:'Reply received', to:'b3', toPort:'In', label:'' },
+      { id:'e3', from:'b2', fromPort:'Timeout',  to:'b5', toPort:'In',  label:'timeout' },
+      { id:'e4', from:'b3', fromPort:'Goal met', to:'b4', toPort:'In',  label:'goal met' },
+      { id:'e5', from:'b3', fromPort:'Human needed', to:'b6', toPort:'In', label:'escalate' },
+      { id:'e6', from:'b4', fromPort:'Booked',   to:'b7', toPort:'In',  label:'booked' },
+      { id:'e7', from:'b4', fromPort:'Failed',   to:'b3', toPort:'In',  label:'retry' },
+    ],
+    lead_qualification: [
+      { id:'e1', from:'b1', fromPort:'Next',     to:'b2', toPort:'In',  label:'' },
+      { id:'e2', from:'b2', fromPort:'Reply received', to:'b3', toPort:'In', label:'' },
+      { id:'e3', from:'b3', fromPort:'Goal met', to:'b4', toPort:'In',  label:'qualified' },
+      { id:'e4', from:'b4', fromPort:'Success',  to:'b5', toPort:'In',  label:'hot lead' },
+      { id:'e5', from:'b4', fromPort:'Failure',  to:'b6', toPort:'In',  label:'qualified' },
+    ],
+    enquiry_response: [
+      { id:'e1', from:'b1', fromPort:'Next',     to:'b2', toPort:'In',  label:'' },
+      { id:'e2', from:'b2', fromPort:'Goal met', to:'b3', toPort:'In',  label:'' },
+      { id:'e3', from:'b3', fromPort:'Success',  to:'b5', toPort:'In',  label:'resolved' },
+      { id:'e4', from:'b3', fromPort:'Failure',  to:'b4', toPort:'In',  label:'escalate' },
+    ],
+    appointment_reminder: [
+      { id:'e1', from:'b1', fromPort:'Next',  to:'b2', toPort:'In', label:'' },
+      { id:'e2', from:'b2', fromPort:'Sent',  to:'b3', toPort:'In', label:'' },
+      { id:'e3', from:'b3', fromPort:'Scheduled', to:'b4', toPort:'In', label:'' },
+    ],
+  }
+  return edges[tpl] || []
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BUILDER OPEN / EXIT
+// ══════════════════════════════════════════════════════════════════
+function openBuilder(wf) {
+  _wfId = wf._id || null
+  _wf = {
+    name:        wf.name || 'New Workflow',
+    description: wf.description || '',
+    status:      wf.status || 'draft',
+    blocks:      JSON.parse(JSON.stringify(wf.blocks || [])),
+    edges:       JSON.parse(JSON.stringify(wf.edges  || [])),
+  }
+  _selected = null
+  _scale = 1; _panX = 0; _panY = 0
+
+  document.getElementById('list-view').style.display    = 'none'
+  document.getElementById('builder-view').style.display = 'block'
+  document.getElementById('wf-name-input').value = _wf.name
+  updateStatusPill()
+  renderCanvas()
+  showSettingsEmpty()
+}
+
+function exitBuilder() {
+  document.getElementById('builder-view').style.display = 'none'
+  document.getElementById('list-view').style.display    = 'block'
+  loadWorkflows()
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CANVAS RENDERING
+// ══════════════════════════════════════════════════════════════════
+function renderCanvas() {
+  var inner = document.getElementById('canvas-inner')
+  inner.innerHTML = ''
+  inner.style.transform = 'scale(' + _scale + ') translate(' + _panX + 'px,' + _panY + 'px)'
+
+  document.getElementById('canvas-empty').style.display = _wf.blocks.length ? 'none' : 'flex'
+
+  _wf.blocks.forEach(function(b) { inner.appendChild(createNodeEl(b)) })
+  renderEdges()
+}
+
+function createNodeEl(block) {
+  var def = (BLOCK_DEFS[block.type] || {})[block.subtype] || {}
+  var el = document.createElement('div')
+  el.className = 'wf-node'
+  el.id = 'node-' + block.id
+  el.dataset.type = block.type
+  el.dataset.id   = block.id
+  el.style.left = (block.x || 80) + 'px'
+  el.style.top  = (block.y || 80) + 'px'
+
+  // Summary line for node body
+  var summary = getBlockSummary(block)
+
+  el.innerHTML = [
+    '<div class="node-header">',
+    '  <span class="node-icon">' + (def.icon || '▪') + '</span>',
+    '  <span class="node-title">' + esc(block.config && block.config.label ? block.config.label : def.label || block.type) + '</span>',
+    '  <span class="node-type-badge">' + (def.badge || block.type) + '</span>',
+    '</div>',
+    '<div class="node-body">' + esc(summary) + '</div>',
+    '<div class="node-ports" id="ports-' + block.id + '">',
+    buildPortsHtml(block, def),
+    '</div>',
+  ].join('')
+
+  // Events
+  el.addEventListener('mousedown', function(e) { onNodeMouseDown(e, block.id) })
+  el.addEventListener('click',     function(e) { e.stopPropagation(); selectNode(block.id) })
+  el.addEventListener('contextmenu', function(e) { e.preventDefault(); e.stopPropagation(); showCtxMenu(e, block.id) })
+
+  if (_selected === block.id) el.classList.add('selected')
+  return el
+}
+
+function buildPortsHtml(block, def) {
+  if (!def.ports) return ''
+  var html = ''
+  ;(def.ports.out || []).forEach(function(label) {
+    html += '<div class="node-port" data-port="' + esc(label) + '" data-nodeid="' + block.id + '" onmousedown="onPortMouseDown(event,\'' + block.id + '\',\'' + label.replace(/'/g,"\\'") + '\')">' +
+      '<span style="flex:1;font-size:11px">' + esc(label) + '</span>' +
+      '<span class="port-dot out" data-port="' + esc(label) + '"></span>' +
+      '</div>'
+  })
+  return html
+}
+
+function getBlockSummary(block) {
+  var cfg = block.config || {}
+  if (block.type === 'trigger')   return cfg.record_type ? 'On ' + cfg.record_type + ' update' : block.subtype === 'form' ? 'On form submission' : 'On incoming message'
+  if (block.type === 'message')   return cfg.message ? cfg.message.substring(0,60) : 'No message set'
+  if (block.type === 'ai')        return cfg.goal ? 'Goal: ' + cfg.goal.substring(0,40) : 'No goal set'
+  if (block.type === 'action' && block.subtype === 'send_wa') return cfg.template_name ? 'Template: ' + cfg.template_name : 'No template selected'
+  if (block.type === 'action' && block.subtype === 'book_appointment') return cfg.service ? cfg.service : 'Appointment booking'
+  if (block.type === 'action' && block.subtype === 'checkout') return 'Razorpay checkout'
+  if (block.type === 'action')    return block.subtype.replace(/_/g,' ')
+  if (block.type === 'condition') return cfg.condition || 'Route by outcome'
+  if (block.type === 'notify' && block.subtype === 'followup') return cfg.delay_hours ? 'In ' + cfg.delay_hours + 'h' : 'Delayed follow-up'
+  if (block.type === 'notify')    return cfg.message ? cfg.message.substring(0,50) : 'Notify staff'
+  if (block.type === 'end')       return 'Workflow complete'
+  return ''
+}
+
+// ── Edge rendering ────────────────────────────────────────────────
+function renderEdges() {
+  var layer = document.getElementById('edges-layer')
+  layer.innerHTML = ''
+  _wf.edges.forEach(function(edge) { renderEdge(edge, layer) })
+}
+
+function renderEdge(edge, layer) {
+  var fromNode = _wf.blocks.find(function(b) { return b.id === edge.from })
+  var toNode   = _wf.blocks.find(function(b) { return b.id === edge.to })
+  if (!fromNode || !toNode) return
+
+  var fx = (fromNode.x + 200) * _scale + _panX * _scale
+  var fy = (fromNode.y + getNodeHeight(fromNode) / 2) * _scale + _panY * _scale
+  var tx = toNode.x * _scale + _panX * _scale
+  var ty = (toNode.y + 40) * _scale + _panY * _scale
+
+  // Bezier
+  var cx1 = fx + 60, cy1 = fy
+  var cx2 = tx - 60, cy2 = ty
+  var d = 'M' + fx + ',' + fy + ' C' + cx1 + ',' + cy1 + ' ' + cx2 + ',' + cy2 + ' ' + tx + ',' + ty
+
+  var path = document.createElementNS('http://www.w3.org/2000/svg','path')
+  path.setAttribute('d', d)
+  path.setAttribute('class', 'wf-edge' + (_selected && (edge.from === _selected || edge.to === _selected) ? ' active' : ''))
+  path.setAttribute('marker-end', _selected && (edge.from === _selected || edge.to === _selected) ? 'url(#arrow-active)' : 'url(#arrow)')
+  layer.appendChild(path)
+
+  // Label
+  if (edge.label) {
+    var midX = (fx + tx) / 2
+    var midY = (fy + ty) / 2
+    var text = document.createElementNS('http://www.w3.org/2000/svg','text')
+    text.setAttribute('x', midX); text.setAttribute('y', midY - 6)
+    text.setAttribute('text-anchor','middle')
+    text.setAttribute('class','wf-edge-label')
+    text.textContent = edge.label
+    layer.appendChild(text)
+  }
+}
+
+function getNodeHeight(block) {
+  var def = (BLOCK_DEFS[block.type] || {})[block.subtype] || {}
+  var outCount = (def.ports && def.ports.out ? def.ports.out.length : 0)
+  return 72 + outCount * 22
+}
+
+// ── Canvas transform ──────────────────────────────────────────────
+function applyTransform() {
+  var inner = document.getElementById('canvas-inner')
+  inner.style.transform = 'scale(' + _scale + ') translate(' + _panX + 'px,' + _panY + 'px)'
+  document.getElementById('zoom-label').textContent = Math.round(_scale * 100) + '%'
+  renderEdges()
+}
+
+function zoom(delta) {
+  _scale = Math.min(2, Math.max(0.3, _scale + delta))
+  applyTransform()
+}
+
+function resetZoom() { _scale = 1; _panX = 0; _panY = 0; applyTransform() }
+
+// ── Mouse events ──────────────────────────────────────────────────
+function onCanvasMouseDown(e) {
+  if (e.target === document.getElementById('canvas-area') || e.target === document.getElementById('canvas-inner') || e.target.tagName === 'svg') {
+    if (e.button === 1 || e.altKey) {
+      _panning = { startX: e.clientX, startY: e.clientY, origPanX: _panX, origPanY: _panY }
+      e.preventDefault()
+    } else {
+      selectNode(null)
     }
   }
+  hideCtxMenu()
 }
 
-function populateForm(cfg) {
-  document.getElementById('sw-enabled').checked          = !!cfg.enabled
-  document.getElementById('f-reminder-hours').value      = cfg.reminder_hours_before  != null ? cfg.reminder_hours_before  : 24
-  document.getElementById('f-reminder-template').value   = cfg.reminder_template_name  || ''
-  document.getElementById('f-reminder-lang').value       = cfg.reminder_template_lang  || 'en_US'
-  document.getElementById('f-followup-hours').value      = cfg.followup_hours_after    != null ? cfg.followup_hours_after    : 2
-  document.getElementById('f-followup-template').value   = cfg.followup_template_name  || ''
-  document.getElementById('f-followup-lang').value       = cfg.followup_template_lang  || 'en_US'
-
-  if (cfg.updated_at) {
-    var d = new Date(cfg.updated_at)
-    document.getElementById('last-saved-note').textContent = 'Last saved: ' + d.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
+function onCanvasMouseMove(e) {
+  if (_dragging) {
+    var dx = (e.clientX - _dragging.startX) / _scale
+    var dy = (e.clientY - _dragging.startY) / _scale
+    var block = _wf.blocks.find(function(b) { return b.id === _dragging.nodeId })
+    if (block) {
+      block.x = Math.max(0, _dragging.origX + dx)
+      block.y = Math.max(0, _dragging.origY + dy)
+      var el = document.getElementById('node-' + block.id)
+      if (el) { el.style.left = block.x + 'px'; el.style.top = block.y + 'px' }
+      renderEdges()
+    }
+  }
+  if (_panning) {
+    _panX = _panning.origPanX + (e.clientX - _panning.startX) / _scale
+    _panY = _panning.origPanY + (e.clientY - _panning.startY) / _scale
+    applyTransform()
+  }
+  if (_connecting) {
+    var line = document.getElementById('connecting-line')
+    var rect = document.getElementById('canvas-area').getBoundingClientRect()
+    var x = e.clientX - rect.left
+    var y = e.clientY - rect.top
+    var fromBlock = _wf.blocks.find(function(b) { return b.id === _connecting.fromId })
+    var fx = (fromBlock.x + 200) * _scale + _panX * _scale
+    var fy = (fromBlock.y + 60) * _scale + _panY * _scale
+    line.setAttribute('d','M'+fx+','+fy+' C'+(fx+60)+','+fy+' '+(x-60)+','+y+' '+x+','+y)
+    line.style.display = 'block'
   }
 }
 
-function updateStatusCard(cfg) {
-  var card = document.getElementById('status-card')
-  if (!cfg || !cfg.last_run_at) { card.style.display = 'none'; return }
-  card.style.display = 'block'
-  var lr = new Date(cfg.last_run_at)
-  document.getElementById('stat-last-run').textContent   = lr.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
-  document.getElementById('stat-reminders').textContent  = cfg.total_reminders_sent != null ? cfg.total_reminders_sent : '—'
-  document.getElementById('stat-followups').textContent  = cfg.total_followups_sent != null ? cfg.total_followups_sent : '—'
+function onCanvasMouseUp(e) {
+  if (_dragging) { _dragging = null }
+  if (_panning)  { _panning  = null }
+  if (_connecting) {
+    document.getElementById('connecting-line').style.display = 'none'
+    // Check if released over a node input port
+    var el = document.elementFromPoint(e.clientX, e.clientY)
+    var targetNode = el && el.closest('.wf-node')
+    if (targetNode && targetNode.dataset.id !== _connecting.fromId) {
+      addEdge(_connecting.fromId, _connecting.fromPort, targetNode.dataset.id)
+    }
+    _connecting = null
+  }
 }
 
-// ── Save ──────────────────────────────────────────────────────────
-async function saveAutomations() {
-  if (!_agentId) { toast('Select an agent first', 'error'); return }
+function onCanvasWheel(e) {
+  e.preventDefault()
+  var delta = e.deltaY > 0 ? -0.05 : 0.05
+  _scale = Math.min(2, Math.max(0.3, _scale + delta))
+  applyTransform()
+}
 
+function onNodeMouseDown(e, nodeId) {
+  e.stopPropagation()
+  if (e.button !== 0) return
+  var block = _wf.blocks.find(function(b) { return b.id === nodeId })
+  if (!block) return
+  _dragging = { nodeId: nodeId, startX: e.clientX, startY: e.clientY, origX: block.x, origY: block.y }
+}
+
+function onPortMouseDown(e, nodeId, portLabel) {
+  e.stopPropagation(); e.preventDefault()
+  _connecting = { fromId: nodeId, fromPort: portLabel }
+}
+
+// ── Drag from palette ─────────────────────────────────────────────
+function onPaletteDragStart(e) {
+  var el = e.currentTarget
+  e.dataTransfer.setData('btype', el.dataset.btype)
+  e.dataTransfer.setData('bsub',  el.dataset.bsub)
+}
+
+function onCanvasDrop(e) {
+  e.preventDefault()
+  var btype = e.dataTransfer.getData('btype')
+  var bsub  = e.dataTransfer.getData('bsub')
+  if (!btype) return
+  var rect = document.getElementById('canvas-area').getBoundingClientRect()
+  var x = (e.clientX - rect.left) / _scale - _panX
+  var y = (e.clientY - rect.top)  / _scale - _panY
+  addBlock(btype, bsub, Math.max(0, x - 100), Math.max(0, y - 40))
+}
+
+function addBlock(type, subtype, x, y) {
+  var id = 'b' + Date.now()
+  var block = { id: id, type: type, subtype: subtype, x: x, y: y, config: {} }
+  _wf.blocks.push(block)
+  document.getElementById('canvas-empty').style.display = 'none'
+  var inner = document.getElementById('canvas-inner')
+  inner.appendChild(createNodeEl(block))
+  renderEdges()
+  selectNode(id)
+}
+
+function addEdge(fromId, fromPort, toId) {
+  // Prevent duplicate
+  var exists = _wf.edges.find(function(e) { return e.from === fromId && e.fromPort === fromPort && e.to === toId })
+  if (exists) return
+  var edge = { id:'e'+Date.now(), from:fromId, fromPort:fromPort, to:toId, toPort:'In', label:fromPort !== 'Next' ? fromPort : '' }
+  _wf.edges.push(edge)
+  renderEdges()
+}
+
+// ── Node selection & settings panel ──────────────────────────────
+function selectNode(id) {
+  var prev = _selected
+  _selected = id
+  if (prev) {
+    var prevEl = document.getElementById('node-' + prev)
+    if (prevEl) prevEl.classList.remove('selected')
+  }
+  if (id) {
+    var el = document.getElementById('node-' + id)
+    if (el) el.classList.add('selected')
+    var block = _wf.blocks.find(function(b) { return b.id === id })
+    if (block) showSettings(block)
+  } else {
+    showSettingsEmpty()
+  }
+  renderEdges()
+}
+
+function showSettingsEmpty() {
+  document.getElementById('sp-empty').style.display   = 'flex'
+  document.getElementById('sp-content').style.display = 'none'
+}
+
+function showSettings(block) {
+  document.getElementById('sp-empty').style.display   = 'none'
+  var content = document.getElementById('sp-content')
+  content.style.display = 'flex'
+
+  var def = (BLOCK_DEFS[block.type] || {})[block.subtype] || {}
+  var cfg = block.config || {}
+
+  content.innerHTML = [
+    '<div class="sp-header">',
+    '  <span class="sp-icon">' + (def.icon || '▪') + '</span>',
+    '  <div><div class="sp-title">' + esc(def.label || block.type) + '</div>',
+    '  <div class="sp-sub">' + esc(block.type) + ' · ' + esc(block.subtype) + '</div></div>',
+    '</div>',
+    '<div class="sp-body" id="sp-body">',
+    buildSettingsForm(block, def, cfg),
+    '</div>',
+    '<div class="sp-actions">',
+    '  <button class="del-btn" onclick="deleteSelectedNode()">🗑 Delete</button>',
+    '  <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="applySettings(\'' + block.id + '\')">Apply ✓</button>',
+    '</div>',
+  ].join('')
+}
+
+function buildSettingsForm(block, def, cfg) {
+  var html = ''
+
+  // Common: custom label
+  html += sf('Custom label', 'sf-label-input', 'text', cfg.label || '', 'Overrides the block name on canvas', false, 'placeholder="e.g. Ask for name"')
+
+  if (block.type === 'trigger') {
+    if (block.subtype === 'form') {
+      html += sf('Webhook URL', 'sf-webhook', 'text', cfg.webhook_url || '', 'Your endpoint to receive form submissions')
+    }
+    if (block.subtype === 'record_update') {
+      html += sfSel('Record type', 'sf-record-type', [['appointment','Appointment'],['order','Order'],['lead','Lead']], cfg.record_type || 'appointment', '')
+      html += sf('Status trigger', 'sf-status-trigger', 'text', cfg.status_trigger || '', 'e.g. confirmed, completed', false, 'placeholder="e.g. confirmed"')
+    }
+  }
+
+  if (block.type === 'message' && block.subtype === 'opening') {
+    html += sfArea('Opening message', 'sf-opening-msg', cfg.message || '', 'First message sent when this workflow starts', 'placeholder="Hi! How can I help you today?"')
+    html += sfSel('Send via', 'sf-msg-channel', [['whatsapp','WhatsApp'],['email','Email']], cfg.channel || 'whatsapp', '')
+    html += sf('Wait for reply (hours)', 'sf-msg-timeout', 'number', cfg.timeout_hours != null ? cfg.timeout_hours : 24, 'Trigger timeout branch after this many hours')
+  }
+
+  if (block.type === 'ai' && block.subtype === 'conversation') {
+    html += sf('Goal', 'sf-ai-goal', 'text', cfg.goal || '', "What should the AI accomplish? e.g. 'Book an appointment'", false, 'placeholder="Book an appointment for the customer"')
+    html += sfArea('Instructions', 'sf-ai-instructions', cfg.instructions || '', 'Additional instructions for the AI in this step', 'placeholder="Be friendly. Collect name, phone and preferred time."')
+    html += sfSel('Intent / mode', 'sf-ai-intent', [
+      ['general','General chat'],['appointments','Appointments'],
+      ['sales','Sales / product'],['qualification','Lead qualification'],
+      ['escalation','Escalation detection'],['custom','Custom'],
+    ], cfg.intent || 'general', '')
+    html += sf('Required customer fields', 'sf-ai-fields', 'text', (cfg.required_fields || []).join(', '), 'Comma-separated: name, phone, email, preferred_time', false, 'placeholder="name, phone, preferred_time"')
+    html += sf('Max turns before fallback', 'sf-ai-max-turns', 'number', cfg.max_turns || 8, 'After this many exchanges, route to Human needed branch')
+    html += sfCheck('Allow appointment booking', 'sf-ai-allow-appt', !!cfg.allow_appointment_booking)
+    html += sfCheck('Allow checkout / payment', 'sf-ai-allow-pay',  !!cfg.allow_payment)
+    html += sfCheck('Detect escalation intent', 'sf-ai-escalation', !!cfg.detect_escalation)
+  }
+
+  if (block.type === 'action' && block.subtype === 'send_wa') {
+    html += '<div class="sf-group"><div class="sf-label">WhatsApp Template</div>'
+    html += '<select class="sf-select" id="sf-wa-tpl">'
+    html += '<option value="">— Select approved template —</option>'
+    _templates.forEach(function(t) {
+      html += '<option value="' + esc(t.name) + '"' + (cfg.template_name === t.name ? ' selected' : '') + '>' + esc(t.name) + '</option>'
+    })
+    html += '</select><div class="sf-hint">Only APPROVED templates can be sent outside 24h window.</div></div>'
+    html += sf('Language code', 'sf-wa-lang', 'text', cfg.lang || 'en_US', '', false, 'placeholder="en_US" style="max-width:120px"')
+    html += sfSel('Timing', 'sf-wa-timing', [
+      ['immediate','Send immediately'],
+      ['24h_before','24h before appointment'],
+      ['2h_before','2h before appointment'],
+      ['2h_after','2h after appointment'],
+    ], cfg.timing || 'immediate', '')
+  }
+
+  if (block.type === 'action' && block.subtype === 'book_appointment') {
+    html += sf('Service name', 'sf-appt-service', 'text', cfg.service || '', 'e.g. Hair cut, Dental consultation', false, 'placeholder="e.g. Consultation"')
+    html += sfSel('Confirmation model', 'sf-appt-confirm', [
+      ['owner','Owner confirms first'],
+      ['customer','Customer selects time'],
+      ['auto','Auto-confirm on submission'],
+    ], cfg.confirmation_model || 'owner', '')
+    html += sfCheck('Allow customer reschedule via chat', 'sf-appt-reschedule', !!cfg.allow_reschedule)
+    html += sfCheck('Send confirmation WA message', 'sf-appt-wa-confirm', cfg.send_wa_confirm !== false)
+  }
+
+  if (block.type === 'action' && block.subtype === 'checkout') {
+    html += sf('Product / plan name', 'sf-pay-product', 'text', cfg.product_name || '', '', false, 'placeholder="e.g. Monthly subscription"')
+    html += sf('Amount (INR paisa)', 'sf-pay-amount', 'number', cfg.amount_paisa || '', 'Amount in paisa — 10000 = ₹100', false, 'placeholder="10000"')
+    html += sfCheck('Verify payment server-side before success', 'sf-pay-verify', cfg.verify_payment !== false)
+  }
+
+  if (block.type === 'action' && block.subtype === 'update_record') {
+    html += sfSel('Record type', 'sf-ur-type', [['appointment','Appointment'],['lead','Lead'],['order','Order']], cfg.record_type || 'appointment', '')
+    html += sf('Set status to', 'sf-ur-status', 'text', cfg.set_status || '', '', false, 'placeholder="e.g. confirmed"')
+  }
+
+  if (block.type === 'condition' && block.subtype === 'branch') {
+    html += sfSel('Branch on', 'sf-cond-on', [
+      ['ai_outcome','AI conversation outcome'],
+      ['action_result','Action result'],
+      ['payment_status','Payment status'],
+      ['appointment_status','Appointment status'],
+    ], cfg.branch_on || 'ai_outcome', '')
+  }
+
+  if (block.type === 'notify' && block.subtype === 'staff') {
+    html += sfArea('Staff notification message', 'sf-staff-msg', cfg.message || '', 'Message sent to staff (internal note)', 'placeholder="Customer needs assistance with…"')
+    html += sfCheck('Pause AI responses after notifying', 'sf-staff-pause', cfg.pause_ai !== false)
+    html += sfCheck('Create escalation record', 'sf-staff-escalate', !!cfg.create_escalation)
+  }
+
+  if (block.type === 'notify' && block.subtype === 'followup') {
+    html += sf('Delay (hours)', 'sf-fu-hours', 'number', cfg.delay_hours || 24, 'Send follow-up after this many hours')
+    html += sfSel('Trigger condition', 'sf-fu-trigger', [
+      ['always','Always schedule'],
+      ['after_appointment','After appointment time'],
+      ['after_payment','After payment confirmed'],
+      ['no_response','If no reply in delay period'],
+    ], cfg.trigger_condition || 'always', '')
+    html += '<div class="sf-group"><div class="sf-label">WhatsApp Template</div>'
+    html += '<select class="sf-select" id="sf-fu-tpl">'
+    html += '<option value="">— Select template —</option>'
+    _templates.forEach(function(t) {
+      html += '<option value="' + esc(t.name) + '"' + (cfg.followup_template === t.name ? ' selected' : '') + '>' + esc(t.name) + '</option>'
+    })
+    html += '</select></div>'
+    html += sf('Max follow-up attempts', 'sf-fu-max', 'number', cfg.max_attempts || 1, 'Stop after this many attempts')
+  }
+
+  if (block.type === 'end') {
+    html += sfSel('Mark goal as', 'sf-end-goal', [
+      ['completed','Completed'],['cancelled','Cancelled'],['no_response','No response'],
+    ], cfg.goal_status || 'completed', '')
+    html += sfCheck('Send completion WA notification', 'sf-end-notify', !!cfg.send_completion_notification)
+  }
+
+  return html
+}
+
+// Settings form helpers
+function sf(label, id, type, val, hint, required, extra) {
+  return '<div class="sf-group">' +
+    '<div class="sf-label">' + label + (required ? ' <span style="color:#ef4444">*</span>' : '') + '</div>' +
+    '<input class="sf-input" id="' + id + '" type="' + (type||'text') + '" value="' + esc(String(val||'')) + '" ' + (extra||'') + '/>' +
+    (hint ? '<div class="sf-hint">' + hint + '</div>' : '') +
+    '</div>'
+}
+function sfArea(label, id, val, hint, extra) {
+  return '<div class="sf-group">' +
+    '<div class="sf-label">' + label + '</div>' +
+    '<textarea class="sf-textarea" id="' + id + '" ' + (extra||'') + '>' + esc(String(val||'')) + '</textarea>' +
+    (hint ? '<div class="sf-hint">' + hint + '</div>' : '') +
+    '</div>'
+}
+function sfSel(label, id, opts, val, hint) {
+  var optsHtml = opts.map(function(o) {
+    return '<option value="' + esc(o[0]) + '"' + (val === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>'
+  }).join('')
+  return '<div class="sf-group"><div class="sf-label">' + label + '</div>' +
+    '<select class="sf-select" id="' + id + '">' + optsHtml + '</select>' +
+    (hint ? '<div class="sf-hint">' + hint + '</div>' : '') +
+    '</div>'
+}
+function sfCheck(label, id, checked) {
+  return '<label class="sf-check-row"><input type="checkbox" id="' + id + '"' + (checked ? ' checked' : '') + '/>' +
+    '<span class="sf-check-label">' + label + '</span></label>'
+}
+
+// Apply settings back to block
+function applySettings(blockId) {
+  var block = _wf.blocks.find(function(b) { return b.id === blockId })
+  if (!block) return
+
+  function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : '' }
+  function c(id) { var el = document.getElementById(id); return el ? el.checked : false }
+
+  block.config = block.config || {}
+  block.config.label = v('sf-label-input') || undefined
+
+  if (block.type === 'trigger' && block.subtype === 'form')
+    block.config.webhook_url = v('sf-webhook')
+  if (block.type === 'trigger' && block.subtype === 'record_update') {
+    block.config.record_type    = v('sf-record-type')
+    block.config.status_trigger = v('sf-status-trigger')
+  }
+  if (block.type === 'message' && block.subtype === 'opening') {
+    block.config.message       = v('sf-opening-msg')
+    block.config.channel       = v('sf-msg-channel')
+    block.config.timeout_hours = parseFloat(v('sf-msg-timeout')) || 24
+  }
+  if (block.type === 'ai' && block.subtype === 'conversation') {
+    block.config.goal           = v('sf-ai-goal')
+    block.config.instructions   = v('sf-ai-instructions')
+    block.config.intent         = v('sf-ai-intent')
+    block.config.required_fields = v('sf-ai-fields').split(',').map(function(s){return s.trim()}).filter(Boolean)
+    block.config.max_turns      = parseInt(v('sf-ai-max-turns')) || 8
+    block.config.allow_appointment_booking = c('sf-ai-allow-appt')
+    block.config.allow_payment  = c('sf-ai-allow-pay')
+    block.config.detect_escalation = c('sf-ai-escalation')
+  }
+  if (block.type === 'action' && block.subtype === 'send_wa') {
+    block.config.template_name = v('sf-wa-tpl')
+    block.config.lang          = v('sf-wa-lang') || 'en_US'
+    block.config.timing        = v('sf-wa-timing')
+  }
+  if (block.type === 'action' && block.subtype === 'book_appointment') {
+    block.config.service             = v('sf-appt-service')
+    block.config.confirmation_model  = v('sf-appt-confirm')
+    block.config.allow_reschedule    = c('sf-appt-reschedule')
+    block.config.send_wa_confirm     = c('sf-appt-wa-confirm')
+  }
+  if (block.type === 'action' && block.subtype === 'checkout') {
+    block.config.product_name   = v('sf-pay-product')
+    block.config.amount_paisa   = parseInt(v('sf-pay-amount')) || 0
+    block.config.verify_payment = c('sf-pay-verify')
+  }
+  if (block.type === 'action' && block.subtype === 'update_record') {
+    block.config.record_type = v('sf-ur-type')
+    block.config.set_status  = v('sf-ur-status')
+  }
+  if (block.type === 'condition' && block.subtype === 'branch') {
+    block.config.branch_on = v('sf-cond-on')
+  }
+  if (block.type === 'notify' && block.subtype === 'staff') {
+    block.config.message           = v('sf-staff-msg')
+    block.config.pause_ai          = c('sf-staff-pause')
+    block.config.create_escalation = c('sf-staff-escalate')
+  }
+  if (block.type === 'notify' && block.subtype === 'followup') {
+    block.config.delay_hours       = parseFloat(v('sf-fu-hours')) || 24
+    block.config.trigger_condition = v('sf-fu-trigger')
+    block.config.followup_template = v('sf-fu-tpl')
+    block.config.max_attempts      = parseInt(v('sf-fu-max')) || 1
+  }
+  if (block.type === 'end') {
+    block.config.goal_status                = v('sf-end-goal')
+    block.config.send_completion_notification = c('sf-end-notify')
+  }
+
+  // Re-render node on canvas
+  var el = document.getElementById('node-' + blockId)
+  if (el) {
+    var def = (BLOCK_DEFS[block.type] || {})[block.subtype] || {}
+    el.querySelector('.node-title').textContent = block.config.label || def.label || block.type
+    el.querySelector('.node-body').textContent = getBlockSummary(block)
+  }
+  toast('Settings applied', 'success')
+}
+
+// ── Delete node ───────────────────────────────────────────────────
+function deleteSelectedNode() {
+  if (!_selected) return
+  _wf.blocks = _wf.blocks.filter(function(b) { return b.id !== _selected })
+  _wf.edges  = _wf.edges.filter(function(e) { return e.from !== _selected && e.to !== _selected })
+  var el = document.getElementById('node-' + _selected)
+  if (el) el.remove()
+  _selected = null
+  showSettingsEmpty()
+  renderEdges()
+  document.getElementById('canvas-empty').style.display = _wf.blocks.length ? 'none' : 'flex'
+}
+
+// ── Context menu ──────────────────────────────────────────────────
+var _ctxNodeId = null
+function showCtxMenu(e, nodeId) {
+  _ctxNodeId = nodeId
+  selectNode(nodeId)
+  var menu = document.getElementById('ctx-menu')
+  menu.style.display = 'block'
+  menu.style.left = e.clientX + 'px'
+  menu.style.top  = e.clientY + 'px'
+}
+function hideCtxMenu() { document.getElementById('ctx-menu').style.display = 'none' }
+function ctxDelete() { hideCtxMenu(); if (_ctxNodeId) { _selected = _ctxNodeId; deleteSelectedNode() } }
+function ctxDuplicate() {
+  hideCtxMenu()
+  var block = _wf.blocks.find(function(b) { return b.id === _ctxNodeId })
+  if (!block) return
+  var newBlock = JSON.parse(JSON.stringify(block))
+  newBlock.id = 'b' + Date.now()
+  newBlock.x += 30; newBlock.y += 30
+  _wf.blocks.push(newBlock)
+  var inner = document.getElementById('canvas-inner')
+  inner.appendChild(createNodeEl(newBlock))
+  selectNode(newBlock.id)
+}
+function ctxAddNote() { hideCtxMenu(); toast('Notes coming soon', 'info') }
+
+document.addEventListener('click', function() { hideCtxMenu() })
+document.addEventListener('keydown', function(e) {
+  if ((e.key === 'Delete' || e.key === 'Backspace') && _selected &&
+      !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+    deleteSelectedNode()
+  }
+})
+
+// ══════════════════════════════════════════════════════════════════
+// SAVE / PUBLISH / VALIDATE / TEST
+// ══════════════════════════════════════════════════════════════════
+function collectWorkflow() {
+  _wf.name        = document.getElementById('wf-name-input').value.trim() || 'Untitled'
+  return {
+    agent_id:    _agentId,
+    name:        _wf.name,
+    description: _wf.description,
+    status:      _wf.status,
+    blocks:      _wf.blocks,
+    edges:       _wf.edges,
+  }
+}
+
+async function saveWorkflow() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+  var body = collectWorkflow()
+  try {
+    var res
+    if (_wfId) {
+      res = await apiFetch('/workflows/' + _wfId, { method: 'PUT', body: JSON.stringify(body) })
+    } else {
+      res = await apiFetch('/workflows', { method: 'POST', body: JSON.stringify(body) })
+      _wfId = res.workflow && (res.workflow._id || res.workflow.id) || res.id
+    }
+    toast('Workflow saved ✓', 'success')
+    updateStatusPill()
+  } catch(e) { toast(e.message || 'Save failed', 'error') }
+}
+
+function validateWorkflow() {
+  var errs = []
+  var triggers = _wf.blocks.filter(function(b) { return b.type === 'trigger' })
+  if (!triggers.length) errs.push('No trigger block — every workflow needs at least one trigger')
+  var ends = _wf.blocks.find(function(b) { return b.type === 'end' })
+  if (!ends) errs.push('No Finish block — add an End/Finish block to close the flow')
+  // Check orphan blocks (no edges)
+  _wf.blocks.forEach(function(b) {
+    if (b.type === 'trigger') return
+    var hasIn = _wf.edges.find(function(e) { return e.to === b.id })
+    if (!hasIn) errs.push('Block "' + ((b.config && b.config.label) || b.type) + '" has no incoming connection')
+  })
+  if (!_wf.name || !_wf.name.trim()) errs.push('Workflow has no name')
+  if (errs.length) {
+    toast('⚠ ' + errs[0] + (errs.length > 1 ? ' (+' + (errs.length-1) + ' more)' : ''), 'error')
+    return false
+  }
+  toast('Workflow looks good! ✓', 'success')
+  return true
+}
+
+async function publishWorkflow() {
+  if (!validateWorkflow()) return
+  await saveWorkflow()
+  if (!_wfId) { toast('Save first', 'error'); return }
+  try {
+    await apiFetch('/workflows/' + _wfId + '/publish', { method: 'POST' })
+    _wf.status = 'active'
+    updateStatusPill()
+    toast('Workflow is now LIVE ✅', 'success')
+  } catch(e) { toast(e.message || 'Publish failed', 'error') }
+}
+
+function testWorkflow() {
+  document.getElementById('test-modal').style.display = 'flex'
+}
+
+async function runTestMode() {
+  if (!_wfId) {
+    // Auto-save first
+    await saveWorkflow()
+    if (!_wfId) { toast('Save workflow before testing', 'error'); return }
+  }
+  closeModal('test-modal')
   var body = {
-    agent_id:               _agentId,
-    enabled:                document.getElementById('sw-enabled').checked,
-    reminder_hours_before:  parseFloat(document.getElementById('f-reminder-hours').value)  || 24,
-    reminder_template_name: document.getElementById('f-reminder-template').value.trim(),
-    reminder_template_lang: document.getElementById('f-reminder-lang').value.trim()   || 'en_US',
-    followup_hours_after:   parseFloat(document.getElementById('f-followup-hours').value)  || 2,
-    followup_template_name: document.getElementById('f-followup-template').value.trim(),
-    followup_template_lang: document.getElementById('f-followup-lang').value.trim()   || 'en_US',
+    workflow_id:   _wfId,
+    trigger_type:  document.getElementById('test-trigger').value,
+    contact_phone: document.getElementById('test-phone').value.trim(),
+    message:       document.getElementById('test-message').value.trim(),
+    test_mode:     true,
   }
-
-  var btn = document.getElementById('save-btn')
-  btn.disabled = true; btn.textContent = 'Saving…'
   try {
-    await apiFetch('/automations', { method: 'PUT', body: JSON.stringify(body) })
-    toast('Automation settings saved ✓', 'success')
-    document.getElementById('last-saved-note').textContent = 'Last saved: just now'
-    await loadAutomations()
-  } catch(e) {
-    toast(e.message || 'Failed to save', 'error')
-  } finally {
-    btn.disabled = false; btn.textContent = 'Save Settings'
-  }
+    var res = await apiFetch('/workflows/test', { method: 'POST', body: JSON.stringify(body) })
+    renderTestResults(res)
+    document.getElementById('test-result-modal').style.display = 'flex'
+  } catch(e) { toast('Test failed: ' + e.message, 'error') }
 }
 
-// ── Run now ───────────────────────────────────────────────────────
-async function runNow() {
-  if (!_agentId) { toast('Select an agent first', 'error'); return }
-  var btn = document.getElementById('run-btn')
-  btn.disabled = true; btn.textContent = '⏳ Running…'
-  try {
-    var d = await apiFetch('/automations/run', { method: 'POST', body: JSON.stringify({ agent_id: _agentId }) })
-    var msg = 'Done — ' + (d.reminders_sent || 0) + ' reminder(s), ' + (d.followups_sent || 0) + ' follow-up(s) sent'
-    toast(msg, 'success')
-    await loadAutomations()
-  } catch(e) {
-    toast(e.message || 'Run failed', 'error')
-  } finally {
-    btn.disabled = false; btn.textContent = '&#9654; Run Now'
-  }
+function renderTestResults(res) {
+  var body = document.getElementById('test-result-body')
+  var steps = res.steps || []
+  var statusColor = res.status === 'success' ? '#10b981' : res.status === 'failed' ? '#ef4444' : '#f59e0b'
+
+  body.innerHTML = [
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">',
+    '  <div style="font-size:28px">' + (res.status === 'success' ? '✅' : res.status === 'failed' ? '❌' : '⚠️') + '</div>',
+    '  <div>',
+    '    <div style="font-size:14px;font-weight:800;color:' + statusColor + '">' + esc(res.status || 'unknown') + '</div>',
+    '    <div style="font-size:12px;color:var(--text-3)">' + esc(res.message || '') + '</div>',
+    '  </div>',
+    '</div>',
+    '<div style="font-size:11.5px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Execution trace</div>',
+    steps.map(function(step) {
+      var ic = step.status === 'ok' ? '✓' : step.status === 'skip' ? '○' : '✗'
+      var col = step.status === 'ok' ? '#10b981' : step.status === 'skip' ? 'var(--text-3)' : '#ef4444'
+      return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">' +
+        '<div style="font-size:13px;color:' + col + ';font-weight:700;flex-shrink:0">' + ic + '</div>' +
+        '<div>' +
+        '<div style="font-size:12.5px;font-weight:700;color:var(--text)">' + esc(step.block_label || step.block_type || '') + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text-3)">' + esc(step.note || '') + '</div>' +
+        '</div></div>'
+    }).join(''),
+  ].join('')
 }
 
-// ── Utility ───────────────────────────────────────────────────────
+function updateStatusPill() {
+  var pill = document.getElementById('wf-status-pill')
+  var s = _wf.status
+  pill.className = 'status-pill ' + (s === 'active' ? 'active' : 'draft')
+  pill.textContent = s === 'active' ? '● Live' : s === 'inactive' ? '○ Inactive' : '● Draft'
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).style.display = 'none' }
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+function fmtDate(d) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
+}
+
 function toast(msg, type) {
   type = type || 'info'
   var c  = document.getElementById('toast-container')
@@ -493,8 +1760,13 @@ function toast(msg, type) {
   el.className = 'toast toast-' + type
   el.textContent = msg
   c.appendChild(el)
-  setTimeout(function(){ el.classList.add('hide'); setTimeout(function(){ el.remove() }, 300) }, 3200)
+  setTimeout(function(){ el.classList.add('hide'); setTimeout(function(){ el.remove() }, 300) }, 3500)
 }
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(function(mo) {
+  mo.addEventListener('click', function(e) { if (e.target === mo) mo.style.display = 'none' })
+})
 
 init()
 </script>
