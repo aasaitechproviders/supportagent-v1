@@ -29,7 +29,8 @@ body.sidebar-collapsed {
 /* Collapsed sidebar — icon only */
 body.sidebar-collapsed .sidebar {
   width: 56px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: visible;
 }
 body.sidebar-collapsed .sidebar-logo span:not(.logo-mark),
 body.sidebar-collapsed .sidebar-logo .logo-gent,
@@ -45,22 +46,7 @@ body.sidebar-collapsed .sidebar-logo { justify-content: center; padding: 14px 0;
 body.sidebar-collapsed .sidebar-user { justify-content: center; }
 body.sidebar-collapsed .nav-section { margin-bottom: 4px; }
 
-/* ── Sidebar collapse button ────────────────────────────────────── */
-.sidebar-collapse-btn {
-  position: absolute;
-  bottom: 72px; right: -13px;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0,0,0,.12);
-  color: var(--text-2); font-size: 14px; font-weight: 700;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  z-index: 310; line-height: 1;
-  transition: var(--t);
-}
-.sidebar-collapse-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-body.sidebar-collapsed .sidebar-collapse-btn { right: -13px; transform: rotate(180deg); }
+/* sidebar-collapse-btn styles injected by nav.js */
 
 /* ── Mobile topbar ───────────────────────────────────────────────── */
 .mob-topbar {
