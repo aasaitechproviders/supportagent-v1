@@ -120,78 +120,142 @@
 /* ── Canvas nodes ───────────────────────────────────────────────── */
 .wf-node {
   position: absolute;
-  width: 200px;
+  width: 240px;
   background: var(--surface);
   border: 2px solid var(--border);
-  border-radius: var(--r);
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.10);
   cursor: pointer;
   user-select: none;
-  transition: border-color .15s, box-shadow .15s;
+  transition: border-color .15s, box-shadow .15s, transform .1s;
 }
-.wf-node:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(99,102,241,.15); }
-.wf-node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.wf-node:hover { border-color: var(--accent); box-shadow: 0 8px 28px rgba(99,102,241,.18); transform: translateY(-1px); }
+.wf-node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim), 0 8px 24px rgba(99,102,241,.2); }
 .node-header {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 12px 8px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px 10px;
   border-bottom: 1px solid var(--border);
+  border-radius: 10px 10px 0 0;
 }
-.node-icon { font-size: 16px; flex-shrink: 0; }
-.node-title { font-size: 12.5px; font-weight: 800; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.node-icon {
+  font-size: 18px; flex-shrink: 0;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; background: var(--surface-2);
+}
+.node-title { font-size: 13px; font-weight: 800; color: var(--text); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .node-type-badge {
   font-size: 10px; font-weight: 700;
-  padding: 2px 6px; border-radius: 20px;
+  padding: 3px 7px; border-radius: 20px;
   background: var(--surface-2); color: var(--text-3);
-  flex-shrink: 0;
+  flex-shrink: 0; text-transform: uppercase; letter-spacing: .04em;
 }
-.node-body { padding: 8px 12px 10px; font-size: 11.5px; color: var(--text-3); line-height: 1.5; min-height: 28px; }
-.node-ports { display: flex; flex-direction: column; gap: 4px; padding: 0 12px 10px; }
+.node-body { padding: 8px 14px 4px; font-size: 11.5px; color: var(--text-3); line-height: 1.5; min-height: 24px; }
+.node-ports { display: flex; flex-direction: column; gap: 2px; padding: 6px 0 10px; }
 .node-port {
   display: flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600;
+  font-size: 11.5px; font-weight: 600;
   color: var(--text-3); cursor: pointer;
+  padding: 3px 14px; position: relative;
+  transition: color .12s;
 }
+.node-port:hover { color: var(--text); }
+.node-port.in-port { justify-content: flex-start; }
+.node-port.out-port { justify-content: flex-end; }
+
+/* Port dot — bigger, clearer, sits on the edge of the node */
 .port-dot {
-  width: 10px; height: 10px;
+  width: 13px; height: 13px;
   border-radius: 50%;
-  border: 2px solid var(--border-md);
+  border: 2.5px solid var(--border-md);
   background: var(--surface);
   flex-shrink: 0; transition: var(--t);
+  cursor: crosshair;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
 }
-.port-dot:hover, .port-dot.active { border-color: var(--accent); background: var(--accent); }
-.port-dot.out { margin-left: auto; }
+.port-dot:hover, .port-dot.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+  transform: scale(1.15);
+}
+.port-dot.out {
+  margin-left: auto;
+  /* Visually poke out on the right edge */
+  position: relative;
+}
+
+/* Port label pill colouring by port name */
+.port-label { font-size: 11px; font-weight: 700; }
+.port-label.lbl-success  { color: #10b981; }
+.port-label.lbl-booked   { color: #10b981; }
+.port-label.lbl-paid     { color: #10b981; }
+.port-label.lbl-sent     { color: #10b981; }
+.port-label.lbl-done     { color: #10b981; }
+.port-label.lbl-scheduled{ color: #10b981; }
+.port-label.lbl-goal     { color: #8b5cf6; }
+.port-label.lbl-reply    { color: #3b82f6; }
+.port-label.lbl-failure  { color: #ef4444; }
+.port-label.lbl-failed   { color: #ef4444; }
+.port-label.lbl-human    { color: #f59e0b; }
+.port-label.lbl-timeout  { color: #6b7280; }
+.port-label.lbl-noresp   { color: #6b7280; }
+
+/* IN port divider line */
+.node-port-divider { height: 1px; background: var(--border); margin: 4px 14px; opacity: .5; }
 
 /* Node type colours */
 .wf-node[data-type="trigger"]     { border-color: #10b981; }
-.wf-node[data-type="trigger"] .node-header { background: #10b98108; }
-.wf-node[data-type="trigger"] .node-type-badge { background: #10b98115; color: #10b981; }
+.wf-node[data-type="trigger"] .node-header { background: #10b98110; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="trigger"] .node-type-badge { background: #10b98120; color: #10b981; }
+.wf-node[data-type="trigger"] .node-icon { background: #10b98120; }
 
 .wf-node[data-type="message"]     { border-color: #3b82f6; }
-.wf-node[data-type="message"] .node-header { background: #3b82f608; }
-.wf-node[data-type="message"] .node-type-badge { background: #3b82f615; color: #3b82f6; }
+.wf-node[data-type="message"] .node-header { background: #3b82f610; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="message"] .node-type-badge { background: #3b82f620; color: #3b82f6; }
+.wf-node[data-type="message"] .node-icon { background: #3b82f620; }
 
 .wf-node[data-type="ai"]          { border-color: #8b5cf6; }
-.wf-node[data-type="ai"] .node-header { background: #8b5cf608; }
-.wf-node[data-type="ai"] .node-type-badge { background: #8b5cf615; color: #8b5cf6; }
+.wf-node[data-type="ai"] .node-header { background: #8b5cf610; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="ai"] .node-type-badge { background: #8b5cf620; color: #8b5cf6; }
+.wf-node[data-type="ai"] .node-icon { background: #8b5cf620; }
 
 .wf-node[data-type="action"]      { border-color: #f59e0b; }
-.wf-node[data-type="action"] .node-header { background: #f59e0b08; }
-.wf-node[data-type="action"] .node-type-badge { background: #f59e0b15; color: #f59e0b; }
+.wf-node[data-type="action"] .node-header { background: #f59e0b10; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="action"] .node-type-badge { background: #f59e0b20; color: #f59e0b; }
+.wf-node[data-type="action"] .node-icon { background: #f59e0b20; }
 
 .wf-node[data-type="condition"]   { border-color: #ec4899; }
-.wf-node[data-type="condition"] .node-header { background: #ec489908; }
-.wf-node[data-type="condition"] .node-type-badge { background: #ec489915; color: #ec4899; }
+.wf-node[data-type="condition"] .node-header { background: #ec489910; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="condition"] .node-type-badge { background: #ec489920; color: #ec4899; }
+.wf-node[data-type="condition"] .node-icon { background: #ec489920; }
 
 .wf-node[data-type="notify"]      { border-color: #06b6d4; }
-.wf-node[data-type="notify"] .node-header { background: #06b6d408; }
-.wf-node[data-type="notify"] .node-type-badge { background: #06b6d415; color: #06b6d4; }
+.wf-node[data-type="notify"] .node-header { background: #06b6d410; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="notify"] .node-type-badge { background: #06b6d420; color: #06b6d4; }
+.wf-node[data-type="notify"] .node-icon { background: #06b6d420; }
 
 .wf-node[data-type="end"]         { border-color: #6b7280; }
+.wf-node[data-type="end"] .node-header { background: #6b728010; border-radius: 10px 10px 0 0; }
+.wf-node[data-type="end"] .node-icon { background: #6b728020; }
 
 /* ── SVG edges ──────────────────────────────────────────────────── */
-.wf-edge { fill: none; stroke: var(--border-md); stroke-width: 2; marker-end: url(#arrow); }
-.wf-edge.active { stroke: var(--accent); }
-.wf-edge-label { font-size: 10.5px; fill: var(--text-3); font-family: var(--font); }
+.wf-edge { fill: none; stroke: var(--border-md); stroke-width: 2.5; marker-end: url(#arrow); stroke-linecap: round; }
+.wf-edge.active { stroke: var(--accent); marker-end: url(#arrow-active); }
+.wf-edge:hover  { stroke: var(--accent); opacity: .8; }
+.wf-edge-hit    { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; }
+
+/* Edge label pill */
+.edge-label-pill rect { rx: 8; }
+.wf-edge-label {
+  font-size: 10.5px; font-weight: 700;
+  fill: var(--text-3); font-family: var(--font);
+  pointer-events: none;
+}
+.edge-label-bg {
+  fill: var(--surface); stroke: var(--border);
+  stroke-width: 1; rx: 6; ry: 6;
+}
 
 /* ── Right panel ────────────────────────────────────────────────── */
 .settings-panel {
@@ -576,12 +640,15 @@
 
       <svg id="canvas-svg" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--border-md)"/>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L1,7 L9,4 z" fill="#94a3b8"/>
           </marker>
-          <marker id="arrow-active" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--accent)"/>
+          <marker id="arrow-active" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+            <path d="M1,1 L1,7 L9,4 z" fill="var(--accent)"/>
           </marker>
+          <filter id="node-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="rgba(0,0,0,0.12)"/>
+          </filter>
         </defs>
         <path id="connecting-line"/>
         <g id="edges-layer"></g>
@@ -599,10 +666,31 @@
 
       <!-- Empty state -->
       <div id="canvas-empty" style="position:absolute;inset:0;display:flex;flex-direction:column;
-        align-items:center;justify-content:center;gap:10px;color:var(--text-3);pointer-events:none">
-        <div style="font-size:48px;opacity:.2">⚡</div>
-        <div style="font-size:14px;font-weight:600">Drag blocks from the left to start building</div>
-        <div style="font-size:12.5px">Begin with a Trigger block</div>
+        align-items:center;justify-content:center;gap:14px;color:var(--text-3);pointer-events:none">
+        <div style="font-size:56px;opacity:.15">⚡</div>
+        <div style="font-size:15px;font-weight:800;color:var(--text-2)">Start with a Trigger block</div>
+        <div style="font-size:12.5px;max-width:320px;text-align:center;line-height:1.6">
+          Drag any block from the left panel onto the canvas, then connect blocks by clicking the <strong>● port dots</strong> on each node.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center">
+          <span style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:600">📋 Drag a Trigger</span>
+          <span style="font-size:18px;opacity:.4;align-self:center">→</span>
+          <span style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:600">🤖 Add AI / Action</span>
+          <span style="font-size:18px;opacity:.4;align-self:center">→</span>
+          <span style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:11.5px;font-weight:600">✅ Finish</span>
+        </div>
+      </div>
+
+      <!-- Canvas help bar -->
+      <div style="position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+        background:var(--surface);border:1px solid var(--border);border-radius:20px;
+        padding:6px 14px;display:flex;gap:16px;font-size:11px;color:var(--text-3);
+        pointer-events:none;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:10" id="canvas-hint">
+        <span>🖱 <b>Drag</b> to move nodes</span>
+        <span>⚪ <b>Click port dot</b> to connect</span>
+        <span>🖱 <b>Right-click</b> node for options</span>
+        <span>⌨ <b>Del</b> to delete selected</span>
+        <span>🔍 <b>Scroll</b> to zoom</span>
       </div>
     </div>
 
@@ -1088,13 +1176,39 @@ function createNodeEl(block) {
 function buildPortsHtml(block, def) {
   if (!def.ports) return ''
   var html = ''
+
+  // IN port (shown at top of port section if block has an in port)
+  if (def.ports.in && def.ports.in.length) {
+    html += '<div class="node-port in-port" style="margin-bottom:2px">' +
+      '<span class="port-dot" style="margin-right:6px" title="Input"></span>' +
+      '<span style="font-size:10.5px;color:var(--text-3);font-weight:600">▸ In</span>' +
+      '</div>'
+    if (def.ports.out && def.ports.out.length) {
+      html += '<div class="node-port-divider"></div>'
+    }
+  }
+
+  // OUT ports
   ;(def.ports.out || []).forEach(function(label) {
-    html += '<div class="node-port" data-port="' + esc(label) + '" data-nodeid="' + block.id + '" onmousedown="onPortMouseDown(event,\'' + block.id + '\',\'' + label.replace(/'/g,"\\'") + '\')">' +
-      '<span style="flex:1;font-size:11px">' + esc(label) + '</span>' +
-      '<span class="port-dot out" data-port="' + esc(label) + '"></span>' +
+    var cssClass = portLabelClass(label)
+    var safeL = label.replace(/'/g,"\\'")
+    html += '<div class="node-port out-port" data-port="' + esc(label) + '" data-nodeid="' + block.id + '">' +
+      '<span class="port-label ' + cssClass + '" style="flex:1;text-align:right;padding-right:6px">' + esc(label) + '</span>' +
+      '<span class="port-dot out" data-port="' + esc(label) + '" onmousedown="onPortMouseDown(event,\'' + block.id + '\',\'' + safeL + '\')" title="Drag to connect"></span>' +
       '</div>'
   })
   return html
+}
+
+function portLabelClass(label) {
+  var l = label.toLowerCase().replace(/\s+/g,'')
+  if (l === 'success' || l === 'booked' || l === 'paid' || l === 'sent' || l === 'done' || l === 'scheduled') return 'lbl-success'
+  if (l === 'goalmet') return 'lbl-goal'
+  if (l === 'replyreceived') return 'lbl-reply'
+  if (l === 'failure' || l === 'failed') return 'lbl-failed'
+  if (l === 'humanneeded') return 'lbl-human'
+  if (l === 'timeout' || l === 'noresponse') return 'lbl-noresp'
+  return ''
 }
 
 function getBlockSummary(block) {
@@ -1125,39 +1239,75 @@ function renderEdge(edge, layer) {
   var toNode   = _wf.blocks.find(function(b) { return b.id === edge.to })
   if (!fromNode || !toNode) return
 
-  var fx = (fromNode.x + 200) * _scale + _panX * _scale
-  var fy = (fromNode.y + getNodeHeight(fromNode) / 2) * _scale + _panY * _scale
+  var isActive = _selected && (edge.from === _selected || edge.to === _selected)
+
+  // From: right edge of source node, vertically positioned by port index
+  var def = (BLOCK_DEFS[fromNode.type] || {})[fromNode.subtype] || {}
+  var outPorts = (def.ports && def.ports.out) ? def.ports.out : []
+  var portIdx  = outPorts.indexOf(edge.fromPort)
+  if (portIdx < 0) portIdx = 0
+  var nodeH    = getNodeHeight(fromNode)
+  var inPortH  = (def.ports && def.ports.in && def.ports.in.length) ? 28 : 0
+  var portOffY = inPortH + 48 + portIdx * 26 + 10
+
+  var fx = (fromNode.x + 240) * _scale + _panX * _scale
+  var fy = (fromNode.y + portOffY) * _scale + _panY * _scale
   var tx = toNode.x * _scale + _panX * _scale
   var ty = (toNode.y + 40) * _scale + _panY * _scale
 
-  // Bezier
-  var cx1 = fx + 60, cy1 = fy
-  var cx2 = tx - 60, cy2 = ty
-  var d = 'M' + fx + ',' + fy + ' C' + cx1 + ',' + cy1 + ' ' + cx2 + ',' + cy2 + ' ' + tx + ',' + ty
+  // Smooth bezier with horizontal handles
+  var dx  = Math.max(80, Math.abs(tx - fx) * 0.5)
+  var cx1 = fx + dx, cy1 = fy
+  var cx2 = tx - dx, cy2 = ty
+  var d   = 'M' + fx + ',' + fy + ' C' + cx1 + ',' + cy1 + ' ' + cx2 + ',' + cy2 + ' ' + tx + ',' + ty
+
+  // Hit-area (invisible wide stroke for easier clicking)
+  var hit = document.createElementNS('http://www.w3.org/2000/svg','path')
+  hit.setAttribute('d', d)
+  hit.setAttribute('class','wf-edge-hit')
+  hit.style.cursor = 'pointer'
+  layer.appendChild(hit)
 
   var path = document.createElementNS('http://www.w3.org/2000/svg','path')
   path.setAttribute('d', d)
-  path.setAttribute('class', 'wf-edge' + (_selected && (edge.from === _selected || edge.to === _selected) ? ' active' : ''))
-  path.setAttribute('marker-end', _selected && (edge.from === _selected || edge.to === _selected) ? 'url(#arrow-active)' : 'url(#arrow)')
+  path.setAttribute('class', 'wf-edge' + (isActive ? ' active' : ''))
+  path.setAttribute('marker-end', isActive ? 'url(#arrow-active)' : 'url(#arrow)')
   layer.appendChild(path)
 
-  // Label
-  if (edge.label) {
-    var midX = (fx + tx) / 2
-    var midY = (fy + ty) / 2
-    var text = document.createElementNS('http://www.w3.org/2000/svg','text')
-    text.setAttribute('x', midX); text.setAttribute('y', midY - 6)
-    text.setAttribute('text-anchor','middle')
-    text.setAttribute('class','wf-edge-label')
-    text.textContent = edge.label
-    layer.appendChild(text)
+  // Port label pill on the edge (always show fromPort label)
+  var labelText = edge.fromPort || edge.label || ''
+  if (labelText) {
+    var midX = (fx + cx1 + cx2 + tx) / 4
+    var midY = (fy + cy1 + cy2 + ty) / 4
+    var pw = labelText.length * 6.5 + 16
+    var ph = 18
+
+    var g = document.createElementNS('http://www.w3.org/2000/svg','g')
+
+    var bg = document.createElementNS('http://www.w3.org/2000/svg','rect')
+    bg.setAttribute('x', midX - pw/2); bg.setAttribute('y', midY - ph/2)
+    bg.setAttribute('width', pw); bg.setAttribute('height', ph)
+    bg.setAttribute('rx', 9); bg.setAttribute('ry', 9)
+    bg.setAttribute('class','edge-label-bg')
+    g.appendChild(bg)
+
+    var txt = document.createElementNS('http://www.w3.org/2000/svg','text')
+    txt.setAttribute('x', midX); txt.setAttribute('y', midY + 4)
+    txt.setAttribute('text-anchor','middle')
+    txt.setAttribute('class','wf-edge-label')
+    txt.style.fill = isActive ? 'var(--accent)' : 'var(--text-3)'
+    txt.textContent = labelText
+    g.appendChild(txt)
+
+    layer.appendChild(g)
   }
 }
 
 function getNodeHeight(block) {
   var def = (BLOCK_DEFS[block.type] || {})[block.subtype] || {}
   var outCount = (def.ports && def.ports.out ? def.ports.out.length : 0)
-  return 72 + outCount * 22
+  var inCount  = (def.ports && def.ports.in  ? def.ports.in.length  : 0)
+  return 80 + (inCount ? 28 : 0) + outCount * 26
 }
 
 // ── Canvas transform ──────────────────────────────────────────────
