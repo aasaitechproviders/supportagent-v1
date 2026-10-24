@@ -1247,10 +1247,11 @@ function populateAutoForm(cfg) {
   var el = function(id) { return document.getElementById(id) }
   el('sw-enabled').checked           = !!cfg.enabled
   el('f-reminder-hours').value       = cfg.reminder_hours_before  != null ? cfg.reminder_hours_before  : 24
-  el('f-reminder-template').value    = cfg.reminder_template_name  || ''
+  // API now stores and returns reminder_template_name (resolved from ID on save)
+  el('f-reminder-template').value    = cfg.reminder_template_name || ''
   el('f-reminder-lang').value        = cfg.reminder_template_lang  || 'en_US'
   el('f-followup-hours').value       = cfg.followup_hours_after    != null ? cfg.followup_hours_after    : 2
-  el('f-followup-template').value    = cfg.followup_template_name  || ''
+  el('f-followup-template').value    = cfg.followup_template_name || ''
   el('f-followup-lang').value        = cfg.followup_template_lang  || 'en_US'
   if (cfg.updated_at) {
     var d = new Date(cfg.updated_at)
@@ -1300,7 +1301,8 @@ async function runNow() {
   btn.disabled = true; btn.textContent = '⏳ Running…'
   try {
     var d = await apiFetch('/automations/run', { method: 'POST', body: JSON.stringify({ agent_id: _agentId }) })
-    toast('Done — ' + (d.reminders_sent || 0) + ' reminder(s), ' + (d.followups_sent || 0) + ' follow-up(s) sent', 'success')
+    // API returns { reminders, followups } (not reminders_sent/followups_sent)
+    toast('Done — ' + (d.reminders || 0) + ' reminder(s), ' + (d.followups || 0) + ' follow-up(s) sent', 'success')
     await loadAutomations()
   } catch(e) {
     toast(e.message || 'Run failed', 'error')
