@@ -398,7 +398,7 @@
       const res  = await apiFetch('/agents')
       const list = Array.isArray(res) ? res : (res.agents || [])
       const sel  = document.getElementById('agentSelect')
-      sel.innerHTML = list.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+      sel.innerHTML = list.map(a => `<option value="${a._id}">${escHtml(a.name)}</option>`).join('')
       if (list.length) {
         currentAgent = list[0]._id
         await loadTemplates()
