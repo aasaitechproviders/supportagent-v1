@@ -582,7 +582,7 @@ let _charts = {}
 function buildAgentSelect(agents) {
   const sel = document.getElementById('agentSelect')
   if (!agents.length) { sel.innerHTML = '<option value="">No agents yet</option>'; return }
-  sel.innerHTML = agents.map(a => `<option value="${a._id}">${a.name}</option>`).join('')
+  sel.innerHTML = agents.map(a => `<option value="${a._id}">${esc(a.name)}</option>`).join('')
   sel.value = agents[0]._id
 }
 
