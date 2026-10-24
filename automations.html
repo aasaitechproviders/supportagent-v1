@@ -9,10 +9,78 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <style>
+/* ── Sidebar-aware layout ────────────────────────────────────────── */
+body.has-sidebar .builder-toolbar,
+body.has-sidebar .mob-topbar,
+body.has-sidebar #list-view .builder-toolbar,
+body.has-sidebar #builder-view .builder-toolbar {
+  left: var(--sidebar-w, 224px);
+  transition: left .22s ease;
+}
+body.has-sidebar .main-wrap,
+body.has-sidebar .builder-wrap,
+body.has-sidebar #list-view > .main-wrap {
+  margin-left: var(--sidebar-w, 224px);
+  transition: margin-left .22s ease;
+}
+body.sidebar-collapsed {
+  --sidebar-w: 56px;
+}
+/* Collapsed sidebar — icon only */
+body.sidebar-collapsed .sidebar {
+  width: 56px;
+  overflow: hidden;
+}
+body.sidebar-collapsed .sidebar-logo span:not(.logo-mark),
+body.sidebar-collapsed .sidebar-logo .logo-gent,
+body.sidebar-collapsed .nav-section-label,
+body.sidebar-collapsed .nav-item span + *,
+body.sidebar-collapsed .sidebar-user-info,
+body.sidebar-collapsed .sidebar-user-skel > div:last-child,
+body.sidebar-collapsed .sidebar-quick-actions,
+body.sidebar-collapsed .sidebar-bottom,
+body.sidebar-collapsed .token-sidebar-widget { display: none !important; }
+body.sidebar-collapsed .nav-item { justify-content: center; padding: 10px 0; }
+body.sidebar-collapsed .sidebar-logo { justify-content: center; padding: 14px 0; }
+body.sidebar-collapsed .sidebar-user { justify-content: center; }
+body.sidebar-collapsed .nav-section { margin-bottom: 4px; }
+
+/* ── Sidebar collapse button ────────────────────────────────────── */
+.sidebar-collapse-btn {
+  position: absolute;
+  bottom: 72px; right: -13px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  color: var(--text-2); font-size: 14px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  z-index: 310; line-height: 1;
+  transition: var(--t);
+}
+.sidebar-collapse-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+body.sidebar-collapsed .sidebar-collapse-btn { right: -13px; transform: rotate(180deg); }
+
+/* ── Mobile topbar ───────────────────────────────────────────────── */
+.mob-topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: 52px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  align-items: center; justify-content: space-between;
+  padding: 0 14px; z-index: 200;
+}
+.mob-menu-btn {
+  background: none; border: none; font-size: 20px;
+  color: var(--text-2); cursor: pointer; padding: 4px 8px;
+  border-radius: var(--r-sm);
+}
+.mob-menu-btn:hover { background: var(--surface-2); }
+
 /* ── Builder layout — full viewport minus sidebar ───────────────── */
 .builder-wrap {
   display: flex;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 56px);
   overflow: hidden;
   background: var(--bg);
 }
@@ -20,7 +88,7 @@
 /* ── Top toolbar ────────────────────────────────────────────────── */
 .builder-toolbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0; left: var(--sidebar-w, 224px); right: 0;
   height: 56px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -29,6 +97,7 @@
   padding: 0 16px;
   gap: 10px;
   z-index: 200;
+  transition: left .22s ease;
 }
 .builder-toolbar .logo-area {
   display: flex; align-items: center; gap: 10px;
@@ -448,9 +517,20 @@
   .palette { display: none; }
   .settings-panel { width: 260px; }
 }
+@media(max-width: 768px) {
+  .mob-topbar { display: flex !important; }
+  .builder-toolbar { display: none !important; }
+  body.has-sidebar .mob-topbar { left: 0 !important; }
+  body.has-sidebar .main-wrap,
+  body.has-sidebar .builder-wrap,
+  body.has-sidebar #list-view > .main-wrap { margin-left: 0 !important; }
+  .builder-wrap { height: calc(100vh - 52px); margin-top: 52px; }
+  .palette { margin-top: 52px; }
+  .canvas-area { margin-top: 52px; }
+  .settings-panel { margin-top: 52px; }
+}
 @media(max-width: 640px) {
   .settings-panel { display: none; }
-  .builder-toolbar { padding: 0 10px; gap: 6px; }
   .wf-name-input { max-width: 160px; }
 }
 </style>
@@ -467,17 +547,29 @@
 <script src="api.js"></script>
 <script src="nav.js"></script>
 </head>
-<body>
+<body class="has-sidebar">
 
 <div id="toast-container"></div>
+
+<!-- ══ SHARED SIDEBAR (all views) ════════════════════════════════ -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <!-- collapse toggle button -->
+  <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">‹</button>
+</div>
 
 <!-- ══ WORKFLOW LIST VIEW ══════════════════════════════════════════ -->
 <div id="list-view" style="display:none">
 
-  <!-- Minimal topbar for list view -->
+  <!-- Mobile topbar -->
+  <div class="mob-topbar">
+    <button class="mob-menu-btn" onclick="openMobileSidebar()">☰</button>
+    <span style="font-size:14px;font-weight:800;color:var(--text)">⚡ Workflows</span>
+    <button class="theme-toggle"></button>
+  </div>
+
+  <!-- Desktop topbar for list view -->
   <div class="builder-toolbar" style="position:relative;margin-bottom:0">
-    <a class="back-btn" href="home.html">← Home</a>
-    <div class="toolbar-sep"></div>
     <span style="font-size:14px;font-weight:800;color:var(--text)">⚡ Automation Builder</span>
     <div class="toolbar-right">
       <select class="agent-sel" id="list-agent-sel" onchange="onListAgentChange()" style="height:34px;font-size:13px">
@@ -529,9 +621,16 @@
 <!-- ══ BUILDER VIEW ════════════════════════════════════════════════ -->
 <div id="builder-view" style="display:none">
 
-  <!-- Toolbar -->
+  <!-- Mobile topbar -->
+  <div class="mob-topbar">
+    <button class="mob-menu-btn" onclick="openMobileSidebar()">☰</button>
+    <span style="font-size:13px;font-weight:700;color:var(--text)" id="mob-wf-name">Workflow Builder</span>
+    <button class="theme-toggle"></button>
+  </div>
+
+  <!-- Desktop Toolbar -->
   <div class="builder-toolbar">
-    <a class="back-btn" onclick="exitBuilder()" style="cursor:pointer">← Back</a>
+    <button class="back-btn" onclick="exitBuilder()" style="cursor:pointer">← Back</button>
     <div class="toolbar-sep"></div>
     <input class="wf-name-input" id="wf-name-input" value="New Workflow" maxlength="80" placeholder="Workflow name…"/>
     <span class="status-pill draft" id="wf-status-pill">● Draft</span>
@@ -871,7 +970,19 @@ var BLOCK_DEFS = {
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
+// ── Sidebar collapse ──────────────────────────────────────────────
+function toggleSidebarCollapse() {
+  var collapsed = document.body.classList.toggle('sidebar-collapsed')
+  localStorage.setItem('sg_sidebar_collapsed', collapsed ? '1' : '')
+}
+function restoreSidebarState() {
+  if (localStorage.getItem('sg_sidebar_collapsed') === '1') {
+    document.body.classList.add('sidebar-collapsed')
+  }
+}
+
 async function init() {
+  restoreSidebarState()
   var nav = await renderNav('automations')
   if (!nav || !nav.user) return
   await loadAgents()
