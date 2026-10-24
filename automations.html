@@ -1233,7 +1233,7 @@ async function loadAutomations() {
   if (!_agentId) return
   try {
     var d = await apiFetch('/automations?agent_id=' + _agentId)
-    _autoConfig = d.automations || d || {}
+    _autoConfig = d.config || {}
     populateAutoForm(_autoConfig)
     updateStatusCard(_autoConfig)
   } catch(e) {
