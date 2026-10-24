@@ -512,6 +512,91 @@ body.sidebar-collapsed .sidebar-collapse-btn { right: -13px; transform: rotate(1
 }
 .field-input-m:focus, .field-select-m:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
+/* ── Automation tabs ─────────────────────────────────────────────── */
+.auto-tabs {
+  display: flex; gap: 4px;
+  padding: 16px 24px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.auto-tab {
+  padding: 9px 18px; border-radius: var(--r-sm) var(--r-sm) 0 0;
+  border: 1px solid transparent; border-bottom: none;
+  background: none; color: var(--text-3);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: var(--t);
+  position: relative; bottom: -1px;
+}
+.auto-tab:hover { color: var(--text); background: var(--surface-2); }
+.auto-tab.active {
+  background: var(--surface); color: var(--accent);
+  border-color: var(--border); border-bottom-color: var(--surface);
+}
+
+/* ── Settings card styles (from automations.html) ────────────────── */
+.section-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); margin-bottom: 20px; overflow: hidden;
+}
+.section-head {
+  padding: 18px 22px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.section-title { font-size: 14.5px; font-weight: 800; color: var(--text); letter-spacing: -.03em; display: flex; align-items: center; gap: 8px; }
+.section-desc  { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.6; }
+.section-body  { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 14px 18px; border-radius: var(--r); background: var(--surface-2); border: 1px solid var(--border);
+}
+.toggle-info { display: flex; flex-direction: column; gap: 3px; }
+.toggle-label { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.toggle-sub   { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+.sw-wrap { position: relative; display: inline-block; }
+.sw-wrap input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
+.sw-track {
+  display: block; width: 44px; height: 24px; border-radius: 12px;
+  background: var(--border-md); cursor: pointer; transition: var(--t);
+  position: relative;
+}
+.sw-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%; background: #fff;
+  transition: var(--t); box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.sw-wrap input:checked + .sw-track { background: var(--accent); }
+.sw-wrap input:checked + .sw-track::after { left: 23px; }
+.info-box {
+  display: flex; gap: 10px; padding: 12px 14px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r); font-size: 12.5px; color: var(--text-2); line-height: 1.6;
+}
+.info-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 12.5px; font-weight: 700; color: var(--text-2); }
+.field-label small { font-weight: 500; color: var(--text-3); margin-left: 4px; }
+.field-input {
+  height: 38px; padding: 0 12px; border: 1px solid var(--border);
+  border-radius: var(--r-sm); background: var(--surface-2); color: var(--text);
+  font-family: var(--font); font-size: 13px; outline: none; transition: var(--t);
+}
+.field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.field-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.5; }
+.save-bar {
+  padding: 14px 22px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--surface-2);
+}
+.save-bar-note { font-size: 12px; color: var(--text-3); }
+.run-status {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.run-status-label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.run-status-val   { font-size: 13px; font-weight: 700; color: var(--text); font-family: var(--mono); }
+
 /* ── Responsive — hide palette on small screens ─────────────────── */
 @media(max-width: 900px) {
   .palette { display: none; }
@@ -568,52 +653,172 @@ body.sidebar-collapsed .sidebar-collapse-btn { right: -13px; transform: rotate(1
     <button class="theme-toggle"></button>
   </div>
 
-  <!-- Desktop topbar for list view -->
-  <div class="builder-toolbar" style="position:relative;margin-bottom:0">
-    <span style="font-size:14px;font-weight:800;color:var(--text)">⚡ Automation Builder</span>
-    <div class="toolbar-right">
-      <select class="agent-sel" id="list-agent-sel" onchange="onListAgentChange()" style="height:34px;font-size:13px">
-        <option value="">— Select agent —</option>
-      </select>
-      <button class="theme-toggle"></button>
-    </div>
-  </div>
-
   <div class="main-wrap" style="padding-top:0">
-    <div class="content" style="max-width:none">
-      <div class="wf-list-panel">
-        <div class="wf-list-title">Workflows</div>
-        <div class="wf-list-sub">Create and manage automated conversation flows for your agent.</div>
-
-        <div class="wf-cards" id="wf-cards-grid">
-          <div class="new-wf-card" onclick="openNewWfModal()">
-            <div class="new-wf-icon">＋</div>
-            <div>New Workflow</div>
-          </div>
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="topbar-title">⚡ Automations</div>
+          <div class="topbar-subtitle">Workflows, reminders &amp; follow-ups</div>
         </div>
+      </div>
+      <div class="topbar-right">
+        <select class="agent-sel" id="list-agent-sel" onchange="onListAgentChange()" style="height:34px;font-size:13px">
+          <option value="">— Select agent —</option>
+        </select>
+        <button class="theme-toggle"></button>
+      </div>
+    </div>
 
-        <!-- Execution history -->
-        <div style="margin-top:32px">
-          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px">Recent Executions</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
-            <table class="exec-table" id="exec-table">
-              <thead>
-                <tr>
-                  <th>Workflow</th>
-                  <th>Trigger</th>
-                  <th>Status</th>
-                  <th>Contact</th>
-                  <th>Started</th>
-                  <th>Duration</th>
-                </tr>
-              </thead>
-              <tbody id="exec-tbody">
-                <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Select an agent to view executions</td></tr>
-              </tbody>
-            </table>
+    <div class="content" style="max-width:none;padding-top:0">
+
+      <!-- Tab bar -->
+      <div class="auto-tabs" id="auto-tabs">
+        <button class="auto-tab active" data-tab="workflows" onclick="switchTab('workflows')">⚡ Workflows</button>
+        <button class="auto-tab" data-tab="settings" onclick="switchTab('settings')">⚙️ Reminder &amp; Follow-up</button>
+      </div>
+
+      <!-- ── TAB: Workflows ─────────────────────────────────────── -->
+      <div id="tab-workflows">
+        <div class="wf-list-panel">
+          <div class="wf-list-title">Workflows</div>
+          <div class="wf-list-sub">Create and manage automated conversation flows for your agent.</div>
+
+          <div class="wf-cards" id="wf-cards-grid">
+            <div class="new-wf-card" onclick="openNewWfModal()">
+              <div class="new-wf-icon">＋</div>
+              <div>New Workflow</div>
+            </div>
+          </div>
+
+          <!-- Execution history -->
+          <div style="margin-top:32px">
+            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px">Recent Executions</div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden">
+              <table class="exec-table" id="exec-table">
+                <thead>
+                  <tr><th>Workflow</th><th>Trigger</th><th>Status</th><th>Contact</th><th>Started</th><th>Duration</th></tr>
+                </thead>
+                <tbody id="exec-tbody">
+                  <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">Select an agent to view executions</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- ── TAB: Settings (reminders + follow-ups) ─────────────── -->
+      <div id="tab-settings" style="display:none">
+        <div class="wf-list-panel">
+
+          <!-- Enable card -->
+          <div class="section-card">
+            <div class="section-head">
+              <div>
+                <div class="section-title">🤖 Appointment Automations</div>
+                <div class="section-desc">Automatically send reminders before appointments and follow-ups after — via WhatsApp using approved templates.</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-label">Enable Automations</div>
+                  <div class="toggle-sub">When on, the scheduler will automatically send reminder &amp; follow-up messages at configured times.</div>
+                </div>
+                <label class="sw-wrap">
+                  <input type="checkbox" id="sw-enabled"/>
+                  <span class="sw-track"></span>
+                </label>
+              </div>
+              <div class="info-box">
+                <div class="info-icon">💡</div>
+                <div class="info-text"><strong>How it works:</strong> When a customer books via any channel, the AI creates an appointment record. The scheduler Lambda (runs every 5 min) sends the reminder before and follow-up after using your WhatsApp templates.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reminder -->
+          <div class="section-card">
+            <div class="section-head">
+              <div>
+                <div class="section-title">🔔 Reminder Message</div>
+                <div class="section-desc">Sent before the appointment as a confirmation reminder.</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="field-grid">
+                <div class="field-group">
+                  <label class="field-label">Send reminder <small>(hours before)</small></label>
+                  <input class="field-input" id="f-reminder-hours" type="number" min="1" max="72" placeholder="e.g. 24"/>
+                  <div class="field-hint">E.g. 24 = send 1 day before the appointment.</div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">WhatsApp Template</label>
+                  <input class="field-input" id="f-reminder-template" placeholder="e.g. appointment_reminder"/>
+                  <div class="field-hint">Approved template name in Meta Business Manager.</div>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Template language <small>(optional)</small></label>
+                <input class="field-input" id="f-reminder-lang" placeholder="en_US" style="max-width:200px"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Follow-up -->
+          <div class="section-card">
+            <div class="section-head">
+              <div>
+                <div class="section-title">📨 Follow-up Message</div>
+                <div class="section-desc">Sent after the appointment — thank the customer, collect feedback, or upsell.</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="field-grid">
+                <div class="field-group">
+                  <label class="field-label">Send follow-up <small>(hours after)</small></label>
+                  <input class="field-input" id="f-followup-hours" type="number" min="1" max="168" placeholder="e.g. 2"/>
+                  <div class="field-hint">E.g. 2 = send 2 hours after the appointment ends.</div>
+                </div>
+                <div class="field-group">
+                  <label class="field-label">WhatsApp Template</label>
+                  <input class="field-input" id="f-followup-template" placeholder="e.g. appointment_followup"/>
+                  <div class="field-hint">Approved template name in Meta Business Manager.</div>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Template language <small>(optional)</small></label>
+                <input class="field-input" id="f-followup-lang" placeholder="en_US" style="max-width:200px"/>
+              </div>
+            </div>
+            <div class="save-bar">
+              <div class="save-bar-note" id="last-saved-note">Not saved yet</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-secondary btn-sm" id="run-btn" onclick="runNow()">▶ Run Now</button>
+                <button class="btn btn-primary" id="save-btn" onclick="saveAutomations()">Save Settings</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="section-card" id="status-card" style="display:none">
+            <div class="section-head">
+              <div>
+                <div class="section-title">📊 Automation Status</div>
+                <div class="section-desc">Last run results for this agent.</div>
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="run-status"><span class="run-status-label">Last run</span><span class="run-status-val" id="stat-last-run">—</span></div>
+              <div class="run-status"><span class="run-status-label">Reminders sent (total)</span><span class="run-status-val" id="stat-reminders">—</span></div>
+              <div class="run-status"><span class="run-status-label">Follow-ups sent (total)</span><span class="run-status-val" id="stat-followups">—</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- /tab-settings -->
+
     </div>
   </div>
 </div>
@@ -970,6 +1175,99 @@ var BLOCK_DEFS = {
 // ══════════════════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════════════════
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.auto-tab').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.tab === tab)
+  })
+  document.getElementById('tab-workflows').style.display = tab === 'workflows' ? '' : 'none'
+  document.getElementById('tab-settings').style.display  = tab === 'settings'  ? '' : 'none'
+  if (tab === 'settings' && _agentId) loadAutomations()
+}
+
+// ── Automations config ────────────────────────────────────────────
+var _autoConfig = null
+
+async function loadAutomations() {
+  if (!_agentId) return
+  try {
+    var d = await apiFetch('/automations?agent_id=' + _agentId)
+    _autoConfig = d.automations || d || {}
+    populateAutoForm(_autoConfig)
+    updateStatusCard(_autoConfig)
+  } catch(e) {
+    _autoConfig = {}
+    populateAutoForm({})
+    if (!e.message || !e.message.includes('404')) toast('Failed to load automation settings: ' + e.message, 'error')
+  }
+}
+
+function populateAutoForm(cfg) {
+  var el = function(id) { return document.getElementById(id) }
+  el('sw-enabled').checked           = !!cfg.enabled
+  el('f-reminder-hours').value       = cfg.reminder_hours_before  != null ? cfg.reminder_hours_before  : 24
+  el('f-reminder-template').value    = cfg.reminder_template_name  || ''
+  el('f-reminder-lang').value        = cfg.reminder_template_lang  || 'en_US'
+  el('f-followup-hours').value       = cfg.followup_hours_after    != null ? cfg.followup_hours_after    : 2
+  el('f-followup-template').value    = cfg.followup_template_name  || ''
+  el('f-followup-lang').value        = cfg.followup_template_lang  || 'en_US'
+  if (cfg.updated_at) {
+    var d = new Date(cfg.updated_at)
+    el('last-saved-note').textContent = 'Last saved: ' + d.toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
+  }
+}
+
+function updateStatusCard(cfg) {
+  var card = document.getElementById('status-card')
+  if (!cfg || !cfg.last_run_at) { card.style.display = 'none'; return }
+  card.style.display = 'block'
+  document.getElementById('stat-last-run').textContent   = new Date(cfg.last_run_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })
+  document.getElementById('stat-reminders').textContent  = cfg.total_reminders_sent != null ? cfg.total_reminders_sent : '—'
+  document.getElementById('stat-followups').textContent  = cfg.total_followups_sent != null ? cfg.total_followups_sent : '—'
+}
+
+async function saveAutomations() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+  var el = function(id) { return document.getElementById(id) }
+  var body = {
+    agent_id:               _agentId,
+    enabled:                el('sw-enabled').checked,
+    reminder_hours_before:  parseFloat(el('f-reminder-hours').value)   || 24,
+    reminder_template_name: el('f-reminder-template').value.trim(),
+    reminder_template_lang: el('f-reminder-lang').value.trim()          || 'en_US',
+    followup_hours_after:   parseFloat(el('f-followup-hours').value)    || 2,
+    followup_template_name: el('f-followup-template').value.trim(),
+    followup_template_lang: el('f-followup-lang').value.trim()          || 'en_US',
+  }
+  var btn = el('save-btn')
+  btn.disabled = true; btn.textContent = 'Saving…'
+  try {
+    await apiFetch('/automations', { method: 'PUT', body: JSON.stringify(body) })
+    toast('Automation settings saved ✓', 'success')
+    el('last-saved-note').textContent = 'Last saved: just now'
+    await loadAutomations()
+  } catch(e) {
+    toast(e.message || 'Failed to save', 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Settings'
+  }
+}
+
+async function runNow() {
+  if (!_agentId) { toast('Select an agent first', 'error'); return }
+  var btn = document.getElementById('run-btn')
+  btn.disabled = true; btn.textContent = '⏳ Running…'
+  try {
+    var d = await apiFetch('/automations/run', { method: 'POST', body: JSON.stringify({ agent_id: _agentId }) })
+    toast('Done — ' + (d.reminders_sent || 0) + ' reminder(s), ' + (d.followups_sent || 0) + ' follow-up(s) sent', 'success')
+    await loadAutomations()
+  } catch(e) {
+    toast(e.message || 'Run failed', 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = '▶ Run Now'
+  }
+}
+
 // ── Sidebar collapse ──────────────────────────────────────────────
 function toggleSidebarCollapse() {
   var collapsed = document.body.classList.toggle('sidebar-collapsed')
@@ -1022,6 +1320,9 @@ async function onListAgentChange() {
     localStorage.setItem('sg_auto_agent', _agentId)
     await loadWorkflows()
     await loadTemplates()
+    // reload settings tab if visible
+    var settingsTab = document.getElementById('tab-settings')
+    if (settingsTab && settingsTab.style.display !== 'none') loadAutomations()
   }
 }
 
