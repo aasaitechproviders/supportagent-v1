@@ -1568,7 +1568,7 @@
   function setupHeader(d) {
     document.getElementById('hdr-name').textContent = d.name || 'Agent'
     const av = document.getElementById('hdr-avatar')
-    if (d.logo_base64) { av.innerHTML = `<img src="${d.logo_base64}" alt="${d.name}"/>` }
+    if (d.logo_base64) { av.innerHTML = `<img src="${d.logo_base64}" alt="${esc(d.name)}"/>` }
     else { av.textContent = (d.name?.[0]?.toUpperCase()) || '✦'; if (d.brand_color) av.style.background = `linear-gradient(135deg,${d.brand_color},${dimColor(d.brand_color)})` }
   }
   function setupColors(d) {
