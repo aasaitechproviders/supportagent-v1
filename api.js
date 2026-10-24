@@ -110,7 +110,15 @@ function toast(msg, type = 'success', duration = 3200) {
   const icons = { success:'✓', error:'✕', info:'ℹ', warning:'⚠' }
   const el = document.createElement('div')
   el.className = 'toast ' + type
-  el.innerHTML = `<span style="flex-shrink:0;font-size:12px;opacity:.7">${icons[type] || 'ℹ'}</span><span style="flex:1">${msg}</span>`
+  // Use DOM API to avoid XSS from error messages containing user-supplied content
+  const iconSpan = document.createElement('span')
+  iconSpan.style.cssText = 'flex-shrink:0;font-size:12px;opacity:.7'
+  iconSpan.textContent = icons[type] || 'ℹ'
+  const msgSpan = document.createElement('span')
+  msgSpan.style.flex = '1'
+  msgSpan.textContent = msg
+  el.appendChild(iconSpan)
+  el.appendChild(msgSpan)
   c.appendChild(el)
   setTimeout(() => {
     el.classList.add('fade-out')
