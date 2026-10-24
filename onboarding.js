@@ -334,42 +334,64 @@ const SG_OB = {
       this.markDone('create_agent')
 
       // Step 2: Add knowledge source
+      // Issue 1 fix: track partial failures so we show an honest status, not always "🎉 ready!"
+      const warnings = []
       prog(45, 'Loading knowledge base…')
-      await apiFetch(`/agents/${agentId}/sources`, {
-        method: 'POST',
-        body: JSON.stringify({
-          type: 'text',
-          title: "Priya's Boutique — Product Catalog & Store Guide",
-          content: DEMO_KNOWLEDGE_TEXT
+      try {
+        await apiFetch(`/agents/${agentId}/sources`, {
+          method: 'POST',
+          body: JSON.stringify({
+            type: 'text',
+            title: "Priya's Boutique — Product Catalog & Store Guide",
+            content: DEMO_KNOWLEDGE_TEXT
+          })
         })
-      }).catch(() => {}) // non-fatal if source fails
-      this.markDone('add_knowledge')
+        this.markDone('add_knowledge')
+      } catch (e) {
+        warnings.push('Knowledge base could not be loaded')
+        console.warn('[demo] source import failed:', e.message)
+      }
       prog(60, 'Knowledge added! Uploading products…')
 
       // Step 3: Upload products CSV
-      const csvBlob = new Blob([DEMO_PRODUCTS_CSV], { type: 'text/csv' })
-      const prodForm = new FormData()
-      prodForm.append('file', csvBlob, 'products.csv')
-      await apiFetch(`/agents/${agentId}/products/import`, {
-        method: 'POST',
-        body: prodForm
-      }).catch(() => {}) // non-fatal
-      this.markDone('add_products')
+      try {
+        const csvBlob = new Blob([DEMO_PRODUCTS_CSV], { type: 'text/csv' })
+        const prodForm = new FormData()
+        prodForm.append('file', csvBlob, 'products.csv')
+        await apiFetch(`/agents/${agentId}/products/bulk`, {
+          method: 'POST',
+          body: prodForm
+        })
+        this.markDone('add_products')
+      } catch (e) {
+        warnings.push('Product catalog could not be uploaded')
+        console.warn('[demo] products import failed:', e.message)
+      }
       prog(80, 'Products uploaded! Uploading categories…')
 
       // Step 4: Upload categories CSV
-      const catBlob = new Blob([DEMO_CATEGORIES_CSV], { type: 'text/csv' })
-      const catForm = new FormData()
-      catForm.append('file', catBlob, 'categories.csv')
-      await apiFetch(`/agents/${agentId}/categories/import`, {
-        method: 'POST',
-        body: catForm
-      }).catch(() => {}) // non-fatal
+      try {
+        const catBlob = new Blob([DEMO_CATEGORIES_CSV], { type: 'text/csv' })
+        const catForm = new FormData()
+        catForm.append('file', catBlob, 'categories.csv')
+        await apiFetch(`/agents/${agentId}/categories/import`, {
+          method: 'POST',
+          body: catForm
+        })
+      } catch (e) {
+        warnings.push('Categories could not be uploaded')
+        console.warn('[demo] categories import failed:', e.message)
+      }
       prog(95, 'Almost done…')
 
       await new Promise(r => setTimeout(r, 500))
-      prog(100, 'Demo store ready!')
-      setTitle('🎉', 'Your demo store is ready!', "Click below to explore your AI shopping agent")
+      prog(100, warnings.length ? 'Demo store created with some issues' : 'Demo store ready!')
+
+      if (warnings.length > 0) {
+        setTitle('⚠️', 'Demo store created — some steps failed', warnings.join(' · ') + '. You can add them manually.')
+      } else {
+        setTitle('🎉', 'Your demo store is ready!', "Click below to explore your AI shopping agent")
+      }
 
       // Replace loading state with success + CTA
       const modalEl = overlay.querySelector('.modal')
