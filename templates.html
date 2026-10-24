@@ -436,6 +436,18 @@
       allTemplates = res.templates || []
       renderStats()
       renderTemplates()
+
+      // Auto-sync status from Meta in background (silent — no toast unless something changed)
+      try {
+        const syncRes = await apiFetch(`/templates/sync?agent_id=${currentAgent}`, { method: 'POST' })
+        if (syncRes.updated > 0) {
+          // Re-fetch and re-render with updated statuses
+          const res2   = await apiFetch(`/templates?agent_id=${currentAgent}`)
+          allTemplates = res2.templates || []
+          renderStats()
+          renderTemplates()
+        }
+      } catch (_) { /* silent — sync is best-effort */ }
     } catch (e) {
       showToast('Failed to load templates: ' + e.message, 'error')
     }
