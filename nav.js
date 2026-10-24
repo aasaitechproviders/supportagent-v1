@@ -42,18 +42,55 @@ function _injectSidebarCollapseStyles() {
   const s = document.createElement('style')
   s.id = 'sg-sidebar-collapse-styles'
   s.textContent = `
+    /* ── Collapse tab button ── */
     .sidebar-collapse-btn {
-      position: absolute; bottom: 72px; right: -13px;
-      width: 26px; height: 26px; border-radius: 50%;
-      background: var(--surface); border: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,.12);
-      color: var(--text-2); font-size: 14px; font-weight: 700;
+      position: absolute; top: 50%; right: -18px;
+      transform: translateY(-50%);
+      width: 18px; height: 56px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+      box-shadow: 3px 0 8px rgba(0,0,0,.10);
+      color: var(--text-2); font-size: 13px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
-      z-index: 310; line-height: 1; transition: var(--t);
+      z-index: 310; transition: background .15s, color .15s;
+      padding: 0;
     }
     .sidebar-collapse-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .sidebar-collapse-arrow { display: inline-block; transition: transform .2s; }
+    .sidebar-collapse-arrow { display: inline-block; transition: transform .25s; line-height:1; }
     body.sidebar-collapsed .sidebar-collapse-arrow { transform: rotate(180deg); }
+
+    /* ── Collapsed sidebar — icons only ── */
+    body.sidebar-collapsed .sidebar { overflow: visible; }
+    body.sidebar-collapsed .nav-label { display: none !important; }
+    body.sidebar-collapsed .nav-item  {
+      justify-content: center !important;
+      padding: 10px 0 !important;
+      position: relative;
+    }
+    body.sidebar-collapsed .nav-item:hover::after {
+      content: attr(title);
+      position: absolute; left: calc(100% + 12px); top: 50%;
+      transform: translateY(-50%);
+      background: var(--text); color: var(--surface);
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+      padding: 5px 10px; border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+      z-index: 500; pointer-events: none;
+    }
+    body.sidebar-collapsed .nav-icon { margin: 0 !important; font-size: 18px; }
+    body.sidebar-collapsed .nav-section-label,
+    body.sidebar-collapsed .sidebar-user-info,
+    body.sidebar-collapsed .sidebar-user-skel > div:last-child,
+    body.sidebar-collapsed .sidebar-quick-actions,
+    body.sidebar-collapsed .sidebar-bottom,
+    body.sidebar-collapsed .token-sidebar-widget,
+    body.sidebar-collapsed .sidebar-logo span:not(.logo-mark),
+    body.sidebar-collapsed .sidebar-logo .logo-gent { display: none !important; }
+    body.sidebar-collapsed .sidebar-logo { justify-content: center; padding: 14px 0; }
+    body.sidebar-collapsed .sidebar-user { justify-content: center; }
+    body.sidebar-collapsed .nav-section { margin-bottom: 4px; }
   `
   document.head.appendChild(s)
 }
@@ -68,8 +105,8 @@ function _buildSidebar(activePage) {
     <div class="nav-section">
       <div class="nav-section-label">${t(sec.labelKey)}</div>
       ${sec.items.map(it => `
-        <a class="nav-item ${it.page === activePage ? 'active' : ''}" href="${it.href}">
-          <span class="nav-icon">${it.icon}</span>${it.label || t(it.labelKey)}
+        <a class="nav-item ${it.page === activePage ? 'active' : ''}" href="${it.href}" title="${it.label || t(it.labelKey)}">
+          <span class="nav-icon">${it.icon}</span><span class="nav-label">${it.label || t(it.labelKey)}</span>
         </a>`).join('')}
     </div>`).join('')
 
