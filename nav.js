@@ -36,10 +36,33 @@ const _NAV_SECTIONS = [
   }
 ]
 
+// Inject sidebar collapse styles once
+function _injectSidebarCollapseStyles() {
+  if (document.getElementById('sg-sidebar-collapse-styles')) return
+  const s = document.createElement('style')
+  s.id = 'sg-sidebar-collapse-styles'
+  s.textContent = `
+    .sidebar-collapse-btn {
+      position: absolute; bottom: 72px; right: -13px;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      color: var(--text-2); font-size: 14px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      z-index: 310; line-height: 1; transition: var(--t);
+    }
+    .sidebar-collapse-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .sidebar-collapse-arrow { display: inline-block; transition: transform .2s; }
+    body.sidebar-collapsed .sidebar-collapse-arrow { transform: rotate(180deg); }
+  `
+  document.head.appendChild(s)
+}
+
 // Build sidebar HTML into existing #sidebar element
 function _buildSidebar(activePage) {
   const sidebar = document.getElementById('sidebar')
   if (!sidebar) return
+  _injectSidebarCollapseStyles()
 
   const navHtml = _NAV_SECTIONS.map(sec => `
     <div class="nav-section">
@@ -56,6 +79,7 @@ function _buildSidebar(activePage) {
   ).join('')
 
   sidebar.innerHTML = `
+    <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" onclick="toggleSidebarCollapse()" title="Collapse sidebar"><span class="sidebar-collapse-arrow">‹</span></button>
     <a class="sidebar-logo" href="home.html">
       <span class="logo-mark">S</span>Support<span class="logo-gent">Gent</span>
     </a>
@@ -211,6 +235,18 @@ function revealSidebarUser() {
   document.getElementById('sidebar-user-real')?.classList.remove('loading')
 }
 
+// ── Sidebar collapse ──────────────────────────────────────────────
+function toggleSidebarCollapse() {
+  const collapsed = document.body.classList.toggle('sidebar-collapsed')
+  localStorage.setItem('sg_sidebar_collapsed', collapsed ? '1' : '0')
+}
+
+function _initSidebarCollapse() {
+  if (localStorage.getItem('sg_sidebar_collapsed') === '1') {
+    document.body.classList.add('sidebar-collapsed')
+  }
+}
+
 // ── MAIN ENTRY POINT ─────────────────────────────────────────────
 async function renderNav(activePage) {
   const params = new URLSearchParams(location.search)
@@ -222,6 +258,7 @@ async function renderNav(activePage) {
   if (!getToken()) { location.replace('/'); return null }
 
   _buildSidebar(activePage)
+  _initSidebarCollapse()
   _initMobile()
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
