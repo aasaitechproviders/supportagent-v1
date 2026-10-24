@@ -1694,11 +1694,12 @@ async function sendTicketReply(tid, btn) {
     const ch = ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation'
     const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
     if (ch === 'gmail') {
-      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, 'POST', { reply: ta.value.trim() })
+      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, { method: 'POST', body: JSON.stringify({ reply: ta.value.trim() }) })
     } else if (ch === 'chat_escalation') {
-      await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { note: ta.value.trim() })
+      await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, { method: 'PATCH', body: JSON.stringify({ note: ta.value.trim() }) })
     } else {
-      await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/reply/${msgId}`, 'POST', { message: ta.value.trim() })
+      // API expects req.body.reply (not message) for all channel reply endpoints
+      await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/reply/${msgId}`, { method: 'POST', body: JSON.stringify({ reply: ta.value.trim() }) })
     }
     showToast('Reply saved ✓', 'success')
     ta.value = ''
@@ -1710,7 +1711,7 @@ async function sendTicketReply(tid, btn) {
 async function resolveTicketFromModal(tid, btn) {
   btn.classList.add('loading')
   try {
-    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { status: 'Resolved' })
+    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, { method: 'PATCH', body: JSON.stringify({ status: 'Resolved' }) })
     showToast('Marked as resolved ✓', 'success')
     closeTicketModal()
     await loadEscalations(true)
@@ -1720,7 +1721,7 @@ async function resolveTicketFromModal(tid, btn) {
 async function quickResolveTicket(tid, btn) {
   btn.classList.add('loading')
   try {
-    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, 'PATCH', { status: 'Resolved' })
+    await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, { method: 'PATCH', body: JSON.stringify({ status: 'Resolved' }) })
     showToast('Resolved ✓', 'success')
     await loadEscalations(true)
   } catch (e) { showToast('Failed: ' + e.message, 'error') } finally { btn.classList.remove('loading') }
