@@ -105,6 +105,7 @@
   background: var(--bg);
   background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
   background-size: 24px 24px;
+  cursor: grab;
 }
 #canvas-svg {
   position: absolute; top: 0; left: 0;
@@ -1327,13 +1328,16 @@ function resetZoom() { _scale = 1; _panX = 0; _panY = 0; applyTransform() }
 
 // ── Mouse events ──────────────────────────────────────────────────
 function onCanvasMouseDown(e) {
-  if (e.target === document.getElementById('canvas-area') || e.target === document.getElementById('canvas-inner') || e.target.tagName === 'svg') {
-    if (e.button === 1 || e.altKey) {
+  var onEmpty = e.target === document.getElementById('canvas-area') ||
+                e.target === document.getElementById('canvas-inner') ||
+                e.target.tagName === 'svg' ||
+                e.target.tagName === 'SVG'
+  if (onEmpty) {
+    if (e.button === 0 || e.button === 1 || e.altKey) {
       _panning = { startX: e.clientX, startY: e.clientY, origPanX: _panX, origPanY: _panY }
       e.preventDefault()
-    } else {
-      selectNode(null)
     }
+    if (e.button === 0) selectNode(null)
   }
   hideCtxMenu()
 }
@@ -1354,6 +1358,7 @@ function onCanvasMouseMove(e) {
   if (_panning) {
     _panX = _panning.origPanX + (e.clientX - _panning.startX) / _scale
     _panY = _panning.origPanY + (e.clientY - _panning.startY) / _scale
+    document.getElementById('canvas-area').style.cursor = 'grabbing'
     applyTransform()
   }
   if (_connecting) {
@@ -1371,7 +1376,7 @@ function onCanvasMouseMove(e) {
 
 function onCanvasMouseUp(e) {
   if (_dragging) { _dragging = null }
-  if (_panning)  { _panning  = null }
+  if (_panning)  { _panning = null; document.getElementById('canvas-area').style.cursor = 'grab' }
   if (_connecting) {
     document.getElementById('connecting-line').style.display = 'none'
     // Check if released over a node input port
