@@ -1552,6 +1552,7 @@ function renderEscalationsList() {
         <div class="esc-top">
           <span class="esc-name">${name}</span>
           <span class="esc-channel-badge ${ch.cls}">${ch.label}</span>
+          ${t.escalation_reason==='user_consent'?`<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:8px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d">👤 User Requested</span>`:t.escalation_reason==='low_confidence'?`<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:8px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5">📉 Low Confidence</span>`:t.escalation_reason==='manual'?`<span style="font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:8px;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd">🖐️ Manual</span>`:''}
           ${isResolved
             ? `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`
             : `<span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔴 Open</span>`}
@@ -1592,6 +1593,7 @@ async function openTicketModal(tid) {
             ${isResolved
               ? `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Resolved</span>`
               : `<span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:8px;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔴 Open</span>`}
+            ${ticket.escalation_reason==='user_consent'?`<span style="font-size:9.5px;font-weight:700;padding:1px 8px;border-radius:8px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d">👤 User Requested</span>`:ticket.escalation_reason==='low_confidence'?`<span style="font-size:9.5px;font-weight:700;padding:1px 8px;border-radius:8px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5">📉 Low Confidence</span>`:ticket.escalation_reason==='manual'?`<span style="font-size:9.5px;font-weight:700;padding:1px 8px;border-radius:8px;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd">🖐️ Manual</span>`:''}
           </div>
         </div>
         <button onclick="closeTicketModal()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-3);padding:4px;line-height:1;border-radius:6px">✕</button>
@@ -1932,7 +1934,7 @@ function renderMsgList(platform) {
           ${msg.status==='noise'?`<span class="badge-pill bp-transactional">🔕 Filtered</span>`:''}
           ${msg.status==='dismissed'?`<span class="badge-pill bp-other">🗑 Dismissed</span>`:''}
           ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed</span>`:''}
-          ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated</span>`:''}
+          ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated</span>${msg.escalation_reason==='user_consent'?`<span class="badge-pill" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:9.5px">👤 User Requested</span>`:msg.escalation_reason==='low_confidence'?`<span class="badge-pill" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-size:9.5px">📉 Low Confidence</span>`:msg.escalation_reason==='manual'?`<span class="badge-pill" style="background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;font-size:9.5px">🖐️ Manual</span>`:''}`:''}
           ${msg.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd">🤝 Human Handling</span>`:''}
           ${msg.confidence_score!=null&&msg.status!=='replied'?`<span class="badge-pill" style="background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">🎯 ${msg.confidence_score}%</span>`:''}
           ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative</span>`:''}
@@ -2000,7 +2002,7 @@ function renderReadPane(platform, msg) {
       ${msg.intent_source==='ai_classify'||msg.intent_source==='ai_draft'?`<span class="badge-pill" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✦ AI classified</span>`:''}
       ${msg.auto_replied?`<span class="badge-pill bp-auto-replied">✦ Auto-replied</span>`:''}
       ${msg.status==='failed'?`<span class="badge-pill bp-failed">❌ Failed — ${esc(msg.error_message||'Send error')}</span>`:''}
-      ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated — AI confidence ${msg.confidence_score??'?'}% below threshold</span>`:''}
+      ${msg.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700">⚠️ Escalated${msg.escalation_reason==='user_consent'?' — User requested escalation':msg.escalation_reason==='low_confidence'?` — Low AI confidence (${msg.confidence_score??'?'}%)`:msg.escalation_reason==='manual'?' — Manually escalated':''}</span>`:''}
       ${msg.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd">🤝 Human Handling — AI paused</span>`:''}
       ${msg.sentiment==='positive'?`<span class="sent-pos">😊 Positive sentiment</span>`:msg.sentiment==='negative'?`<span class="sent-neg">😤 Negative sentiment</span>`:msg.sentiment==='neutral'?`<span class="sent-neu">😐 Neutral</span>`:''}
     </div>
