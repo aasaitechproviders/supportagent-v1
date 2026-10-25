@@ -1918,7 +1918,7 @@ function renderMsgList(platform) {
   }
   pane.innerHTML = msgs.map((msg,idx)=>{
     const {name:pName,email:pEmail}=parseFrom(msg.from||'')
-    const name=pName||(isEmail?pEmail:msg.from)||'Unknown'
+    const name=msg.sender_name||pName||(isEmail?pEmail:msg.from)||'Unknown'
     const bg=avatarColor(name), sel=STATE.selId[platform]===msg._id, cfg=INTENT_CFG[msg.intent]||INTENT_CFG.other
     return `<div class="msg-row ${sel?'selected':''} ${msg.status==='noise'?'noise-row':''} ${msg.status==='failed'?'failed-row':''}" data-msgid="${esc(msg._id)}" style="animation-delay:${idx*25}ms">
       <div class="msg-avatar" style="background:${bg}">${(name[0]||'?').toUpperCase()}</div>
@@ -1978,11 +1978,11 @@ function renderReadPane(platform, msg) {
   const pane=document.getElementById(`read-${platform}`); if(!pane) return
   const isEmail=platform==='email', isWA=platform==='whatsapp'
   const {name:pName,email:pEmail}=parseFrom(msg.from||'')
-  const name=pName||(isEmail?pEmail:msg.from)||'Unknown'
+  const name=msg.sender_name||pName||(isEmail?pEmail:msg.from)||'Unknown'
   const bg=avatarColor(name), cfg=INTENT_CFG[msg.intent]||INTENT_CFG.other
   const canReply=(msg.status==='inbox'||msg.status==='escalated')&&!msg.human_handling, isNoise=msg.status==='noise', isFailed=msg.status==='failed', isEscalated=msg.status==='escalated', isHumanHandling=msg.human_handling
   const waExpired=isWA&&(Date.now()-new Date(msg.created_at).getTime())>86400000
-  const chanBadge=isWA?`<span class="badge-pill bp-wa">💬 WhatsApp</span>`:platform==='instagram'?`<span class="badge-pill bp-ig">📸 Instagram</span>`:''
+  const chanBadge=isWA?`<span class="badge-pill bp-wa">💬 WhatsApp</span>`:platform==='instagram'?`<span class="badge-pill bp-ig">📸 Instagram</span>`:platform==='messenger'?`<span class="badge-pill" style="background:#e8f4fd;color:#0078ff;border:1px solid #90cdf4">💬 Messenger</span>`:''
 
   pane.innerHTML=`
   <div class="email-read-header">
@@ -1991,7 +1991,7 @@ function renderReadPane(platform, msg) {
       <div class="email-read-avatar" style="background:${bg}">${(name[0]||'?').toUpperCase()}</div>
       <div class="email-read-from-wrap">
         <div class="email-read-from-name">${esc(name)}</div>
-        <div class="email-read-from-email">${isEmail?esc(pEmail):isWA?'📱 WhatsApp':'📸 Instagram DM'}</div>
+        <div class="email-read-from-email">${isEmail?esc(pEmail):isWA?'📱 WhatsApp':platform==='messenger'?'💬 Messenger DM':'📸 Instagram DM'}</div>
       </div>
       <div class="email-read-timestamp">${fmtRelTime(msg.created_at)}</div>
     </div>
