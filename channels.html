@@ -2833,6 +2833,9 @@ function renderConvList(platform) {
         <div class="conv-row-preview ${c.reply_sent && !hasUnread ? 'sent-preview' : ''}">${esc(preview)}</div>
         <div class="msg-badges" style="margin-top:4px">
           ${c.status==='escalated'?`<span class="badge-pill" style="background:#fff3cd;color:#856404;border:1px solid #ffd700;font-size:9.5px;padding:1px 6px">⚠️ Escalated</span>`:''}
+          ${c.status==='escalated'&&c.escalation_reason==='user_consent'?`<span class="badge-pill" style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;font-size:9.5px;padding:1px 6px">👤 User Requested</span>`:''}
+          ${c.status==='escalated'&&c.escalation_reason==='low_confidence'?`<span class="badge-pill" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-size:9.5px;padding:1px 6px">📉 Low Confidence</span>${c.confidence_score!=null?`<span class="badge-pill" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;font-size:9.5px;padding:1px 6px">🔴 ${c.confidence_score}%</span>`:''}`:''}
+          ${c.status==='escalated'&&c.escalation_reason==='manual'?`<span class="badge-pill" style="background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;font-size:9.5px;padding:1px 6px">🖐️ Manual</span>`:''}
           ${c.human_handling?`<span class="badge-pill" style="background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;font-size:9.5px;padding:1px 6px">🤝 Human</span>`:''}
           ${c.ticket_id?`<span class="badge-pill" style="background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;font-size:9.5px;padding:1px 6px">🎫 Ticket Raised</span>`:''}
           ${c.thread_status==='escalated'&&!c.ticket_id?`<span class="badge-pill" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;font-size:9.5px;padding:1px 6px">🔴 CTA Shown</span>`:''}
