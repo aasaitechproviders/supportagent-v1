@@ -349,6 +349,35 @@
                 </div>
               </div>
             </div>
+
+            <!-- ── Pre-Chat Lead Capture ── -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title">📱 Pre-Chat Lead Capture</div>
+                <label class="toggle-switch" style="margin-left:auto">
+                  <input type="checkbox" id="pre-chat-toggle" onchange="togglePreChat(this.checked)">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="card-body">
+                <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0 0 16px">When enabled, visitors must enter their details before starting a chat. Their information is saved to your Leads automatically.</p>
+                <div class="field" style="margin-bottom:12px">
+                  <label>Identifier Type</label>
+                  <select class="inp" id="f-identifier-type" onchange="onIdentifierTypeChange(this.value)">
+                    <option value="">None — anonymous sessions</option>
+                    <option value="phone">📱 Phone Number</option>
+                    <option value="email">✉️ Email Address</option>
+                    <option value="custom">✏️ Custom</option>
+                  </select>
+                  <div class="field-hint">What visitors must enter before chatting. Phone is recommended for WhatsApp follow-ups.</div>
+                </div>
+                <div class="field" id="identifier-label-field" style="display:none;margin-bottom:0">
+                  <label>Custom Identifier Label</label>
+                  <input class="inp" type="text" id="f-identifier-label" placeholder="e.g. Loyalty Card Number, Member ID"/>
+                  <div class="field-hint">This label is shown to the visitor in the pre-chat form.</div>
+                </div>
+              </div>
+            </div>
           </div>
 
 
@@ -570,31 +599,13 @@
                 </div>
               </div>
             </div>
-            <!-- Session Memory — only shown for sales agents -->
+            <!-- Session Memory — sales agents only (identifier type moved to Publish tab) -->
             <div class="card" style="margin-bottom:16px;display:none" id="session-memory-card">
               <div class="card-header">
-                <div class="card-title">🧠 User Identification &amp; Session Memory</div>
+                <div class="card-title">🧠 Session Memory</div>
                 <span class="badge badge-accent">Sales Only</span>
               </div>
               <div class="card-body">
-                <div style="font-size:12px;color:var(--text-3);margin-bottom:16px;padding:10px 12px;background:var(--accent-dim);border:1px solid rgba(108,95,245,.2);border-radius:10px">
-                  When enabled, the chat widget shows a pre-chat form collecting the customer's name and identifier before the first message. Returning customers are recognised and greeted by name.
-                </div>
-                <div class="field">
-                  <label>Identifier Type</label>
-                  <select class="inp" id="f-identifier-type" onchange="onIdentifierTypeChange(this.value)">
-                    <option value="">None — anonymous sessions</option>
-                    <option value="phone">📱 Phone Number</option>
-                    <option value="email">✉️ Email Address</option>
-                    <option value="custom">✏️ Custom</option>
-                  </select>
-                  <div class="field-hint">How customers will be identified across sessions. Leave as None for anonymous chat (default behaviour).</div>
-                </div>
-                <div class="field" id="identifier-label-field" style="display:none">
-                  <label>Custom Identifier Label</label>
-                  <input class="inp" type="text" id="f-identifier-label" placeholder="e.g. Loyalty Card Number, Member ID"/>
-                  <div class="field-hint">This label is shown to the customer in the pre-chat form.</div>
-                </div>
                 <div class="field">
                   <label>Session Memory (days)</label>
                   <input class="inp" type="number" id="f-session-memory-days" min="1" max="365" value="30"/>
@@ -671,18 +682,6 @@
                 Your agent goes live at a dedicated subdomain: <code style="color:var(--accent)">{your-slug}.supportagent.aasaitech.in</code>
               </div>
               <button class="btn btn-primary" style="height:46px;padding:0 28px;font-size:14px" onclick="publishAgent()" id="publish-btn">Publish Agent</button>
-            </div>
-            <div class="card" style="margin-bottom:16px">
-              <div class="card-header">
-                <div class="card-title">📱 Pre-Chat Lead Capture</div>
-                <label class="toggle-switch" style="margin-left:auto">
-                  <input type="checkbox" id="pre-chat-toggle" onchange="togglePreChat(this.checked)">
-                  <span class="toggle-slider"></span>
-                </label>
-              </div>
-              <div class="card-body">
-                <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0">When enabled, visitors must enter their <strong>mobile number</strong> before starting a chat. Their details are saved to your Leads automatically.</p>
-              </div>
             </div>
             <div id="publish-links-card" class="card" style="display:none;margin-bottom:16px">
               <div class="card-header">
@@ -1908,8 +1907,21 @@ function setLink(id, href, text) {
 
 async function togglePreChat(enabled) {
   try {
-    await apiFetch(`/agents/${agent._id}`, { method: 'PUT', body: JSON.stringify({ pre_chat_enabled: enabled }) })
+    const idTypeEl  = document.getElementById('f-identifier-type')
+    const idLabelEl = document.getElementById('f-identifier-label')
+    // Read current dropdown value; default to 'phone' when enabling with nothing selected
+    const identifierType  = enabled ? (idTypeEl?.value || 'phone') : null
+    const identifierLabel = idLabelEl?.value || ''
+    await apiFetch(`/agents/${agent._id}`, { method: 'PUT', body: JSON.stringify({
+      pre_chat_enabled: enabled,
+      identifier_type:  identifierType,
+      identifier_label: identifierLabel
+    }) })
     agent.pre_chat_enabled = enabled
+    agent.identifier_type  = identifierType
+    agent.identifier_label = identifierLabel
+    // Keep dropdown in sync (in case we defaulted to 'phone')
+    if (idTypeEl) { idTypeEl.value = identifierType || ''; onIdentifierTypeChange(identifierType || '') }
     toast(enabled ? 'Pre-chat capture enabled' : 'Pre-chat capture disabled', 'success')
   } catch(e) {
     toast(e.message, 'error')
