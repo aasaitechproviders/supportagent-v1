@@ -1472,7 +1472,7 @@ function renderLiveChatSessions() {
     const msgCount = s.message_count || 0
     const isOpen = STATE.lcOpenKey === key
     return `
-      <div onclick="loadLiveChatThread('${esc(key)}','${esc(label)}')" style="cursor:pointer;padding:10px 12px;border-radius:10px;background:${isOpen ? 'var(--accent-dim)' : 'var(--surface)'};border:1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border)'};transition:border-color .15s,background .15s">
+      <div onclick="loadLiveChatThread('${esc(key)}','${esc(label)}','${esc(ident)}')" style="cursor:pointer;padding:10px 12px;border-radius:10px;background:${isOpen ? 'var(--accent-dim)' : 'var(--surface)'};border:1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border)'};transition:border-color .15s,background .15s">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">
           <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">👤 ${esc(label)}</div>
           <div style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0">${ago}</div>
@@ -1483,14 +1483,15 @@ function renderLiveChatSessions() {
   }).join('')
 }
 
-async function loadLiveChatThread(key, label) {
+async function loadLiveChatThread(key, label, identifier) {
   STATE.lcOpenKey = key
   renderLiveChatSessions() // re-render list to show active highlight
   const pane = document.getElementById('lc-thread-pane')
   if (!pane) return
   pane.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">Loading…</div>`
   try {
-    const msgs = await apiFetch(`/agents/${STATE.agentId}/conversations/${encodeURIComponent(key)}`)
+    const qs = identifier ? '?identifier=' + encodeURIComponent(identifier) : ''
+    const msgs = await apiFetch(`/agents/${STATE.agentId}/conversations/${encodeURIComponent(key)}${qs}`)
     STATE.lcThread = Array.isArray(msgs) ? msgs : (msgs.messages || [])
     const displayLabel = label || key
     pane.innerHTML = `
