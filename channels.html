@@ -1169,6 +1169,8 @@ function renderPage() {
   if (waOn)     { loadConversations('whatsapp') }
   if (igOn)     { loadConversations('instagram') }
   if (fbOn)     { loadConversations('messenger') }
+  // Load live chat sessions on init
+  loadLiveChatSessions(false)
   // Load escalations in background
   loadEscalations(false)
 }
@@ -1461,24 +1463,27 @@ function renderLiveChatSessions() {
   }
   listEl.innerHTML = sessions.map(s => {
     const key = s.session_id || s.visitor_id || s.visitor_ip || s._id
-    const label = s.visitor_id && !s.visitor_id.startsWith('anon') ? s.visitor_id : (s.visitor_ip ? `IP ${s.visitor_ip.split('.').slice(0,3).join('.')}.*` : 'Anonymous')
+    // Show real identifier (phone/email) and name if available, else fall back to IP
+    const name  = s.user_name || ''
+    const ident = s.user_identifier || ''
+    const label = name && ident ? `${name} · ${ident}` : (name || ident || (s.visitor_ip ? `IP ${s.visitor_ip.split('.').slice(0,3).join('.')}.*` : 'Anonymous'))
     const firstQ = (s.first_question || '').slice(0,60) + ((s.first_question||'').length > 60 ? '…' : '')
     const ago = s.last_active ? fmtRelTime(s.last_active) : ''
     const msgCount = s.message_count || 0
     const isOpen = STATE.lcOpenKey === key
     return `
-      <div onclick="loadLiveChatThread('${esc(key)}')" style="cursor:pointer;padding:10px 12px;border-radius:10px;background:${isOpen ? 'var(--accent-dim)' : 'var(--surface)'};border:1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border)'};transition:border-color .15s,background .15s">
+      <div onclick="loadLiveChatThread('${esc(key)}','${esc(label)}')" style="cursor:pointer;padding:10px 12px;border-radius:10px;background:${isOpen ? 'var(--accent-dim)' : 'var(--surface)'};border:1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border)'};transition:border-color .15s,background .15s">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:4px">
           <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">👤 ${esc(label)}</div>
           <div style="font-size:10px;color:var(--text-3);white-space:nowrap;flex-shrink:0">${ago}</div>
         </div>
         <div style="font-size:11.5px;color:var(--text-2);line-height:1.4;margin-bottom:5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${esc(firstQ) || '<em style="color:var(--text-3)">No message</em>'}</div>
-        <div style="font-size:10.5px;color:var(--text-3)">${msgCount} message${msgCount!==1?'s':''}</div>
+        <div style="font-size:10.5px;color:var(--text-3)">${msgCount} msg${msgCount!==1?'s':''} · 🌐 Web Chat</div>
       </div>`
   }).join('')
 }
 
-async function loadLiveChatThread(key) {
+async function loadLiveChatThread(key, label) {
   STATE.lcOpenKey = key
   renderLiveChatSessions() // re-render list to show active highlight
   const pane = document.getElementById('lc-thread-pane')
@@ -1487,10 +1492,14 @@ async function loadLiveChatThread(key) {
   try {
     const msgs = await apiFetch(`/agents/${STATE.agentId}/conversations/${encodeURIComponent(key)}`)
     STATE.lcThread = Array.isArray(msgs) ? msgs : (msgs.messages || [])
+    const displayLabel = label || key
     pane.innerHTML = `
       <div style="display:flex;flex-direction:column;height:100%;max-height:520px">
-        <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text);flex-shrink:0">
-          Conversation · ${STATE.lcThread.length} message${STATE.lcThread.length!==1?'s':''}
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--text)">👤 ${esc(displayLabel)}</div>
+            <div style="font-size:10.5px;color:var(--text-3);margin-top:1px">${STATE.lcThread.length} message${STATE.lcThread.length!==1?'s':''} · 🌐 Web Chat</div>
+          </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
           ${STATE.lcThread.map(m => `
@@ -1501,7 +1510,7 @@ async function loadLiveChatThread(key) {
         </div>
       </div>`
   } catch(e) {
-    pane.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">Failed to load thread. <button class="btn btn-secondary btn-sm" onclick="loadLiveChatThread('${esc(key)}')">Retry</button></div>`
+    pane.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-3);font-size:12px">Failed to load thread. <button class="btn btn-secondary btn-sm" onclick="loadLiveChatThread('${esc(key)}','${esc(label||'')}')">Retry</button></div>`
   }
 }
 
