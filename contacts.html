@@ -182,6 +182,7 @@
         <option value="gmail">📧 Email</option>
         <option value="instagram">📸 Instagram</option>
         <option value="messenger">💙 Messenger</option>
+        <option value="webchat">🌐 Web Chat</option>
       </select>
       <select class="filter-sel" id="filterIntent" onchange="applyFilters()">
         <option value="">All Intents</option>
@@ -494,7 +495,7 @@ function avatarColor(str){let h=0;for(const c of String(str||'')) h=(h*31+c.char
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function chBadgeHtml(ch) {
-  const map = { whatsapp:['ch-wa','💬 WhatsApp'], gmail:['ch-gmail','📧 Email'], instagram:['ch-instagram','📸 Instagram'], messenger:['ch-messenger','💙 Messenger'] }
+  const map = { whatsapp:['ch-wa','💬 WhatsApp'], gmail:['ch-gmail','📧 Email'], instagram:['ch-instagram','📸 Instagram'], messenger:['ch-messenger','💙 Messenger'], webchat:['ch-webchat','🌐 Web Chat'] }
   const [cls, label] = map[ch] || ['', ch||'—']
   return `<span class="ch-badge ${cls}">${label}</span>`
 }
