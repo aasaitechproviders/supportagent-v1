@@ -354,28 +354,25 @@
             <div class="card" style="margin-bottom:16px">
               <div class="card-header">
                 <div class="card-title">📱 Pre-Chat Lead Capture</div>
-                <label class="toggle-switch" style="margin-left:auto">
-                  <input type="checkbox" id="pre-chat-toggle" onchange="togglePreChat(this.checked)">
-                  <span class="toggle-slider"></span>
-                </label>
               </div>
               <div class="card-body">
                 <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0 0 16px">When enabled, visitors must enter their details before starting a chat. Their information is saved to your Leads automatically.</p>
                 <div class="field" style="margin-bottom:12px">
                   <label>Identifier Type</label>
                   <select class="inp" id="f-identifier-type" onchange="onIdentifierTypeChange(this.value)">
-                    <option value="">None — anonymous sessions</option>
+                    <option value="">Disabled — anonymous sessions</option>
                     <option value="phone">📱 Phone Number</option>
                     <option value="email">✉️ Email Address</option>
                     <option value="custom">✏️ Custom</option>
                   </select>
-                  <div class="field-hint">What visitors must enter before chatting. Phone is recommended for WhatsApp follow-ups.</div>
+                  <div class="field-hint">Select Phone or Email to enable the pre-chat form. Visitors must fill this before chatting.</div>
                 </div>
-                <div class="field" id="identifier-label-field" style="display:none;margin-bottom:0">
+                <div class="field" id="identifier-label-field" style="display:none;margin-bottom:12px">
                   <label>Custom Identifier Label</label>
                   <input class="inp" type="text" id="f-identifier-label" placeholder="e.g. Loyalty Card Number, Member ID"/>
                   <div class="field-hint">This label is shown to the visitor in the pre-chat form.</div>
                 </div>
+                <button class="btn btn-primary btn-sm" onclick="savePreChatSettings()">Save Pre-Chat Settings</button>
               </div>
             </div>
           </div>
@@ -1882,9 +1879,7 @@ function updatePublishUI(a) {
   const inqEmbed = document.getElementById('inquiry-embed-box')
   if (inqEmbed) inqEmbed.textContent = `<iframe src="${inquiryURL}" width="100%" height="560" frameborder="0"></iframe>`
 
-  // Pre-chat toggle state
-  const toggle = document.getElementById('pre-chat-toggle')
-  if (toggle) toggle.checked = !!a.pre_chat_enabled
+  // Pre-chat state is restored via the identifier type dropdown at line above (idTypeEl)
 
   const sideCard = document.getElementById('agent-url-side-card')
   const sideUrl  = document.getElementById('side-agent-url')
@@ -1905,27 +1900,27 @@ function setLink(id, href, text) {
   else if (!el.textContent.trim() || el.textContent === '—') el.textContent = href || '—'
 }
 
-async function togglePreChat(enabled) {
+async function savePreChatSettings() {
+  const btn = document.querySelector('[onclick="savePreChatSettings()"]')
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…' }
   try {
-    const idTypeEl  = document.getElementById('f-identifier-type')
-    const idLabelEl = document.getElementById('f-identifier-label')
-    // Read current dropdown value; default to 'phone' when enabling with nothing selected
-    const identifierType  = enabled ? (idTypeEl?.value || 'phone') : null
-    const identifierLabel = idLabelEl?.value || ''
+    const identifierType  = document.getElementById('f-identifier-type')?.value || null
+    const identifierLabel = document.getElementById('f-identifier-label')?.value || ''
+    // pre_chat_enabled = true whenever a type is selected, false when set to "Disabled"
+    const preChatEnabled  = !!identifierType
     await apiFetch(`/agents/${agent._id}`, { method: 'PUT', body: JSON.stringify({
-      pre_chat_enabled: enabled,
+      pre_chat_enabled: preChatEnabled,
       identifier_type:  identifierType,
       identifier_label: identifierLabel
     }) })
-    agent.pre_chat_enabled = enabled
+    agent.pre_chat_enabled = preChatEnabled
     agent.identifier_type  = identifierType
     agent.identifier_label = identifierLabel
-    // Keep dropdown in sync (in case we defaulted to 'phone')
-    if (idTypeEl) { idTypeEl.value = identifierType || ''; onIdentifierTypeChange(identifierType || '') }
-    toast(enabled ? 'Pre-chat capture enabled' : 'Pre-chat capture disabled', 'success')
+    toast(preChatEnabled ? 'Pre-chat capture enabled' : 'Pre-chat capture disabled', 'success')
   } catch(e) {
     toast(e.message, 'error')
-    document.getElementById('pre-chat-toggle').checked = !enabled
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Pre-Chat Settings' }
   }
 }
 
