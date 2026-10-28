@@ -1684,7 +1684,8 @@ async function loadTicketConversations(tid) {
     scroll.innerHTML = convs.map(c => {
       const parts = []
       if (c.question) parts.push(`<div><div class="esc-msg-label" style="text-align:right">Customer</div><div class="esc-msg-user">${esc(c.question)}</div></div>`)
-      if (c.answer) parts.push(`<div><div class="esc-msg-label">AI Agent</div><div class="esc-msg-ai">${c.answer}</div></div>`)
+      if (c.answer && c.is_agent_reply) parts.push(`<div><div class="esc-msg-label" style="color:var(--accent)">👤 Support Agent</div><div class="esc-msg-ai" style="border-left:3px solid var(--accent)">${esc(c.answer)}</div></div>`)
+      else if (c.answer) parts.push(`<div><div class="esc-msg-label">AI Agent</div><div class="esc-msg-ai">${c.answer}</div></div>`)
       return parts.join('')
     }).join('')
     scroll.scrollTop = scroll.scrollHeight
