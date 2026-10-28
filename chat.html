@@ -1212,14 +1212,14 @@
       window._historyToRender.forEach(msg => {
         if (msg.question) addUserMsg(msg.question)
         if (msg.is_agent_reply && msg.answer) {
-          // Human support agent reply — render with label
+          // Human support agent reply (or resolved notice) — render with label
           const msgs2 = document.getElementById('chat-messages')
           const group = document.createElement('div'); group.className = 'msg-group agent'
           const label = document.createElement('div')
-          label.style.cssText = 'font-size:11px;color:var(--brand);font-weight:600;margin-bottom:4px;padding-left:2px;'
-          label.textContent = '\u{1F464} Support Agent'
+          label.style.cssText = `font-size:11px;font-weight:600;margin-bottom:4px;padding-left:2px;color:${msg.is_resolution ? '#22863a' : 'var(--brand)'};`
+          label.textContent = msg.is_resolution ? '✅ Ticket Resolved' : '\u{1F464} Support Agent'
           const bubble = document.createElement('div'); bubble.className = 'msg-bubble-agent'
-          bubble.style.cssText = 'border-left:3px solid var(--brand);'
+          bubble.style.cssText = `border-left:3px solid ${msg.is_resolution ? '#22863a' : 'var(--brand)'};`
           bubble.textContent = msg.answer
           const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
           group.appendChild(label); group.appendChild(bubble); group.appendChild(timeEl)
@@ -1272,10 +1272,10 @@
             const msgs2 = document.getElementById('chat-messages')
             const group = document.createElement('div'); group.className = 'msg-group agent'
             const label = document.createElement('div')
-            label.style.cssText = 'font-size:11px;color:var(--brand);font-weight:600;margin-bottom:4px;padding-left:2px;'
-            label.textContent = '\u{1F464} Support Agent'
+            label.style.cssText = `font-size:11px;font-weight:600;margin-bottom:4px;padding-left:2px;color:${msg.is_resolution ? '#22863a' : 'var(--brand)'};`
+            label.textContent = msg.is_resolution ? '✅ Ticket Resolved' : '\u{1F464} Support Agent'
             const bubble = document.createElement('div'); bubble.className = 'msg-bubble-agent'
-            bubble.style.cssText = 'border-left:3px solid var(--brand);'
+            bubble.style.cssText = `border-left:3px solid ${msg.is_resolution ? '#22863a' : 'var(--brand)'};`
             bubble.textContent = msg.answer
             const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
             group.appendChild(label); group.appendChild(bubble); group.appendChild(timeEl)
