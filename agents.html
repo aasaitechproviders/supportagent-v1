@@ -130,10 +130,8 @@
     <div class="field">
       <label data-i18n="agentType">Agent Type</label>
       <div class="type-grid" id="type-grid">
-        <div class="type-opt active" onclick="selectType('support',this)"><div class="type-opt-icon">🎧</div><div><div class="type-opt-name" data-i18n="typeSupport">Support</div><div class="type-opt-sub" data-i18n="typeSupportSub">Handle customer queries</div></div></div>
-        <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name" data-i18n="typeSales">Sales</div><div class="type-opt-sub" data-i18n="typeSalesSub">Sell products via chat</div></div></div>
-        <div class="type-opt" onclick="selectType('faq',this)"><div class="type-opt-icon">❓</div><div><div class="type-opt-name" data-i18n="typeFaq">FAQ Bot</div><div class="type-opt-sub" data-i18n="typeFaqSub">Answer common questions</div></div></div>
-        <div class="type-opt" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name" data-i18n="typeGeneral">General</div><div class="type-opt-sub" data-i18n="typeGeneralSub">Flexible assistant</div></div></div>
+        <div class="type-opt active" onclick="selectType('general',this)"><div class="type-opt-icon">🤖</div><div><div class="type-opt-name">General</div><div class="type-opt-sub">Answer queries from your knowledge base</div></div></div>
+        <div class="type-opt" onclick="selectType('sales',this)"><div class="type-opt-icon">🛒</div><div><div class="type-opt-name">Sales</div><div class="type-opt-sub">Sell products via chat</div></div></div>
       </div>
     </div>
     <div class="field" style="margin-bottom:0">
@@ -158,13 +156,11 @@
 
 <script>
 /* ── State ─────────────────────────────────────────────────────── */
-let _cmColor = '#7C6FFF', _cmType = 'support'
+let _cmColor = '#7C6FFF', _cmType = 'general'
 
 const PROMPTS = {
-  support: 'You are a helpful customer support agent. Answer from the knowledge base. Be empathetic and concise.',
-  sales:   'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, guide them to purchase.',
-  faq:     'You are a friendly FAQ bot. Answer questions strictly from the knowledge base. Be concise.',
-  general: 'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.'
+  general: 'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.',
+  sales:   'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, guide them to purchase.'
 }
 
 /* ── Boot ──────────────────────────────────────────────────────── */
@@ -212,7 +208,7 @@ async function loadAgents(user) {
           <div class="ob-tip-body">
             <div class="ob-tip-title">How to set up your AI agent (3 steps)</div>
             <div class="ob-tip-desc">
-              <strong>Step 1 — Create agent:</strong> Click "+ New Agent", give it a name, choose type (Support / Sales / FAQ), pick a brand colour.<br>
+              <strong>Step 1 — Create agent:</strong> Click "+ New Agent", give it a name, choose type (General / Sales), pick a brand colour.<br>
               <strong>Step 2 — Add knowledge:</strong> Upload your Products CSV, paste your FAQ, or add your website URL. The AI learns from this data.<br>
               <strong>Step 3 — Publish:</strong> Hit Publish. You get a live link (e.g. <code>your-store.supportagent.aasaitech.in</code>) to share anywhere.
             </div>
@@ -268,10 +264,8 @@ async function loadAgents(user) {
 }
 
 const TYPE_META = {
-  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
-  support: { label: '🎧 Support', cls: 'badge-blue'   },
-  faq:     { label: '❓ FAQ',     cls: 'badge-gray'   },
   general: { label: '🤖 General', cls: 'badge-gray'   },
+  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
 }
 
 function buildAgentCard(a, i, limit) {
