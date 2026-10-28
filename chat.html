@@ -1224,7 +1224,7 @@
     document.getElementById('chat-input-wrap').style.display = 'block'
     document.getElementById('chat-header').style.display     = 'flex'
     // Load tickets badge only (non-blocking, no list render)
-    if (agentType === 'support' || !agentType) loadMyTickets(false).catch(() => {})
+    loadMyTickets(false).catch(() => {})
     addDateSeparator()
     // Render past history for returning user BEFORE welcome message
     // Shopping agents wait until prodMap is loaded (handled after loadProducts below)
@@ -1617,11 +1617,9 @@
   // ── HEADER & COLORS ─────────────────────────────────────────────────────
   function setupHeader(d) {
     document.getElementById('hdr-name').textContent = d.name || 'Agent'
-    // Show tickets icon for support agents when user is identified
-    if (d.agent_type === 'support' || !d.agent_type) {
-      const btn = document.getElementById('my-tickets-btn')
-      if (btn) btn.style.display = 'flex'
-    }
+    // Show My Tickets button for all agent types (general + sales)
+    const btn = document.getElementById('my-tickets-btn')
+    if (btn) btn.style.display = 'flex'
     const av = document.getElementById('hdr-avatar')
     if (d.logo_base64) { av.innerHTML = `<img src="${d.logo_base64}" alt="${esc(d.name)}"/>` }
     else { av.textContent = (d.name?.[0]?.toUpperCase()) || '✦'; if (d.brand_color) av.style.background = `linear-gradient(135deg,${d.brand_color},${dimColor(d.brand_color)})` }
@@ -1994,7 +1992,7 @@
       return
     }
     const statusColor = { Open: '#E09A2B', Escalated: '#E05252', Resolved: '#3DBE6C' }
-    const sourceIcon  = { chat_escalation: '💬', whatsapp: '📱', instagram: '📸', messenger: '💬', gmail: '📧', booking_intent: '📅' }
+    const sourceIcon  = { chat_escalation: '💬', whatsapp: '📱', instagram: '📸', messenger: '💬', gmail: '📧' }
     list.innerHTML = items.map(t => {
       const sid   = (t._id || t.id || '').toString().slice(-8).toUpperCase()
       const color = statusColor[t.status] || 'var(--text-3)'
@@ -2034,7 +2032,6 @@
   // AGENT REPLY POLLING — after escalation, poll for human replies
   // ══════════════════════════════════════════════════════════════════════
     function showTicketFormLink() {
-    if (agentType !== 'support') return
     const msgs = document.getElementById('chat-messages')
     const wrap = document.createElement('div')
     wrap.style.cssText = 'display:flex;justify-content:center;padding:6px 0 2px;'
@@ -2050,9 +2047,13 @@
     formWrap.id = 'sg-ticket-form'
     formWrap.style.cssText = 'padding:14px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;margin:8px 0;'
     formWrap.innerHTML = `<p style="margin:0 0 10px;font-size:13.5px;font-weight:600;color:var(--text);">📝 Raise a Support Ticket</p><input id="sg-ticket-name" placeholder="Your name (optional)" style="width:100%;padding:8px 10px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;" /><input id="sg-ticket-email" placeholder="Email (optional)" style="width:100%;padding:8px 10px;margin-bottom:8px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;" /><textarea id="sg-ticket-issue" placeholder="Describe your issue…" rows="3" style="width:100%;padding:8px 10px;margin-bottom:10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;resize:vertical;"></textarea><div style="display:flex;gap:8px;"><button onclick="submitTicketForm()" style="flex:1;padding:9px 0;border-radius:9px;background:var(--brand);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">Submit Ticket</button><button onclick="document.getElementById('sg-ticket-form').remove()" style="padding:9px 14px;border-radius:9px;background:var(--surface3);color:var(--text2);border:1px solid var(--border);cursor:pointer;font-size:13px;font-family:inherit;">Cancel</button></div><p id="sg-ticket-msg" style="display:none;margin:8px 0 0;font-size:12.5px;color:var(--green);"></p>`
-    // Pre-fill issue from last user message
+    // Pre-fill from known identifiers
     const issueEl = formWrap.querySelector('#sg-ticket-issue')
     if (issueEl && lastQuestion) issueEl.value = lastQuestion
+    const emailEl = formWrap.querySelector('#sg-ticket-email')
+    if (emailEl && USER_IDENTIFIER) emailEl.value = USER_IDENTIFIER
+    const nameEl = formWrap.querySelector('#sg-ticket-name')
+    if (nameEl && window._customerName) nameEl.value = window._customerName
     msgs.appendChild(formWrap); msgs.scrollTop = msgs.scrollHeight
   }
 
