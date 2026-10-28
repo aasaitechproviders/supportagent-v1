@@ -137,6 +137,16 @@
     }
     .acct-addr-btn:hover{background:var(--brand-dim);}
     .acct-addr-set{border-style:solid;color:var(--text2);border-color:var(--border2);background:var(--surface-solid);}
+    .acct-logout-btn{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:3px 10px;border-radius:20px;
+      border:1.5px solid var(--border2);background:transparent;
+      font-size:10.5px;font-weight:600;color:var(--text3);
+      cursor:pointer;white-space:nowrap;margin-left:auto;
+      transition:background .15s,color .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .acct-logout-btn:hover{background:var(--surface3);color:var(--text2);}
 
     /* ── ADDRESS MANAGER MODAL ── */
     .addr-modal-overlay{
@@ -726,6 +736,7 @@
     <button class="acct-addr-btn" id="acct-addr-btn" onclick="openAddressModal()" style="display:none;">
       <span>📍</span><span id="acct-addr-label">Add address</span>
     </button>
+    <button class="acct-logout-btn" id="acct-logout-btn" onclick="sgLogout()" title="Log out / Switch user">↩ Logout</button>
   </div>
 
   <div class="chat-messages" id="chat-messages" style="display:none;"></div>
@@ -2007,6 +2018,22 @@
         <div style="font-size:11px;color:var(--text-3);">${date}</div>
       </div>`
     }).join('')
+  }
+
+  function sgLogout() {
+    // Clear all agent-specific localStorage keys so next load starts fresh
+    const keysToRemove = [
+      'sg_uid_' + AGENT_ID,
+      'sg_customer_' + AGENT_ID,
+      'sg_addrs_' + AGENT_ID,
+      'sg_addr_' + AGENT_ID,
+      'sg_device_' + AGENT_ID,
+      'sg_vid_' + AGENT_ID,
+    ]
+    keysToRemove.forEach(k => { try { localStorage.removeItem(k) } catch {} })
+    // Also clear VISITOR_ID so a brand new identity is generated
+    try { localStorage.removeItem('sg_vid') } catch {}
+    location.reload()
   }
 
   async function loadMyTickets(renderList = true) {
