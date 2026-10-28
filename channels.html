@@ -1704,18 +1704,20 @@ async function sendTicketReply(tid, btn) {
   if (!ticket) return
   btn.classList.add('loading')
   try {
-    const ch = ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation'
-    const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
+    const ch = (ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation').toLowerCase()
     if (ch === 'gmail') {
+      // Gmail: use the dedicated gmail approve endpoint (handles threading)
+      const msgId = ticket.message_id || ticket.thread_id || ticket.conversation_id || tid
       await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${msgId}`, { method: 'POST', body: JSON.stringify({ reply: ta.value.trim() }) })
-    } else if (ch === 'chat_escalation') {
-      await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, { method: 'PATCH', body: JSON.stringify({ note: ta.value.trim() }) })
     } else {
-      // API expects req.body.reply (not message) for all channel reply endpoints
-      await apiFetch(`/agents/${STATE.agentId}/channels/${ch}/reply/${msgId}`, { method: 'POST', body: JSON.stringify({ reply: ta.value.trim() }) })
+      // chat_escalation, whatsapp, instagram, messenger — all go through the ticket PATCH endpoint.
+      // For WA/IG/Messenger the server will forward the reply through the channel API automatically.
+      await apiFetch(`/agents/${STATE.agentId}/tickets/${tid}`, { method: 'PATCH', body: JSON.stringify({ note: ta.value.trim() }) })
     }
-    showToast('Reply saved ✓', 'success')
+    showToast('Reply sent ✓', 'success')
     ta.value = ''
+    // Refresh conversation history in the modal
+    await loadTicketConversations(tid)
   } catch (e) {
     showToast('Failed: ' + e.message, 'error')
   } finally { btn.classList.remove('loading') }
