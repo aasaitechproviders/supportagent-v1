@@ -265,10 +265,8 @@
             <div class="field">
               <label>Agent Type</label>
               <select class="inp" id="f-agent-type" onchange="onAgentTypeChange(this.value)">
-                <option value="support">🎧 Support — Handle customer queries</option>
+                <option value="general">🤖 General — Answer queries from your knowledge base</option>
                 <option value="sales">🛒 Sales — Sell products via chat</option>
-                <option value="faq">❓ FAQ Bot — Answer common questions</option>
-                <option value="general">🤖 General — Flexible assistant</option>
               </select>
               <div class="field-hint">Changing type shows/hides the Shopping tab and updates the system prompt.</div>
             </div>
@@ -952,7 +950,7 @@ async function loadAgent() {
     fillForm(agent)
     livePreview()
     updateStats(agent)
-    applyAgentTypeTabs(agent.agent_type || agent.type || 'support')
+    applyAgentTypeTabs(agent.agent_type || agent.type || 'general')
     if (agent.published) { updatePublishUI(agent); loadEnqForm(agent.enquiry_form) }
     document.getElementById('main-content').style.display = 'grid'
     dismissSkeleton()
@@ -964,10 +962,8 @@ async function loadAgent() {
 
 /* ── Form fill ──────────────────────────────────────────────────── */
 const TYPE_META = {
-  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
-  support: { label: '🎧 Support', cls: 'badge-blue'   },
-  faq:     { label: '❓ FAQ',     cls: 'badge-gray'   },
   general: { label: '🤖 General', cls: 'badge-gray'   },
+  sales:   { label: '🛒 Sales',   cls: 'badge-accent' },
 }
 
 function fillForm(a) {
@@ -1002,7 +998,7 @@ function fillForm(a) {
 
   // Populate agent type selector
   const agentTypeEl = document.getElementById('f-agent-type')
-  if (agentTypeEl) agentTypeEl.value = a.agent_type || a.type || 'support'
+  if (agentTypeEl) agentTypeEl.value = a.agent_type || a.type || 'general'
 
   // Agent type badge in topbar
   const agentType = a.agent_type || a.type || 'general'
@@ -1139,10 +1135,8 @@ function removeLogo() {
 }
 
 const AGENT_TYPE_PROMPTS = {
-  support: 'You are a helpful customer support agent. Answer questions from the knowledge base. Be empathetic and concise.',
+  general: 'You are a helpful AI assistant. Answer questions from the knowledge base. Be friendly, accurate, and concise.',
   sales:   'You are a knowledgeable sales assistant. Help customers find products, answer pricing questions, and guide them to purchase.',
-  faq:     'You are a FAQ bot. Answer only from the provided knowledge base. Be brief and accurate.',
-  general: 'You are a helpful AI assistant. Be friendly, concise, and accurate.',
 }
 
 function onIdentifierTypeChange(val) {
