@@ -1003,8 +1003,6 @@
   let agentType         = 'general'
   let escalationCtaShown = false   // true after server sends escalation_cta_shown
   let lastQuestion      = ''       // for retry
-  let _agentReplyPollTimer = null  // polling timer after escalation confirmed
-  let _agentReplyLastSeen = null   // timestamp of last seen agent reply to avoid duplicates
 
   // ── Retry last message (wired to error card button) ──────────────────────
   window.__sgRetryLast = function () {
@@ -1937,49 +1935,6 @@
   // ══════════════════════════════════════════════════════════════════════
   // AGENT REPLY POLLING — after escalation, poll for human replies
   // ══════════════════════════════════════════════════════════════════════
-  function startAgentReplyPolling() {
-    if (_agentReplyPollTimer) clearInterval(_agentReplyPollTimer)
-    _agentReplyLastSeen = new Date().toISOString()
-    console.log('[agent-poll] started polling for agent replies')
-    _agentReplyPollTimer = setInterval(async () => {
-      try {
-        const identifier = localStorage.getItem('sg_user_identifier') || ''
-        if (!identifier && !SESSION_ID) return
-        const qs = identifier
-          ? `identifier=${encodeURIComponent(identifier)}&session_id=${encodeURIComponent(SESSION_ID)}`
-          : `session_id=${encodeURIComponent(SESSION_ID)}`
-        const res = await fetch(`${API}/chat/${AGENT_ID}/history?${qs}`)
-        if (!res.ok) return
-        const data = await res.json()
-        const agentReplies = (data.messages || []).filter(m =>
-          m.is_agent_reply && m.answer &&
-          new Date(m.created_at) > new Date(_agentReplyLastSeen)
-        )
-        if (agentReplies.length) {
-          agentReplies.forEach(m => {
-            console.log('[agent-poll] new agent reply received')
-            const msgs = document.getElementById('chat-messages')
-            const group = document.createElement('div'); group.className = 'msg-group agent'
-            const label = document.createElement('div')
-            label.style.cssText = 'font-size:11px;color:var(--brand);font-weight:600;margin-bottom:4px;padding-left:2px;'
-            label.textContent = '\u{1F464} Support Agent'
-            const bubble = document.createElement('div'); bubble.className = 'msg-bubble-agent'
-            bubble.style.cssText = 'border-left:3px solid var(--brand);'
-            bubble.textContent = m.answer
-            const timeEl = document.createElement('div'); timeEl.className = 'msg-time'; timeEl.textContent = getTime()
-            group.appendChild(label); group.appendChild(bubble); group.appendChild(timeEl)
-            msgs.appendChild(group); msgs.scrollTop = msgs.scrollHeight
-          })
-          _agentReplyLastSeen = agentReplies[agentReplies.length - 1].created_at
-        }
-      } catch (e) { console.warn('[agent-poll] error:', e.message) }
-    }, 6000) // poll every 6 seconds
-  }
-
-  function stopAgentReplyPolling() {
-    if (_agentReplyPollTimer) { clearInterval(_agentReplyPollTimer); _agentReplyPollTimer = null }
-  }
-
     function showTicketFormLink() {
     if (agentType !== 'support') return
     const msgs = document.getElementById('chat-messages')
@@ -2137,8 +2092,6 @@
               console.log(`[stream:sse] escalation_confirmed ticket_id:${evt.ticket_id} short:#${evt.ticket_short}`)
               // Optionally append raise-another-ticket link below confirmation card
               setTimeout(() => showTicketFormLink(), 800)
-              // Start polling for agent replies to this ticket
-              startAgentReplyPolling()
             }
             // Stream error with retry button (sent by backend catch block)
             if (evt.type==='stream_error') {
