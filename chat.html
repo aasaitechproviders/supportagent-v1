@@ -665,10 +665,7 @@
       <div class="agent-status"><span class="status-dot"></span><span id="agent-status-text">Online</span></div>
     </div>
     <div class="hdr-actions">
-      <button id="my-tickets-btn" onclick="openMyTickets()" title="My Tickets" style="display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;position:relative;transition:background .15s" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-        <span id="my-tickets-badge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:#E05252;border-radius:50%;"></span>
-      </button>
+      <button id="my-tickets-btn" onclick="openMyTickets()" style="display:none;background:none;border:none;cursor:pointer;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:var(--brand);font-family:inherit;transition:background .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">My Tickets</button>
       <div class="powered-by"><span id="powered-by-text">Powered by</span><br><a href="https://supportagent.aasaitech.in" target="_blank" rel="noopener">SupportGent</a></div>
     </div>
   </div>
@@ -2025,9 +2022,9 @@
       const data = await res.json()
       _myTicketsAll = data.tickets || []
       if (renderList) renderMyTickets()
-      // Show badge if any open tickets
-      const badge = document.getElementById('my-tickets-badge')
-      if (badge) badge.style.display = _myTicketsAll.some(t => t.status === 'Open' || t.status === 'Escalated') ? 'block' : 'none'
+      // Highlight button if any open tickets
+      const btn = document.getElementById('my-tickets-btn')
+      if (btn) btn.style.fontWeight = _myTicketsAll.some(t => t.status === 'Open' || t.status === 'Escalated') ? '800' : '600'
     } catch (e) {
       if (renderList && list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Could not load requests</div>`
     }
