@@ -665,7 +665,29 @@
       <div class="agent-status"><span class="status-dot"></span><span id="agent-status-text">Online</span></div>
     </div>
     <div class="hdr-actions">
+      <button id="my-tickets-btn" onclick="openMyTickets()" title="My Tickets" style="display:none;background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;position:relative;transition:background .15s" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        <span id="my-tickets-badge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;background:#E05252;border-radius:50%;"></span>
+      </button>
       <div class="powered-by"><span id="powered-by-text">Powered by</span><br><a href="https://supportagent.aasaitech.in" target="_blank" rel="noopener">SupportGent</a></div>
+    </div>
+  </div>
+
+  <!-- My Tickets panel -->
+  <div id="my-tickets-panel" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--surface);z-index:50;flex-direction:column;border-radius:inherit;">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <button onclick="closeMyTickets()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;color:var(--text-2)" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span style="font-size:15px;font-weight:700;color:var(--text);">My Requests</span>
+    </div>
+    <div style="display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <button class="mt-filter active" data-filter="all" onclick="filterMyTickets('all',this)" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--brand);background:var(--brand);color:#fff;font-family:var(--font);">All</button>
+      <button class="mt-filter" data-filter="Open" onclick="filterMyTickets('Open',this)" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:none;color:var(--text-2);font-family:var(--font);">Open</button>
+      <button class="mt-filter" data-filter="Resolved" onclick="filterMyTickets('Resolved',this)" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:none;color:var(--text-2);font-family:var(--font);">Resolved</button>
+    </div>
+    <div id="my-tickets-list" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Loading…</div>
     </div>
   </div>
 
@@ -1204,6 +1226,8 @@
     document.getElementById('chat-messages').style.display   = 'flex'
     document.getElementById('chat-input-wrap').style.display = 'block'
     document.getElementById('chat-header').style.display     = 'flex'
+    // Load tickets badge only (non-blocking, no list render)
+    if (agentType === 'support' || !agentType) loadMyTickets(false).catch(() => {})
     addDateSeparator()
     // Render past history for returning user BEFORE welcome message
     // Shopping agents wait until prodMap is loaded (handled after loadProducts below)
@@ -1596,6 +1620,11 @@
   // ── HEADER & COLORS ─────────────────────────────────────────────────────
   function setupHeader(d) {
     document.getElementById('hdr-name').textContent = d.name || 'Agent'
+    // Show tickets icon for support agents when user is identified
+    if (d.agent_type === 'support' || !d.agent_type) {
+      const btn = document.getElementById('my-tickets-btn')
+      if (btn) btn.style.display = 'flex'
+    }
     const av = document.getElementById('hdr-avatar')
     if (d.logo_base64) { av.innerHTML = `<img src="${d.logo_base64}" alt="${esc(d.name)}"/>` }
     else { av.textContent = (d.name?.[0]?.toUpperCase()) || '✦'; if (d.brand_color) av.style.background = `linear-gradient(135deg,${d.brand_color},${dimColor(d.brand_color)})` }
@@ -1933,6 +1962,78 @@
   // TICKET FORM — in-chat form to raise a support ticket manually
   // ══════════════════════════════════════════════════════════════════════
   // ══════════════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════
+  // MY TICKETS PANEL — customer view of their own tickets/appointments
+  // ══════════════════════════════════════════════════════════════════════
+  let _myTicketsAll = []
+  let _myTicketsFilter = 'all'
+
+  async function openMyTickets() {
+    const panel = document.getElementById('my-tickets-panel')
+    panel.style.display = 'flex'
+    await loadMyTickets(true)
+  }
+
+  function closeMyTickets() {
+    document.getElementById('my-tickets-panel').style.display = 'none'
+  }
+
+  function filterMyTickets(f, btn) {
+    _myTicketsFilter = f
+    document.querySelectorAll('.mt-filter').forEach(b => {
+      const active = b === btn
+      b.style.background = active ? 'var(--brand)' : 'none'
+      b.style.color = active ? '#fff' : 'var(--text-2)'
+      b.style.borderColor = active ? 'var(--brand)' : 'var(--border)'
+    })
+    renderMyTickets()
+  }
+
+  function renderMyTickets() {
+    const list = document.getElementById('my-tickets-list')
+    const items = _myTicketsFilter === 'all' ? _myTicketsAll : _myTicketsAll.filter(t => t.status === _myTicketsFilter)
+    if (!items.length) {
+      list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">No requests found</div>`
+      return
+    }
+    const statusColor = { Open: '#E09A2B', Escalated: '#E05252', Resolved: '#3DBE6C' }
+    const sourceIcon  = { chat_escalation: '💬', whatsapp: '📱', instagram: '📸', messenger: '💬', gmail: '📧', booking_intent: '📅' }
+    list.innerHTML = items.map(t => {
+      const sid   = (t._id || t.id || '').toString().slice(-8).toUpperCase()
+      const color = statusColor[t.status] || 'var(--text-3)'
+      const icon  = sourceIcon[t.source] || '🎫'
+      const date  = t.created_at ? new Date(t.created_at).toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' }) : ''
+      return `<div style="padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">${icon} #${sid}</span>
+          <span style="font-size:11px;font-weight:700;color:${color};background:${color}22;padding:2px 8px;border-radius:20px;">${t.status}</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--text-2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${t.issue || 'No description'}</div>
+        <div style="font-size:11px;color:var(--text-3);">${date}</div>
+      </div>`
+    }).join('')
+  }
+
+  async function loadMyTickets(renderList = true) {
+    const list = document.getElementById('my-tickets-list')
+    if (renderList && list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Loading…</div>`
+    try {
+      const params = new URLSearchParams({ limit: 20 })
+      if (USER_IDENTIFIER) params.set('identifier', USER_IDENTIFIER)
+      else if (VISITOR_ID) params.set('visitor_id', VISITOR_ID)
+      const res  = await fetch(`${API}/agents/${AGENT_ID}/tickets/mine?${params}`)
+      const data = await res.json()
+      _myTicketsAll = data.tickets || []
+      if (renderList) renderMyTickets()
+      // Show badge if any open tickets
+      const badge = document.getElementById('my-tickets-badge')
+      if (badge) badge.style.display = _myTicketsAll.some(t => t.status === 'Open' || t.status === 'Escalated') ? 'block' : 'none'
+    } catch (e) {
+      if (renderList && list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Could not load requests</div>`
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
   // AGENT REPLY POLLING — after escalation, poll for human replies
   // ══════════════════════════════════════════════════════════════════════
     function showTicketFormLink() {
@@ -2090,8 +2191,7 @@
             if (evt.type==='escalation_confirmed') {
               escalationCtaShown = false
               console.log(`[stream:sse] escalation_confirmed ticket_id:${evt.ticket_id} short:#${evt.ticket_short}`)
-              // Optionally append raise-another-ticket link below confirmation card
-              setTimeout(() => showTicketFormLink(), 800)
+              // Ticket already created — no need to show raise-ticket link again
             }
             // Stream error with retry button (sent by backend catch block)
             if (evt.type==='stream_error') {
