@@ -1583,7 +1583,7 @@ async function openTicketModal(tid) {
   if (!ticket) return
   document.getElementById('esc-detail-modal')?.remove()
   const ch = ESC_CHANNEL_CFG[ticket.channel_type || ticket.channel || ticket.source || 'chat_escalation'] || ESC_CHANNEL_CFG.chat_escalation
-  const rawName = ticket.customer_name || ticket.from_name || ticket.user_identifier || 'Unknown'
+  const rawName = ticket.customer_name || ticket.from_name || ticket.contact_name || ticket.user_identifier || 'Unknown'
   const av = avatarColor(rawName)
   const status = ticket.status || 'Open'
   const isResolved = status === 'Resolved'
