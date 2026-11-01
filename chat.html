@@ -1957,8 +1957,14 @@
     msgHistory.push({ role: 'user', content: question })
     isTyping = true; document.getElementById('send-btn').disabled = true
     try {
-      const ok = await streamResponse(question, suggestedPrompt)
-      if (!ok) await nonStreamResponse(question, suggestedPrompt)
+      // Non-sales agents use buffered JSON path (no streaming needed, and JSON mode
+      // makes escalate_requested detection 100% reliable vs. marker-in-stream approach)
+      if (agentType !== 'sales') {
+        await nonStreamResponse(question, suggestedPrompt)
+      } else {
+        const ok = await streamResponse(question, suggestedPrompt)
+        if (!ok) await nonStreamResponse(question, suggestedPrompt)
+      }
     } catch(e) { console.warn('[send]', e); await nonStreamResponse(question, suggestedPrompt) }
     isTyping = false; document.getElementById('send-btn').disabled = false
     document.getElementById('chat-input').focus()
@@ -2293,6 +2299,21 @@
         const g=finalizeSalesResponse({...d,products:uniqueIds},null,null)
         const productNames=uniqueIds.map(id=>prodMap[id]?.name).filter(Boolean)
         msgHistory.push({role:'assistant',content:d.message||'',products:productNames})
+        return
+      }
+      // Escalation confirmed — show the ticket card and lock input
+      if (d.escalation_confirmed) {
+        const {bubble} = createAgentBubble()
+        bubble.innerHTML = d.answer || ''
+        bubble.classList.remove('msg-bubble-streaming')
+        document.getElementById('chat-messages').scrollTop=999999
+        console.log(`[nonstream:escalation] ticket created — id:${d.ticket_id} short:#${d.ticket_short}`)
+        // Disable further input so user knows ticket is raised
+        const inp = document.getElementById('chat-input')
+        const btn = document.getElementById('send-btn')
+        if (inp) { inp.disabled = true; inp.placeholder = 'Ticket raised — an agent will contact you shortly.' }
+        if (btn) btn.disabled = true
+        msgHistory.push({role:'assistant',content:`Ticket raised. Reference: #${d.ticket_short||''}`})
         return
       }
       const {bubble} = createAgentBubble()
