@@ -255,10 +255,20 @@
             <!-- Template fields -->
             <div class="tpl-box" id="tpl-box">
               <div class="tpl-label">✅ WhatsApp Approved Template</div>
+              <!-- Template picker dropdown -->
+              <div style="margin-bottom:10px;">
+                <div class="flabel">Select Template *</div>
+                <select class="tpl-inp" id="tpl-select" style="height:36px;cursor:pointer;width:100%" onchange="onTplSelect()">
+                  <option value="">— Loading templates… —</option>
+                </select>
+                <div id="tpl-load-hint" style="font-size:11px;color:var(--text-3);margin-top:4px;display:none">
+                  No approved templates found. Go to <a href="templates.html" style="color:var(--accent)">WA Templates</a> → Sync from Meta first.
+                </div>
+              </div>
               <div class="tpl-grid">
                 <div>
-                  <div class="flabel">Template Name *</div>
-                  <input class="tpl-inp" id="tpl-name" type="text" placeholder="e.g. diwali_offer" oninput="updateTplPreview()">
+                  <div class="flabel">Template Name</div>
+                  <input class="tpl-inp" id="tpl-name" type="text" placeholder="auto-filled from selection" readonly style="background:var(--surface-2);cursor:default">
                 </div>
                 <div>
                   <div class="flabel">Language</div>
@@ -431,6 +441,7 @@ const S = {
   agents: [], agentId: null, campaigns: [],
   channel: 'whatsapp',
   tplMode: false,
+  approvedTemplates: [],   // loaded from DB when toggle is turned on
   bvarCount: 1,
   // Picker
   pickerContacts: [], pickerTotal: 0,
@@ -468,6 +479,8 @@ function buildAgentSelect() {
   sel.addEventListener('change', async e => {
     S.agentId = e.target.value; S.selected.clear()
     await loadCampaigns(); await loadPicker(); previewAud()
+    // Refresh template dropdown if toggle is on
+    if (S.tplMode) await loadApprovedTemplates()
   })
 }
 
@@ -493,11 +506,80 @@ function setChannel(ch) {
 }
 
 // ══ TEMPLATE TOGGLE
-function onTplToggle() {
+async function onTplToggle() {
   S.tplMode = document.getElementById('wa-tpl-toggle').checked
   document.getElementById('tpl-box').classList.toggle('open', S.tplMode)
   document.getElementById('wa-freeform').classList.toggle('open', !S.tplMode)
-  if (S.tplMode) updateTplPreview()
+  if (S.tplMode) {
+    await loadApprovedTemplates()
+    updateTplPreview()
+  }
+}
+
+async function loadApprovedTemplates() {
+  if (!S.agentId) return
+  const sel  = document.getElementById('tpl-select')
+  const hint = document.getElementById('tpl-load-hint')
+  sel.innerHTML = '<option value="">— Loading… —</option>'
+  try {
+    const data = await apiFetch(`/templates?agent_id=${S.agentId}`)
+    S.approvedTemplates = (data.templates || []).filter(t => t.status === 'approved')
+    if (S.approvedTemplates.length === 0) {
+      sel.innerHTML = '<option value="">— No approved templates —</option>'
+      hint.style.display = 'block'
+    } else {
+      hint.style.display = 'none'
+      sel.innerHTML = '<option value="">— Pick a template —</option>' +
+        S.approvedTemplates.map(t =>
+          `<option value="${t._id}">${t.name} (${t.language || 'en'})</option>`
+        ).join('')
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">— Error loading templates —</option>'
+    hint.style.display = 'none'
+  }
+}
+
+function onTplSelect() {
+  const sel = document.getElementById('tpl-select')
+  const tpl = S.approvedTemplates.find(t => t._id === sel.value)
+  if (!tpl) {
+    document.getElementById('tpl-name').value = ''
+    return
+  }
+  // Auto-fill name and language
+  document.getElementById('tpl-name').value = tpl.name
+  const langSel = document.getElementById('tpl-lang')
+  if (tpl.language) {
+    const opt = Array.from(langSel.options).find(o => o.value === tpl.language)
+    if (opt) langSel.value = tpl.language
+  }
+  // Auto-build variable rows from components
+  const components = tpl.components || []
+  const body   = components.find(c => c.type === 'BODY')
+  const header = components.find(c => c.type === 'HEADER')
+  // Count {{n}} placeholders in body
+  const bodyText = body?.text || ''
+  const bodyVarCount = (bodyText.match(/\{\{\d+\}\}/g) || []).length
+  const hasHeaderVar = /\{\{\d+\}\}/.test(header?.text || '')
+  // Show header var row only if template has one
+  const hrow = document.getElementById('tpl-hvar')?.closest('.var-row')
+  if (hrow) hrow.style.display = hasHeaderVar ? '' : 'none'
+  // Rebuild body var rows to match template
+  const bvarContainer = document.getElementById('tpl-bvar-rows')
+  bvarContainer.innerHTML = ''
+  S.bvarCount = bodyVarCount || 1
+  for (let i = 0; i < S.bvarCount; i++) {
+    const row = document.createElement('div')
+    row.className = 'var-row'; row.id = `tpl-bvar-row-${i}`
+    row.innerHTML = `<span class="var-lbl">Body {{${i+1}}}</span><span class="var-arrow">→</span>
+      <select class="tpl-var-sel" id="tpl-bvar-${i}" onchange="updateTplPreview()">
+        <option value="name">Name</option><option value="phone">Phone</option>
+        <option value="identifier">Identifier</option><option value="">(skip)</option>
+      </select>`
+    bvarContainer.appendChild(row)
+  }
+  updateTplPreview()
 }
 
 // ══ TEMPLATE VARS
@@ -716,6 +798,8 @@ async function createCampaign() {
     // Reset
     document.getElementById('camp-name').value = ''
     ;['msg-wa','msg-email','msg-igfb','tpl-name','seg-tag'].forEach(id => { const el=document.getElementById(id); if(el) el.value='' })
+    const tplSelEl = document.getElementById('tpl-select')
+    if (tplSelEl) tplSelEl.value = ''
     document.getElementById('seg-intent').value = ''
     document.getElementById('seg-score').value  = ''
     document.getElementById('wa-tpl-toggle').checked = false
