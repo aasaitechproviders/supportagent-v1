@@ -725,7 +725,6 @@ const STATE = {
   convLoadedAt: {whatsapp:0,     instagram:0,     messenger:0},
   filterSettings: null,
   quickReplies:   [],
-  pollingTimer:   null,
   // Escalations
   escTickets: [], escLoading: false, escOpenId: null,
   // Live Chat sessions
@@ -830,7 +829,7 @@ const platCh = p => p === 'email' ? 'gmail' : p
     }
 
     buildAgentSelect(STATE.agents, agentFromUrl, preferredAgentId)
-    if (STATE.agents.length) { await loadPage(); startPolling() }
+    if (STATE.agents.length) { await loadPage() }
     else renderNoAgents()
   } catch (e) { showToast('Failed to load agents', 'error') }
   finally {
@@ -3468,76 +3467,6 @@ async function dismissFollowup(id) {
   } catch (e) { showToast(e.message, 'error') }
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// POLLING — 30-second background refresh
-// ══════════════════════════════════════════════════════════════════════════════
-
-function startPolling() {
-  stopPolling()
-  STATE.pollingTimer = setInterval(async () => {
-    if (!STATE.agentId) return
-    // Silent incremental Gmail sync — runs every 30s, fast (only fetches new emails)
-    if (STATE.channels.gmail?.status === 'active') {
-      silentGmailSync().catch(() => {})
-    }
-    await refreshBadgeCounts()
-    // Silently refresh the conv list for the active platform so new
-    // WA/IG/Messenger messages appear without needing a manual refresh
-    const p = STATE.platform
-    if (p !== 'email' && STATE.channels[p]?.status === 'active' && !STATE.convLoading[p]) {
-      loadConversations(p, true).catch(() => {})
-    }
-  }, 30000)
-}
-
-// Silent background Gmail sync — no spinner, no toast
-// Uses incremental mode (no ?full=1) so only fetches emails since last sync
-let _gmailSyncing = false
-async function silentGmailSync() {
-  if (_gmailSyncing) return  // prevent overlapping calls
-  _gmailSyncing = true
-  try {
-    const data = await apiFetch(`/agents/${STATE.agentId}/channels/gmail/sync`, { method: 'POST' })
-    if (data.synced > 0) {
-      // New emails arrived — silently refresh inbox if on email tab
-      if (STATE.platform === 'email') {
-        STATE.page.email = 1
-        await loadInbox('email')
-        await loadBucketCounts('email')
-      }
-      // Always update metrics/counts regardless of active tab
-      await loadMetrics().catch(() => {})
-    }
-  } catch {} finally {
-    _gmailSyncing = false
-  }
-}
-
-function stopPolling() {
-  if (STATE.pollingTimer) { clearInterval(STATE.pollingTimer); STATE.pollingTimer = null }
-}
-
-async function refreshBadgeCounts() {
-  try {
-    // Refresh channel cards' inbox counts silently
-    const data = await apiFetch(`/agents/${STATE.agentId}/channels`)
-    const channels = (data.channels || [])
-    channels.forEach(ch => {
-      const cnt = ch.inbox_count || 0
-      const ptBadge = document.getElementById(`pt-badge-${ch.type === 'gmail' ? 'email' : ch.type}`)
-      if (ptBadge) ptBadge.textContent = cnt || '0'
-      const el = document.getElementById(`m-inbox`)
-      if (ch.type === 'gmail' && el) el.textContent = cnt || '—'
-    })
-    // If current platform is active, silently refresh conversation counts
-    const p = STATE.platform
-    if (p !== 'email' && STATE.convs[p]?.length) {
-      const totalUnread = STATE.convs[p].reduce((s, c) => s + (c.unread || 0), 0)
-      const ptBadge = document.getElementById(`pt-badge-${p}`)
-      if (ptBadge) ptBadge.textContent = totalUnread || STATE.convTotal[p] || '0'
-    }
-  } catch {}
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // RETRY FAILED MESSAGE
