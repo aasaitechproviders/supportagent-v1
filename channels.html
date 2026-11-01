@@ -1824,10 +1824,13 @@ async function loadTicketConversations(tid) {
         const label = isHuman ? '👤 Support Agent' : '✦ AI Agent'
         const style = isHuman ? 'border-left:3px solid var(--accent)' : ''
         const labelColor = isHuman ? 'color:var(--accent)' : ''
+        // AI replies may contain HTML (escalation card, formatted answer) — render as innerHTML
+        // Human agent replies are plain text — escape them
+        const outboundRendered = isHuman ? esc(outboundBody) : outboundBody
         parts.push(`
           <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
             <div class="esc-msg-label" style="${labelColor}">${label}</div>
-            <div class="esc-msg-ai" style="${style}">${esc(outboundBody)}</div>
+            <div class="esc-msg-ai" style="${style}">${outboundRendered}</div>
             ${ts ? `<div style="font-size:10px;color:var(--text-3);padding-left:4px">${ts}</div>` : ''}
           </div>`)
       }
