@@ -2218,6 +2218,18 @@
               console.log(`[stream:sse] escalation_confirmed ticket_id:${evt.ticket_id} short:#${evt.ticket_short}`)
               // Ticket already created — no need to show raise-ticket link again
             }
+            // Replace: backend detected escalation mid-stream — swap partial AI reply with confirmation card
+            if (evt.type==='replace' && evt.html) {
+              if (renderer && group) {
+                const bubble = group.querySelector('.agent-bubble') || group.querySelector('[class*="bubble"]')
+                if (bubble) bubble.innerHTML = evt.html
+              } else {
+                if (typingEl) { typingEl.remove(); typingEl=null }
+                const created = createAgentBubble(); group = created.group
+                created.bubble.innerHTML = evt.html
+              }
+              console.log('[stream:sse] replace — escalation confirmation card injected')
+            }
             // Stream error with retry button (sent by backend catch block)
             if (evt.type==='stream_error') {
               console.error(`[stream:sse] stream_error — message:"${evt.message}"`)
