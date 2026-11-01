@@ -638,7 +638,7 @@
     .esc-steps-box{padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
     .esc-convo-section{flex:1;display:flex;flex-direction:column;min-height:0}
     .esc-convo-header{padding:12px 20px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px}
-    .esc-convo-scroll{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:10px;min-height:200px;max-height:280px}
+    .esc-convo-scroll{flex:1;overflow-y:auto;padding:14px 20px;display:flex;flex-direction:column;gap:12px;min-height:200px;max-height:320px}
     .esc-msg-user{align-self:flex-end;max-width:75%;background:var(--accent);color:#fff;padding:8px 13px;border-radius:14px 14px 2px 14px;font-size:12.5px;line-height:1.5;word-break:break-word}
     .esc-msg-ai{align-self:flex-start;max-width:80%;background:var(--surface-2);border:1px solid var(--border);padding:8px 13px;border-radius:14px 14px 14px 2px;font-size:12.5px;line-height:1.5;color:var(--text);word-break:break-word}
     .esc-msg-label{font-size:10px;color:var(--text-3);margin-bottom:3px;font-weight:600}
@@ -1682,10 +1682,32 @@ async function loadTicketConversations(tid) {
       return
     }
     scroll.innerHTML = convs.map(c => {
+      const ts = c.created_at ? fmtTimeIST(new Date(c.created_at)) : ''
       const parts = []
-      if (c.question) parts.push(`<div><div class="esc-msg-label" style="text-align:right">Customer</div><div class="esc-msg-user">${esc(c.question)}</div></div>`)
-      if (c.answer && c.is_agent_reply) parts.push(`<div><div class="esc-msg-label" style="color:var(--accent)">👤 Support Agent</div><div class="esc-msg-ai" style="border-left:3px solid var(--accent)">${esc(c.answer)}</div></div>`)
-      else if (c.answer) parts.push(`<div><div class="esc-msg-label">AI Agent</div><div class="esc-msg-ai">${c.answer}</div></div>`)
+      // Customer / inbound message
+      const inboundBody = c.question || (c.direction === 'inbound' ? (c.answer || '') : '')
+      if (inboundBody) {
+        parts.push(`
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+            <div style="font-size:10px;color:var(--text-3);font-weight:600;padding-right:4px">Customer</div>
+            <div class="esc-msg-user">${esc(inboundBody)}</div>
+            ${ts ? `<div style="font-size:10px;color:var(--text-3);padding-right:4px">${ts}</div>` : ''}
+          </div>`)
+      }
+      // Agent / AI / outbound message
+      const outboundBody = c.direction === 'outbound' ? (c.answer || c.question || '') : (c.question ? '' : c.answer || '')
+      if (outboundBody && c.direction !== 'inbound') {
+        const isHuman = c.is_agent_reply || c.from === 'agent'
+        const label = isHuman ? '👤 Support Agent' : '✦ AI Agent'
+        const style = isHuman ? 'border-left:3px solid var(--accent)' : ''
+        const labelColor = isHuman ? 'color:var(--accent)' : ''
+        parts.push(`
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+            <div class="esc-msg-label" style="${labelColor}">${label}</div>
+            <div class="esc-msg-ai" style="${style}">${esc(outboundBody)}</div>
+            ${ts ? `<div style="font-size:10px;color:var(--text-3);padding-left:4px">${ts}</div>` : ''}
+          </div>`)
+      }
       return parts.join('')
     }).join('')
     scroll.scrollTop = scroll.scrollHeight
