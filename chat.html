@@ -2221,13 +2221,15 @@
             // Replace: backend detected escalation mid-stream — swap partial AI reply with confirmation card
             if (evt.type==='replace' && evt.html) {
               if (renderer && group) {
-                const bubble = group.querySelector('.agent-bubble') || group.querySelector('[class*="bubble"]')
+                const bubble = group.querySelector('.msg-bubble-agent')
                 if (bubble) bubble.innerHTML = evt.html
               } else {
                 if (typingEl) { typingEl.remove(); typingEl=null }
                 const created = createAgentBubble(); group = created.group
                 created.bubble.innerHTML = evt.html
               }
+              // Null renderer so finalize() doesn't overwrite the card with streamed partial text
+              renderer = null
               console.log('[stream:sse] replace — escalation confirmation card injected')
             }
             // Stream error with retry button (sent by backend catch block)
