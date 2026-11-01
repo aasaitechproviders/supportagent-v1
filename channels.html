@@ -541,9 +541,12 @@
     .ch-status-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
     @media(max-width:900px){.ch-status-bar{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:600px){.ch-status-bar{grid-template-columns:1fr 1fr}}
-    .ch-status-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color var(--dur-base),box-shadow var(--dur-base),transform var(--dur-fast) var(--ease-spring);cursor:default}
-    .ch-status-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm);transform:translateY(-1px)}
+    .ch-status-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;transition:border-color var(--dur-base),box-shadow var(--dur-base),transform var(--dur-fast) var(--ease-spring);cursor:default;position:relative;overflow:hidden}
+    .ch-status-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),#7c3aed);opacity:0;transition:opacity var(--dur-base)}
+    .ch-status-card.csc-live::before{opacity:1}
+    .ch-status-card:hover{border-color:var(--border-md);box-shadow:var(--sh-sm);transform:translateY(-2px)}
     .ch-status-card.csc-live{border-color:var(--accent-glow);background:var(--accent-soft)}
+    .csc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
     .csc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.1)}
     .csc-body{flex:1;min-width:0}
     .csc-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
@@ -898,14 +901,14 @@ function renderPage() {
   const subURL = agentObj.subdomain_url && !agentObj.subdomain_url.includes('://undefined') ? agentObj.subdomain_url : null
 
   document.getElementById('pageBody').innerHTML = `
-  <!-- ── Channel Status Cards (replaces old metrics bar) ── -->
+  <!-- ── Channel Status Cards ── -->
   <div class="ch-status-bar reveal">
     <!-- Live Chat -->
     <div class="ch-status-card ${subURL?'csc-live':''}" onclick="switchPlatform('livechat');switchHubTab('channels')" style="cursor:pointer">
       <div class="csc-icon" style="background:linear-gradient(135deg,var(--accent),#7c3aed)">🌐</div>
       <div class="csc-body">
         <div class="csc-name">Live Chat</div>
-        <div class="csc-detail">${subURL?`<a href="${subURL}" target="_blank" style="color:var(--accent);font-size:10.5px;word-break:break-all;text-decoration:none">${subURL.replace('https://','')}</a>`:'Not published yet'}</div>
+        <div class="csc-detail">${subURL?'Widget published':'Not published yet'}</div>
       </div>
       <span class="csc-badge ${subURL?'csc-badge-live':'csc-badge-off'}">${subURL?'Live':'—'}</span>
     </div>
@@ -914,47 +917,51 @@ function renderPage() {
       <div class="csc-icon" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">📧</div>
       <div class="csc-body">
         <div class="csc-name">Gmail</div>
-        <div class="csc-detail">${gmailOn?esc(gmail.email||'Connected'):'Not connected'}</div>
+        <div class="csc-detail" style="font-weight:${gmailOn?'600':'400'};color:${gmailOn?'var(--text-2)':'var(--text-3)'}">${gmailOn?esc(gmail.email||'Connected'):'Not connected'}</div>
+        ${gmailOn?`<div style="font-size:10px;color:var(--text-3);margin-top:1px">${inboxCnt} in inbox</div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
         <span class="csc-badge ${gmailOn?'csc-badge-live':'csc-badge-off'}">${gmailOn?'Live':'—'}</span>
-        ${gmailOn?`<span style="font-size:10px;color:var(--text-3)">${inboxCnt} inbox</span>`:`<button class="btn btn-primary btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectGmail(this)">Connect</button>`}
+        ${!gmailOn?`<button class="btn btn-primary btn-sm" style="font-size:10px;height:24px;padding:0 10px;white-space:nowrap" onclick="event.stopPropagation();connectGmail(this)">Connect</button>`:''}
       </div>
     </div>
     <!-- WhatsApp -->
-    <div class="ch-status-card ${waOn?'csc-live':''}" onclick="${waOn?`switchPlatform('whatsapp');switchHubTab('channels')`:'connectWhatsAppES(this)'}" style="cursor:pointer">
+    <div class="ch-status-card ${waOn?'csc-live':''}" onclick="switchPlatform('whatsapp');switchHubTab('channels')" style="cursor:pointer">
       <div class="csc-icon" style="background:linear-gradient(135deg,#25D366,#128C7E)">💬</div>
       <div class="csc-body">
         <div class="csc-name">WhatsApp</div>
-        <div class="csc-detail">${waOn?esc(wa.display_account||wa.phone_number||'Connected'):'Not connected'}</div>
+        <div class="csc-detail" style="font-weight:${waOn?'600':'400'};color:${waOn?'var(--text-2)':'var(--text-3)'}">${waOn?esc(wa.display_account||wa.phone_number||'Connected'):'Not connected'}</div>
+        ${waOn?`<div style="font-size:10px;color:var(--text-3);margin-top:1px">${waCnt} chats</div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
         <span class="csc-badge ${waOn?'csc-badge-live':'csc-badge-off'}">${waOn?'Live':'—'}</span>
-        ${waOn?`<span style="font-size:10px;color:var(--text-3)">${waCnt} chats</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectWhatsAppES(this)">Connect</button>`}
+        ${!waOn?`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px;white-space:nowrap" onclick="event.stopPropagation();connectWhatsAppES(this)">Connect</button>`:''}
       </div>
     </div>
     <!-- Instagram -->
-    <div class="ch-status-card ${igOn?'csc-live':''}" onclick="${igOn?`switchPlatform('instagram');switchHubTab('channels')`:'connectMeta(this)'}" style="cursor:pointer">
+    <div class="ch-status-card ${igOn?'csc-live':''}" onclick="switchPlatform('instagram');switchHubTab('channels')" style="cursor:pointer">
       <div class="csc-icon" style="background:linear-gradient(135deg,#E1306C,#F77737,#FCAF45)">📸</div>
       <div class="csc-body">
         <div class="csc-name">Instagram</div>
-        <div class="csc-detail">${igOn?esc(ig.display_account||ig.page_name||'Connected'):'Not connected'}</div>
+        <div class="csc-detail" style="font-weight:${igOn?'600':'400'};color:${igOn?'var(--text-2)':'var(--text-3)'}">${igOn?esc(ig.display_account||ig.page_name||'Connected'):'Not connected'}</div>
+        ${igOn?`<div style="font-size:10px;color:var(--text-3);margin-top:1px">${igCnt} DMs</div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
         <span class="csc-badge ${igOn?'csc-badge-live':'csc-badge-off'}">${igOn?'Live':'—'}</span>
-        ${igOn?`<span style="font-size:10px;color:var(--text-3)">${igCnt} DMs</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`}
+        ${!igOn?`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px;white-space:nowrap" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`:''}
       </div>
     </div>
     <!-- Facebook -->
-    <div class="ch-status-card ${fbOn?'csc-live':''}" onclick="${fbOn?`switchPlatform('messenger');switchHubTab('channels')`:'connectMeta(this)'}" style="cursor:pointer">
+    <div class="ch-status-card ${fbOn?'csc-live':''}" onclick="switchPlatform('messenger');switchHubTab('channels')" style="cursor:pointer">
       <div class="csc-icon" style="background:linear-gradient(135deg,#0084FF,#00B2FF)">💙</div>
       <div class="csc-body">
         <div class="csc-name">Facebook</div>
-        <div class="csc-detail">${fbOn?esc(fb.page_name||'Connected'):'Not connected'}</div>
+        <div class="csc-detail" style="font-weight:${fbOn?'600':'400'};color:${fbOn?'var(--text-2)':'var(--text-3)'}">${fbOn?esc(fb.display_account||fb.page_name||'Connected'):'Not connected'}</div>
+        ${fbOn?`<div style="font-size:10px;color:var(--text-3);margin-top:1px">${fbCnt} chats</div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
         <span class="csc-badge ${fbOn?'csc-badge-live':'csc-badge-off'}">${fbOn?'Live':'—'}</span>
-        ${fbOn?`<span style="font-size:10px;color:var(--text-3)">${fbCnt} chats</span>`:`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`}
+        ${!fbOn?`<button class="btn btn-meta btn-sm" style="font-size:10px;height:24px;padding:0 10px;white-space:nowrap" onclick="event.stopPropagation();connectMeta(this)">Connect</button>`:''}
       </div>
     </div>
   </div>
@@ -982,12 +989,11 @@ function renderPage() {
     <div class="ch-subtabs-bar" id="chSubtabsBar">
       <button class="ch-subtab ${STATE.platform==='livechat'?'active':''}" data-ch="livechat">
         <span>🌐</span><span>Live Chat</span>
-        <span class="cst-soon">Soon</span>
+        ${subURL?`<span class="cst-badge" style="background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">Live</span>`:`<span class="cst-badge">—</span>`}
       </button>
       <button class="ch-subtab ${STATE.platform==='email'?'active':''}" data-ch="email">
         <span>📧</span><span>Gmail</span>
-        <span class="cst-badge" id="cst-badge-email">${inboxCnt||'—'}</span>
-        ${arGmail?`<span class="cst-ai">AI Auto</span>`:''}
+        ${gmailOn?`<span class="cst-badge" id="cst-badge-email">${inboxCnt||'0'}</span>${arGmail?`<span class="cst-ai">AI Auto</span>`:''}`:`<span class="cst-soon">Connect</span>`}
       </button>
       <button class="ch-subtab ${STATE.platform==='whatsapp'?'active':''}" data-ch="whatsapp">
         <span>💬</span><span>WhatsApp</span>
@@ -1039,15 +1045,20 @@ function renderPage() {
             </div>
             <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="navigator.clipboard.writeText(document.getElementById('lc-embed-snippet').textContent).then(()=>showToast('Snippet copied','success'))">Copy Snippet</button>
           </div>
-          <!-- Quick tips -->
-          <div style="background:var(--surface-2);border-radius:12px;padding:14px 16px;margin-bottom:24px">
-            <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:10px">💡 Quick tips</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
+          <!-- Quick tips (collapsible) -->
+          <div style="background:var(--surface-2);border:1.5px solid var(--border);border-radius:12px;margin-bottom:24px;overflow:hidden">
+            <button onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')==='true'?'false':'true');this.nextElementSibling.style.display=this.getAttribute('aria-expanded')==='true'?'flex':'none';this.querySelector('.qt-chevron').style.transform=this.getAttribute('aria-expanded')==='true'?'rotate(180deg)':'rotate(0deg)'" aria-expanded="false" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:none;border:none;cursor:pointer;font-family:var(--font)">
+              <span style="font-size:12px;font-weight:700;color:var(--text-2);display:flex;align-items:center;gap:6px">💡 Quick tips — how to use Live Chat</span>
+              <span class="qt-chevron" style="font-size:12px;color:var(--text-3);transition:transform .2s">▼</span>
+            </button>
+            <div style="display:none;flex-direction:column;gap:8px;padding:0 16px 14px">
               ${[
-                ['Share the link','Send your Web Chat URL directly to customers via WhatsApp, email or SMS — no website needed.'],
-                ['Embed on your site','Paste the snippet and a chat bubble appears on every page. Visitors can start chatting instantly.'],
-                ['AI handles replies','Your agent auto-replies from your knowledge base. Complex queries get escalated to you.'],
-              ].map(([t,d])=>`<div style="display:flex;gap:10px"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0"></div><div><span style="font-size:12px;font-weight:600;color:var(--text)">${t} — </span><span style="font-size:12px;color:var(--text-3)">${d}</span></div></div>`).join('')}
+                ['🔗 Share the link','Send your Web Chat URL directly to customers via WhatsApp, email or SMS — no website needed.'],
+                ['📋 Embed on your site','Paste the snippet and a chat bubble appears on every page. Visitors can start chatting instantly.'],
+                ['✦ AI handles replies','Your agent auto-replies from your knowledge base. Complex queries get escalated to you.'],
+                ['⚙️ Settings tab','Customise smart filters, blocked domains, and quick replies from the Settings tab above.'],
+                ['🚨 Escalations tab','When AI confidence is low, the conversation gets escalated — check the Escalations tab to reply manually.'],
+              ].map(([t,d])=>`<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);last-child:border:none"><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">${t}</div><div style="font-size:11.5px;color:var(--text-3);line-height:1.5">${d}</div></div></div>`).join('')}
             </div>
           </div>
           <!-- Live Chat Conversations -->
@@ -1332,24 +1343,41 @@ function renderSettingsTab() {
       </div>
     </div>
 
-    <!-- Web Chat URL (Live Chat settings placeholder) -->
+    <!-- Web Chat URL (Live Chat settings) -->
+    ${(()=>{
+      const ao = STATE.agents.find(a=>a._id===STATE.agentId)||{}
+      const su = ao.subdomain_url && !ao.subdomain_url.includes('://undefined') ? ao.subdomain_url : null
+      return su ? `
     <div class="settings-card webchat-settings-card">
       <div class="settings-card-header">
         <div class="settings-card-title">🌐 Web Chat Configuration</div>
-        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe">Coming Soon</span>
+        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">✓ Live</span>
       </div>
       <div class="settings-card-body">
-        <div class="scope-info">Once Live Chat is enabled, your unique Web Chat URL and embed snippet will appear here. Paste the snippet anywhere on your site to add the chat widget.</div>
-        <div class="webchat-url-row" style="opacity:.4;pointer-events:none">
-          <input class="webchat-url-input" readonly placeholder="https://chat.yourdomain.com/agent/…" />
-          <button class="btn btn-secondary btn-sm">Copy URL</button>
+        <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px">🔗 Your Web Chat URL</div>
+        <div class="webchat-url-row">
+          <input class="webchat-url-input" readonly value="${su}" />
+          <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('${su}').then(()=>showToast('URL copied','success'))">Copy URL</button>
+          <a href="${su}" target="_blank" class="btn btn-primary btn-sm">Open ↗</a>
         </div>
-        <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px;margin-top:4px;opacity:.4">Embed Snippet</div>
-        <div class="webchat-embed-box" style="opacity:.4">
-          <pre>&lt;script src="https://cdn.supportgent.com/widget.js" data-agent="YOUR_AGENT_ID" async&gt;&lt;/script&gt;</pre>
+        <div style="font-size:11.5px;font-weight:700;color:var(--text-2);margin-bottom:8px;margin-top:14px">📋 Embed Snippet</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">Paste before your site's <code style="background:var(--surface-3);padding:1px 5px;border-radius:4px">&lt;/body&gt;</code> tag.</div>
+        <div class="webchat-embed-box">
+          <pre id="wc-snip-settings">&lt;iframe src="${su}" width="420" height="640" frameborder="0" allow="microphone" style="position:fixed;bottom:24px;right:24px;border:none;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:9999"&gt;&lt;/iframe&gt;</pre>
         </div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="navigator.clipboard.writeText(document.getElementById('wc-snip-settings').textContent).then(()=>showToast('Snippet copied','success'))">Copy Snippet</button>
       </div>
-    </div>
+    </div>` : `
+    <div class="settings-card webchat-settings-card">
+      <div class="settings-card-header">
+        <div class="settings-card-title">🌐 Web Chat Configuration</div>
+        <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--surface-3);color:var(--text-3);border:1px solid var(--border)">Not published</span>
+      </div>
+      <div class="settings-card-body">
+        <div class="scope-info">Your Live Chat widget isn't published yet. Go to the <a href="agent.html" style="color:var(--accent);font-weight:700">Agent page</a>, fill in your agent's details and knowledge base, then hit <strong>Publish</strong>. Your Web Chat URL and embed snippet will appear here automatically.</div>
+      </div>
+    </div>`
+    })()}
 
     <!-- Email Notification Preferences -->
     <div class="settings-card">
