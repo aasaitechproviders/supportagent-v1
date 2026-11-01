@@ -1818,7 +1818,13 @@ async function loadTicketConversations(tid) {
           </div>`)
       }
       // Agent / AI / outbound message
-      const outboundBody = c.direction === 'outbound' ? (c.answer || c.question || '') : (c.question ? '' : c.answer || '')
+      // Web chat records have no `direction` — both question (user) and answer (AI) are set.
+      // Social channel records use direction:'outbound'. Handle both:
+      const outboundBody = c.direction === 'outbound'
+        ? (c.answer || c.question || '')
+        : c.direction === 'inbound'
+          ? ''
+          : (c.answer || '')  // web chat: no direction field, answer is the AI reply
       if (outboundBody && c.direction !== 'inbound') {
         const isHuman = c.is_agent_reply || c.from === 'agent'
         const label = isHuman ? '👤 Support Agent' : '✦ AI Agent'
