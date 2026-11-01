@@ -1528,10 +1528,30 @@ async function loadLiveChatThread(key, label, identifier) {
   const pane = document.getElementById('lc-thread-pane')
   if (!pane) return
   pane.innerHTML = `<div class="chat-empty"><div class="dots-loader"><span></span><span></span><span></span></div></div>`
+  // Store current session context for reply
+  STATE.lcCurrentKey        = key
+  STATE.lcCurrentLabel      = label
+  STATE.lcCurrentIdentifier = identifier
+  STATE.lcCurrentTicketId   = null
   try {
     const qs = identifier ? '?identifier=' + encodeURIComponent(identifier) : ''
     const msgs = await apiFetch(`/agents/${STATE.agentId}/conversations/${encodeURIComponent(key)}${qs}`)
     STATE.lcThread = Array.isArray(msgs) ? msgs : (msgs.messages || [])
+
+    // Extract ticket_id from messages if any have one (escalated sessions)
+    const ticketMsg = STATE.lcThread.find(m => m.ticket_id)
+    STATE.lcCurrentTicketId = ticketMsg ? String(ticketMsg.ticket_id) : null
+
+    // Also try matching from already-loaded escalation tickets by session_id or identifier
+    if (!STATE.lcCurrentTicketId && STATE.escTickets?.length) {
+      const match = STATE.escTickets.find(t =>
+        (t.session_id && t.session_id === key) ||
+        (identifier && t.user_identifier === identifier) ||
+        (t.thread_id && t.thread_id === key)
+      )
+      if (match) STATE.lcCurrentTicketId = String(match._id || match.id)
+    }
+
     const displayLabel = label || key
     const av = avatarColor(displayLabel)
     const initials = displayLabel.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?'
@@ -1543,9 +1563,24 @@ async function loadLiveChatThread(key, label, identifier) {
         msgsHTML += `<div class="chat-bubble-wrap sent"><div class="chat-bubble sent">${esc(m.question)}</div><div class="chat-bubble-meta">${ts}</div></div>`
       }
       if (m.answer) {
-        msgsHTML += `<div class="chat-bubble-wrap recv"><div class="chat-bubble recv">${m.answer}</div><div class="chat-bubble-meta"><span class="chat-ai-tag">✦ AI</span><span>${ts}</span></div></div>`
+        const isAgent = m.is_agent_reply
+        msgsHTML += `<div class="chat-bubble-wrap recv"><div class="chat-bubble recv${isAgent?' agent-reply':''}">${esc(m.answer)}</div><div class="chat-bubble-meta">${isAgent?'':'<span class="chat-ai-tag">✦ AI</span>'}<span>${ts}</span></div></div>`
       }
     }
+
+    const composerHTML = STATE.lcCurrentTicketId
+      ? `<div class="chat-composer">
+          <div class="chat-composer-inner">
+            <textarea class="chat-textarea" id="lc-reply-ta" placeholder="Type a reply…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatReply()}"></textarea>
+            <button class="chat-send-btn" id="lc-send-btn" onclick="sendLiveChatReply()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>`
+      : `<div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--surface-2);font-size:11.5px;color:var(--text-3);text-align:center">
+          💬 Replies available for escalated tickets — check the Escalations tab to reply
+        </div>`
+
     pane.innerHTML = `
       <div class="chat-header">
         <div class="chat-header-avatar" style="background:${av};font-size:14px">${initials}</div>
@@ -1554,13 +1589,45 @@ async function loadLiveChatThread(key, label, identifier) {
           <div class="chat-header-sub">🌐 Web Chat · ${msgPairCount} exchange${msgPairCount!==1?'s':''}</div>
         </div>
       </div>
-      <div class="chat-messages" id="lc-msgs-scroll">${msgsHTML || `<div class="chat-empty"><div style="font-size:24px">💬</div><div style="font-size:12px">No messages yet</div></div>`}</div>`
+      <div class="chat-messages" id="lc-msgs-scroll">${msgsHTML || `<div class="chat-empty"><div style="font-size:24px">💬</div><div style="font-size:12px">No messages yet</div></div>`}</div>
+      ${composerHTML}`
     requestAnimationFrame(() => {
       const sc = document.getElementById('lc-msgs-scroll')
       if (sc) sc.scrollTop = sc.scrollHeight
     })
   } catch(e) {
     pane.innerHTML = `<div class="chat-empty"><div style="color:var(--red);font-size:12px">Failed to load chat.</div><button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="loadLiveChatThread('${esc(key)}','${esc(label||'')}','${esc(identifier||'')}')">Retry</button></div>`
+  }
+}
+
+async function sendLiveChatReply() {
+  const ta  = document.getElementById('lc-reply-ta')
+  const btn = document.getElementById('lc-send-btn')
+  const text = ta?.value?.trim()
+  if (!text || !STATE.lcCurrentTicketId) return
+  if (btn) { btn.disabled = true }
+  try {
+    await apiFetch(`/agents/${STATE.agentId}/tickets/${STATE.lcCurrentTicketId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ note: text })
+    })
+    // Optimistic: append reply bubble immediately
+    const sc = document.getElementById('lc-msgs-scroll')
+    if (sc) {
+      const ts = fmtTimeIST(new Date())
+      const div = document.createElement('div')
+      div.className = 'chat-bubble-wrap recv agent-reply'
+      div.innerHTML = `<div class="chat-bubble recv agent-reply">${esc(text)}</div><div class="chat-bubble-meta"><span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">👤 You</span><span>${ts}</span></div>`
+      sc.appendChild(div)
+      sc.scrollTop = sc.scrollHeight
+    }
+    if (ta) { ta.value = ''; ta.style.height = 'auto' }
+    showToast('Reply sent ✓', 'success')
+  } catch(e) {
+    showToast('Failed to send: ' + e.message, 'error')
+  } finally {
+    if (btn) btn.disabled = false
   }
 }
 
