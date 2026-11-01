@@ -1566,9 +1566,12 @@ async function loadLiveChatThread(key, label, identifier) {
       }
       if (m.answer) {
         const isAgent = m.is_agent_reply
+        const isEscCard = !isAgent && m.answer.includes('data-escalation-card')
         // Agent replies are plain text (escape them); AI replies are HTML (render as-is)
         const answerContent = isAgent ? esc(m.answer) : m.answer
-        msgsHTML += `<div class="chat-bubble-wrap recv"><div class="chat-bubble recv${isAgent?' agent-reply':''}">${answerContent}</div><div class="chat-bubble-meta">${isAgent?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">👤 You</span>':'<span class="chat-ai-tag">✦ AI</span>'}<span>${ts}</span></div></div>`
+        // Escalation cards get transparent bubble (card has its own styling); normal bubbles get standard recv style
+        const bubbleStyle = isEscCard ? ' style="background:transparent;border:none;padding:4px 0;box-shadow:none"' : ''
+        msgsHTML += `<div class="chat-bubble-wrap recv"><div class="chat-bubble recv${isAgent?' agent-reply':''}"${bubbleStyle}>${answerContent}</div><div class="chat-bubble-meta">${isAgent?'<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)">👤 You</span>':'<span class="chat-ai-tag">✦ AI</span>'}<span>${ts}</span></div></div>`
       }
     }
 
