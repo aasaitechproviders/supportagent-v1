@@ -2286,11 +2286,50 @@ function renderNonActionable(msg, isNoise, isFailed, isHumanHandling, platform) 
     <div class="replied-notice">🔕 Auto-filtered as ${esc(msg.intent||'noise')} — 0 tokens used
       <button class="btn btn-secondary btn-sm" id="btn-rescue" style="margin-left:8px"><span class="btn-text">↑ Move to Inbox</span></button>
     </div>`
+  // Replied / dismissed — show previous reply + a follow-up composer
+  const statusLabel = msg.auto_replied ? '✦ Auto-replied by AI' : (msg.status === 'replied' ? '✅ Replied' : '🗑 Dismissed')
+  const viewReply = msg.reply_sent
+    ? `<button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.style.display='block';this.style.display='none'" style="margin-left:8px"><span class="btn-text">View Reply</span></button><div style="display:none;margin-top:10px;width:100%"><textarea class="reply-textarea" style="min-height:80px;opacity:.7" readonly>${esc(msg.reply_sent)}</textarea></div>`
+    : ''
   return `
-    <div class="replied-notice">
-      ${msg.auto_replied?'✦ Auto-replied by AI':(msg.status==='replied'?'✅ Replied':'🗑 Dismissed')}
-      ${msg.reply_sent?`<button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.style.display='block';this.style.display='none'" style="margin-left:8px"><span class="btn-text">View Reply</span></button><div style="display:none;margin-top:10px;width:100%"><textarea class="reply-textarea" style="min-height:80px;opacity:.7" readonly>${esc(msg.reply_sent)}</textarea></div>`:''}
+    <div class="replied-notice">${statusLabel}${viewReply}</div>
+    <div style="margin-top:10px">
+      <div style="font-size:11.5px;color:var(--text-3);margin-bottom:6px">Send a follow-up reply:</div>
+      <textarea class="reply-textarea" id="reply-followup-${esc(msg._id)}" placeholder="Type your follow-up message…" style="min-height:80px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <button class="btn btn-primary btn-sm" onclick="sendFollowupReply('${platform}','${esc(msg._id)}',this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span class="btn-text">Send Reply</span>
+        </button>
+        <span style="font-size:11px;color:var(--text-3)">To: <strong style="color:var(--text-2)">${esc(msg.from||'')}</strong></span>
+      </div>
     </div>`
+}
+
+async function sendFollowupReply(platform, msgId, btn) {
+  const ta = document.getElementById(`reply-followup-${msgId}`)
+  if (!ta || !ta.value.trim()) { showToast('Type a reply first', 'error'); return }
+  btn.classList.add('loading')
+  try {
+    const msg = STATE.msgMap[platform]?.[msgId]
+    if (platform === 'email') {
+      // Gmail: use the approve endpoint with the channel_message_id or thread msgId
+      const gmailId = msg?.channel_message_id || msg?.thread_id || msgId
+      await apiFetch(`/agents/${STATE.agentId}/channels/gmail/approve/${gmailId}`, {
+        method: 'POST', body: JSON.stringify({ reply: ta.value.trim() })
+      })
+    } else {
+      // WhatsApp / Instagram / Messenger — patch the message with reply
+      await apiFetch(`/agents/${STATE.agentId}/channels/${platform}/messages/${msgId}/reply`, {
+        method: 'POST', body: JSON.stringify({ reply: ta.value.trim() })
+      })
+    }
+    showToast('Reply sent!', 'success')
+    ta.value = ''
+    await loadInbox(platform)
+  } catch (e) {
+    showToast(e.message || 'Failed to send', 'error')
+  } finally { btn.classList.remove('loading') }
 }
 
 function openManualReply(platform, msgId) {
