@@ -1818,14 +1818,21 @@ async function loadTicketConversations(tid) {
           </div>`)
       }
       // Agent / AI / outbound message
-      // Web chat records have no `direction` — both question (user) and answer (AI) are set.
-      // Social channel records use direction:'outbound'. Handle both:
-      const outboundBody = c.direction === 'outbound'
-        ? (c.answer || c.question || '')
-        : c.direction === 'inbound'
-          ? ''
-          : (c.answer || '')  // web chat: no direction field, answer is the AI reply
-      if (outboundBody && c.direction !== 'inbound') {
+      // Three cases:
+      // 1. direction='outbound'  — separate outbound doc (escalation confirm, manual reply)
+      // 2. direction='inbound'   — inbound doc that also has reply_sent = AI auto-reply on same record
+      // 3. no direction          — web chat: both question (user) and answer (AI) on same record
+      let outboundBody = ''
+      if (c.direction === 'outbound') {
+        outboundBody = c.answer || c.question || ''
+      } else if (c.direction === 'inbound') {
+        // reply_sent is the AI reply saved onto the inbound record — answer field carries it
+        outboundBody = c.answer || ''
+      } else {
+        // web chat: no direction field — answer is the AI reply
+        outboundBody = c.answer || ''
+      }
+      if (outboundBody) {
         const isHuman = c.is_agent_reply || c.from === 'agent'
         const label = isHuman ? '👤 Support Agent' : '✦ AI Agent'
         const style = isHuman ? 'border-left:3px solid var(--accent)' : ''
