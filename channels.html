@@ -1527,6 +1527,8 @@ async function loadLiveChatThread(key, label, identifier) {
   renderLiveChatSessions() // re-render list to show active highlight
   const pane = document.getElementById('lc-thread-pane')
   if (!pane) return
+  pane.style.alignItems = ''
+  pane.style.justifyContent = ''
   pane.innerHTML = `<div class="chat-empty"><div class="dots-loader"><span></span><span></span><span></span></div></div>`
   // Store current session context for reply
   STATE.lcCurrentKey        = key
@@ -1573,7 +1575,7 @@ async function loadLiveChatThread(key, label, identifier) {
     const composerHTML = STATE.lcCurrentTicketId
       ? `<div class="chat-composer">
           <div class="chat-composer-inner">
-            <textarea class="chat-textarea" id="lc-reply-ta" placeholder="Type a reply…" rows="1" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,200)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatReply()}"></textarea>
+            <textarea class="chat-textarea" id="lc-reply-ta" placeholder="Type a reply…" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,320)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatReply()}"></textarea>
             <button class="chat-send-btn" id="lc-send-btn" onclick="sendLiveChatReply()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
