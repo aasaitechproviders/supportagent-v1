@@ -1602,7 +1602,7 @@ async function loadAppointments() {
   const agentId      = agentFilter || (agents[0] ? String(agents[0]._id) : '')
   if (!agentId) return
   try {
-    let url = `${API}/appointments?agent_id=${agentId}&limit=500`
+    let url = `/appointments?agent_id=${agentId}&limit=500`
     if (statusFilter) url += `&status=${statusFilter}`
     const r = await apiFetch(url)
     apptAll = r.appointments || []
