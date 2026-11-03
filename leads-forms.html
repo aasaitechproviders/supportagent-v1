@@ -408,31 +408,10 @@
                 </select>
                 <input type="hidden" id="appt-confirm-tmpl" value="">
               </div>
-              <!-- Create new template (separate card) -->
-              <div style="border:1px dashed var(--border-md);border-radius:8px;overflow:hidden">
-                <button type="button" id="appt-confirm-new-btn" onclick="toggleApptNewTmpl('confirm')" style="width:100%;text-align:left;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:none;color:var(--text-3);cursor:pointer;display:flex;align-items:center;gap:6px">
-                  <span id="appt-confirm-new-arrow" style="font-size:10px">▶</span> Create New Template
-                </button>
-                <div id="appt-confirm-new-wrap" style="display:none;flex-direction:column;gap:8px;padding:0 12px 12px">
-                  <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
-                    <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px">
-                      <button type="button" onclick="insertApptVar('confirm','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
-                      <button type="button" onclick="insertApptVar('confirm','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
-                      <button type="button" onclick="insertApptVar('confirm','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
-                    </div>
-                  </div>
-                  <textarea id="appt-confirm-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, your appointment for {{2}} is confirmed on {{3}}." oninput="updateApptPreview('confirm')"></textarea>
-                  <div id="appt-confirm-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
-                    <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
-                    <div id="appt-confirm-preview-text"></div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <button type="button" class="btn btn-secondary btn-sm" id="appt-confirm-reg-btn" onclick="registerApptTemplate('confirm')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
-                    <span id="appt-confirm-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
-                  </div>
-                </div>
-              </div>
+              <!-- Create new template button → opens modal -->
+              <button type="button" onclick="openApptTmplModal('confirm')" style="width:100%;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:1px dashed var(--border-md);border-radius:8px;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px">
+                ＋ Create New Template
+              </button>
             </div>
           </div>
           <!-- Reminder -->
@@ -460,30 +439,10 @@
                 </select>
                 <input type="hidden" id="appt-reminder-tmpl" value="">
               </div>
-              <div style="border:1px dashed var(--border-md);border-radius:8px;overflow:hidden">
-                <button type="button" id="appt-reminder-new-btn" onclick="toggleApptNewTmpl('reminder')" style="width:100%;text-align:left;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:none;color:var(--text-3);cursor:pointer;display:flex;align-items:center;gap:6px">
-                  <span id="appt-reminder-new-arrow" style="font-size:10px">▶</span> Create New Template
-                </button>
-                <div id="appt-reminder-new-wrap" style="display:none;flex-direction:column;gap:8px;padding:0 12px 12px">
-                  <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
-                    <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px">
-                      <button type="button" onclick="insertApptVar('reminder','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
-                      <button type="button" onclick="insertApptVar('reminder','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
-                      <button type="button" onclick="insertApptVar('reminder','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
-                    </div>
-                  </div>
-                  <textarea id="appt-reminder-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, reminder for your {{2}} appointment on {{3}}. Please be on time!" oninput="updateApptPreview('reminder')"></textarea>
-                  <div id="appt-reminder-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
-                    <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
-                    <div id="appt-reminder-preview-text"></div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <button type="button" class="btn btn-secondary btn-sm" id="appt-reminder-reg-btn" onclick="registerApptTemplate('reminder')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
-                    <span id="appt-reminder-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
-                  </div>
-                </div>
-              </div>
+              <!-- Create new template button → opens modal -->
+              <button type="button" onclick="openApptTmplModal('reminder')" style="width:100%;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:1px dashed var(--border-md);border-radius:8px;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px">
+                ＋ Create New Template
+              </button>
             </div>
           </div>
           <!-- Followup -->
@@ -511,34 +470,63 @@
                 </select>
                 <input type="hidden" id="appt-followup-tmpl" value="">
               </div>
-              <div style="border:1px dashed var(--border-md);border-radius:8px;overflow:hidden">
-                <button type="button" id="appt-followup-new-btn" onclick="toggleApptNewTmpl('followup')" style="width:100%;text-align:left;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:none;color:var(--text-3);cursor:pointer;display:flex;align-items:center;gap:6px">
-                  <span id="appt-followup-new-arrow" style="font-size:10px">▶</span> Create New Template
-                </button>
-                <div id="appt-followup-new-wrap" style="display:none;flex-direction:column;gap:8px;padding:0 12px 12px">
-                  <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
-                    <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px">
-                      <button type="button" onclick="insertApptVar('followup','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
-                      <button type="button" onclick="insertApptVar('followup','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
-                      <button type="button" onclick="insertApptVar('followup','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
-                    </div>
-                  </div>
-                  <textarea id="appt-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, thank you for your {{2}} appointment on {{3}}. Hope it went well!" oninput="updateApptPreview('followup')"></textarea>
-                  <div id="appt-followup-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
-                    <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
-                    <div id="appt-followup-preview-text"></div>
-                  </div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <button type="button" class="btn btn-secondary btn-sm" id="appt-followup-reg-btn" onclick="registerApptTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
-                    <span id="appt-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
-                  </div>
-                </div>
-              </div>
+              <!-- Create new template button → opens modal -->
+              <button type="button" onclick="openApptTmplModal('followup')" style="width:100%;font-size:12px;font-weight:600;padding:9px 12px;background:transparent;border:1px dashed var(--border-md);border-radius:8px;color:var(--primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:2px">
+                ＋ Create New Template
+              </button>
             </div>
           </div>
         </div>
         <div id="appt-tog-status" style="margin-top:10px;font-size:11.5px;color:var(--text-3);min-height:16px"></div>
+      </div>
+
+      <!-- Shared Create New Template Modal -->
+      <div id="appt-tmpl-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:16px">
+        <div style="background:var(--surface);border-radius:12px;width:100%;max-width:480px;box-shadow:0 8px 40px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden">
+          <!-- Modal header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface-2)">
+            <div>
+              <div id="appt-tmpl-modal-title" style="font-size:14px;font-weight:700;color:var(--text)">Create New Template</div>
+              <div id="appt-tmpl-modal-subtitle" style="font-size:11.5px;color:var(--text-3);margin-top:2px"></div>
+            </div>
+            <button type="button" onclick="closeApptTmplModal()" style="background:none;border:none;font-size:18px;color:var(--text-3);cursor:pointer;line-height:1;padding:4px">✕</button>
+          </div>
+          <!-- Modal body -->
+          <div style="padding:16px 20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:70vh">
+            <!-- Template name -->
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Template Name <span style="color:var(--danger)">*</span></label>
+              <input type="text" id="appt-modal-name" placeholder="e.g. appointment_confirm_v1 (lowercase, underscores only)" style="width:100%;height:34px;font-size:12px;padding:0 10px;border:1px solid var(--border-md);border-radius:6px;background:var(--surface-2);color:var(--text)">
+            </div>
+            <!-- Variable chips -->
+            <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px">
+              <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" onclick="insertApptModalVar('{{1}}')" style="font-size:11.5px;padding:4px 12px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
+                <button type="button" onclick="insertApptModalVar('{{2}}')" style="font-size:11.5px;padding:4px 12px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
+                <button type="button" onclick="insertApptModalVar('{{3}}')" style="font-size:11.5px;padding:4px 12px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
+              </div>
+            </div>
+            <!-- Textarea -->
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Message Body <span style="color:var(--danger)">*</span></label>
+              <textarea id="appt-modal-body" rows="4" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, your appointment for {{2}} is confirmed on {{3}}." oninput="updateApptModalPreview()"></textarea>
+            </div>
+            <!-- Live preview -->
+            <div id="appt-modal-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:10px 12px;font-size:12px;color:#1a3a1b;line-height:1.5">
+              <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
+              <div id="appt-modal-preview-text"></div>
+            </div>
+          </div>
+          <!-- Modal footer -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface-2)">
+            <span id="appt-modal-status" style="font-size:12px;color:var(--text-3)"></span>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="closeApptTmplModal()" style="font-size:12px">Cancel</button>
+              <button type="button" class="btn btn-primary btn-sm" id="appt-modal-reg-btn" onclick="registerApptTemplateModal()" style="font-size:12px;padding:0 16px">Register Template</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Toolbar -->
@@ -1894,24 +1882,12 @@ async function loadApptToggles(agentId) {
     if (cfg.followup_unit) { const el = document.getElementById('appt-followup-unit'); if (el) el.value = cfg.followup_unit }
     // Restore hidden template name inputs + status labels
     const restoreApptTmpl = (type, tmplName) => {
-      const inp = document.getElementById(`appt-${type}-tmpl`); if (inp && tmplName) inp.value = tmplName
-      const s   = document.getElementById(`appt-${type}-reg-status`)
-      const b   = document.getElementById(`appt-${type}-reg-btn`)
-      // Always keep create-new section collapsed on load
-      const wrap  = document.getElementById(`appt-${type}-new-wrap`)
-      const arrow = document.getElementById(`appt-${type}-new-arrow`)
-      if (wrap)  wrap.style.display = 'none'
-      if (arrow) arrow.textContent = '▶'
-      if (tmplName && s) s.textContent = '✓ Template Ready'
-      if (tmplName && b) { b.textContent = '✓ Ready'; b.disabled = true }
+      const inp = document.getElementById(`appt-${type}-tmpl`)
+      if (inp && tmplName) inp.value = tmplName
     }
     restoreApptTmpl('confirm',  cfg.confirm_template_name)
     restoreApptTmpl('reminder', cfg.reminder_template_name)
     restoreApptTmpl('followup', cfg.followup_template_name)
-    // Pre-fill default bodies if empty
-    const cb = document.getElementById('appt-confirm-body');  if (cb && !cb.value.trim()) cb.value = APPT_CONFIRM_DEFAULT
-    const rb = document.getElementById('appt-reminder-body'); if (rb && !rb.value.trim()) rb.value = APPT_REMINDER_DEFAULT
-    const fb = document.getElementById('appt-followup-body'); if (fb && !fb.value.trim()) fb.value = APPT_FOLLOWUP_DEFAULT
     // Populate saved-template dropdowns
     loadTmplSelectors()
   } catch (e) { console.warn('loadApptToggles', e.message) }
@@ -2084,65 +2060,90 @@ function onApptTmplSelChange(type) {
   const hid = document.getElementById(`appt-${type}-tmpl`)
   if (!sel || !hid) return
   hid.value = sel.value
-  if (sel.value) {
-    // Collapse the create-new section when a template is selected
-    const wrap  = document.getElementById(`appt-${type}-new-wrap`)
-    const arrow = document.getElementById(`appt-${type}-new-arrow`)
-    if (wrap)  wrap.style.display = 'none'
-    if (arrow) arrow.textContent = '▶'
-  }
   if (typeof saveApptToggles === 'function') saveApptToggles()
 }
 
-function toggleApptNewTmpl(type) {
-  const wrap  = document.getElementById(`appt-${type}-new-wrap`)
-  const arrow = document.getElementById(`appt-${type}-new-arrow`)
-  if (!wrap) return
-  const open = wrap.style.display === 'flex'
-  wrap.style.display = open ? 'none' : 'flex'
-  if (arrow) arrow.textContent = open ? '▶' : '▼'
-  // Pre-fill default text when opening for the first time
-  if (!open) {
-    const ta = document.getElementById(`appt-${type}-body`)
-    if (ta && !ta.value) {
-      const defaults = {
-        confirm:  APPT_CONFIRM_DEFAULT,
-        reminder: APPT_REMINDER_DEFAULT,
-        followup: APPT_FOLLOWUP_DEFAULT,
-      }
-      ta.value = defaults[type] || ''
-      updateApptPreview(type)
-    }
-  }
+// ── Appt Template Modal ──────────────────────────────────────────────────────
+let _apptModalType = null // 'confirm' | 'reminder' | 'followup'
+
+const APPT_MODAL_LABELS = { confirm: 'Confirmation', reminder: 'Reminder', followup: 'Follow-up' }
+const APPT_MODAL_DESCS  = {
+  confirm:  'Sent immediately when appointment is created',
+  reminder: 'Sent before the appointment as a reminder',
+  followup: 'Sent after appointment is marked completed',
 }
 
-// Insert variable at cursor position in the appt template textarea
-function insertApptVar(type, variable) {
-  const ta = document.getElementById(`appt-${type}-body`)
+function openApptTmplModal(type) {
+  _apptModalType = type
+  const modal   = document.getElementById('appt-tmpl-modal')
+  const title   = document.getElementById('appt-tmpl-modal-title')
+  const sub     = document.getElementById('appt-tmpl-modal-subtitle')
+  const nameEl  = document.getElementById('appt-modal-name')
+  const bodyEl  = document.getElementById('appt-modal-body')
+  const statusEl= document.getElementById('appt-modal-status')
+  const btn     = document.getElementById('appt-modal-reg-btn')
+
+  if (title)   title.textContent   = `New ${APPT_MODAL_LABELS[type] || type} Template`
+  if (sub)     sub.textContent     = APPT_MODAL_DESCS[type] || ''
+  if (nameEl)  nameEl.value        = ''
+  if (statusEl)statusEl.textContent= ''
+  if (btn)    { btn.textContent = 'Register Template'; btn.disabled = false }
+
+  // Pre-fill default body text
+  if (bodyEl) {
+    const defaults = { confirm: APPT_CONFIRM_DEFAULT, reminder: APPT_REMINDER_DEFAULT, followup: APPT_FOLLOWUP_DEFAULT }
+    bodyEl.value = defaults[type] || ''
+    updateApptModalPreview()
+  }
+
+  modal.style.display = 'flex'
+  document.body.style.overflow = 'hidden'
+  setTimeout(() => nameEl?.focus(), 80)
+}
+
+function closeApptTmplModal() {
+  const modal = document.getElementById('appt-tmpl-modal')
+  modal.style.display = 'none'
+  document.body.style.overflow = ''
+  _apptModalType = null
+}
+
+// Close modal on backdrop click
+document.addEventListener('click', e => {
+  if (e.target.id === 'appt-tmpl-modal') closeApptTmplModal()
+})
+
+// Insert variable at cursor in modal textarea
+function insertApptModalVar(variable) {
+  const ta = document.getElementById('appt-modal-body')
   if (!ta) return
   const start = ta.selectionStart, end = ta.selectionEnd
   ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end)
   ta.selectionStart = ta.selectionEnd = start + variable.length
   ta.focus()
-  updateApptPreview(type)
+  updateApptModalPreview()
 }
 
-// Live preview with sample values: {{1}}=Ravi {{2}}=Hair Cut {{3}}=3 Nov, 10:00 AM
-function updateApptPreview(type) {
-  const ta      = document.getElementById(`appt-${type}-body`)
-  const preview = document.getElementById(`appt-${type}-preview`)
-  const preText = document.getElementById(`appt-${type}-preview-text`)
+// Live preview in modal
+function updateApptModalPreview() {
+  const ta      = document.getElementById('appt-modal-body')
+  const preview = document.getElementById('appt-modal-preview')
+  const preText = document.getElementById('appt-modal-preview-text')
   if (!ta || !preview || !preText) return
   const text = ta.value.trim()
   if (!text) { preview.style.display = 'none'; return }
-  const sample = text
+  preText.textContent = text
     .replace(/\{\{1\}\}/g, 'Ravi')
     .replace(/\{\{2\}\}/g, 'Hair Cut')
     .replace(/\{\{3\}\}/g, '3 Nov 2026, 10:00 AM')
     .replace(/\{\{4\}\}/g, 'Please bring ID')
-  preText.textContent = sample
   preview.style.display = 'block'
 }
+
+// Keep legacy stubs so nothing else breaks (inline sections removed)
+function toggleApptNewTmpl() {}
+function insertApptVar(type, variable) { insertApptModalVar(variable) }
+function updateApptPreview(type) { updateApptModalPreview() }
 
 // Register a WA template for this form (ack or followup)
 async function registerFormTemplate(type) {
@@ -2232,20 +2233,26 @@ async function registerFormTemplate(type) {
 }
 
 // Register a WA template for appointments (confirm / reminder / followup)
-async function registerApptTemplate(type) {
+// Called from modal Register button
+async function registerApptTemplateModal() {
+  const type    = _apptModalType
+  if (!type) return
+
   const agentId = apptWaAgentId || document.getElementById('appt-wa-agent')?.value
   if (!agentId) return toast('Select an agent first', 'error')
 
-  const bodyEl   = document.getElementById(`appt-${type}-body`)
-  const statusEl = document.getElementById(`appt-${type}-reg-status`)
+  const nameEl  = document.getElementById('appt-modal-name')
+  const bodyEl  = document.getElementById('appt-modal-body')
+  const statusEl= document.getElementById('appt-modal-status')
+  const btn     = document.getElementById('appt-modal-reg-btn')
   const tmplInput = document.getElementById(`appt-${type}-tmpl`)
-  const btn      = document.getElementById(`appt-${type}-reg-btn`)
 
   const bodyText = bodyEl?.value?.trim()
-  if (!bodyText) return toast('Enter the template message body first', 'error')
+  if (!bodyText) return toast('Enter the message body first', 'error')
 
-  const DEFAULTS = { confirm: APPT_CONFIRM_DEFAULT, reminder: APPT_REMINDER_DEFAULT, followup: APPT_FOLLOWUP_DEFAULT }
-  const tmplName = `appt_${type}_${agentId.slice(-8).toLowerCase().replace(/[^a-z0-9]/g, '')}`
+  // Build template name: use user input or auto-generate
+  let tmplName = (nameEl?.value?.trim() || '').toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')
+  if (!tmplName) tmplName = `appt_${type}_${agentId.slice(-8).toLowerCase().replace(/[^a-z0-9]/g, '')}`
 
   if (statusEl) statusEl.textContent = 'Checking…'
   if (btn) btn.disabled = true
@@ -2257,17 +2264,21 @@ async function registerApptTemplate(type) {
     if (existing) {
       if (existing.status === 'approved') {
         if (tmplInput) tmplInput.value = existing.name
-        if (statusEl) statusEl.textContent = '✓ Template Ready'
-        if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
+        if (statusEl) statusEl.textContent = '✓ Template already approved!'
+        if (btn) btn.disabled = false
         await saveApptToggles()
+        await loadTmplSelectors()
+        // Auto-select in dropdown
+        const sel = document.getElementById(`appt-${type}-tmpl-sel`)
+        if (sel) { sel.value = existing.name; onApptTmplSelChange(type) }
+        setTimeout(closeApptTmplModal, 1200)
         return
       } else if (existing.status === 'rejected' || existing.status === 'draft') {
-        if (statusEl) statusEl.textContent = 'Retrying Meta submission…'
+        if (statusEl) statusEl.textContent = 'Resubmitting to Meta…'
         try {
           await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
-          if (tmplInput) tmplInput.value = existing.name
-          if (statusEl) statusEl.textContent = existing.status === 'rejected' ? '✕ Rejected — edit body and retry' : '⏳ Pending Meta Review'
-          if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+          if (statusEl) statusEl.textContent = '⏳ Resubmitted — pending Meta review'
+          if (btn) btn.disabled = false
         } catch (e2) {
           if (statusEl) statusEl.textContent = '✕ Meta error: ' + e2.message
           if (btn) btn.disabled = false
@@ -2275,8 +2286,8 @@ async function registerApptTemplate(type) {
         return
       } else {
         if (tmplInput) tmplInput.value = existing.name
-        if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
-        if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+        if (statusEl) statusEl.textContent = '⏳ Pending Meta review'
+        if (btn) btn.disabled = false
         return
       }
     }
@@ -2291,25 +2302,33 @@ async function registerApptTemplate(type) {
     })
     const tpl = res.template
     if (tmplInput) tmplInput.value = tpl.name
+
     if (tpl.status === 'approved') {
-      if (statusEl) statusEl.textContent = '✓ Template Ready'
-      if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
-    } else {
-      if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
-      if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
-    }
-    if (res.meta_error) {
+      if (statusEl) statusEl.textContent = '✓ Template approved!'
+      await saveApptToggles()
+      await loadTmplSelectors()
+      const sel = document.getElementById(`appt-${type}-tmpl-sel`)
+      if (sel) { sel.value = tpl.name; onApptTmplSelChange(type) }
+      setTimeout(closeApptTmplModal, 1200)
+    } else if (res.meta_error) {
       if (statusEl) statusEl.textContent = '✕ Meta error: ' + res.meta_error
       if (btn) btn.disabled = false
+    } else {
+      if (statusEl) statusEl.textContent = '⏳ Submitted — pending Meta review. You can close this.'
+      if (btn) btn.disabled = false
+      await saveApptToggles()
+      await loadTmplSelectors()
     }
-    // Auto-save the template name to agent config
-    await saveApptToggles()
-    // Refresh dropdown so newly-registered template appears
-    loadTmplSelectors()
   } catch (e) {
     if (statusEl) statusEl.textContent = '✕ ' + e.message
     if (btn) btn.disabled = false
   }
+}
+
+// Legacy wrapper kept for any stray references
+function registerApptTemplate(type) {
+  _apptModalType = type
+  registerApptTemplateModal()
 }
 
 // When agent changes in form builder, reload WA template options
