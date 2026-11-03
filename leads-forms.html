@@ -1925,11 +1925,19 @@ function fmTemplateSlug(type) {
 
 // Populate all template selects for forms and appointments with saved templates
 async function loadTmplSelectors() {
-  const agentId = currentAgent?._id; if (!agentId) return
+  // Works in both form builder (fm-agent dropdown) and appt WA panel (apptWaAgentId)
+  const agentId = (typeof apptWaAgentId !== 'undefined' && apptWaAgentId)
+    || document.getElementById('fm-agent')?.value
+    || (typeof currentAgent !== 'undefined' && currentAgent?._id)
+  console.log('[loadTmplSelectors] agentId:', agentId)
+  if (!agentId) { console.warn('[loadTmplSelectors] no agentId, skipping'); return }
   try {
     const res = await apiFetch(`/templates?agent_id=${agentId}`)
+    console.log('[loadTmplSelectors] raw res:', res)
     const tmpls = res.templates || []
+    console.log('[loadTmplSelectors] all templates:', tmpls.map(t => `${t.name} (${t.status})`))
     const usable = tmpls.filter(t => t.status === 'approved')
+    console.log('[loadTmplSelectors] approved templates:', usable.map(t => t.name))
     const makeOpts = (selEl, currentVal) => {
       if (!selEl) return
       const prev = selEl.value || currentVal || ''
