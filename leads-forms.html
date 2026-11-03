@@ -1604,7 +1604,7 @@ async function loadAppointments() {
   try {
     let url = `${API}/appointments?agent_id=${agentId}&limit=500`
     if (statusFilter) url += `&status=${statusFilter}`
-    const r = await fetchJSON(url)
+    const r = await apiFetch(url)
     apptAll = r.appointments || []
     apptPage = 0
     apptApplySearch(document.getElementById('appt-search')?.value || '')
@@ -1727,10 +1727,10 @@ async function saveAppt() {
   try {
     if (apptEditId) {
       body.status = status
-      await fetchJSON(`${API}/appointments/${apptEditId}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+      await apiFetch(`/appointments/${apptEditId}`, { method:'PATCH', body:JSON.stringify(body) })
       toast('Appointment updated ✓', 'success')
     } else {
-      await fetchJSON(`${API}/appointments`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })
+      await apiFetch(`/appointments`, { method:'POST', body:JSON.stringify(body) })
       toast('Appointment created ✓', 'success')
     }
     closeApptModal()
@@ -1741,7 +1741,7 @@ async function saveAppt() {
 async function deleteAppt(id) {
   if (!confirm('Delete this appointment?')) return
   try {
-    await fetchJSON(`${API}/appointments/${id}`, { method:'DELETE' })
+    await apiFetch(`/appointments/${id}`, { method:'DELETE' })
     toast('Deleted', 'success')
     loadAppointments()
   } catch (e) { toast(e.message || 'Delete failed', 'error') }
@@ -1950,12 +1950,15 @@ async function loadTmplSelectors() {
         selEl.appendChild(opt)
       })
     }
+    const selIds = ['fm-ack-tmpl-sel','fm-followup-tmpl-sel','appt-confirm-tmpl-sel','appt-reminder-tmpl-sel','appt-followup-tmpl-sel']
+    selIds.forEach(id => console.log(`[loadTmplSelectors] selector #${id}:`, document.getElementById(id) ? 'found' : 'NOT FOUND'))
     makeOpts(document.getElementById('fm-ack-tmpl-sel'),        document.getElementById('fm-ack-tmpl')?.value)
     makeOpts(document.getElementById('fm-followup-tmpl-sel'),   document.getElementById('fm-followup-tmpl')?.value)
     makeOpts(document.getElementById('appt-confirm-tmpl-sel'),  document.getElementById('appt-confirm-tmpl')?.value)
     makeOpts(document.getElementById('appt-reminder-tmpl-sel'), document.getElementById('appt-reminder-tmpl')?.value)
     makeOpts(document.getElementById('appt-followup-tmpl-sel'), document.getElementById('appt-followup-tmpl')?.value)
-  } catch(e) { console.warn('loadTmplSelectors', e) }
+    console.log('[loadTmplSelectors] done populating selectors')
+  } catch(e) { console.warn('[loadTmplSelectors] ERROR', e) }
 }
 
 function onFmTmplSelChange(type) {
