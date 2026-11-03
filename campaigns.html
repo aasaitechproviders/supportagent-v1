@@ -389,10 +389,14 @@
                   <div id="tpl-bvar-rows">
                     <div class="var-row" id="tpl-bvar-row-0">
                       <span class="var-lbl">Body {{1}}</span><span class="var-arrow">→</span>
+                      <select class="tpl-var-sel" id="tpl-bvar-type-0" onchange="onBVarTypeChange(0)" style="width:100px">
+                        <option value="field">Contact field</option><option value="custom">Custom text</option>
+                      </select>
                       <select class="tpl-var-sel" id="tpl-bvar-0" onchange="updateTplPreview()">
                         <option value="name">Name</option><option value="phone">Phone</option>
                         <option value="identifier">Identifier</option><option value="">(skip)</option>
                       </select>
+                      <input class="tpl-inp" id="tpl-bvar-custom-0" type="text" placeholder="e.g. 20% off" style="display:none;height:28px;font-size:12px" oninput="updateTplPreview()">
                     </div>
                   </div>
                   <button class="btn btn-secondary btn-sm" style="margin-top:5px;font-size:11px;border-color:#86efac;color:#166534" onclick="addBVar()">+ Add Variable</button>
@@ -597,6 +601,16 @@
       <div class="form-group">
         <label class="form-label">Footer <span>(optional)</span></label>
         <input class="form-input" id="fFooter" placeholder="e.g. Reply STOP to unsubscribe"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Buttons <span>(optional)</span></label>
+        <div id="fBtnList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addTplBtn('url')">+ URL Button</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addTplBtn('phone')">+ Call Button</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addTplBtn('quick_reply')">+ Quick Reply</button>
+        </div>
+        <div class="form-hint">Max 2 call-to-action buttons (URL/Call) and 3 quick replies. URL buttons let users open your website directly from WhatsApp.</div>
       </div>
       <div class="form-group" id="varSection" style="display:none">
         <label class="form-label">Variable Labels <span>(helps agents know what to fill)</span></label>
@@ -822,15 +836,28 @@ function onTplSelect() {
   updateTplPreview()
 }
 
+function onBVarTypeChange(n) {
+  const type = document.getElementById(`tpl-bvar-type-${n}`)?.value
+  const sel  = document.getElementById(`tpl-bvar-${n}`)
+  const inp  = document.getElementById(`tpl-bvar-custom-${n}`)
+  if (!sel || !inp) return
+  if (type === 'custom') { sel.style.display = 'none'; inp.style.display = '' }
+  else { sel.style.display = ''; inp.style.display = 'none' }
+  updateTplPreview()
+}
 function addBVar() {
   const n = S.bvarCount++
   const row = document.createElement('div')
   row.className = 'var-row'; row.id = `tpl-bvar-row-${n}`
   row.innerHTML = `<span class="var-lbl">Body {{${n+1}}}</span><span class="var-arrow">→</span>
+    <select class="tpl-var-sel" id="tpl-bvar-type-${n}" onchange="onBVarTypeChange(${n})" style="width:100px">
+      <option value="field">Contact field</option><option value="custom">Custom text</option>
+    </select>
     <select class="tpl-var-sel" id="tpl-bvar-${n}" onchange="updateTplPreview()">
       <option value="name">Name</option><option value="phone">Phone</option>
       <option value="identifier">Identifier</option><option value="">(skip)</option>
     </select>
+    <input class="tpl-inp" id="tpl-bvar-custom-${n}" type="text" placeholder="e.g. 20% off" style="display:none;height:28px;font-size:12px" oninput="updateTplPreview()">
     <button onclick="rmBVar(${n})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:13px;padding:0 3px">✕</button>`
   document.getElementById('tpl-bvar-rows').appendChild(row)
   updateTplPreview()
@@ -845,10 +872,17 @@ function updateTplPreview() {
   const ex   = { name:'Priya Kumar', phone:'+91 98765 43210', identifier:'+91 98765 43210' }
   const hvar = document.getElementById('tpl-hvar')?.value
   const bvars = []; let i = 0
-  while (document.getElementById(`tpl-bvar-${i}`)) { bvars.push(document.getElementById(`tpl-bvar-${i}`).value); i++ }
+  while (document.getElementById(`tpl-bvar-${i}`) !== null || document.getElementById(`tpl-bvar-custom-${i}`) !== null) {
+    const typeEl = document.getElementById(`tpl-bvar-type-${i}`)
+    const isCustom = typeEl?.value === 'custom'
+    const val = isCustom ? (document.getElementById(`tpl-bvar-custom-${i}`)?.value || '') : (document.getElementById(`tpl-bvar-${i}`)?.value || '')
+    bvars.push({ type: isCustom ? 'custom' : 'field', value: val })
+    i++
+    if (i > 20) break
+  }
   const lines = [`Template: ${name}`]
   if (hvar) lines.push(`Header {{1}} → ${ex[hvar]||hvar}`)
-  if (bvars.filter(Boolean).length) lines.push(`Body: ${bvars.map((v,i)=>`{{${i+1}}}=${ex[v]||v||'—'}`).join(', ')}`)
+  if (bvars.filter(b=>b.value).length) lines.push(`Body: ${bvars.map((b,i)=>`{{${i+1}}}=${b.type==='custom'?b.value:(ex[b.value]||b.value||'—')}`).join(', ')}`)
   txt.textContent = lines.join('\n'); prev.classList.add('open')
 }
 
@@ -974,11 +1008,23 @@ async function createCampaign() {
       if (!tplName) { showToast('Select a template first', 'error'); return }
       const lang = document.getElementById('tpl-lang').value
       const hvar = document.getElementById('tpl-hvar').value
-      const bvars = []; let i = 0
-      while (document.getElementById(`tpl-bvar-${i}`)) {
-        const v = document.getElementById(`tpl-bvar-${i}`).value; if (v) bvars.push(v); i++
+      const bvars = []; const bvar_customs = []; let i = 0
+      while (i <= 20) {
+        const typeEl = document.getElementById(`tpl-bvar-type-${i}`)
+        const selEl  = document.getElementById(`tpl-bvar-${i}`)
+        const inpEl  = document.getElementById(`tpl-bvar-custom-${i}`)
+        if (!typeEl && !selEl && !inpEl) break
+        const isCustom = typeEl?.value === 'custom'
+        if (isCustom) {
+          bvars.push('__custom__')
+          bvar_customs.push(inpEl?.value || '')
+        } else {
+          bvars.push(selEl?.value || '')
+          bvar_customs.push(null)
+        }
+        i++
       }
-      wa_template = { name: tplName, lang, header_var: hvar, body_vars: bvars }
+      wa_template = { name: tplName, lang, header_var: hvar, body_vars: bvars, body_var_customs: bvar_customs }
       message = `[Template: ${tplName}]`
     } else {
       message = document.getElementById('msg-wa').value.trim()
@@ -1239,6 +1285,15 @@ function openEditModal(id) {
   document.getElementById('fFooter').value   = t.footer_text || ''
   document.getElementById('fBody').value     = bodyText(t)
   onCategoryChange(); (t.variables || []).forEach(v => addVarRow(v)); updatePreview()
+  // Restore buttons from saved components
+  const btnComp = (t.components || []).find(c => c.type === 'BUTTONS')
+  if (btnComp?.buttons?.length) {
+    btnComp.buttons.forEach(b => {
+      if (b.type === 'URL') { addTplBtn('url'); const id = _btnCount-1; document.getElementById(`fbtn-label-${id}`).value = b.text||''; document.getElementById(`fbtn-url-${id}`).value = b.url||'' }
+      else if (b.type === 'PHONE_NUMBER') { addTplBtn('phone'); const id = _btnCount-1; document.getElementById(`fbtn-label-${id}`).value = b.text||''; document.getElementById(`fbtn-phone-${id}`).value = b.phone_number||'' }
+      else if (b.type === 'QUICK_REPLY') { addTplBtn('quick_reply'); const id = _btnCount-1; document.getElementById(`fbtn-label-${id}`).value = b.text||'' }
+    })
+  }
   openModal('createModal')
 }
 function clearForm() {
@@ -1246,10 +1301,12 @@ function clearForm() {
   document.getElementById('fLang').value     = 'en'
   document.getElementById('fCategory').value = 'UTILITY'
   document.getElementById('fUseCase').value  = 'review_request'
-  document.getElementById('varList').innerHTML = ''
+  document.getElementById('varList').innerHTML   = ''
+  document.getElementById('fBtnList').innerHTML  = ''
   document.getElementById('varSection').style.display = 'none'
   document.getElementById('formError').style.display  = 'none'
   document.getElementById('previewBox').textContent   = 'Your message preview will appear here…'
+  _btnCount = 0
   onCategoryChange()
 }
 function onCategoryChange() {
@@ -1302,6 +1359,60 @@ function updatePreview() {
   preview = preview.replace(/\{\{(\d+)\}\}/g, '<span class="preview-var">{{$1}}</span>')
   document.getElementById('previewBox').innerHTML = preview || '<span style="color:var(--text-3)">Your message preview will appear here…</span>'
 }
+// ── Template buttons ──────────────────────────────
+let _btnCount = 0
+function addTplBtn(type) {
+  const list = document.getElementById('fBtnList')
+  const ctaCount = list.querySelectorAll('[data-btype="url"],[data-btype="phone"]').length
+  const qrCount  = list.querySelectorAll('[data-btype="quick_reply"]').length
+  if ((type === 'url' || type === 'phone') && ctaCount >= 2) { showFormError('Max 2 call-to-action buttons allowed'); return }
+  if (type === 'quick_reply' && qrCount >= 3) { showFormError('Max 3 quick reply buttons allowed'); return }
+  const id = _btnCount++
+  const row = document.createElement('div')
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;padding:8px;background:var(--surface-2);border-radius:6px;border:1px solid var(--border)'
+  row.dataset.btype = type
+  row.dataset.bid   = id
+  if (type === 'url') {
+    row.innerHTML = `<span style="font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap">🔗 URL</span>
+      <input class="form-input" id="fbtn-label-${id}" placeholder="Button label (e.g. Visit Website)" style="flex:1;height:32px">
+      <input class="form-input" id="fbtn-url-${id}" placeholder="https://yoursite.com" style="flex:2;height:32px">
+      <button type="button" onclick="removeTplBtn(${id})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:0 4px">✕</button>`
+  } else if (type === 'phone') {
+    row.innerHTML = `<span style="font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap">📞 Call</span>
+      <input class="form-input" id="fbtn-label-${id}" placeholder="Button label (e.g. Call Us)" style="flex:1;height:32px">
+      <input class="form-input" id="fbtn-phone-${id}" placeholder="+91 99999 99999" style="flex:1;height:32px">
+      <button type="button" onclick="removeTplBtn(${id})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:0 4px">✕</button>`
+  } else {
+    row.innerHTML = `<span style="font-size:11px;font-weight:700;color:var(--text-2);white-space:nowrap">↩ Reply</span>
+      <input class="form-input" id="fbtn-label-${id}" placeholder="Quick reply text (e.g. Interested)" style="flex:1;height:32px">
+      <button type="button" onclick="removeTplBtn(${id})" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:16px;padding:0 4px">✕</button>`
+  }
+  list.appendChild(row)
+}
+function removeTplBtn(id) {
+  document.querySelector(`[data-bid="${id}"]`)?.remove()
+  hideFormError()
+}
+function collectTplButtons() {
+  const rows = document.querySelectorAll('#fBtnList [data-btype]')
+  const buttons = []
+  rows.forEach(row => {
+    const type = row.dataset.btype
+    const id   = row.dataset.bid
+    const label = document.getElementById(`fbtn-label-${id}`)?.value.trim() || ''
+    if (type === 'url') {
+      const url = document.getElementById(`fbtn-url-${id}`)?.value.trim() || ''
+      if (label && url) buttons.push({ type:'URL', text:label, url })
+    } else if (type === 'phone') {
+      const phone = document.getElementById(`fbtn-phone-${id}`)?.value.trim() || ''
+      if (label && phone) buttons.push({ type:'PHONE_NUMBER', text:label, phone_number:phone })
+    } else {
+      if (label) buttons.push({ type:'QUICK_REPLY', text:label })
+    }
+  })
+  return buttons
+}
+
 function sanitizeName(input) { input.value = input.value.toLowerCase().replace(/[^a-z0-9_]/g, '_') }
 function checkHeaderEmoji(input) {
   const hasEmoji = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FEFF}*_~`]/u.test(input.value)
@@ -1324,11 +1435,23 @@ function buildTplPayload(submitFlag) {
   if (!name)   { showFormError('Template name is required'); return null }
   if (!body)   { showFormError('Message body is required'); return null }
   if (!/^[a-z0-9_]+$/.test(name)) { showFormError('Name must be lowercase letters, numbers and underscores only'); return null }
+  const buttons = collectTplButtons()
+  if (buttons.length) {
+    const ctaButtons = buttons.filter(b => b.type === 'URL' || b.type === 'PHONE_NUMBER')
+    const qrButtons  = buttons.filter(b => b.type === 'QUICK_REPLY')
+    if (ctaButtons.length > 2) { showFormError('Max 2 call-to-action buttons (URL/Call)'); return null }
+    if (qrButtons.length > 3)  { showFormError('Max 3 quick reply buttons'); return null }
+    if (ctaButtons.length && qrButtons.length) { showFormError('Cannot mix call-to-action and quick reply buttons'); return null }
+    for (const b of buttons) {
+      if (b.type === 'URL' && !b.url.startsWith('http')) { showFormError(`URL button "${b.text}" must start with http:// or https://`); return null }
+    }
+  }
   const components = []
   if (header) components.push({ type:'HEADER', format:'TEXT', text:header })
   components.push({ type:'BODY', text:body })
   if (footer) components.push({ type:'FOOTER', text:footer })
-  return { name, language:lang, category, use_case, header_text:header, body_text:body, footer_text:footer, variables, components, submit_to_meta:!!submitFlag, agent_id:S.agentId }
+  if (buttons.length) components.push({ type:'BUTTONS', buttons })
+  return { name, language:lang, category, use_case, header_text:header, body_text:body, footer_text:footer, variables, components, buttons, submit_to_meta:!!submitFlag, agent_id:S.agentId }
 }
 async function saveDraft() { const p = buildTplPayload(false); if (p) await saveTemplate(p,'Draft saved') }
 async function saveAndSubmit() {
