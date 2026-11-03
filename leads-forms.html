@@ -1648,7 +1648,7 @@ function renderApptTable() {
   tbody.innerHTML = slice.map(a => {
     const agent = agents.find(ag => String(ag._id) === String(a.agent_id))
     const sc    = statusColors[a.status] || 'var(--text-3)'
-    const sched = a.scheduled_at ? new Date(a.scheduled_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'
+    const sched = a.scheduled_at ? new Date(a.scheduled_at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kolkata'}) : '—'
     return `<tr>
       <td><div class="lead-cell">
         <div class="lead-avatar" style="background:var(--accent)">${esc((a.customer_name||'?')[0]).toUpperCase()}</div>
@@ -1696,10 +1696,21 @@ function openApptModal(id) {
       document.getElementById('appt-f-service').value = a.service        || ''
       document.getElementById('appt-f-notes').value   = a.notes          || ''
       document.getElementById('appt-f-status').value  = a.status         || 'pending'
+      // Disable "completed" option until appointment time has passed
+      const completedOpt = document.querySelector('#appt-f-status option[value="completed"]')
+      if (completedOpt) {
+        const apptPast = a.scheduled_at && new Date(a.scheduled_at) <= new Date()
+        completedOpt.disabled = !apptPast
+        if (!apptPast) completedOpt.title = 'Can only mark completed after the appointment time'
+        else completedOpt.title = ''
+      }
       if (a.scheduled_at) {
-        const d = new Date(a.scheduled_at)
+        // Convert UTC stored time → IST (UTC+5:30) for display in datetime-local input
+        const utcMs = new Date(a.scheduled_at).getTime()
+        const istMs = utcMs + (5 * 60 + 30) * 60 * 1000
+        const d = new Date(istMs)
         const pad = n => String(n).padStart(2,'0')
-        document.getElementById('appt-f-date').value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+        document.getElementById('appt-f-date').value = `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`
       } else { document.getElementById('appt-f-date').value = '' }
     }
   } else {
@@ -1723,7 +1734,13 @@ async function saveAppt() {
   const errEl   = document.getElementById('appt-form-err')
   if (!name) { errEl.textContent = 'Customer name is required'; return }
   errEl.textContent = ''
-  const body = { agent_id:agentId, customer_name:name, customer_phone:phone||null, customer_email:email||null, service, notes, scheduled_at:dateVal||null }
+  // datetime-local gives local time with no timezone — treat as IST (UTC+5:30) and convert to UTC ISO string
+  let scheduledAt = null
+  if (dateVal) {
+    const istMs = new Date(dateVal).getTime() // JS parses datetime-local as LOCAL time (browser is IST)
+    scheduledAt = new Date(istMs).toISOString()
+  }
+  const body = { agent_id:agentId, customer_name:name, customer_phone:phone||null, customer_email:email||null, service, notes, scheduled_at:scheduledAt }
   try {
     if (apptEditId) {
       body.status = status
