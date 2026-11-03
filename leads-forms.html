@@ -403,9 +403,20 @@
               <select id="appt-confirm-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('confirm')">
                 <option value="">— Select saved template —</option>
               </select>
-              <div id="appt-confirm-new-wrap" style="display:none;flex-direction:column;gap:6px">
-                <textarea id="appt-confirm-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
-                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+              <div id="appt-confirm-new-wrap" style="display:none;flex-direction:column;gap:8px">
+                <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px">
+                  <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <button type="button" onclick="insertApptVar('confirm','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
+                    <button type="button" onclick="insertApptVar('confirm','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
+                    <button type="button" onclick="insertApptVar('confirm','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
+                  </div>
+                </div>
+                <textarea id="appt-confirm-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, your appointment for {{2}} is confirmed on {{3}}." oninput="updateApptPreview('confirm')"></textarea>
+                <div id="appt-confirm-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
+                  <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
+                  <div id="appt-confirm-preview-text"></div>
+                </div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <button type="button" class="btn btn-secondary btn-sm" id="appt-confirm-reg-btn" onclick="registerApptTemplate('confirm')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
                   <span id="appt-confirm-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
@@ -436,9 +447,20 @@
               <select id="appt-reminder-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('reminder')">
                 <option value="">— Select saved template —</option>
               </select>
-              <div id="appt-reminder-new-wrap" style="display:none;flex-direction:column;gap:6px">
-                <textarea id="appt-reminder-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
-                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+              <div id="appt-reminder-new-wrap" style="display:none;flex-direction:column;gap:8px">
+                <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px">
+                  <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <button type="button" onclick="insertApptVar('reminder','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
+                    <button type="button" onclick="insertApptVar('reminder','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
+                    <button type="button" onclick="insertApptVar('reminder','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
+                  </div>
+                </div>
+                <textarea id="appt-reminder-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, reminder for your {{2}} appointment on {{3}}. Please be on time!" oninput="updateApptPreview('reminder')"></textarea>
+                <div id="appt-reminder-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
+                  <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
+                  <div id="appt-reminder-preview-text"></div>
+                </div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <button type="button" class="btn btn-secondary btn-sm" id="appt-reminder-reg-btn" onclick="registerApptTemplate('reminder')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
                   <span id="appt-reminder-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
@@ -469,9 +491,20 @@
               <select id="appt-followup-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('followup')">
                 <option value="">— Select saved template —</option>
               </select>
-              <div id="appt-followup-new-wrap" style="display:none;flex-direction:column;gap:6px">
-                <textarea id="appt-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
-                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+              <div id="appt-followup-new-wrap" style="display:none;flex-direction:column;gap:8px">
+                <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px">
+                  <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Click to insert variable</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <button type="button" onclick="insertApptVar('followup','{{1}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{1}} name</button>
+                    <button type="button" onclick="insertApptVar('followup','{{2}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{2}} service</button>
+                    <button type="button" onclick="insertApptVar('followup','{{3}}')" style="font-size:11.5px;padding:3px 10px;border:1px solid var(--border-md);border-radius:20px;background:var(--surface);color:var(--text);cursor:pointer">{{3}} date &amp; time</button>
+                  </div>
+                </div>
+                <textarea id="appt-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="e.g. Hi {{1}}, thank you for your {{2}} appointment on {{3}}. Hope it went well!" oninput="updateApptPreview('followup')"></textarea>
+                <div id="appt-followup-preview" style="display:none;background:#e7fde8;border:1px solid #b2dfb4;border-radius:6px;padding:8px 10px;font-size:12px;color:#1a3a1b;line-height:1.5">
+                  <div style="font-size:10px;font-weight:600;color:#2e7d32;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em">📱 Preview (sample values)</div>
+                  <div id="appt-followup-preview-text"></div>
+                </div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <button type="button" class="btn btn-secondary btn-sm" id="appt-followup-reg-btn" onclick="registerApptTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
                   <span id="appt-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
@@ -2022,6 +2055,47 @@ function toggleApptNewTmpl(type) {
   const open = wrap.style.display === 'flex'
   wrap.style.display = open ? 'none' : 'flex'
   if (btn) btn.textContent = open ? '＋ Register new template' : '✕ Cancel'
+  // Pre-fill default text when opening for the first time
+  if (!open) {
+    const ta = document.getElementById(`appt-${type}-body`)
+    if (ta && !ta.value) {
+      const defaults = {
+        confirm:  APPT_CONFIRM_DEFAULT,
+        reminder: APPT_REMINDER_DEFAULT,
+        followup: APPT_FOLLOWUP_DEFAULT,
+      }
+      ta.value = defaults[type] || ''
+      updateApptPreview(type)
+    }
+  }
+}
+
+// Insert variable at cursor position in the appt template textarea
+function insertApptVar(type, variable) {
+  const ta = document.getElementById(`appt-${type}-body`)
+  if (!ta) return
+  const start = ta.selectionStart, end = ta.selectionEnd
+  ta.value = ta.value.slice(0, start) + variable + ta.value.slice(end)
+  ta.selectionStart = ta.selectionEnd = start + variable.length
+  ta.focus()
+  updateApptPreview(type)
+}
+
+// Live preview with sample values: {{1}}=Ravi {{2}}=Hair Cut {{3}}=3 Nov, 10:00 AM
+function updateApptPreview(type) {
+  const ta      = document.getElementById(`appt-${type}-body`)
+  const preview = document.getElementById(`appt-${type}-preview`)
+  const preText = document.getElementById(`appt-${type}-preview-text`)
+  if (!ta || !preview || !preText) return
+  const text = ta.value.trim()
+  if (!text) { preview.style.display = 'none'; return }
+  const sample = text
+    .replace(/\{\{1\}\}/g, 'Ravi')
+    .replace(/\{\{2\}\}/g, 'Hair Cut')
+    .replace(/\{\{3\}\}/g, '3 Nov 2026, 10:00 AM')
+    .replace(/\{\{4\}\}/g, 'Please bring ID')
+  preText.textContent = sample
+  preview.style.display = 'block'
 }
 
 // Register a WA template for this form (ack or followup)
