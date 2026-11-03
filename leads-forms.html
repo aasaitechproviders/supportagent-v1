@@ -1928,8 +1928,8 @@ async function loadTmplSelectors() {
   const agentId = currentAgent?._id; if (!agentId) return
   try {
     const res = await apiFetch(`/templates?agent_id=${agentId}`)
-    const tmpls = (await res.json()).templates || []
-    const usable = tmpls.filter(t => ['approved','pending','pending_approval','submitted'].includes(t.status))
+    const tmpls = res.templates || []
+    const usable = tmpls.filter(t => t.status === 'approved')
     const makeOpts = (selEl, currentVal) => {
       if (!selEl) return
       const prev = selEl.value || currentVal || ''
