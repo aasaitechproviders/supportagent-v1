@@ -295,53 +295,6 @@
     <div id="builder-panel-content">
       <div class="forms-grid" id="forms-grid"></div>
 
-      <!-- ── Forms WA Automations ─────────────────────────────────────────── -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;margin-top:24px" id="forms-wa-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3)">💬 Form WhatsApp Automations</div>
-          <select class="filter-sel" id="forms-wa-agent" onchange="onFormsWaAgentChange()" style="height:30px;font-size:12px;min-width:150px">
-            <option value="">Select Agent…</option>
-          </select>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0">
-          <!-- Acknowledgement -->
-          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
-              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Acknowledgement Message</div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA message immediately when someone submits a form</div></div>
-              <label class="tog-switch"><input type="checkbox" id="form-tog-ack" onchange="saveFormToggles()"><span class="tog-slider"></span></label>
-            </div>
-            <div id="form-ack-tmpl-row" style="margin-top:10px;display:none">
-              <select class="filter-sel" id="form-ack-tmpl" onchange="saveFormToggles()" style="width:100%;height:32px;font-size:12px">
-                <option value="">Select approved template…</option>
-              </select>
-              <div style="font-size:11px;color:var(--text-3);margin-top:4px">Template vars: {{1}}=customer name, {{2}}=form name, {{3}}=message</div>
-            </div>
-          </div>
-          <!-- Followup -->
-          <div style="padding:12px 0">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
-              <div>
-                <div style="display:flex;align-items:center;gap:8px">
-                  <div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up</div>
-                  <select class="filter-sel" id="form-followup-days" onchange="saveFormToggles()" style="height:26px;font-size:12px;padding:0 6px">
-                    <option value="1" selected>1 day after</option><option value="2">2 days after</option><option value="3">3 days after</option>
-                    <option value="5">5 days after</option><option value="7">7 days after</option>
-                  </select>
-                </div>
-                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up message to form leads after N days</div>
-              </div>
-              <label class="tog-switch"><input type="checkbox" id="form-tog-followup" onchange="saveFormToggles()"><span class="tog-slider"></span></label>
-            </div>
-            <div id="form-followup-tmpl-row" style="margin-top:10px;display:none">
-              <select class="filter-sel" id="form-followup-tmpl" onchange="saveFormToggles()" style="width:100%;height:32px;font-size:12px">
-                <option value="">Select approved template…</option>
-              </select>
-              <div style="font-size:11px;color:var(--text-3);margin-top:4px">Template vars: {{1}}=customer name, {{2}}=form name, {{3}}=message</div>
-            </div>
-          </div>
-        </div>
-        <div id="forms-tog-status" style="margin-top:10px;font-size:11.5px;color:var(--text-3);min-height:16px"></div>
-      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════ -->
@@ -581,7 +534,7 @@
           </div>
           <div class="field-row">
             <div class="field-lbl">Link to Agent <span style="font-size:10px;color:var(--text-3)">(optional, for branding)</span></div>
-            <select class="sel-clean" id="fm-agent" onchange="updatePreview()">
+            <select class="sel-clean" id="fm-agent" onchange="onFmAgentChange()">
               <option value="">No agent (unbranded)</option>
             </select>
           </div>
@@ -599,6 +552,57 @@
             <div class="field-lbl">Thank You Message</div>
             <input class="inp-clean" type="text" id="fm-thankyou" placeholder="Thank you! We'll contact you soon.">
             <div class="hint">Shown after someone submits the form.</div>
+          </div>
+
+          <!-- ── WA Automations (per-form) ─────────────────────────────── -->
+          <div style="border-top:1px solid var(--border);margin-top:18px;padding-top:16px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:12px">💬 WhatsApp Automations</div>
+            <div id="fm-wa-no-agent" style="font-size:12px;color:var(--text-3);padding:8px 0;display:none">⚠️ Link this form to an agent above to enable WA automations.</div>
+
+            <!-- Acknowledgement -->
+            <div id="fm-wa-fields" style="display:flex;flex-direction:column;gap:12px">
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                  <div>
+                    <div style="font-size:12.5px;font-weight:600;color:var(--text)">Acknowledgement</div>
+                    <div style="font-size:11.5px;color:var(--text-3);margin-top:1px">Send WA message when someone submits this form</div>
+                  </div>
+                  <label class="tog-switch"><input type="checkbox" id="fm-tog-ack" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
+                </div>
+                <div id="fm-ack-tmpl-row" style="margin-top:8px;display:none">
+                  <select class="sel-clean" id="fm-ack-tmpl" style="height:34px;font-size:12px">
+                    <option value="">Select approved template…</option>
+                  </select>
+                  <div style="font-size:10.5px;color:var(--text-3);margin-top:3px">Vars: {{1}}=name, {{2}}=form name, {{3}}=message</div>
+                </div>
+              </div>
+
+              <!-- Followup -->
+              <div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                  <div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <div style="font-size:12.5px;font-weight:600;color:var(--text)">Follow-up</div>
+                      <select class="sel-clean" id="fm-followup-days" style="height:26px;font-size:11.5px;padding:0 6px;width:auto">
+                        <option value="1" selected>after 1 day</option>
+                        <option value="2">after 2 days</option>
+                        <option value="3">after 3 days</option>
+                        <option value="5">after 5 days</option>
+                        <option value="7">after 7 days</option>
+                      </select>
+                    </div>
+                    <div style="font-size:11.5px;color:var(--text-3);margin-top:1px">Follow-up WA to leads who submitted this form</div>
+                  </div>
+                  <label class="tog-switch"><input type="checkbox" id="fm-tog-followup" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
+                </div>
+                <div id="fm-followup-tmpl-row" style="margin-top:8px;display:none">
+                  <select class="sel-clean" id="fm-followup-tmpl" style="height:34px;font-size:12px">
+                    <option value="">Select approved template…</option>
+                  </select>
+                  <div style="font-size:10.5px;color:var(--text-3);margin-top:3px">Vars: {{1}}=name, {{2}}=form name, {{3}}=message</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -760,7 +764,6 @@ const TYPE_META = {
     renderGrid()
     buildFormSelector()
     buildAgentFilter()
-    populateFormsWaAgentSel()
     populateApptWaAgentSel()
 
     // Check URL param — auto-switch to the right tab
@@ -809,9 +812,6 @@ function switchTab(tab) {
     populateApptAgentFilter()
     populateApptWaAgentSel()
     loadAppointments()
-  }
-  if (isBuilder) {
-    populateFormsWaAgentSel()
   }
 }
 
@@ -892,6 +892,7 @@ function openCreatePanel() {
   document.getElementById('fm-subtitle').value = ''
   document.getElementById('fm-thankyou').value = ''
   document.getElementById('fm-agent').value    = ''
+  resetFmWaFields()
   showPanel()
   goToStep(1)
   updatePreview()
@@ -910,6 +911,22 @@ async function openEditPanel(id) {
     document.getElementById('fm-subtitle').value = form.subtitle  || ''
     document.getElementById('fm-thankyou').value = form.thank_you || ''
     document.getElementById('fm-agent').value    = form.agent_id ? String(form.agent_id) : ''
+    // Load WA config
+    resetFmWaFields()
+    if (form.agent_id) {
+      await loadFmWaTemplates(String(form.agent_id))
+      const wa = form.wa_config || {}
+      const setTog = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v }
+      setTog('fm-tog-ack',     wa.ack_enabled)
+      setTog('fm-tog-followup', wa.followup_enabled)
+      const ackTmpl = document.getElementById('fm-ack-tmpl')
+      if (ackTmpl && wa.ack_template_name) ackTmpl.value = wa.ack_template_name
+      const fupTmpl = document.getElementById('fm-followup-tmpl')
+      if (fupTmpl && wa.followup_template_name) fupTmpl.value = wa.followup_template_name
+      const daysSel = document.getElementById('fm-followup-days')
+      if (daysSel && wa.followup_days) daysSel.value = String(wa.followup_days)
+      onFmWaToggle()
+    }
     showPanel()
     goToStep(1)
     updatePreview()
@@ -992,6 +1009,15 @@ async function saveForm() {
     thank_you: document.getElementById('fm-thankyou').value.trim() || "Thank you! We'll contact you soon.",
     agent_id:  document.getElementById('fm-agent').value || null,
     fields:    fbFields,
+    wa_config: {
+      ack_enabled:           document.getElementById('fm-tog-ack')?.checked     || false,
+      ack_template_name:     document.getElementById('fm-ack-tmpl')?.value      || null,
+      ack_template_lang:     'en',
+      followup_enabled:      document.getElementById('fm-tog-followup')?.checked || false,
+      followup_template_name: document.getElementById('fm-followup-tmpl')?.value || null,
+      followup_template_lang: 'en',
+      followup_days:         parseInt(document.getElementById('fm-followup-days')?.value) || 1,
+    },
   }
   try {
     let result
@@ -1685,16 +1711,17 @@ function _setTogRow(togId, rowId, checked) {
 async function loadApptToggles(agentId) {
   if (!agentId) return
   try {
-    const data = await apiFetch(`/automations?agent_id=${agentId}`)
-    const cfg = data.config || {}
-    _setTogRow('appt-tog-confirm',  'appt-confirm-tmpl-row',  !!cfg.appt_confirm_enabled)
-    _setTogRow('appt-tog-reminder', 'appt-reminder-tmpl-row', !!cfg.appt_reminder_enabled)
-    _setTogRow('appt-tog-followup', 'appt-followup-tmpl-row', !!cfg.appt_followup_enabled)
+    // Config lives on the agent doc itself (appt_wa_config)
+    const agent = await apiFetch(`/agents/${agentId}`)
+    const cfg = agent?.appt_wa_config || {}
+    _setTogRow('appt-tog-confirm',  'appt-confirm-tmpl-row',  !!cfg.confirm_enabled)
+    _setTogRow('appt-tog-reminder', 'appt-reminder-tmpl-row', !!cfg.reminder_enabled)
+    _setTogRow('appt-tog-followup', 'appt-followup-tmpl-row', !!cfg.followup_enabled)
     const sel = document.getElementById('appt-reminder-hours')
     if (sel && cfg.reminder_hours_before) sel.value = String(cfg.reminder_hours_before)
     // Load templates
     const tmpls = await loadWaTemplates(agentId)
-    populateTemplateSelect('appt-confirm-tmpl',  tmpls, cfg.appt_confirm_template_name)
+    populateTemplateSelect('appt-confirm-tmpl',  tmpls, cfg.confirm_template_name)
     populateTemplateSelect('appt-reminder-tmpl', tmpls, cfg.reminder_template_name)
     populateTemplateSelect('appt-followup-tmpl', tmpls, cfg.followup_template_name)
   } catch (e) { console.warn('loadApptToggles', e.message) }
@@ -1711,22 +1738,25 @@ async function saveApptToggles() {
   showRow('appt-confirm-tmpl-row',  confirmOn)
   showRow('appt-reminder-tmpl-row', reminderOn)
   showRow('appt-followup-tmpl-row', followupOn)
-  // Save to DB
+  // Save to DB via PUT /agents/:id with appt_wa_config
   const statusEl = document.getElementById('appt-tog-status')
   if (statusEl) statusEl.textContent = 'Saving…'
   try {
-    await apiFetch('/automations', {
+    await apiFetch(`/agents/${agentId}`, {
       method: 'PUT',
       body: JSON.stringify({
-        agent_id: agentId,
-        enabled: confirmOn || reminderOn || followupOn,
-        appt_confirm_enabled:  confirmOn,
-        appt_confirm_template_name: document.getElementById('appt-confirm-tmpl')?.value  || null,
-        appt_reminder_enabled: reminderOn,
-        reminder_template_name: document.getElementById('appt-reminder-tmpl')?.value || null,
-        reminder_hours_before:  parseInt(document.getElementById('appt-reminder-hours')?.value) || 24,
-        appt_followup_enabled: followupOn,
-        followup_template_name: document.getElementById('appt-followup-tmpl')?.value || null,
+        appt_wa_config: {
+          confirm_enabled:        confirmOn,
+          confirm_template_name:  document.getElementById('appt-confirm-tmpl')?.value  || null,
+          confirm_template_lang:  'en',
+          reminder_enabled:       reminderOn,
+          reminder_template_name: document.getElementById('appt-reminder-tmpl')?.value || null,
+          reminder_template_lang: 'en',
+          reminder_hours_before:  parseInt(document.getElementById('appt-reminder-hours')?.value) || 24,
+          followup_enabled:       followupOn,
+          followup_template_name: document.getElementById('appt-followup-tmpl')?.value || null,
+          followup_template_lang: 'en',
+        },
       }),
     })
     if (statusEl) { statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = '' }, 2500) }
@@ -1735,64 +1765,48 @@ async function saveApptToggles() {
   }
 }
 
-// ── Forms WA Automation ─────────────────────────────────────────────────────
-let formsWaAgentId = null
-
-function populateFormsWaAgentSel() {
-  const sel = document.getElementById('forms-wa-agent')
-  if (!sel) return
-  const cur = sel.value
-  sel.innerHTML = '<option value="">Select Agent…</option>' + agents.map(a => `<option value="${a._id}" ${a._id===cur?'selected':''}>${esc(a.name)}</option>`).join('')
+// ── Per-form WA config (inside builder panel Step 1) ────────────────────────
+function resetFmWaFields() {
+  const ids = ['fm-tog-ack','fm-tog-followup']
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.checked = false })
+  ;['fm-ack-tmpl-row','fm-followup-tmpl-row'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none' })
+  ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<option value="">Select approved template…</option>' })
+  document.getElementById('fm-followup-days') && (document.getElementById('fm-followup-days').value = '1')
+  // Show/hide WA fields based on agent selection
+  const agentVal = document.getElementById('fm-agent')?.value
+  const noAgent = document.getElementById('fm-wa-no-agent')
+  const waFields = document.getElementById('fm-wa-fields')
+  if (noAgent) noAgent.style.display = agentVal ? 'none' : ''
+  if (waFields) waFields.style.display = agentVal ? '' : 'none'
 }
 
-async function onFormsWaAgentChange() {
-  const sel = document.getElementById('forms-wa-agent')
-  formsWaAgentId = sel?.value || null
-  if (formsWaAgentId) await loadFormToggles(formsWaAgentId)
+async function loadFmWaTemplates(agentId) {
+  const tmpls = await loadWaTemplates(agentId)
+  const opts = '<option value="">Select approved template…</option>' + tmpls.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('')
+  ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts })
 }
 
-async function loadFormToggles(agentId) {
-  if (!agentId) return
-  try {
-    const data = await apiFetch(`/automations?agent_id=${agentId}`)
-    const cfg = data.config || {}
-    _setTogRow('form-tog-ack',     'form-ack-tmpl-row',     !!cfg.form_ack_enabled)
-    _setTogRow('form-tog-followup','form-followup-tmpl-row', !!cfg.form_followup_enabled)
-    const daysSel = document.getElementById('form-followup-days')
-    if (daysSel && cfg.form_followup_days) daysSel.value = String(cfg.form_followup_days)
-    const tmpls = await loadWaTemplates(agentId)
-    populateTemplateSelect('form-ack-tmpl',     tmpls, cfg.form_ack_template_name)
-    populateTemplateSelect('form-followup-tmpl',tmpls, cfg.form_followup_template_name)
-  } catch (e) { console.warn('loadFormToggles', e.message) }
+function onFmWaToggle() {
+  const ackOn = document.getElementById('fm-tog-ack')?.checked
+  const fupOn = document.getElementById('fm-tog-followup')?.checked
+  const ackRow = document.getElementById('fm-ack-tmpl-row')
+  const fupRow = document.getElementById('fm-followup-tmpl-row')
+  if (ackRow) ackRow.style.display = ackOn ? '' : 'none'
+  if (fupRow) fupRow.style.display = fupOn ? '' : 'none'
 }
 
-async function saveFormToggles() {
-  const agentId = formsWaAgentId || document.getElementById('forms-wa-agent')?.value
-  if (!agentId) return
-  const ackOn     = document.getElementById('form-tog-ack')?.checked
-  const followOn  = document.getElementById('form-tog-followup')?.checked
-  const showRow = (rowId, show) => { const r = document.getElementById(rowId); if (r) r.style.display = show ? '' : 'none' }
-  showRow('form-ack-tmpl-row',     ackOn)
-  showRow('form-followup-tmpl-row', followOn)
-  const statusEl = document.getElementById('forms-tog-status')
-  if (statusEl) statusEl.textContent = 'Saving…'
-  try {
-    await apiFetch('/automations', {
-      method: 'PUT',
-      body: JSON.stringify({
-        agent_id: agentId,
-        form_ack_enabled:      ackOn,
-        form_ack_template_name: document.getElementById('form-ack-tmpl')?.value     || null,
-        form_followup_enabled: followOn,
-        form_followup_template_name: document.getElementById('form-followup-tmpl')?.value || null,
-        form_followup_days:   parseInt(document.getElementById('form-followup-days')?.value) || 1,
-      }),
-    })
-    if (statusEl) { statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = '' }, 2500) }
-  } catch (e) {
-    if (statusEl) statusEl.textContent = '✕ Save failed: ' + e.message
-  }
+// When agent changes in form builder, reload WA template options
+async function onFmAgentChange() {
+  updatePreview()
+  const agentVal = document.getElementById('fm-agent')?.value
+  const noAgent = document.getElementById('fm-wa-no-agent')
+  const waFields = document.getElementById('fm-wa-fields')
+  if (noAgent) noAgent.style.display = agentVal ? 'none' : ''
+  if (waFields) waFields.style.display = agentVal ? '' : 'none'
+  if (agentVal) await loadFmWaTemplates(agentVal)
 }
+
+// (per-form WA config is saved inline with saveForm() via wa_config field on inquiry_forms)
 
 function populateApptAgentFilter() {
   const sel = document.getElementById('appt-filter-agent')
