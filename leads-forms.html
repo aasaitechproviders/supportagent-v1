@@ -1895,8 +1895,13 @@ async function loadApptToggles(agentId) {
     // Restore hidden template name inputs + status labels
     const restoreApptTmpl = (type, tmplName) => {
       const inp = document.getElementById(`appt-${type}-tmpl`); if (inp && tmplName) inp.value = tmplName
-      const s = document.getElementById(`appt-${type}-reg-status`)
-      const b = document.getElementById(`appt-${type}-reg-btn`)
+      const s   = document.getElementById(`appt-${type}-reg-status`)
+      const b   = document.getElementById(`appt-${type}-reg-btn`)
+      // Always keep create-new section collapsed on load
+      const wrap  = document.getElementById(`appt-${type}-new-wrap`)
+      const arrow = document.getElementById(`appt-${type}-new-arrow`)
+      if (wrap)  wrap.style.display = 'none'
+      if (arrow) arrow.textContent = '▶'
       if (tmplName && s) s.textContent = '✓ Template Ready'
       if (tmplName && b) { b.textContent = '✓ Ready'; b.disabled = true }
     }
@@ -2035,7 +2040,7 @@ async function loadTmplSelectors() {
       usable.forEach(t => {
         const opt = document.createElement('option')
         opt.value = t.name
-        opt.textContent = `${t.name}  (${t.status})`
+        opt.textContent = `${t.name}  ✓`
         if (t.name === prev) opt.selected = true
         selEl.appendChild(opt)
       })
@@ -2080,10 +2085,11 @@ function onApptTmplSelChange(type) {
   if (!sel || !hid) return
   hid.value = sel.value
   if (sel.value) {
-    const wrap = document.getElementById(`appt-${type}-new-wrap`)
-    const btn  = document.getElementById(`appt-${type}-new-btn`)
-    if (wrap) wrap.style.display = 'none'
-    if (btn)  btn.textContent = '＋ Register new template'
+    // Collapse the create-new section when a template is selected
+    const wrap  = document.getElementById(`appt-${type}-new-wrap`)
+    const arrow = document.getElementById(`appt-${type}-new-arrow`)
+    if (wrap)  wrap.style.display = 'none'
+    if (arrow) arrow.textContent = '▶'
   }
   if (typeof saveApptToggles === 'function') saveApptToggles()
 }
