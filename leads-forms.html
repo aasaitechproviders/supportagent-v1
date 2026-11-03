@@ -569,11 +569,15 @@
                   </div>
                   <label class="tog-switch"><input type="checkbox" id="fm-tog-ack" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
                 </div>
-                <div id="fm-ack-tmpl-row" style="margin-top:8px;display:none">
-                  <select class="sel-clean" id="fm-ack-tmpl" style="height:34px;font-size:12px">
-                    <option value="">Select approved template…</option>
-                  </select>
-                  <div style="font-size:10.5px;color:var(--text-3);margin-top:3px">Vars: {{1}}=name, {{2}}=form name, {{3}}=message</div>
+                <div id="fm-ack-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:6px">
+                  <textarea id="fm-ack-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                  <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <button type="button" class="btn btn-secondary btn-sm" id="fm-ack-reg-btn" onclick="registerFormTemplate('ack')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                    <span id="fm-ack-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                  </div>
+                  <!-- hidden: stores resolved template name after register -->
+                  <input type="hidden" id="fm-ack-tmpl" value="">
                 </div>
               </div>
 
@@ -595,11 +599,15 @@
                   </div>
                   <label class="tog-switch"><input type="checkbox" id="fm-tog-followup" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
                 </div>
-                <div id="fm-followup-tmpl-row" style="margin-top:8px;display:none">
-                  <select class="sel-clean" id="fm-followup-tmpl" style="height:34px;font-size:12px">
-                    <option value="">Select approved template…</option>
-                  </select>
-                  <div style="font-size:10.5px;color:var(--text-3);margin-top:3px">Vars: {{1}}=name, {{2}}=form name, {{3}}=message</div>
+                <div id="fm-followup-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:6px">
+                  <textarea id="fm-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                  <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <button type="button" class="btn btn-secondary btn-sm" id="fm-followup-reg-btn" onclick="registerFormTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                    <span id="fm-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                  </div>
+                  <!-- hidden: stores resolved template name after register -->
+                  <input type="hidden" id="fm-followup-tmpl" value="">
                 </div>
               </div>
             </div>
@@ -914,17 +922,31 @@ async function openEditPanel(id) {
     // Load WA config
     resetFmWaFields()
     if (form.agent_id) {
-      await loadFmWaTemplates(String(form.agent_id))
       const wa = form.wa_config || {}
       const setTog = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v }
-      setTog('fm-tog-ack',     wa.ack_enabled)
+      setTog('fm-tog-ack',      wa.ack_enabled)
       setTog('fm-tog-followup', wa.followup_enabled)
+      // Restore hidden template name inputs
       const ackTmpl = document.getElementById('fm-ack-tmpl')
       if (ackTmpl && wa.ack_template_name) ackTmpl.value = wa.ack_template_name
       const fupTmpl = document.getElementById('fm-followup-tmpl')
       if (fupTmpl && wa.followup_template_name) fupTmpl.value = wa.followup_template_name
+      // Restore days
       const daysSel = document.getElementById('fm-followup-days')
       if (daysSel && wa.followup_days) daysSel.value = String(wa.followup_days)
+      // Show status + button state for already-registered templates
+      if (wa.ack_enabled && wa.ack_template_name) {
+        const s = document.getElementById('fm-ack-reg-status')
+        const b = document.getElementById('fm-ack-reg-btn')
+        if (s) s.textContent = '✓ Template Ready'
+        if (b) { b.textContent = '✓ Ready'; b.disabled = true }
+      }
+      if (wa.followup_enabled && wa.followup_template_name) {
+        const s = document.getElementById('fm-followup-reg-status')
+        const b = document.getElementById('fm-followup-reg-btn')
+        if (s) s.textContent = '✓ Template Ready'
+        if (b) { b.textContent = '✓ Ready'; b.disabled = true }
+      }
       onFmWaToggle()
     }
     showPanel()
@@ -1766,11 +1788,19 @@ async function saveApptToggles() {
 }
 
 // ── Per-form WA config (inside builder panel Step 1) ────────────────────────
+
+const FM_ACK_DEFAULT     = `Hi {{1}}, thank you for filling out {{2}}. We received your enquiry: {{3}}. Our team will get back to you shortly.`
+const FM_FOLLOWUP_DEFAULT = `Hi {{1}}, this is a follow-up regarding your enquiry on {{2}}. We wanted to check if you needed any further assistance with: {{3}}. Feel free to reach out anytime.`
+
 function resetFmWaFields() {
   const ids = ['fm-tog-ack','fm-tog-followup']
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.checked = false })
   ;['fm-ack-tmpl-row','fm-followup-tmpl-row'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none' })
-  ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = '<option value="">Select approved template…</option>' })
+  ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  ;['fm-ack-reg-status','fm-followup-reg-status'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '' })
+  ;[['fm-ack-reg-btn','Register Template'],['fm-followup-reg-btn','Register Template']].forEach(([id,txt]) => { const el = document.getElementById(id); if (el) { el.textContent = txt; el.disabled = false } })
+  const ackBody = document.getElementById('fm-ack-body'); if (ackBody) ackBody.value = FM_ACK_DEFAULT
+  const fupBody = document.getElementById('fm-followup-body'); if (fupBody) fupBody.value = FM_FOLLOWUP_DEFAULT
   document.getElementById('fm-followup-days') && (document.getElementById('fm-followup-days').value = '1')
   // Show/hide WA fields based on agent selection
   const agentVal = document.getElementById('fm-agent')?.value
@@ -1781,9 +1811,8 @@ function resetFmWaFields() {
 }
 
 async function loadFmWaTemplates(agentId) {
-  const tmpls = await loadWaTemplates(agentId)
-  const opts = '<option value="">Select approved template…</option>' + tmpls.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('')
-  ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = opts })
+  // no-op now — templates are registered inline via registerFormTemplate()
+  // kept for compat in case called elsewhere
 }
 
 function onFmWaToggle() {
@@ -1791,8 +1820,90 @@ function onFmWaToggle() {
   const fupOn = document.getElementById('fm-tog-followup')?.checked
   const ackRow = document.getElementById('fm-ack-tmpl-row')
   const fupRow = document.getElementById('fm-followup-tmpl-row')
-  if (ackRow) ackRow.style.display = ackOn ? '' : 'none'
-  if (fupRow) fupRow.style.display = fupOn ? '' : 'none'
+  if (ackRow) ackRow.style.display = ackOn ? 'flex' : 'none'
+  if (fupRow) fupRow.style.display = fupOn ? 'flex' : 'none'
+  // Pre-fill default body text if empty
+  if (ackOn) { const el = document.getElementById('fm-ack-body'); if (el && !el.value.trim()) el.value = FM_ACK_DEFAULT }
+  if (fupOn) { const el = document.getElementById('fm-followup-body'); if (el && !el.value.trim()) el.value = FM_FOLLOWUP_DEFAULT }
+}
+
+// Slugify form name for template name
+function fmTemplateSlug(type) {
+  const name = document.getElementById('fm-name')?.value || 'form'
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30)
+  return `form_${type}_${slug}`
+}
+
+// Register a WA template for this form (ack or followup)
+async function registerFormTemplate(type) {
+  const agentId = document.getElementById('fm-agent')?.value
+  if (!agentId) return toast('Select an agent first', 'error')
+
+  const bodyEl   = document.getElementById(`fm-${type}-body`)
+  const statusEl = document.getElementById(`fm-${type}-reg-status`)
+  const tmplInput = document.getElementById(`fm-${type}-tmpl`)
+  const btn      = document.getElementById(`fm-${type}-reg-btn`)
+
+  const bodyText = bodyEl?.value?.trim()
+  if (!bodyText) return toast('Enter the template message body first', 'error')
+
+  const tmplName = fmTemplateSlug(type === 'ack' ? 'ack' : 'followup')
+
+  if (statusEl) statusEl.textContent = 'Checking…'
+  if (btn) btn.disabled = true
+
+  try {
+    // 1. Check if template already exists for this agent
+    const { templates } = await apiFetch(`/templates?agent_id=${agentId}`)
+    const existing = templates?.find(t => t.name === tmplName)
+
+    if (existing) {
+      if (existing.status === 'approved') {
+        if (tmplInput) tmplInput.value = existing.name
+        if (statusEl) statusEl.textContent = '✓ Template Ready'
+        if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
+        return
+      } else {
+        // pending or rejected
+        if (tmplInput) tmplInput.value = existing.name
+        if (statusEl) statusEl.textContent = existing.status === 'rejected'
+          ? '✕ Rejected by Meta — edit body and try again'
+          : '⏳ Pending Meta Review'
+        if (btn) btn.disabled = false
+        return
+      }
+    }
+
+    // 2. Register new template
+    if (statusEl) statusEl.textContent = 'Registering…'
+    const res = await apiFetch('/templates', {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_id:       agentId,
+        name:           tmplName,
+        language:       'en',
+        category:       'UTILITY',
+        body_text:      bodyText,
+        submit_to_meta: true,
+      }),
+    })
+    const tpl = res.template
+    if (tmplInput) tmplInput.value = tpl.name
+
+    if (tpl.status === 'approved') {
+      if (statusEl) statusEl.textContent = '✓ Template Ready'
+      if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
+    } else {
+      if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
+      if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+    }
+    if (res.meta_error) {
+      if (statusEl) statusEl.textContent = '✕ Meta error: ' + res.meta_error
+    }
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '✕ ' + e.message
+    if (btn) btn.disabled = false
+  }
 }
 
 // When agent changes in form builder, reload WA template options
