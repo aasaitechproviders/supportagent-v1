@@ -399,10 +399,20 @@
               <div><div style="font-size:13px;font-weight:600;color:var(--text)">Confirmation Message</div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA message immediately when appointment is created</div></div>
               <label class="tog-switch"><input type="checkbox" id="appt-tog-confirm" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
             </div>
-            <div id="appt-confirm-tmpl-row" style="margin-top:10px;display:none">
-              <select class="filter-sel" id="appt-confirm-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
-                <option value="">Select approved template…</option>
+            <div id="appt-confirm-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:8px">
+              <select id="appt-confirm-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('confirm')">
+                <option value="">— Select saved template —</option>
               </select>
+              <div id="appt-confirm-new-wrap" style="display:none;flex-direction:column;gap:6px">
+                <textarea id="appt-confirm-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <button type="button" class="btn btn-secondary btn-sm" id="appt-confirm-reg-btn" onclick="registerApptTemplate('confirm')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                  <span id="appt-confirm-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                </div>
+              </div>
+              <button type="button" id="appt-confirm-new-btn" onclick="toggleApptNewTmpl('confirm')" style="align-self:flex-start;font-size:11px;padding:0 10px;height:24px;border:1px dashed var(--border-md);border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer">＋ Register new template</button>
+              <input type="hidden" id="appt-confirm-tmpl" value="">
             </div>
           </div>
           <!-- Reminder -->
@@ -422,10 +432,20 @@
               </div>
               <label class="tog-switch"><input type="checkbox" id="appt-tog-reminder" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
             </div>
-            <div id="appt-reminder-tmpl-row" style="margin-top:10px;display:none">
-              <select class="filter-sel" id="appt-reminder-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
-                <option value="">Select approved template…</option>
+            <div id="appt-reminder-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:8px">
+              <select id="appt-reminder-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('reminder')">
+                <option value="">— Select saved template —</option>
               </select>
+              <div id="appt-reminder-new-wrap" style="display:none;flex-direction:column;gap:6px">
+                <textarea id="appt-reminder-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <button type="button" class="btn btn-secondary btn-sm" id="appt-reminder-reg-btn" onclick="registerApptTemplate('reminder')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                  <span id="appt-reminder-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                </div>
+              </div>
+              <button type="button" id="appt-reminder-new-btn" onclick="toggleApptNewTmpl('reminder')" style="align-self:flex-start;font-size:11px;padding:0 10px;height:24px;border:1px dashed var(--border-md);border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer">＋ Register new template</button>
+              <input type="hidden" id="appt-reminder-tmpl" value="">
             </div>
           </div>
           <!-- Followup -->
@@ -445,10 +465,20 @@
               </div>
               <label class="tog-switch"><input type="checkbox" id="appt-tog-followup" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
             </div>
-            <div id="appt-followup-tmpl-row" style="margin-top:10px;display:none">
-              <select class="filter-sel" id="appt-followup-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
-                <option value="">Select approved template…</option>
+            <div id="appt-followup-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:8px">
+              <select id="appt-followup-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('followup')">
+                <option value="">— Select saved template —</option>
               </select>
+              <div id="appt-followup-new-wrap" style="display:none;flex-direction:column;gap:6px">
+                <textarea id="appt-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = service &nbsp;·&nbsp; {{3}} = date &amp; time</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <button type="button" class="btn btn-secondary btn-sm" id="appt-followup-reg-btn" onclick="registerApptTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                  <span id="appt-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                </div>
+              </div>
+              <button type="button" id="appt-followup-new-btn" onclick="toggleApptNewTmpl('followup')" style="align-self:flex-start;font-size:11px;padding:0 10px;height:24px;border:1px dashed var(--border-md);border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer">＋ Register new template</button>
+              <input type="hidden" id="appt-followup-tmpl" value="">
             </div>
           </div>
         </div>
@@ -582,14 +612,21 @@
                   </div>
                   <label class="tog-switch"><input type="checkbox" id="fm-tog-ack" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
                 </div>
-                <div id="fm-ack-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:6px">
-                  <textarea id="fm-ack-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
-                  <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <button type="button" class="btn btn-secondary btn-sm" id="fm-ack-reg-btn" onclick="registerFormTemplate('ack')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
-                    <span id="fm-ack-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                <div id="fm-ack-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:8px">
+                  <!-- Pick existing -->
+                  <select id="fm-ack-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onFmTmplSelChange('ack')">
+                    <option value="">— Select saved template —</option>
+                  </select>
+                  <!-- Register new (collapsible) -->
+                  <div id="fm-ack-new-wrap" style="display:none;flex-direction:column;gap:6px">
+                    <textarea id="fm-ack-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                    <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <button type="button" class="btn btn-secondary btn-sm" id="fm-ack-reg-btn" onclick="registerFormTemplate('ack')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                      <span id="fm-ack-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                    </div>
                   </div>
-                  <!-- hidden: stores resolved template name after register -->
+                  <button type="button" id="fm-ack-new-btn" onclick="toggleFmNewTmpl('ack')" style="align-self:flex-start;font-size:11px;padding:0 10px;height:24px;border:1px dashed var(--border-md);border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer">＋ Register new template</button>
                   <input type="hidden" id="fm-ack-tmpl" value="">
                 </div>
               </div>
@@ -611,14 +648,19 @@
                   </div>
                   <label class="tog-switch"><input type="checkbox" id="fm-tog-followup" onchange="onFmWaToggle()"><span class="tog-slider"></span></label>
                 </div>
-                <div id="fm-followup-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:6px">
-                  <textarea id="fm-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
-                  <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <button type="button" class="btn btn-secondary btn-sm" id="fm-followup-reg-btn" onclick="registerFormTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
-                    <span id="fm-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                <div id="fm-followup-tmpl-row" style="margin-top:10px;display:none;flex-direction:column;gap:8px">
+                  <select id="fm-followup-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onFmTmplSelChange('followup')">
+                    <option value="">— Select saved template —</option>
+                  </select>
+                  <div id="fm-followup-new-wrap" style="display:none;flex-direction:column;gap:6px">
+                    <textarea id="fm-followup-body" rows="3" style="width:100%;font-size:12px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.5" placeholder="Template message body…"></textarea>
+                    <div style="font-size:10.5px;color:var(--text-3)">Variables: {{1}} = customer name &nbsp;·&nbsp; {{2}} = form name &nbsp;·&nbsp; {{3}} = their message</div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <button type="button" class="btn btn-secondary btn-sm" id="fm-followup-reg-btn" onclick="registerFormTemplate('followup')" style="font-size:11.5px;padding:0 12px;height:28px">Register Template</button>
+                      <span id="fm-followup-reg-status" style="font-size:11.5px;color:var(--text-3)"></span>
+                    </div>
                   </div>
-                  <!-- hidden: stores resolved template name after register -->
+                  <button type="button" id="fm-followup-new-btn" onclick="toggleFmNewTmpl('followup')" style="align-self:flex-start;font-size:11px;padding:0 10px;height:24px;border:1px dashed var(--border-md);border-radius:var(--r-sm);background:transparent;color:var(--text-3);cursor:pointer">＋ Register new template</button>
                   <input type="hidden" id="fm-followup-tmpl" value="">
                 </div>
               </div>
@@ -960,6 +1002,8 @@ async function openEditPanel(id) {
         if (b) { b.textContent = '✓ Ready'; b.disabled = true }
       }
       onFmWaToggle()
+      // Populate saved-template dropdowns and pre-select saved value
+      loadTmplSelectors()
     }
     showPanel()
     goToStep(1)
@@ -1740,7 +1784,7 @@ async function onApptWaAgentChange() {
 
 function _setTogRow(togId, rowId, checked) {
   const el = document.getElementById(togId); if (el) el.checked = checked
-  const row = document.getElementById(rowId); if (row) row.style.display = checked ? '' : 'none'
+  const row = document.getElementById(rowId); if (row) row.style.display = checked ? 'flex' : 'none'
 }
 
 async function loadApptToggles(agentId) {
@@ -1758,11 +1802,23 @@ async function loadApptToggles(agentId) {
     // Restore followup timing
     if (cfg.followup_val) { const el = document.getElementById('appt-followup-val'); if (el) el.value = String(cfg.followup_val) }
     if (cfg.followup_unit) { const el = document.getElementById('appt-followup-unit'); if (el) el.value = cfg.followup_unit }
-    // Load templates
-    const tmpls = await loadWaTemplates(agentId)
-    populateTemplateSelect('appt-confirm-tmpl',  tmpls, cfg.confirm_template_name)
-    populateTemplateSelect('appt-reminder-tmpl', tmpls, cfg.reminder_template_name)
-    populateTemplateSelect('appt-followup-tmpl', tmpls, cfg.followup_template_name)
+    // Restore hidden template name inputs + status labels
+    const restoreApptTmpl = (type, tmplName) => {
+      const inp = document.getElementById(`appt-${type}-tmpl`); if (inp && tmplName) inp.value = tmplName
+      const s = document.getElementById(`appt-${type}-reg-status`)
+      const b = document.getElementById(`appt-${type}-reg-btn`)
+      if (tmplName && s) s.textContent = '✓ Template Ready'
+      if (tmplName && b) { b.textContent = '✓ Ready'; b.disabled = true }
+    }
+    restoreApptTmpl('confirm',  cfg.confirm_template_name)
+    restoreApptTmpl('reminder', cfg.reminder_template_name)
+    restoreApptTmpl('followup', cfg.followup_template_name)
+    // Pre-fill default bodies if empty
+    const cb = document.getElementById('appt-confirm-body');  if (cb && !cb.value.trim()) cb.value = APPT_CONFIRM_DEFAULT
+    const rb = document.getElementById('appt-reminder-body'); if (rb && !rb.value.trim()) rb.value = APPT_REMINDER_DEFAULT
+    const fb = document.getElementById('appt-followup-body'); if (fb && !fb.value.trim()) fb.value = APPT_FOLLOWUP_DEFAULT
+    // Populate saved-template dropdowns
+    loadTmplSelectors()
   } catch (e) { console.warn('loadApptToggles', e.message) }
 }
 
@@ -1773,10 +1829,13 @@ async function saveApptToggles() {
   const confirmOn  = document.getElementById('appt-tog-confirm')?.checked
   const reminderOn = document.getElementById('appt-tog-reminder')?.checked
   const followupOn = document.getElementById('appt-tog-followup')?.checked
-  const showRow = (rowId, show) => { const r = document.getElementById(rowId); if (r) r.style.display = show ? '' : 'none' }
-  showRow('appt-confirm-tmpl-row',  confirmOn)
-  showRow('appt-reminder-tmpl-row', reminderOn)
-  showRow('appt-followup-tmpl-row', followupOn)
+  const showRow = (rowId, show, bodyId, defaultBody) => {
+    const r = document.getElementById(rowId); if (r) r.style.display = show ? 'flex' : 'none'
+    if (show && bodyId && defaultBody) { const b = document.getElementById(bodyId); if (b && !b.value.trim()) b.value = defaultBody }
+  }
+  showRow('appt-confirm-tmpl-row',  confirmOn,  'appt-confirm-body',  APPT_CONFIRM_DEFAULT)
+  showRow('appt-reminder-tmpl-row', reminderOn, 'appt-reminder-body', APPT_REMINDER_DEFAULT)
+  showRow('appt-followup-tmpl-row', followupOn, 'appt-followup-body', APPT_FOLLOWUP_DEFAULT)
   // Save to DB via PUT /agents/:id with appt_wa_config
   const statusEl = document.getElementById('appt-tog-status')
   if (statusEl) statusEl.textContent = 'Saving…'
@@ -1809,14 +1868,21 @@ async function saveApptToggles() {
 
 // ── Per-form WA config (inside builder panel Step 1) ────────────────────────
 
-const FM_ACK_DEFAULT     = `Hi {{1}}, thank you for filling out {{2}}. We received your enquiry: {{3}}. Our team will get back to you shortly.`
+const FM_ACK_DEFAULT      = `Hi {{1}}, thank you for filling out {{2}}. We received your enquiry: {{3}}. Our team will get back to you shortly.`
 const FM_FOLLOWUP_DEFAULT = `Hi {{1}}, this is a follow-up regarding your enquiry on {{2}}. We wanted to check if you needed any further assistance with: {{3}}. Feel free to reach out anytime.`
+
+const APPT_CONFIRM_DEFAULT  = `Hi {{1}}, your appointment for {{2}} has been confirmed on {{3}}. We look forward to seeing you!`
+const APPT_REMINDER_DEFAULT = `Hi {{1}}, this is a reminder for your upcoming appointment for {{2}} on {{3}}. Please be on time.`
+const APPT_FOLLOWUP_DEFAULT = `Hi {{1}}, thank you for your appointment for {{2}} on {{3}}. We hope everything went well. Feel free to reach out if you need anything.`
 
 function resetFmWaFields() {
   const ids = ['fm-tog-ack','fm-tog-followup']
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.checked = false })
   ;['fm-ack-tmpl-row','fm-followup-tmpl-row'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none' })
   ;['fm-ack-tmpl','fm-followup-tmpl'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  ;['fm-ack-tmpl-sel','fm-followup-tmpl-sel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  ;['fm-ack-new-wrap','fm-followup-new-wrap'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none' })
+  ;['fm-ack-new-btn','fm-followup-new-btn'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '＋ Register new template' })
   ;['fm-ack-reg-status','fm-followup-reg-status'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '' })
   ;[['fm-ack-reg-btn','Register Template'],['fm-followup-reg-btn','Register Template']].forEach(([id,txt]) => { const el = document.getElementById(id); if (el) { el.textContent = txt; el.disabled = false } })
   const ackBody = document.getElementById('fm-ack-body'); if (ackBody) ackBody.value = FM_ACK_DEFAULT
@@ -1853,6 +1919,81 @@ function fmTemplateSlug(type) {
   const name = document.getElementById('fm-name')?.value || 'form'
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30)
   return `form_${type}_${slug}`
+}
+
+// ── Existing template selectors ─────────────────────────────────────────────
+
+// Populate all template selects for forms and appointments with saved templates
+async function loadTmplSelectors() {
+  const agentId = currentAgent?._id; if (!agentId) return
+  try {
+    const res = await apiFetch(`/templates?agent_id=${agentId}`)
+    const tmpls = (await res.json()).templates || []
+    const usable = tmpls.filter(t => ['approved','pending','pending_approval','submitted'].includes(t.status))
+    const makeOpts = (selEl, currentVal) => {
+      if (!selEl) return
+      const prev = selEl.value || currentVal || ''
+      selEl.innerHTML = '<option value="">— Select saved template —</option>'
+      usable.forEach(t => {
+        const opt = document.createElement('option')
+        opt.value = t.name
+        opt.textContent = `${t.name}  (${t.status})`
+        if (t.name === prev) opt.selected = true
+        selEl.appendChild(opt)
+      })
+    }
+    makeOpts(document.getElementById('fm-ack-tmpl-sel'),        document.getElementById('fm-ack-tmpl')?.value)
+    makeOpts(document.getElementById('fm-followup-tmpl-sel'),   document.getElementById('fm-followup-tmpl')?.value)
+    makeOpts(document.getElementById('appt-confirm-tmpl-sel'),  document.getElementById('appt-confirm-tmpl')?.value)
+    makeOpts(document.getElementById('appt-reminder-tmpl-sel'), document.getElementById('appt-reminder-tmpl')?.value)
+    makeOpts(document.getElementById('appt-followup-tmpl-sel'), document.getElementById('appt-followup-tmpl')?.value)
+  } catch(e) { console.warn('loadTmplSelectors', e) }
+}
+
+function onFmTmplSelChange(type) {
+  const sel = document.getElementById(`fm-${type}-tmpl-sel`)
+  const hid = document.getElementById(`fm-${type}-tmpl`)
+  if (!sel || !hid) return
+  hid.value = sel.value
+  if (sel.value) {
+    const wrap = document.getElementById(`fm-${type}-new-wrap`)
+    const btn  = document.getElementById(`fm-${type}-new-btn`)
+    if (wrap) wrap.style.display = 'none'
+    if (btn)  btn.textContent = '＋ Register new template'
+  }
+  if (typeof saveFmWa === 'function') saveFmWa()
+}
+
+function toggleFmNewTmpl(type) {
+  const wrap = document.getElementById(`fm-${type}-new-wrap`)
+  const btn  = document.getElementById(`fm-${type}-new-btn`)
+  if (!wrap) return
+  const open = wrap.style.display === 'flex'
+  wrap.style.display = open ? 'none' : 'flex'
+  if (btn) btn.textContent = open ? '＋ Register new template' : '✕ Cancel'
+}
+
+function onApptTmplSelChange(type) {
+  const sel = document.getElementById(`appt-${type}-tmpl-sel`)
+  const hid = document.getElementById(`appt-${type}-tmpl`)
+  if (!sel || !hid) return
+  hid.value = sel.value
+  if (sel.value) {
+    const wrap = document.getElementById(`appt-${type}-new-wrap`)
+    const btn  = document.getElementById(`appt-${type}-new-btn`)
+    if (wrap) wrap.style.display = 'none'
+    if (btn)  btn.textContent = '＋ Register new template'
+  }
+  if (typeof saveApptToggles === 'function') saveApptToggles()
+}
+
+function toggleApptNewTmpl(type) {
+  const wrap = document.getElementById(`appt-${type}-new-wrap`)
+  const btn  = document.getElementById(`appt-${type}-new-btn`)
+  if (!wrap) return
+  const open = wrap.style.display === 'flex'
+  wrap.style.display = open ? 'none' : 'flex'
+  if (btn) btn.textContent = open ? '＋ Register new template' : '✕ Cancel'
 }
 
 // Register a WA template for this form (ack or followup)
@@ -1934,6 +2075,89 @@ async function registerFormTemplate(type) {
     if (res.meta_error) {
       if (statusEl) statusEl.textContent = '✕ Meta error: ' + res.meta_error
     }
+    // Refresh dropdown so newly-registered template appears
+    loadTmplSelectors()
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '✕ ' + e.message
+    if (btn) btn.disabled = false
+  }
+}
+
+// Register a WA template for appointments (confirm / reminder / followup)
+async function registerApptTemplate(type) {
+  const agentId = apptWaAgentId || document.getElementById('appt-wa-agent')?.value
+  if (!agentId) return toast('Select an agent first', 'error')
+
+  const bodyEl   = document.getElementById(`appt-${type}-body`)
+  const statusEl = document.getElementById(`appt-${type}-reg-status`)
+  const tmplInput = document.getElementById(`appt-${type}-tmpl`)
+  const btn      = document.getElementById(`appt-${type}-reg-btn`)
+
+  const bodyText = bodyEl?.value?.trim()
+  if (!bodyText) return toast('Enter the template message body first', 'error')
+
+  const DEFAULTS = { confirm: APPT_CONFIRM_DEFAULT, reminder: APPT_REMINDER_DEFAULT, followup: APPT_FOLLOWUP_DEFAULT }
+  const tmplName = `appt_${type}_${agentId.slice(-8).toLowerCase().replace(/[^a-z0-9]/g, '')}`
+
+  if (statusEl) statusEl.textContent = 'Checking…'
+  if (btn) btn.disabled = true
+
+  try {
+    const { templates } = await apiFetch(`/templates?agent_id=${agentId}`)
+    const existing = templates?.find(t => t.name === tmplName)
+
+    if (existing) {
+      if (existing.status === 'approved') {
+        if (tmplInput) tmplInput.value = existing.name
+        if (statusEl) statusEl.textContent = '✓ Template Ready'
+        if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
+        await saveApptToggles()
+        return
+      } else if (existing.status === 'rejected' || existing.status === 'draft') {
+        if (statusEl) statusEl.textContent = 'Retrying Meta submission…'
+        try {
+          await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
+          if (tmplInput) tmplInput.value = existing.name
+          if (statusEl) statusEl.textContent = existing.status === 'rejected' ? '✕ Rejected — edit body and retry' : '⏳ Pending Meta Review'
+          if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+        } catch (e2) {
+          if (statusEl) statusEl.textContent = '✕ Meta error: ' + e2.message
+          if (btn) btn.disabled = false
+        }
+        return
+      } else {
+        if (tmplInput) tmplInput.value = existing.name
+        if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
+        if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+        return
+      }
+    }
+
+    if (statusEl) statusEl.textContent = 'Registering…'
+    const res = await apiFetch('/templates', {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_id: agentId, name: tmplName, language: 'en', category: 'UTILITY',
+        body_text: bodyText, submit_to_meta: true,
+      }),
+    })
+    const tpl = res.template
+    if (tmplInput) tmplInput.value = tpl.name
+    if (tpl.status === 'approved') {
+      if (statusEl) statusEl.textContent = '✓ Template Ready'
+      if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
+    } else {
+      if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
+      if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+    }
+    if (res.meta_error) {
+      if (statusEl) statusEl.textContent = '✕ Meta error: ' + res.meta_error
+      if (btn) btn.disabled = false
+    }
+    // Auto-save the template name to agent config
+    await saveApptToggles()
+    // Refresh dropdown so newly-registered template appears
+    loadTmplSelectors()
   } catch (e) {
     if (statusEl) statusEl.textContent = '✕ ' + e.message
     if (btn) btn.disabled = false
@@ -1948,7 +2172,7 @@ async function onFmAgentChange() {
   const waFields = document.getElementById('fm-wa-fields')
   if (noAgent) noAgent.style.display = agentVal ? 'none' : ''
   if (waFields) waFields.style.display = agentVal ? '' : 'none'
-  if (agentVal) await loadFmWaTemplates(agentVal)
+  if (agentVal) { await loadFmWaTemplates(agentVal); loadTmplSelectors() }
 }
 
 // (per-form WA config is saved inline with saveForm() via wa_config field on inquiry_forms)
