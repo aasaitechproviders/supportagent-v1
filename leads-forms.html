@@ -1884,13 +1884,26 @@ async function registerFormTemplate(type) {
         if (statusEl) statusEl.textContent = '✓ Template Ready'
         if (btn) { btn.textContent = '✓ Ready'; btn.disabled = true }
         return
+      } else if (existing.status === 'rejected' || existing.status === 'draft') {
+        // draft = Meta submit failed previously — retry submit
+        if (statusEl) statusEl.textContent = 'Retrying Meta submission…'
+        try {
+          const submitRes = await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
+          if (tmplInput) tmplInput.value = existing.name
+          if (statusEl) statusEl.textContent = existing.status === 'rejected'
+            ? '✕ Rejected by Meta — edit body and try again'
+            : '⏳ Pending Meta Review'
+          if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
+        } catch (e2) {
+          if (statusEl) statusEl.textContent = '✕ Meta error: ' + e2.message
+          if (btn) btn.disabled = false
+        }
+        return
       } else {
-        // pending or rejected
+        // pending
         if (tmplInput) tmplInput.value = existing.name
-        if (statusEl) statusEl.textContent = existing.status === 'rejected'
-          ? '✕ Rejected by Meta — edit body and try again'
-          : '⏳ Pending Meta Review'
-        if (btn) btn.disabled = false
+        if (statusEl) statusEl.textContent = '⏳ Pending Meta Review'
+        if (btn) { btn.textContent = 'Re-check'; btn.disabled = false }
         return
       }
     }
