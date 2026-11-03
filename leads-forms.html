@@ -411,9 +411,11 @@
               <div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <div style="font-size:13px;font-weight:600;color:var(--text)">Reminder</div>
-                  <select class="filter-sel" id="appt-reminder-hours" onchange="saveApptToggles()" style="height:26px;font-size:12px;padding:0 6px">
-                    <option value="1">1 hr before</option><option value="2">2 hrs before</option><option value="4">4 hrs before</option>
-                    <option value="12">12 hrs before</option><option value="24" selected>24 hrs before</option><option value="48">48 hrs before</option>
+                  <input type="number" id="appt-reminder-val" min="1" value="24" onchange="saveApptToggles()" style="width:54px;height:26px;font-size:12px;padding:0 6px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                  <select id="appt-reminder-unit" onchange="saveApptToggles()" style="height:26px;font-size:12px;padding:0 6px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                    <option value="minutes">min before</option>
+                    <option value="hours" selected>hrs before</option>
+                    <option value="days">days before</option>
                   </select>
                 </div>
                 <div style="font-size:12px;color:var(--text-3);margin-top:2px">Scheduled reminder before the appointment</div>
@@ -429,7 +431,18 @@
           <!-- Followup -->
           <div style="padding:12px 0">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
-              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up <span style="font-size:11px;color:var(--text-3);font-weight:400">(after completion)</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up after appointment is marked completed</div></div>
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up <span style="font-size:11px;color:var(--text-3);font-weight:400">(after completion)</span></div>
+                  <input type="number" id="appt-followup-val" min="1" value="24" onchange="saveApptToggles()" style="width:54px;height:26px;font-size:12px;padding:0 6px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                  <select id="appt-followup-unit" onchange="saveApptToggles()" style="height:26px;font-size:12px;padding:0 6px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                    <option value="minutes">min after</option>
+                    <option value="hours" selected>hrs after</option>
+                    <option value="days">days after</option>
+                  </select>
+                </div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up after appointment is marked completed</div>
+              </div>
               <label class="tog-switch"><input type="checkbox" id="appt-tog-followup" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
             </div>
             <div id="appt-followup-tmpl-row" style="margin-top:10px;display:none">
@@ -587,12 +600,11 @@
                   <div>
                     <div style="display:flex;align-items:center;gap:6px">
                       <div style="font-size:12.5px;font-weight:600;color:var(--text)">Follow-up</div>
-                      <select class="sel-clean" id="fm-followup-days" style="height:26px;font-size:11.5px;padding:0 6px;width:auto">
-                        <option value="1" selected>after 1 day</option>
-                        <option value="2">after 2 days</option>
-                        <option value="3">after 3 days</option>
-                        <option value="5">after 5 days</option>
-                        <option value="7">after 7 days</option>
+                      <input type="number" id="fm-followup-val" min="1" value="1" style="width:48px;height:26px;font-size:11.5px;padding:0 5px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                      <select id="fm-followup-unit" style="height:26px;font-size:11.5px;padding:0 5px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)">
+                        <option value="minutes">min after</option>
+                        <option value="hours">hrs after</option>
+                        <option value="days" selected>days after</option>
                       </select>
                     </div>
                     <div style="font-size:11.5px;color:var(--text-3);margin-top:1px">Follow-up WA to leads who submitted this form</div>
@@ -931,9 +943,9 @@ async function openEditPanel(id) {
       if (ackTmpl && wa.ack_template_name) ackTmpl.value = wa.ack_template_name
       const fupTmpl = document.getElementById('fm-followup-tmpl')
       if (fupTmpl && wa.followup_template_name) fupTmpl.value = wa.followup_template_name
-      // Restore days
-      const daysSel = document.getElementById('fm-followup-days')
-      if (daysSel && wa.followup_days) daysSel.value = String(wa.followup_days)
+      // Restore followup timing
+      if (wa.followup_val) { const el = document.getElementById('fm-followup-val'); if (el) el.value = String(wa.followup_val) }
+      if (wa.followup_unit) { const el = document.getElementById('fm-followup-unit'); if (el) el.value = wa.followup_unit }
       // Show status + button state for already-registered templates
       if (wa.ack_enabled && wa.ack_template_name) {
         const s = document.getElementById('fm-ack-reg-status')
@@ -1038,7 +1050,8 @@ async function saveForm() {
       followup_enabled:      document.getElementById('fm-tog-followup')?.checked || false,
       followup_template_name: document.getElementById('fm-followup-tmpl')?.value || null,
       followup_template_lang: 'en',
-      followup_days:         parseInt(document.getElementById('fm-followup-days')?.value) || 1,
+      followup_val:          parseInt(document.getElementById('fm-followup-val')?.value) || 1,
+      followup_unit:         document.getElementById('fm-followup-unit')?.value || 'days',
     },
   }
   try {
@@ -1739,8 +1752,12 @@ async function loadApptToggles(agentId) {
     _setTogRow('appt-tog-confirm',  'appt-confirm-tmpl-row',  !!cfg.confirm_enabled)
     _setTogRow('appt-tog-reminder', 'appt-reminder-tmpl-row', !!cfg.reminder_enabled)
     _setTogRow('appt-tog-followup', 'appt-followup-tmpl-row', !!cfg.followup_enabled)
-    const sel = document.getElementById('appt-reminder-hours')
-    if (sel && cfg.reminder_hours_before) sel.value = String(cfg.reminder_hours_before)
+    // Restore reminder timing
+    if (cfg.reminder_val) { const el = document.getElementById('appt-reminder-val'); if (el) el.value = String(cfg.reminder_val) }
+    if (cfg.reminder_unit) { const el = document.getElementById('appt-reminder-unit'); if (el) el.value = cfg.reminder_unit }
+    // Restore followup timing
+    if (cfg.followup_val) { const el = document.getElementById('appt-followup-val'); if (el) el.value = String(cfg.followup_val) }
+    if (cfg.followup_unit) { const el = document.getElementById('appt-followup-unit'); if (el) el.value = cfg.followup_unit }
     // Load templates
     const tmpls = await loadWaTemplates(agentId)
     populateTemplateSelect('appt-confirm-tmpl',  tmpls, cfg.confirm_template_name)
@@ -1774,10 +1791,13 @@ async function saveApptToggles() {
           reminder_enabled:       reminderOn,
           reminder_template_name: document.getElementById('appt-reminder-tmpl')?.value || null,
           reminder_template_lang: 'en',
-          reminder_hours_before:  parseInt(document.getElementById('appt-reminder-hours')?.value) || 24,
+          reminder_val:           parseInt(document.getElementById('appt-reminder-val')?.value) || 24,
+          reminder_unit:          document.getElementById('appt-reminder-unit')?.value || 'hours',
           followup_enabled:       followupOn,
           followup_template_name: document.getElementById('appt-followup-tmpl')?.value || null,
           followup_template_lang: 'en',
+          followup_val:           parseInt(document.getElementById('appt-followup-val')?.value) || 24,
+          followup_unit:          document.getElementById('appt-followup-unit')?.value || 'hours',
         },
       }),
     })
@@ -1801,7 +1821,8 @@ function resetFmWaFields() {
   ;[['fm-ack-reg-btn','Register Template'],['fm-followup-reg-btn','Register Template']].forEach(([id,txt]) => { const el = document.getElementById(id); if (el) { el.textContent = txt; el.disabled = false } })
   const ackBody = document.getElementById('fm-ack-body'); if (ackBody) ackBody.value = FM_ACK_DEFAULT
   const fupBody = document.getElementById('fm-followup-body'); if (fupBody) fupBody.value = FM_FOLLOWUP_DEFAULT
-  document.getElementById('fm-followup-days') && (document.getElementById('fm-followup-days').value = '1')
+  const fupVal = document.getElementById('fm-followup-val'); if (fupVal) fupVal.value = '1'
+  const fupUnit = document.getElementById('fm-followup-unit'); if (fupUnit) fupUnit.value = 'days'
   // Show/hide WA fields based on agent selection
   const agentVal = document.getElementById('fm-agent')?.value
   const noAgent = document.getElementById('fm-wa-no-agent')
