@@ -1831,9 +1831,16 @@ let apptWaAgentId = null
 function populateApptWaAgentSel() {
   const sel = document.getElementById('appt-wa-agent')
   if (!sel) return
-  // keep current
-  const cur = sel.value
+  const cur = sel.value || apptWaAgentId || ''
   sel.innerHTML = '<option value="">Select Agent…</option>' + agents.map(a => `<option value="${a._id}" ${a._id===cur?'selected':''}>${esc(a.name)}</option>`).join('')
+  // Auto-select the first (or only) agent so users don't need to pick manually
+  if (!sel.value && agents.length === 1) {
+    sel.value = agents[0]._id
+    onApptWaAgentChange()
+  } else if (!sel.value && cur && agents.find(a => a._id === cur)) {
+    sel.value = cur
+    onApptWaAgentChange()
+  }
 }
 
 async function onApptWaAgentChange() {
