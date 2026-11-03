@@ -294,6 +294,54 @@
     <!-- ═══════════════════════════════════════════════════════════ -->
     <div id="builder-panel-content">
       <div class="forms-grid" id="forms-grid"></div>
+
+      <!-- ── Forms WA Automations ─────────────────────────────────────────── -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;margin-top:24px" id="forms-wa-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3)">💬 Form WhatsApp Automations</div>
+          <select class="filter-sel" id="forms-wa-agent" onchange="onFormsWaAgentChange()" style="height:30px;font-size:12px;min-width:150px">
+            <option value="">Select Agent…</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          <!-- Acknowledgement -->
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Acknowledgement Message</div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA message immediately when someone submits a form</div></div>
+              <label class="tog-switch"><input type="checkbox" id="form-tog-ack" onchange="saveFormToggles()"><span class="tog-slider"></span></label>
+            </div>
+            <div id="form-ack-tmpl-row" style="margin-top:10px;display:none">
+              <select class="filter-sel" id="form-ack-tmpl" onchange="saveFormToggles()" style="width:100%;height:32px;font-size:12px">
+                <option value="">Select approved template…</option>
+              </select>
+              <div style="font-size:11px;color:var(--text-3);margin-top:4px">Template vars: {{1}}=customer name, {{2}}=form name, {{3}}=message</div>
+            </div>
+          </div>
+          <!-- Followup -->
+          <div style="padding:12px 0">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up</div>
+                  <select class="filter-sel" id="form-followup-days" onchange="saveFormToggles()" style="height:26px;font-size:12px;padding:0 6px">
+                    <option value="1" selected>1 day after</option><option value="2">2 days after</option><option value="3">3 days after</option>
+                    <option value="5">5 days after</option><option value="7">7 days after</option>
+                  </select>
+                </div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up message to form leads after N days</div>
+              </div>
+              <label class="tog-switch"><input type="checkbox" id="form-tog-followup" onchange="saveFormToggles()"><span class="tog-slider"></span></label>
+            </div>
+            <div id="form-followup-tmpl-row" style="margin-top:10px;display:none">
+              <select class="filter-sel" id="form-followup-tmpl" onchange="saveFormToggles()" style="width:100%;height:32px;font-size:12px">
+                <option value="">Select approved template…</option>
+              </select>
+              <div style="font-size:11px;color:var(--text-3);margin-top:4px">Template vars: {{1}}=customer name, {{2}}=form name, {{3}}=message</div>
+            </div>
+          </div>
+        </div>
+        <div id="forms-tog-status" style="margin-top:10px;font-size:11.5px;color:var(--text-3);min-height:16px"></div>
+      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════ -->
@@ -384,23 +432,61 @@
       </div>
 
       <!-- WA Automation Toggles -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:18px">
-        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:14px">💬 WhatsApp Automations</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:18px" id="appt-wa-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3)">💬 WhatsApp Automations</div>
+          <select class="filter-sel" id="appt-wa-agent" onchange="onApptWaAgentChange()" style="height:30px;font-size:12px;min-width:150px">
+            <option value="">Select Agent…</option>
+          </select>
+        </div>
         <div style="display:flex;flex-direction:column;gap:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">Confirmation Message</div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA message when appointment is created</div></div>
-            <label class="tog-switch"><input type="checkbox" id="appt-tog-confirm" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+          <!-- Confirmation -->
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Confirmation Message</div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA message immediately when appointment is created</div></div>
+              <label class="tog-switch"><input type="checkbox" id="appt-tog-confirm" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+            </div>
+            <div id="appt-confirm-tmpl-row" style="margin-top:10px;display:none">
+              <select class="filter-sel" id="appt-confirm-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
+                <option value="">Select approved template…</option>
+              </select>
+            </div>
           </div>
-          <div style="border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">Reminder <span style="font-size:11px;color:var(--text-3);font-weight:400">(24 hrs before)</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA reminder a day before the appointment</div></div>
-            <label class="tog-switch"><input type="checkbox" id="appt-tog-reminder" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+          <!-- Reminder -->
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="font-size:13px;font-weight:600;color:var(--text)">Reminder</div>
+                  <select class="filter-sel" id="appt-reminder-hours" onchange="saveApptToggles()" style="height:26px;font-size:12px;padding:0 6px">
+                    <option value="1">1 hr before</option><option value="2">2 hrs before</option><option value="4">4 hrs before</option>
+                    <option value="12">12 hrs before</option><option value="24" selected>24 hrs before</option><option value="48">48 hrs before</option>
+                  </select>
+                </div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Scheduled reminder before the appointment</div>
+              </div>
+              <label class="tog-switch"><input type="checkbox" id="appt-tog-reminder" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+            </div>
+            <div id="appt-reminder-tmpl-row" style="margin-top:10px;display:none">
+              <select class="filter-sel" id="appt-reminder-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
+                <option value="">Select approved template…</option>
+              </select>
+            </div>
           </div>
-          <div style="border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0">
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up <span style="font-size:11px;color:var(--text-3);font-weight:400">(after completion)</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up after appointment is marked completed</div></div>
-            <label class="tog-switch"><input type="checkbox" id="appt-tog-followup" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+          <!-- Followup -->
+          <div style="padding:12px 0">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text)">Follow-up <span style="font-size:11px;color:var(--text-3);font-weight:400">(after completion)</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px">Send WA follow-up after appointment is marked completed</div></div>
+              <label class="tog-switch"><input type="checkbox" id="appt-tog-followup" onchange="saveApptToggles()"><span class="tog-slider"></span></label>
+            </div>
+            <div id="appt-followup-tmpl-row" style="margin-top:10px;display:none">
+              <select class="filter-sel" id="appt-followup-tmpl" onchange="saveApptToggles()" style="width:100%;height:32px;font-size:12px">
+                <option value="">Select approved template…</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div style="margin-top:12px;padding:8px 12px;background:var(--surface-2);border-radius:var(--r-sm);font-size:11.5px;color:var(--text-3)">⚙️ Template mapping will be configurable from the <strong>Automations</strong> page (coming soon).</div>
+        <div id="appt-tog-status" style="margin-top:10px;font-size:11.5px;color:var(--text-3);min-height:16px"></div>
       </div>
 
       <!-- Toolbar -->
@@ -674,6 +760,8 @@ const TYPE_META = {
     renderGrid()
     buildFormSelector()
     buildAgentFilter()
+    populateFormsWaAgentSel()
+    populateApptWaAgentSel()
 
     // Check URL param — auto-switch to the right tab
     const params = new URLSearchParams(location.search)
@@ -719,8 +807,11 @@ function switchTab(tab) {
   document.getElementById('export-btn').style.display             = isResponses && selectedForm ? '' : 'none'
   if (isAppointments) {
     populateApptAgentFilter()
-    loadApptToggles()
+    populateApptWaAgentSel()
     loadAppointments()
+  }
+  if (isBuilder) {
+    populateFormsWaAgentSel()
   }
 }
 
@@ -1551,23 +1642,156 @@ async function deleteAppt(id) {
   } catch (e) { toast(e.message || 'Delete failed', 'error') }
 }
 
-function saveApptToggles() {
-  const val = {
-    confirm:  document.getElementById('appt-tog-confirm')?.checked  || false,
-    reminder: document.getElementById('appt-tog-reminder')?.checked || false,
-    followup: document.getElementById('appt-tog-followup')?.checked || false,
-  }
-  try { localStorage.setItem(`appt_tog_${agents[0]?._id||'x'}`, JSON.stringify(val)) } catch {}
+// ── WA Templates cache ──────────────────────────────────────────────────────
+let _waTemplates = {}  // keyed by agent_id
+async function loadWaTemplates(agentId) {
+  if (_waTemplates[agentId]) return _waTemplates[agentId]
+  try {
+    const data = await apiFetch(`/wa-templates?agent_id=${agentId}&status=approved&limit=100`)
+    _waTemplates[agentId] = (data.templates || [])
+    return _waTemplates[agentId]
+  } catch { return [] }
 }
 
-function loadApptToggles() {
+function populateTemplateSelect(selId, templates, selectedName) {
+  const sel = document.getElementById(selId)
+  if (!sel) return
+  sel.innerHTML = '<option value="">Select approved template…</option>' +
+    templates.map(t => `<option value="${esc(t.name)}" ${t.name===selectedName?'selected':''}>${esc(t.name)}</option>`).join('')
+}
+
+// ── Appointment WA Automation ───────────────────────────────────────────────
+let apptWaAgentId = null
+
+function populateApptWaAgentSel() {
+  const sel = document.getElementById('appt-wa-agent')
+  if (!sel) return
+  // keep current
+  const cur = sel.value
+  sel.innerHTML = '<option value="">Select Agent…</option>' + agents.map(a => `<option value="${a._id}" ${a._id===cur?'selected':''}>${esc(a.name)}</option>`).join('')
+}
+
+async function onApptWaAgentChange() {
+  const sel = document.getElementById('appt-wa-agent')
+  apptWaAgentId = sel?.value || null
+  if (apptWaAgentId) await loadApptToggles(apptWaAgentId)
+}
+
+function _setTogRow(togId, rowId, checked) {
+  const el = document.getElementById(togId); if (el) el.checked = checked
+  const row = document.getElementById(rowId); if (row) row.style.display = checked ? '' : 'none'
+}
+
+async function loadApptToggles(agentId) {
+  if (!agentId) return
   try {
-    const val = JSON.parse(localStorage.getItem(`appt_tog_${agents[0]?._id||'x'}`) || '{}')
-    const set = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v }
-    set('appt-tog-confirm',  val.confirm)
-    set('appt-tog-reminder', val.reminder)
-    set('appt-tog-followup', val.followup)
-  } catch {}
+    const data = await apiFetch(`/automations?agent_id=${agentId}`)
+    const cfg = data.config || {}
+    _setTogRow('appt-tog-confirm',  'appt-confirm-tmpl-row',  !!cfg.appt_confirm_enabled)
+    _setTogRow('appt-tog-reminder', 'appt-reminder-tmpl-row', !!cfg.appt_reminder_enabled)
+    _setTogRow('appt-tog-followup', 'appt-followup-tmpl-row', !!cfg.appt_followup_enabled)
+    const sel = document.getElementById('appt-reminder-hours')
+    if (sel && cfg.reminder_hours_before) sel.value = String(cfg.reminder_hours_before)
+    // Load templates
+    const tmpls = await loadWaTemplates(agentId)
+    populateTemplateSelect('appt-confirm-tmpl',  tmpls, cfg.appt_confirm_template_name)
+    populateTemplateSelect('appt-reminder-tmpl', tmpls, cfg.reminder_template_name)
+    populateTemplateSelect('appt-followup-tmpl', tmpls, cfg.followup_template_name)
+  } catch (e) { console.warn('loadApptToggles', e.message) }
+}
+
+async function saveApptToggles() {
+  const agentId = apptWaAgentId || document.getElementById('appt-wa-agent')?.value
+  if (!agentId) return
+  // Show/hide template rows
+  const confirmOn  = document.getElementById('appt-tog-confirm')?.checked
+  const reminderOn = document.getElementById('appt-tog-reminder')?.checked
+  const followupOn = document.getElementById('appt-tog-followup')?.checked
+  const showRow = (rowId, show) => { const r = document.getElementById(rowId); if (r) r.style.display = show ? '' : 'none' }
+  showRow('appt-confirm-tmpl-row',  confirmOn)
+  showRow('appt-reminder-tmpl-row', reminderOn)
+  showRow('appt-followup-tmpl-row', followupOn)
+  // Save to DB
+  const statusEl = document.getElementById('appt-tog-status')
+  if (statusEl) statusEl.textContent = 'Saving…'
+  try {
+    await apiFetch('/automations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        agent_id: agentId,
+        enabled: confirmOn || reminderOn || followupOn,
+        appt_confirm_enabled:  confirmOn,
+        appt_confirm_template_name: document.getElementById('appt-confirm-tmpl')?.value  || null,
+        appt_reminder_enabled: reminderOn,
+        reminder_template_name: document.getElementById('appt-reminder-tmpl')?.value || null,
+        reminder_hours_before:  parseInt(document.getElementById('appt-reminder-hours')?.value) || 24,
+        appt_followup_enabled: followupOn,
+        followup_template_name: document.getElementById('appt-followup-tmpl')?.value || null,
+      }),
+    })
+    if (statusEl) { statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = '' }, 2500) }
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '✕ Save failed: ' + e.message
+  }
+}
+
+// ── Forms WA Automation ─────────────────────────────────────────────────────
+let formsWaAgentId = null
+
+function populateFormsWaAgentSel() {
+  const sel = document.getElementById('forms-wa-agent')
+  if (!sel) return
+  const cur = sel.value
+  sel.innerHTML = '<option value="">Select Agent…</option>' + agents.map(a => `<option value="${a._id}" ${a._id===cur?'selected':''}>${esc(a.name)}</option>`).join('')
+}
+
+async function onFormsWaAgentChange() {
+  const sel = document.getElementById('forms-wa-agent')
+  formsWaAgentId = sel?.value || null
+  if (formsWaAgentId) await loadFormToggles(formsWaAgentId)
+}
+
+async function loadFormToggles(agentId) {
+  if (!agentId) return
+  try {
+    const data = await apiFetch(`/automations?agent_id=${agentId}`)
+    const cfg = data.config || {}
+    _setTogRow('form-tog-ack',     'form-ack-tmpl-row',     !!cfg.form_ack_enabled)
+    _setTogRow('form-tog-followup','form-followup-tmpl-row', !!cfg.form_followup_enabled)
+    const daysSel = document.getElementById('form-followup-days')
+    if (daysSel && cfg.form_followup_days) daysSel.value = String(cfg.form_followup_days)
+    const tmpls = await loadWaTemplates(agentId)
+    populateTemplateSelect('form-ack-tmpl',     tmpls, cfg.form_ack_template_name)
+    populateTemplateSelect('form-followup-tmpl',tmpls, cfg.form_followup_template_name)
+  } catch (e) { console.warn('loadFormToggles', e.message) }
+}
+
+async function saveFormToggles() {
+  const agentId = formsWaAgentId || document.getElementById('forms-wa-agent')?.value
+  if (!agentId) return
+  const ackOn     = document.getElementById('form-tog-ack')?.checked
+  const followOn  = document.getElementById('form-tog-followup')?.checked
+  const showRow = (rowId, show) => { const r = document.getElementById(rowId); if (r) r.style.display = show ? '' : 'none' }
+  showRow('form-ack-tmpl-row',     ackOn)
+  showRow('form-followup-tmpl-row', followOn)
+  const statusEl = document.getElementById('forms-tog-status')
+  if (statusEl) statusEl.textContent = 'Saving…'
+  try {
+    await apiFetch('/automations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        agent_id: agentId,
+        form_ack_enabled:      ackOn,
+        form_ack_template_name: document.getElementById('form-ack-tmpl')?.value     || null,
+        form_followup_enabled: followOn,
+        form_followup_template_name: document.getElementById('form-followup-tmpl')?.value || null,
+        form_followup_days:   parseInt(document.getElementById('form-followup-days')?.value) || 1,
+      }),
+    })
+    if (statusEl) { statusEl.textContent = '✓ Saved'; setTimeout(() => { if (statusEl) statusEl.textContent = '' }, 2500) }
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '✕ Save failed: ' + e.message
+  }
 }
 
 function populateApptAgentFilter() {
