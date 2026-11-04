@@ -641,8 +641,7 @@
                 <option value="">Select approved template…</option>
               </select>
               <div style="margin-top:8px">
-                <button class="notif-reg-btn" onclick="openRegisterTemplate('placed')">＋ Register new template</button>
-                <span id="notif-placed-reg-status" style="font-size:11.5px;color:var(--green);margin-left:8px"></span>
+                <button class="notif-reg-btn" onclick="openTmplModal('placed')">＋ Register new template</button>
               </div>
             </div>
             <!-- Email -->
@@ -684,8 +683,7 @@
                 <option value="">Select approved template…</option>
               </select>
               <div style="margin-top:8px">
-                <button class="notif-reg-btn" onclick="openRegisterTemplate('abandoned')">＋ Register new template</button>
-                <span id="notif-abandoned-reg-status" style="font-size:11.5px;color:var(--green);margin-left:8px"></span>
+                <button class="notif-reg-btn" onclick="openTmplModal('abandoned')">＋ Register new template</button>
               </div>
             </div>
             <div>
@@ -726,8 +724,7 @@
                 <option value="">Select approved template…</option>
               </select>
               <div style="margin-top:8px">
-                <button class="notif-reg-btn" onclick="openRegisterTemplate('status')">＋ Register new template</button>
-                <span id="notif-status-reg-status" style="font-size:11.5px;color:var(--green);margin-left:8px"></span>
+                <button class="notif-reg-btn" onclick="openTmplModal('status')">＋ Register new template</button>
               </div>
             </div>
             <div>
@@ -796,6 +793,45 @@
     </div>
   </div>
 </div>
+
+<!-- ── Register WA Template Modal ───────────────────────────────────────── -->
+<div class="detail-overlay" id="tmplModal" onclick="if(event.target===this)closeTmplModal()">
+  <div class="detail-modal" style="max-width:480px">
+    <div class="detail-header">
+      <div>
+        <div class="detail-name" id="tmpl-modal-title">📱 Register WhatsApp Template</div>
+        <div class="detail-meta" id="tmpl-modal-subtitle">Create and submit a new template to Meta for approval</div>
+      </div>
+      <button onclick="closeTmplModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-3);line-height:1;padding:2px 6px">✕</button>
+    </div>
+    <div class="detail-body" style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:6px">Template Body</div>
+        <textarea id="tmpl-modal-body" rows="5"
+          style="width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface-2);color:var(--text);resize:vertical;line-height:1.6;box-sizing:border-box"
+          placeholder="Hi {{1}}, your order {{2}} has been placed!"></textarea>
+      </div>
+      <div id="tmpl-modal-vars" style="font-size:11.5px;color:var(--text-3);background:var(--surface-2);padding:8px 12px;border-radius:var(--r-sm);line-height:1.8"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="tmpl-modal-reg-btn" onclick="registerNotifTemplate()">Register &amp; Submit to Meta</button>
+        <span id="tmpl-modal-status" style="font-size:12px;color:var(--text-3)"></span>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);border-top:1px solid var(--border);padding-top:12px">
+        Templates go through Meta review (usually a few minutes to hours). Once approved they'll appear in the dropdown automatically.
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+  .detail-overlay.open{opacity:1;pointer-events:all}
+  .detail-modal{background:var(--surface);border-radius:var(--r-lg);padding:0;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+  .detail-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0}
+  .detail-name{font-size:16px;font-weight:700;margin-bottom:3px}
+  .detail-meta{font-size:12px;color:var(--text-3)}
+  .detail-body{padding:18px 22px;overflow-y:auto;flex:1}
+</style>
 
 <script src="api.js"></script>
 <script src="i18n.js"></script>
@@ -1354,10 +1390,10 @@ async function loadSalesNotifications(agentId) {
   document.getElementById('notif-no-agent').style.display = 'none'
   document.getElementById('notif-content').style.display  = ''
   try {
-    // Load agent's sales_notifications config
-    const agent = await apiFetch(`/agents/${agentId}`)
-    const cfg   = agent?.sales_notifications || {}
-    _notifCfg   = cfg
+    // Load sales_notifications config via dedicated endpoint
+    const resp = await apiFetch(`/agents/${agentId}/sales-notifications`)
+    const cfg  = resp?.sales_notifications || {}
+    _notifCfg  = cfg
 
     // Master toggle
     document.getElementById('notif-master-toggle').checked = !!cfg.enabled
@@ -1370,13 +1406,19 @@ async function loadSalesNotifications(agentId) {
     restoreScenario('abandoned', cfg.on_abandoned_cart || {})
     restoreScenario('status',    cfg.on_status_changed || {})
 
-    // Load WA templates
-    _waTemplates = await loadWaTemplatesForMerchant(agentId)
+    // Load WA templates (fetch independently so a template error doesn't block config)
+    try {
+      _waTemplates = await loadWaTemplatesForMerchant(agentId)
+    } catch (te) {
+      console.warn('[notif] wa-templates fetch failed:', te.message)
+      _waTemplates = []
+    }
     populateMerchantTemplateSelect('notif-placed-wa-tmpl',    _waTemplates, cfg.on_order_placed?.wa_template_name)
     populateMerchantTemplateSelect('notif-abandoned-wa-tmpl', _waTemplates, cfg.on_abandoned_cart?.wa_template_name)
     populateMerchantTemplateSelect('notif-status-wa-tmpl',    _waTemplates, cfg.on_status_changed?.wa_template_name)
 
   } catch (e) {
+    console.error('[notif] loadSalesNotifications error:', e)
     toast('Failed to load notification settings', 'error')
   }
 }
@@ -1413,23 +1455,135 @@ function onMasterToggle() {
 }
 
 async function loadWaTemplatesForMerchant(agentId) {
-  try {
-    const data = await apiFetch(`/wa-templates?agent_id=${agentId}&status=approved&limit=100`)
-    return data.templates || []
-  } catch { return [] }
+  const data = await apiFetch(`/wa-templates?agent_id=${agentId}&status=approved&limit=100`)
+  return data.templates || []
 }
 
 function populateMerchantTemplateSelect(selId, templates, selectedName) {
   const sel = document.getElementById(selId)
   if (!sel) return
+  if (!templates.length) {
+    sel.innerHTML = '<option value="">No approved templates — register one below</option>'
+    return
+  }
   sel.innerHTML = '<option value="">Select approved template…</option>' +
     templates.map(t => `<option value="${esc(t.name)}" ${t.name === selectedName ? 'selected' : ''}>${esc(t.name)}</option>`).join('')
 }
 
-function openRegisterTemplate(scenario) {
-  // Redirect to WA templates page with the agent pre-selected
-  const url = `wa-templates.html?agent_id=${encodeURIComponent(_agentId)}&scenario=${scenario}`
-  window.open(url, '_blank')
+let _tmplModalScenario = null
+
+const _tmplVars = {
+  placed:   'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID',
+  abandoned:'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID',
+  status:   'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID &nbsp;·&nbsp; <b>{{3}}</b> = new status',
+}
+const _tmplTitles = {
+  placed:   '📦 Register Template — Order Placed',
+  abandoned:'🛒 Register Template — Abandoned Cart',
+  status:   '🔄 Register Template — Status Changed',
+}
+const _tmplPlaceholders = {
+  placed:   'e.g. Hi {{1}}, your order {{2}} has been placed! We\'ll keep you updated.',
+  abandoned:'e.g. Hi {{1}}, you left items in your cart. Complete your order: {{2}}',
+  status:   'e.g. Hi {{1}}, your order {{2}} status is now {{3}}. Thank you!',
+}
+
+function openTmplModal(scenario) {
+  _tmplModalScenario = scenario
+  document.getElementById('tmpl-modal-title').textContent   = _tmplTitles[scenario]   || '📱 Register Template'
+  document.getElementById('tmpl-modal-vars').innerHTML      = _tmplVars[scenario]     || ''
+  document.getElementById('tmpl-modal-body').placeholder    = _tmplPlaceholders[scenario] || 'Template message body…'
+  document.getElementById('tmpl-modal-body').value          = ''
+  document.getElementById('tmpl-modal-status').textContent  = ''
+  const btn = document.getElementById('tmpl-modal-reg-btn')
+  btn.disabled = false; btn.textContent = 'Register & Submit to Meta'
+  document.getElementById('tmplModal').classList.add('open')
+  setTimeout(() => document.getElementById('tmpl-modal-body').focus(), 120)
+}
+
+function closeTmplModal() {
+  document.getElementById('tmplModal').classList.remove('open')
+  _tmplModalScenario = null
+}
+
+async function registerNotifTemplate() {
+  const scenario = _tmplModalScenario
+  if (!scenario || !_agentId) return
+  const bodyText = document.getElementById('tmpl-modal-body').value.trim()
+  if (!bodyText) return toast('Enter the template message body first', 'error')
+
+  const statusEl = document.getElementById('tmpl-modal-status')
+  const btn      = document.getElementById('tmpl-modal-reg-btn')
+  const selEl    = document.getElementById(`notif-${scenario}-wa-tmpl`)
+
+  const slugMap  = { placed: 'order_placed', abandoned: 'abandoned_cart', status: 'status_changed' }
+  const tmplName = `notif_${slugMap[scenario]}_${_agentId.slice(-8).toLowerCase().replace(/[^a-z0-9]/g, '')}`
+
+  statusEl.textContent = 'Checking…'
+  btn.disabled = true
+
+  try {
+    const { templates } = await apiFetch(`/templates?agent_id=${_agentId}`)
+    const existing = templates?.find(t => t.name === tmplName)
+
+    if (existing) {
+      if (existing.status === 'approved') {
+        statusEl.textContent = '✓ Already approved — selecting it now'
+        addToDropdown(selEl, existing.name)
+        setTimeout(closeTmplModal, 1200)
+        return
+      } else if (existing.status === 'pending') {
+        statusEl.textContent = '⏳ Already submitted — pending Meta review'
+        btn.disabled = false; btn.textContent = 'Re-check'
+        return
+      } else {
+        statusEl.textContent = 'Retrying Meta submission…'
+        try {
+          await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
+          statusEl.textContent = existing.status === 'rejected'
+            ? '✕ Previously rejected by Meta — edit body and retry'
+            : '⏳ Pending Meta Review'
+        } catch (e2) { statusEl.textContent = '✕ Meta error: ' + e2.message }
+        btn.disabled = false; btn.textContent = 'Re-check'
+        return
+      }
+    }
+
+    statusEl.textContent = 'Registering…'
+    const res = await apiFetch('/templates', {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_id: _agentId, name: tmplName, language: 'en',
+        category: 'UTILITY', body_text: bodyText, submit_to_meta: true,
+      }),
+    })
+    const tpl = res.template
+    addToDropdown(selEl, tpl.name)
+    if (tpl.status === 'approved') {
+      statusEl.textContent = '✓ Approved & ready!'
+      btn.disabled = true; btn.textContent = '✓ Done'
+      setTimeout(closeTmplModal, 1200)
+    } else {
+      statusEl.textContent = res.meta_error
+        ? '✕ Meta error: ' + res.meta_error
+        : '⏳ Submitted — pending Meta review'
+      btn.disabled = false; btn.textContent = 'Close'
+      btn.onclick = closeTmplModal
+    }
+  } catch (e) {
+    statusEl.textContent = '✕ ' + e.message
+    btn.disabled = false
+  }
+}
+
+function addToDropdown(sel, name) {
+  if (!sel) return
+  if (![...sel.options].some(o => o.value === name)) {
+    const opt = document.createElement('option')
+    opt.value = name; opt.textContent = name
+    sel.appendChild(opt)
+  }
+  sel.value = name
 }
 
 async function saveSalesNotifications() {
