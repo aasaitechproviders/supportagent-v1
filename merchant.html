@@ -1482,16 +1482,56 @@ const _tmplTitles = {
   abandoned:'🛒 Register Template — Abandoned Cart',
   status:   '🔄 Register Template — Status Changed',
 }
+const _tmplSubtitles = {
+  placed:   'Sent to customer when their order is confirmed. Edit the message below if needed.',
+  abandoned:'Sent when a customer leaves without completing payment. Edit the message below if needed.',
+  status:   'Sent when you update an order status (e.g. Out for delivery, Delivered). Edit below if needed.',
+}
 const _tmplPlaceholders = {
-  placed:   'e.g. Hi {{1}}, your order {{2}} has been placed! We\'ll keep you updated.',
-  abandoned:'e.g. Hi {{1}}, you left items in your cart. Complete your order: {{2}}',
-  status:   'e.g. Hi {{1}}, your order {{2}} status is now {{3}}. Thank you!',
+  placed:   `Hello {{1}},
+
+Thank you for your order! 🎉
+
+Your order *{{2}}* has been placed successfully and is now being processed.
+
+We will notify you as soon as it is confirmed and ready for dispatch.
+
+For any queries, feel free to reach out to us.
+
+Warm regards,
+Our Team`,
+  abandoned:`Hello {{1}},
+
+We noticed you left some items in your cart! 🛒
+
+Your order *{{2}}* is saved and waiting for you. Complete your purchase before your items sell out.
+
+👉 Reply to this message or contact us to complete your order.
+
+We are happy to help!
+
+Warm regards,
+Our Team`,
+  status:   `Hello {{1}},
+
+Great news! Your order status has been updated. 📦
+
+Order ID: *{{2}}*
+Current Status: *{{3}}*
+
+We will continue to keep you posted on your order progress. Thank you for shopping with us!
+
+For any questions, feel free to reach out.
+
+Warm regards,
+Our Team`,
 }
 
 function openTmplModal(scenario) {
   _tmplModalScenario = scenario
-  document.getElementById('tmpl-modal-title').textContent   = _tmplTitles[scenario]   || '📱 Register Template'
-  document.getElementById('tmpl-modal-vars').innerHTML      = _tmplVars[scenario]     || ''
+  document.getElementById('tmpl-modal-title').textContent    = _tmplTitles[scenario]    || '📱 Register Template'
+  document.getElementById('tmpl-modal-subtitle').textContent = _tmplSubtitles[scenario] || 'Create and submit a new template to Meta for approval'
+  document.getElementById('tmpl-modal-vars').innerHTML       = _tmplVars[scenario]      || ''
   document.getElementById('tmpl-modal-body').placeholder    = 'Template message body…'
   document.getElementById('tmpl-modal-body').value          = _tmplPlaceholders[scenario] || ''
   document.getElementById('tmpl-modal-status').textContent  = ''
