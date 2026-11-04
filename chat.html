@@ -2017,8 +2017,8 @@
       list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">No orders found</div>`
       return
     }
-    const statusColor = { paid: '#3DBE6C', pending: '#E09A2B', failed: '#E05252' }
-    const statusLabel = { paid: '✓ Paid', pending: '⏳ Pending', failed: '✗ Failed' }
+    const statusColor = { paid: '#3DBE6C', pending: '#E09A2B', confirmed: '#3B82F6', out_for_delivery: '#8B5CF6', delivered: '#3DBE6C', failed: '#E05252', cancelled: '#E05252' }
+    const statusLabel = { paid: '✓ Paid', pending: '⏳ Pending', confirmed: '✓ Confirmed', out_for_delivery: '🚚 Out for Delivery', delivered: '✅ Delivered', failed: '✗ Failed', cancelled: '✗ Cancelled' }
     list.innerHTML = orders.map(o => {
       const oid   = (o._id || '').toString().slice(-8).toUpperCase()
       const color = statusColor[o.status] || 'var(--text-3)'
@@ -2026,12 +2026,15 @@
       const date  = o.paid_at || o.created_at
         ? new Date(o.paid_at || o.created_at).toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' })
         : ''
-      const amt   = o.currency === 'INR' ? '₹' + (o.amount/100).toFixed(2) : (o.amount/100).toFixed(2) + ' ' + (o.currency||'')
+      const amt   = o.currency === 'INR' ? '₹' + Number(o.amount).toFixed(2) : Number(o.amount).toFixed(2) + ' ' + (o.currency||'')
+      const payBadge = o.payment_method === 'cod' || (!o.razorpay_payment_id && o.status !== 'paid')
+        ? '<span style="font-size:10px;padding:1px 7px;border-radius:20px;background:#f0f0f0;color:#555;font-weight:600;">💵 COD</span>'
+        : '<span style="font-size:10px;padding:1px 7px;border-radius:20px;background:#ede9fe;color:#6C5FF5;font-weight:600;">💳 Online</span>'
       const itemLines = (o.items || []).map(it => `<div style="font-size:12px;color:var(--text-2);">• ${it.name || it.product_name || 'Item'} × ${it.qty||1}</div>`).join('')
       return `<div style="padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
           <span style="font-size:13px;font-weight:700;color:var(--text);">🛒 #${oid}</span>
-          <span style="font-size:11px;font-weight:700;color:${color};background:${color}22;padding:2px 8px;border-radius:20px;">${label}</span>
+          <div style="display:flex;gap:5px;align-items:center;">${payBadge}<span style="font-size:11px;font-weight:700;color:${color};background:${color}22;padding:2px 8px;border-radius:20px;">${label}</span></div>
         </div>
         ${itemLines}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
@@ -2050,7 +2053,10 @@
       return
     }
     try {
-      const res  = await fetch(`${API}/chat/${AGENT_ID}/orders/${encodeURIComponent(USER_IDENTIFIER)}`)
+      const params = new URLSearchParams()
+      if (SESSION_ID)  params.set('session_id', SESSION_ID)
+      if (VISITOR_ID)  params.set('visitor_id', VISITOR_ID)
+      const res  = await fetch(`${API}/chat/${AGENT_ID}/orders/${encodeURIComponent(USER_IDENTIFIER)}?${params}`)
       const data = await res.json()
       renderMyOrders(data.orders || [])
     } catch (e) {
@@ -2532,6 +2538,35 @@
     await checkout()
   }
 
+  // ── Payment method picker (shown when both online + COD are available) ────
+  function openPaymentPicker() {
+    let el = document.getElementById('sg-pay-picker')
+    if (!el) {
+      el = document.createElement('div')
+      el.id = 'sg-pay-picker'
+      el.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45);'
+      el.innerHTML = `
+        <div style="background:var(--surface);border-radius:18px 18px 0 0;padding:24px 20px 32px;width:100%;max-width:420px;box-shadow:0 -4px 32px rgba(0,0,0,.18);">
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text);">Choose Payment Method</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-bottom:20px;">How would you like to pay?</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button id="sg-pay-online" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border-md);background:var(--surface-2);cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);text-align:left;">
+              <span style="font-size:22px;">💳</span>
+              <div><div>Pay Online</div><div style="font-size:11.5px;font-weight:400;color:var(--text-2);">UPI, Cards, Net Banking via Razorpay</div></div>
+            </button>
+            <button id="sg-pay-cod" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border-md);background:var(--surface-2);cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);text-align:left;">
+              <span style="font-size:22px;">💵</span>
+              <div><div>Cash on Delivery</div><div style="font-size:11.5px;font-weight:400;color:var(--text-2);">Pay when your order arrives</div></div>
+            </button>
+          </div>
+          <button onclick="document.getElementById('sg-pay-picker').remove()" style="margin-top:16px;width:100%;padding:11px;border:none;background:transparent;color:var(--text-2);font-size:13px;cursor:pointer;">Cancel</button>
+        </div>`
+      document.body.appendChild(el)
+      el.querySelector('#sg-pay-online').onclick = () => { el.remove(); doCheckout('online') }
+      el.querySelector('#sg-pay-cod').onclick    = () => { el.remove(); doCheckout('cod') }
+    }
+  }
+
   async function checkout() {
     if (!cart.length) return
     if (checkout._running) return
@@ -2543,6 +2578,14 @@
       openAddressModal(true)   // true = auto-proceed after default is set
       return
     }
+    // Gate 3 — payment method picker if both online + COD available
+    const hasOnline = agent?.payment_enabled
+    const hasCod    = agent?.cod_enabled
+    if (hasOnline && hasCod) { openPaymentPicker(); return }
+    await doCheckout(hasCod ? 'cod' : 'online')
+  }
+
+  async function doCheckout(paymentMethod = 'online') {
     checkout._running = true
     closeCart()
     const msgs = document.getElementById('chat-messages')
@@ -2556,6 +2599,10 @@
         method:'POST', headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
           items: cart.map(i=>({product_id:i._id,qty:i.qty})),
+          payment_method: paymentMethod,
+          session_id: SESSION_ID || null,
+          visitor_id: VISITOR_ID || null,
+          user_identifier: USER_IDENTIFIER || null,
           customer: {
             name: window._customerName || '',
             identifier: USER_IDENTIFIER || '',
@@ -2565,6 +2612,12 @@
       })
       const d = await res.json(); prep.remove()
       if (!res.ok||d.error) { checkout._running=false; showChatMsg(`❌ ${d.error||'Unable to create order.'}`); return }
+      // COD — order placed directly, no Razorpay
+      if (d.cod) {
+        checkout._running=false; cart=[]; updateCartBar()
+        showChatMsg('✅ Order placed successfully! We will deliver your items and collect payment on delivery. Thank you! 🎉')
+        return
+      }
       if (d.order_id && d.key_id) {
         const rz = new Razorpay({
           key:d.key_id,amount:d.amount,currency:d.currency||'INR',
