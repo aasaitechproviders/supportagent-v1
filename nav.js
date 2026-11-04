@@ -13,7 +13,6 @@ const _NAV_SECTIONS = [
       { page:'contacts',      href:'contacts.html',      label:'Contacts',            icon:'👥' },
       { page:'leads-forms',   href:'leads-forms.html',   label:'Forms & Appointments', icon:'📋' },
       { page:'campaigns',     href:'campaigns.html',     label:'Campaigns & Templates', icon:'📣' },
-      { page:'automations',   href:'automations.html',   label:'Automations',          icon:'⚡' },
       { page:'merchant',      href:'merchant.html',      label:'Merchant Corner',     icon:'🏪' },
     ]
   },
