@@ -1573,20 +1573,11 @@ async function registerNotifTemplate() {
         addToDropdown(selEl, existing.name)
         setTimeout(closeTmplModal, 1200)
         return
-      } else if (existing.status === 'pending') {
-        statusEl.textContent = '⏳ Already submitted — pending Meta review'
-        btn.disabled = false; btn.textContent = 'Re-check'
-        return
       } else {
-        statusEl.textContent = 'Retrying Meta submission…'
-        try {
-          await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
-          statusEl.textContent = existing.status === 'rejected'
-            ? '✕ Previously rejected by Meta — edit body and retry'
-            : '⏳ Pending Meta Review'
-        } catch (e2) { statusEl.textContent = '✕ Meta error: ' + e2.message }
-        btn.disabled = false; btn.textContent = 'Re-check'
-        return
+        // pending / rejected / draft — delete and re-register with new body
+        statusEl.textContent = 'Deleting old template and re-registering…'
+        try { await apiFetch(`/templates/${existing._id}`, { method: 'DELETE' }) } catch (_) {}
+        // fall through to fresh registration below
       }
     }
 
