@@ -1497,6 +1497,7 @@ function openTmplModal(scenario) {
   document.getElementById('tmpl-modal-status').textContent  = ''
   const btn = document.getElementById('tmpl-modal-reg-btn')
   btn.disabled = false; btn.textContent = 'Register & Submit to Meta'
+  btn.onclick = registerNotifTemplate
   document.getElementById('tmplModal').classList.add('open')
   setTimeout(() => document.getElementById('tmpl-modal-body').focus(), 120)
 }
@@ -1568,7 +1569,7 @@ async function registerNotifTemplate() {
         ? '✕ Meta error: ' + res.meta_error
         : '⏳ Submitted — pending Meta review'
       btn.disabled = false; btn.textContent = 'Close'
-      btn.onclick = closeTmplModal
+      btn.onclick = () => { closeTmplModal(); btn.onclick = registerNotifTemplate }
     }
   } catch (e) {
     statusEl.textContent = '✕ ' + e.message
