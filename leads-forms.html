@@ -2087,7 +2087,7 @@ function openApptTmplModal(type) {
   if (sub)     sub.textContent     = APPT_MODAL_DESCS[type] || ''
   if (nameEl)  nameEl.value        = ''
   if (statusEl)statusEl.textContent= ''
-  if (btn)    { btn.textContent = 'Register Template'; btn.disabled = false }
+  if (btn)    { btn.textContent = 'Register Template'; btn.disabled = false; btn.onclick = registerApptTemplateModal }
 
   // Pre-fill default body text
   if (bodyEl) {
