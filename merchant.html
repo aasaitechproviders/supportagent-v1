@@ -378,6 +378,7 @@
       <button class="tab-btn" data-tab="orders" onclick="switchTab('orders')">📦 Orders</button>
       <button class="tab-btn" data-tab="customers" onclick="switchTab('customers')">👥 Customers</button>
       <button class="tab-btn" data-tab="notifications" onclick="switchTab('notifications')">🔔 Notification Settings</button>
+      <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️ Settings</button>
     </div>
 
     <!-- ═══ ANALYTICS TAB ══════════════════════════════════════════ -->
@@ -756,6 +757,84 @@
       </div>
     </div>
 
+    <!-- ═══ SETTINGS TAB ══════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-settings">
+
+      <div id="settings-no-agent" style="display:none;padding:40px;text-align:center;color:var(--text-3);font-size:13px">
+        Select an agent above to configure settings.
+      </div>
+
+      <div id="settings-content">
+
+        <!-- Payment Settings card -->
+        <div class="notif-card" style="margin-bottom:16px">
+          <div class="notif-card-header">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--text-1)">💳 Payment Settings</div>
+              <div style="font-size:12px;color:var(--text-3);margin-top:2px">Configure online & cash on delivery options for checkout</div>
+            </div>
+          </div>
+          <div class="notif-card-body">
+
+            <!-- Enable Online Payments -->
+            <div class="notif-row" style="margin-bottom:12px">
+              <div class="notif-row-left">
+                <div class="notif-row-title">Enable Online Payments (Razorpay)</div>
+                <div class="notif-row-desc">Accept card, UPI, netbanking via Razorpay</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pay-enabled-toggle" onchange="onPayEnabledToggle()">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <!-- Razorpay fields (shown when online enabled) -->
+            <div id="razorpay-fields" style="display:none;padding:12px;background:var(--bg-2);border-radius:8px;margin-bottom:12px">
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;color:var(--text-2);font-weight:600">Razorpay Key ID</label>
+                <input id="pay-key-id" type="text" placeholder="rzp_live_xxxxxxxxxxxx"
+                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px;box-sizing:border-box">
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;color:var(--text-2);font-weight:600">Razorpay Key Secret</label>
+                <input id="pay-key-secret" type="password" placeholder="Leave blank to keep existing"
+                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px;box-sizing:border-box">
+                <div id="pay-has-secret" style="font-size:11px;color:var(--text-3);margin-top:3px;display:none">✓ Secret already saved — leave blank to keep it</div>
+              </div>
+              <div>
+                <label style="font-size:12px;color:var(--text-2);font-weight:600">Currency</label>
+                <select id="pay-currency"
+                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px">
+                  <option value="INR">INR — Indian Rupee</option>
+                  <option value="USD">USD — US Dollar</option>
+                  <option value="EUR">EUR — Euro</option>
+                  <option value="GBP">GBP — British Pound</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Enable COD -->
+            <div class="notif-row">
+              <div class="notif-row-left">
+                <div class="notif-row-title">Enable Cash on Delivery (COD)</div>
+                <div class="notif-row-desc">Customers can place orders and pay at delivery</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="pay-cod-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="savePaymentSettings()">💾 Save Payment Settings</button>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- end .page-body -->
 </div><!-- end .main-wrap -->
 
@@ -934,6 +1013,10 @@ function switchTab(tab) {
       document.getElementById('notif-no-agent').style.display = ''
       document.getElementById('notif-content').style.display = 'none'
     }
+    if (tab === 'settings') {
+      document.getElementById('settings-no-agent').style.display = ''
+      document.getElementById('settings-content').style.display = 'none'
+    }
     return
   }
   loadTabData()
@@ -944,6 +1027,7 @@ function loadTabData() {
   else if (_activeTab === 'orders') loadOrders(_agentId)
   else if (_activeTab === 'customers') loadCustomers(_agentId)
   else if (_activeTab === 'notifications') loadSalesNotifications(_agentId)
+  else if (_activeTab === 'settings') loadPaymentSettings(_agentId)
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -1658,6 +1742,52 @@ async function saveSalesNotifications() {
     toast('Notification settings saved!', 'success')
   } catch (e) {
     toast('Failed to save settings', 'error')
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PAYMENT SETTINGS
+// ══════════════════════════════════════════════════════════════════
+async function loadPaymentSettings(agentId) {
+  document.getElementById('settings-no-agent').style.display = 'none'
+  document.getElementById('settings-content').style.display  = ''
+  try {
+    const d = await apiFetch(`/agents/${agentId}/payment-settings`)
+    document.getElementById('pay-enabled-toggle').checked = !!d.enabled
+    document.getElementById('pay-cod-toggle').checked     = !!d.cod_enabled
+    document.getElementById('pay-key-id').value           = d.razorpay_key_id || ''
+    document.getElementById('pay-key-secret').value       = ''
+    document.getElementById('pay-has-secret').style.display = d.has_secret ? '' : 'none'
+    document.getElementById('razorpay-fields').style.display = d.enabled ? '' : 'none'
+    const sel = document.getElementById('pay-currency')
+    if (d.currency) sel.value = d.currency
+  } catch (e) {
+    toast('Failed to load payment settings', 'error')
+  }
+}
+
+function onPayEnabledToggle() {
+  const enabled = document.getElementById('pay-enabled-toggle').checked
+  document.getElementById('razorpay-fields').style.display = enabled ? '' : 'none'
+}
+
+async function savePaymentSettings() {
+  if (!_agentId) return
+  const body = {
+    enabled:          document.getElementById('pay-enabled-toggle').checked,
+    cod_enabled:      document.getElementById('pay-cod-toggle').checked,
+    razorpay_key_id:  document.getElementById('pay-key-id').value.trim(),
+    currency:         document.getElementById('pay-currency').value,
+  }
+  const secret = document.getElementById('pay-key-secret').value
+  if (secret) body.razorpay_key_secret = secret
+  try {
+    await apiFetch(`/agents/${_agentId}/payment-settings`, { method: 'PUT', body: JSON.stringify(body) })
+    toast('Payment settings saved!', 'success')
+    // refresh secret indicator
+    if (secret) document.getElementById('pay-has-secret').style.display = ''
+  } catch (e) {
+    toast('Failed to save payment settings', 'error')
   }
 }
 
