@@ -2798,46 +2798,62 @@
     if (!navigator.onLine) setOnline(false)
   })()
 
-  // ── CART LOCALSTORAGE PERSISTENCE ────────────────────────────────────────
-  const _CART_KEY = () => `sg_cart_${AGENT_ID}`
+  // ── CART BACKEND PERSISTENCE ──────────────────────────────────────────────
+  // Cart is stored in MongoDB (carts collection) keyed by user_identifier,
+  // visitor_id, or session_id — works across devices and powers the scheduler
+  // abandoned-cart automation.
+
+  let _cartSaveTimer = null
   function saveCart() {
-    try { localStorage.setItem(_CART_KEY(), JSON.stringify(cart)) } catch {}
+    // Debounce — batch rapid add/remove into one API call
+    clearTimeout(_cartSaveTimer)
+    _cartSaveTimer = setTimeout(async () => {
+      try {
+        const params = {}
+        if (USER_IDENTIFIER) params.user_identifier = USER_IDENTIFIER
+        else if (VISITOR_ID)  params.visitor_id = VISITOR_ID
+        else if (SESSION_ID)  params.session_id = SESSION_ID
+        else return  // no identity — can't persist
+
+        await fetch(`${API}/chat/${AGENT_ID}/cart`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: cart, ...params }),
+        })
+      } catch (e) { /* non-fatal — cart save is best-effort */ }
+    }, 600)
   }
-  function restoreCart() {
+
+  async function restoreCart() {
     try {
-      const stored = localStorage.getItem(_CART_KEY())
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        if (Array.isArray(parsed) && parsed.length) {
-          cart = parsed
-          updateCartBar()
-        }
+      const qs = new URLSearchParams()
+      if (USER_IDENTIFIER) qs.set('user_identifier', USER_IDENTIFIER)
+      else if (VISITOR_ID)  qs.set('visitor_id', VISITOR_ID)
+      else if (SESSION_ID)  qs.set('session_id', SESSION_ID)
+      else return
+
+      const res  = await fetch(`${API}/chat/${AGENT_ID}/cart?${qs}`)
+      const data = await res.json()
+      if (Array.isArray(data.items) && data.items.length) {
+        cart = data.items
+        updateCartBar()
       }
-    } catch {}
+    } catch (e) { /* non-fatal */ }
   }
-  // Patch addToCart and cart qty change to auto-save
+
+  // Patch addToCart to auto-save to backend
   const _origAddToCart = addToCart
   window.addToCart = function(product, silent=false) {
     _origAddToCart(product, silent)
     saveCart()
   }
-  // Patch checkout success to clear persisted cart
+  // Patch updateCartBar to auto-save after every cart change (qty up/down, remove)
   const _origUpdateCartBar = updateCartBar
-  // Hook: clear persisted cart when cart array is emptied externally (checkout)
-  const _cartProxy = new Proxy(cart, {
-    set(target, prop, value) {
-      target[prop] = value
-      if (prop === 'length' && value === 0) try { localStorage.removeItem(_CART_KEY()) } catch {}
-      return true
-    }
-  })
-  // Simpler approach: patch the qty change path in openCart
-  // We patch updateCartBar to save after every update
   window.updateCartBar = function() {
     _origUpdateCartBar()
     saveCart()
   }
-  // Restore cart on page load
+  // Restore cart on widget open
   restoreCart()
 
   // BOOT
