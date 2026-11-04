@@ -1492,8 +1492,8 @@ function openTmplModal(scenario) {
   _tmplModalScenario = scenario
   document.getElementById('tmpl-modal-title').textContent   = _tmplTitles[scenario]   || '📱 Register Template'
   document.getElementById('tmpl-modal-vars').innerHTML      = _tmplVars[scenario]     || ''
-  document.getElementById('tmpl-modal-body').placeholder    = _tmplPlaceholders[scenario] || 'Template message body…'
-  document.getElementById('tmpl-modal-body').value          = ''
+  document.getElementById('tmpl-modal-body').placeholder    = 'Template message body…'
+  document.getElementById('tmpl-modal-body').value          = _tmplPlaceholders[scenario] || ''
   document.getElementById('tmpl-modal-status').textContent  = ''
   const btn = document.getElementById('tmpl-modal-reg-btn')
   btn.disabled = false; btn.textContent = 'Register & Submit to Meta'
