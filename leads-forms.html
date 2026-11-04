@@ -404,7 +404,7 @@
               <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
                 <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Active Template</div>
                 <select id="appt-confirm-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('confirm')">
-                  <option value="">— Select approved template —</option>
+                  <option value="">— Select template —</option>
                 </select>
                 <input type="hidden" id="appt-confirm-tmpl" value="">
               </div>
@@ -435,7 +435,7 @@
               <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
                 <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Active Template</div>
                 <select id="appt-reminder-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('reminder')">
-                  <option value="">— Select approved template —</option>
+                  <option value="">— Select template —</option>
                 </select>
                 <input type="hidden" id="appt-reminder-tmpl" value="">
               </div>
@@ -466,7 +466,7 @@
               <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
                 <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Active Template</div>
                 <select id="appt-followup-tmpl-sel" style="width:100%;height:32px;font-size:12px;padding:0 8px;border:1px solid var(--border-md);border-radius:var(--r-sm);background:var(--surface);color:var(--text)" onchange="onApptTmplSelChange('followup')">
-                  <option value="">— Select approved template —</option>
+                  <option value="">— Select template —</option>
                 </select>
                 <input type="hidden" id="appt-followup-tmpl" value="">
               </div>
@@ -2007,17 +2007,38 @@ async function loadTmplSelectors() {
     console.log('[loadTmplSelectors] raw res:', res)
     const tmpls = res.templates || []
     console.log('[loadTmplSelectors] all templates:', tmpls.map(t => `${t.name} (${t.status})`))
-    const usable = tmpls.filter(t => t.status === 'approved')
-    console.log('[loadTmplSelectors] approved templates:', usable.map(t => t.name))
+    const approved = tmpls.filter(t => t.status === 'approved')
+    const pending  = tmpls.filter(t => t.status === 'pending')
+    const others   = tmpls.filter(t => t.status !== 'approved' && t.status !== 'pending')
+    console.log('[loadTmplSelectors] approved:', approved.map(t => t.name), '| pending:', pending.map(t => t.name))
     const makeOpts = (selEl, currentVal) => {
       if (!selEl) return
       const prev = selEl.value || currentVal || ''
-      selEl.innerHTML = '<option value="">— Select saved template —</option>'
-      usable.forEach(t => {
+      selEl.innerHTML = '<option value="">— Select template —</option>'
+      // Approved — selectable
+      approved.forEach(t => {
         const opt = document.createElement('option')
         opt.value = t.name
         opt.textContent = `${t.name}  ✓`
         if (t.name === prev) opt.selected = true
+        selEl.appendChild(opt)
+      })
+      // Pending — shown but disabled (red label via text prefix)
+      pending.forEach(t => {
+        const opt = document.createElement('option')
+        opt.value = ''
+        opt.disabled = true
+        opt.textContent = `⏳ ${t.name}  (pending approval)`
+        opt.style.color = '#ef4444'
+        selEl.appendChild(opt)
+      })
+      // Rejected / draft — shown but disabled
+      others.forEach(t => {
+        const opt = document.createElement('option')
+        opt.value = ''
+        opt.disabled = true
+        opt.textContent = `✕ ${t.name}  (${t.status})`
+        opt.style.color = '#ef4444'
         selEl.appendChild(opt)
       })
     }
