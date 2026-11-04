@@ -676,7 +676,21 @@
     </div>
     <div class="hdr-actions">
       <button id="my-tickets-btn" onclick="openMyTickets()" style="display:none;background:none;border:none;cursor:pointer;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:var(--brand);font-family:inherit;transition:background .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">My Tickets</button>
+      <button id="my-orders-btn" onclick="openMyOrders()" style="display:none;background:none;border:none;cursor:pointer;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;color:var(--brand);font-family:inherit;transition:background .15s;white-space:nowrap;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">My Orders</button>
       <div class="powered-by"><span id="powered-by-text">Powered by</span><br><a href="https://supportagent.aasaitech.in" target="_blank" rel="noopener">SupportGent</a></div>
+    </div>
+  </div>
+
+  <!-- My Orders panel -->
+  <div id="my-orders-panel" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--surface);z-index:50;flex-direction:column;border-radius:inherit;">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <button onclick="closeMyOrders()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;display:flex;align-items:center;color:var(--text-2)" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='none'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span id="my-orders-title" style="font-size:15px;font-weight:700;color:var(--text);">My Orders</span>
+    </div>
+    <div id="my-orders-list" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Loading…</div>
     </div>
   </div>
 
@@ -1507,6 +1521,9 @@
     }
     addrBtn.style.display = 'inline-flex'; hasContent = true
     bar.style.display = hasContent ? 'flex' : 'none'
+    // Show My Orders button when user is identified and agent has shopping
+    const ordBtn = document.getElementById('my-orders-btn')
+    if (ordBtn) ordBtn.style.display = (USER_IDENTIFIER && agent?.shopping_enabled) ? 'flex' : 'none'
   }
 
   function openAddressModal(autoCheckout) {
@@ -1631,6 +1648,10 @@
     // Show My Tickets button for all agent types (general + sales)
     const btn = document.getElementById('my-tickets-btn')
     if (btn) btn.style.display = 'flex'
+    // Show My Orders button only for shopping agents with an identified user
+    // (will be shown/hidden dynamically when user identifies themselves)
+    const ordBtn = document.getElementById('my-orders-btn')
+    if (ordBtn && d.shopping_enabled && USER_IDENTIFIER) ordBtn.style.display = 'flex'
     const av = document.getElementById('hdr-avatar')
     if (d.logo_base64) { av.innerHTML = `<img src="${d.logo_base64}" alt="${esc(d.name)}"/>` }
     else { av.textContent = (d.name?.[0]?.toUpperCase()) || '✦'; if (d.brand_color) av.style.background = `linear-gradient(135deg,${d.brand_color},${dimColor(d.brand_color)})` }
@@ -1979,6 +2000,63 @@
   // ══════════════════════════════════════════════════════════════════════
   let _myTicketsAll = []
   let _myTicketsFilter = 'all'
+
+  async function openMyOrders() {
+    const panel = document.getElementById('my-orders-panel')
+    panel.style.display = 'flex'
+    await loadMyOrders()
+  }
+
+  function closeMyOrders() {
+    document.getElementById('my-orders-panel').style.display = 'none'
+  }
+
+  function renderMyOrders(orders) {
+    const list = document.getElementById('my-orders-list')
+    if (!orders || !orders.length) {
+      list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">No orders found</div>`
+      return
+    }
+    const statusColor = { paid: '#3DBE6C', pending: '#E09A2B', failed: '#E05252' }
+    const statusLabel = { paid: '✓ Paid', pending: '⏳ Pending', failed: '✗ Failed' }
+    list.innerHTML = orders.map(o => {
+      const oid   = (o._id || '').toString().slice(-8).toUpperCase()
+      const color = statusColor[o.status] || 'var(--text-3)'
+      const label = statusLabel[o.status] || o.status
+      const date  = o.paid_at || o.created_at
+        ? new Date(o.paid_at || o.created_at).toLocaleDateString(undefined, { day:'numeric', month:'short', year:'numeric' })
+        : ''
+      const amt   = o.currency === 'INR' ? '₹' + (o.amount/100).toFixed(2) : (o.amount/100).toFixed(2) + ' ' + (o.currency||'')
+      const itemLines = (o.items || []).map(it => `<div style="font-size:12px;color:var(--text-2);">• ${it.name || it.product_name || 'Item'} × ${it.qty||1}</div>`).join('')
+      return `<div style="padding:12px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">🛒 #${oid}</span>
+          <span style="font-size:11px;font-weight:700;color:${color};background:${color}22;padding:2px 8px;border-radius:20px;">${label}</span>
+        </div>
+        ${itemLines}
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">${amt}</span>
+          <span style="font-size:11px;color:var(--text-3);">${date}</span>
+        </div>
+      </div>`
+    }).join('')
+  }
+
+  async function loadMyOrders() {
+    const list = document.getElementById('my-orders-list')
+    if (list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Loading…</div>`
+    if (!USER_IDENTIFIER) {
+      if (list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Sign in to view your orders</div>`
+      return
+    }
+    try {
+      const res  = await fetch(`${API}/chat/${AGENT_ID}/orders/${encodeURIComponent(USER_IDENTIFIER)}`)
+      const data = await res.json()
+      renderMyOrders(data.orders || [])
+    } catch (e) {
+      if (list) list.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--text-3);font-size:13px;">Could not load orders</div>`
+    }
+  }
 
   async function openMyTickets() {
     const panel = document.getElementById('my-tickets-panel')
