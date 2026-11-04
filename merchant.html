@@ -1473,9 +1473,9 @@ function populateMerchantTemplateSelect(selId, templates, selectedName) {
 let _tmplModalScenario = null
 
 const _tmplVars = {
-  placed:   'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID',
-  abandoned:'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID',
-  status:   'Variables: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID &nbsp;·&nbsp; <b>{{3}}</b> = new status',
+  placed:   'Variables sent: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID (e.g. ORD-A1B2C3D4) &nbsp;·&nbsp; <b>{{3}}</b> = order status (e.g. pending)',
+  abandoned:'Variables sent: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID (e.g. ORD-A1B2C3D4) &nbsp;·&nbsp; <b>{{3}}</b> = order status (e.g. pending)',
+  status:   'Variables sent: <b>{{1}}</b> = customer name &nbsp;·&nbsp; <b>{{2}}</b> = order ID (e.g. ORD-A1B2C3D4) &nbsp;·&nbsp; <b>{{3}}</b> = new status (e.g. out_for_delivery)',
 }
 const _tmplTitles = {
   placed:   '📦 Register Template — Order Placed',
@@ -1575,8 +1575,11 @@ async function registerNotifTemplate() {
         return
       } else {
         // pending / rejected / draft — delete and re-register with new body
-        statusEl.textContent = 'Deleting old template and re-registering…'
+        statusEl.textContent = 'Deleting old template…'
         try { await apiFetch(`/templates/${existing._id}`, { method: 'DELETE' }) } catch (_) {}
+        // Wait for Meta to finish deleting (Meta delete is async)
+        statusEl.textContent = 'Waiting for Meta to process deletion…'
+        await new Promise(r => setTimeout(r, 5000))
         // fall through to fresh registration below
       }
     }
