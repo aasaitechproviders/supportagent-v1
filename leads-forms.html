@@ -2303,21 +2303,32 @@ async function registerApptTemplateModal() {
     const tpl = res.template
     if (tmplInput) tmplInput.value = tpl.name
 
+    // Always refresh the dropdown (template is saved in DB regardless of Meta status)
+    await saveApptToggles()
+    await loadTmplSelectors()
+
     if (tpl.status === 'approved') {
-      if (statusEl) statusEl.textContent = '✓ Template approved!'
-      await saveApptToggles()
-      await loadTmplSelectors()
+      if (statusEl) statusEl.textContent = '✓ Template approved and ready!'
       const sel = document.getElementById(`appt-${type}-tmpl-sel`)
       if (sel) { sel.value = tpl.name; onApptTmplSelChange(type) }
-      setTimeout(closeApptTmplModal, 1200)
+      setTimeout(closeApptTmplModal, 1500)
     } else if (res.meta_error) {
-      if (statusEl) statusEl.textContent = '✕ Meta error: ' + res.meta_error
-      if (btn) btn.disabled = false
+      // Template saved to DB, but Meta submission failed
+      // Show clear error + link to WA Templates tab to manage it
+      if (statusEl) statusEl.innerHTML = `
+        <span style="color:var(--danger)">⚠️ Saved but Meta error: ${res.meta_error}</span><br>
+        <span style="color:var(--text-3);font-size:11px">Template saved as draft. Go to
+          <a href="campaigns.html" target="_blank" style="color:var(--primary);font-weight:600">WA Templates</a>
+          to fix &amp; submit when WhatsApp channel is ready.
+        </span>`
+      if (btn) { btn.textContent = 'Close'; btn.onclick = closeApptTmplModal; btn.disabled = false }
     } else {
-      if (statusEl) statusEl.textContent = '⏳ Submitted — pending Meta review. You can close this.'
-      if (btn) btn.disabled = false
-      await saveApptToggles()
-      await loadTmplSelectors()
+      // Submitted to Meta, pending review
+      if (statusEl) statusEl.innerHTML = `⏳ Submitted to Meta — pending review.<br>
+        <span style="font-size:11px;color:var(--text-3)">Check status in
+          <a href="campaigns.html" target="_blank" style="color:var(--primary);font-weight:600">WA Templates</a> tab.
+        </span>`
+      if (btn) { btn.textContent = 'Close'; btn.onclick = closeApptTmplModal; btn.disabled = false }
     }
   } catch (e) {
     if (statusEl) statusEl.textContent = '✕ ' + e.message
