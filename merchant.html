@@ -766,65 +766,49 @@
 
       <div id="settings-content">
 
-        <!-- Payment Settings card -->
-        <div class="notif-card" style="margin-bottom:16px">
+        <!-- Online Payments card -->
+        <div class="notif-card" style="margin-bottom:14px">
           <div class="notif-card-header">
+            <div class="notif-card-title">💳 Online Payments (Razorpay)</div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="pay-enabled-toggle" onchange="onPayEnabledToggle()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="notif-card-body disabled-section" id="razorpay-fields">
             <div>
-              <div style="font-weight:600;font-size:14px;color:var(--text-1)">💳 Payment Settings</div>
-              <div style="font-size:12px;color:var(--text-3);margin-top:2px">Configure online & cash on delivery options for checkout</div>
+              <div class="notif-row-label">Razorpay Key ID</div>
+              <input id="pay-key-id" type="text" placeholder="rzp_live_xxxxxxxxxxxx" class="notif-select"
+                style="font-family:monospace">
+            </div>
+            <div>
+              <div class="notif-row-label">Razorpay Key Secret</div>
+              <input id="pay-key-secret" type="password" placeholder="Leave blank to keep existing" class="notif-select">
+              <div id="pay-has-secret" style="font-size:11px;color:var(--text-3);margin-top:4px;display:none">✓ Secret already saved — leave blank to keep it</div>
+            </div>
+            <div>
+              <div class="notif-row-label">Currency</div>
+              <select id="pay-currency" class="notif-select">
+                <option value="INR">INR — Indian Rupee</option>
+                <option value="USD">USD — US Dollar</option>
+                <option value="EUR">EUR — Euro</option>
+                <option value="GBP">GBP — British Pound</option>
+              </select>
             </div>
           </div>
+        </div>
+
+        <!-- COD card -->
+        <div class="notif-card" style="margin-bottom:14px">
+          <div class="notif-card-header">
+            <div class="notif-card-title">💵 Cash on Delivery (COD)</div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="pay-cod-toggle">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
           <div class="notif-card-body">
-
-            <!-- Enable Online Payments -->
-            <div class="notif-row" style="margin-bottom:12px">
-              <div class="notif-row-left">
-                <div class="notif-row-title">Enable Online Payments (Razorpay)</div>
-                <div class="notif-row-desc">Accept card, UPI, netbanking via Razorpay</div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="pay-enabled-toggle" onchange="onPayEnabledToggle()">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
-            <!-- Razorpay fields (shown when online enabled) -->
-            <div id="razorpay-fields" style="display:none;padding:12px;background:var(--bg-2);border-radius:8px;margin-bottom:12px">
-              <div style="margin-bottom:10px">
-                <label style="font-size:12px;color:var(--text-2);font-weight:600">Razorpay Key ID</label>
-                <input id="pay-key-id" type="text" placeholder="rzp_live_xxxxxxxxxxxx"
-                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px;box-sizing:border-box">
-              </div>
-              <div style="margin-bottom:10px">
-                <label style="font-size:12px;color:var(--text-2);font-weight:600">Razorpay Key Secret</label>
-                <input id="pay-key-secret" type="password" placeholder="Leave blank to keep existing"
-                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px;box-sizing:border-box">
-                <div id="pay-has-secret" style="font-size:11px;color:var(--text-3);margin-top:3px;display:none">✓ Secret already saved — leave blank to keep it</div>
-              </div>
-              <div>
-                <label style="font-size:12px;color:var(--text-2);font-weight:600">Currency</label>
-                <select id="pay-currency"
-                  style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-1);color:var(--text-1);font-size:13px">
-                  <option value="INR">INR — Indian Rupee</option>
-                  <option value="USD">USD — US Dollar</option>
-                  <option value="EUR">EUR — Euro</option>
-                  <option value="GBP">GBP — British Pound</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Enable COD -->
-            <div class="notif-row">
-              <div class="notif-row-left">
-                <div class="notif-row-title">Enable Cash on Delivery (COD)</div>
-                <div class="notif-row-desc">Customers can place orders and pay at delivery</div>
-              </div>
-              <label class="toggle-switch">
-                <input type="checkbox" id="pay-cod-toggle">
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-
+            <div style="font-size:12.5px;color:var(--text-3)">Customers can place orders and pay cash at the time of delivery. No payment gateway required.</div>
           </div>
         </div>
 
@@ -1758,7 +1742,7 @@ async function loadPaymentSettings(agentId) {
     document.getElementById('pay-key-id').value           = d.razorpay_key_id || ''
     document.getElementById('pay-key-secret').value       = ''
     document.getElementById('pay-has-secret').style.display = d.has_secret ? '' : 'none'
-    document.getElementById('razorpay-fields').style.display = d.enabled ? '' : 'none'
+    document.getElementById('razorpay-fields').classList.toggle('disabled-section', !d.enabled)
     const sel = document.getElementById('pay-currency')
     if (d.currency) sel.value = d.currency
   } catch (e) {
@@ -1768,7 +1752,7 @@ async function loadPaymentSettings(agentId) {
 
 function onPayEnabledToggle() {
   const enabled = document.getElementById('pay-enabled-toggle').checked
-  document.getElementById('razorpay-fields').style.display = enabled ? '' : 'none'
+  document.getElementById('razorpay-fields').classList.toggle('disabled-section', !enabled)
 }
 
 async function savePaymentSettings() {
