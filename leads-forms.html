@@ -2236,9 +2236,11 @@ async function registerFormTemplate(type) {
 // Called from modal Register button
 async function registerApptTemplateModal() {
   const type    = _apptModalType
-  if (!type) return
+  console.log('[appt-tmpl] registerApptTemplateModal called, type=', type)
+  if (!type) { console.warn('[appt-tmpl] no type set, aborting'); return }
 
   const agentId = apptWaAgentId || document.getElementById('appt-wa-agent')?.value
+  console.log('[appt-tmpl] agentId=', agentId, '| apptWaAgentId=', apptWaAgentId)
   if (!agentId) return toast('Select an agent first', 'error')
 
   const nameEl  = document.getElementById('appt-modal-name')
@@ -2248,43 +2250,52 @@ async function registerApptTemplateModal() {
   const tmplInput = document.getElementById(`appt-${type}-tmpl`)
 
   const bodyText = bodyEl?.value?.trim()
+  console.log('[appt-tmpl] bodyText length=', bodyText?.length)
   if (!bodyText) return toast('Enter the message body first', 'error')
 
   // Build template name: use user input or auto-generate
   let tmplName = (nameEl?.value?.trim() || '').toLowerCase().replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '')
   if (!tmplName) tmplName = `appt_${type}_${agentId.slice(-8).toLowerCase().replace(/[^a-z0-9]/g, '')}`
+  console.log('[appt-tmpl] template name=', tmplName)
 
   if (statusEl) statusEl.textContent = 'Checking…'
   if (btn) btn.disabled = true
 
   try {
+    console.log('[appt-tmpl] fetching existing templates for agent', agentId)
     const { templates } = await apiFetch(`/templates?agent_id=${agentId}`)
+    console.log('[appt-tmpl] existing templates count=', templates?.length, '| names=', templates?.map(t=>t.name+':'+t.status))
     const existing = templates?.find(t => t.name === tmplName)
+    console.log('[appt-tmpl] existing match=', existing ? `${existing.name} (${existing.status})` : 'none')
 
     if (existing) {
       if (existing.status === 'approved') {
+        console.log('[appt-tmpl] already approved, auto-selecting')
         if (tmplInput) tmplInput.value = existing.name
         if (statusEl) statusEl.textContent = '✓ Template already approved!'
         if (btn) btn.disabled = false
         await saveApptToggles()
         await loadTmplSelectors()
-        // Auto-select in dropdown
         const sel = document.getElementById(`appt-${type}-tmpl-sel`)
         if (sel) { sel.value = existing.name; onApptTmplSelChange(type) }
         setTimeout(closeApptTmplModal, 1200)
         return
       } else if (existing.status === 'rejected' || existing.status === 'draft') {
+        console.log('[appt-tmpl] status=', existing.status, '— resubmitting to Meta, id=', existing._id)
         if (statusEl) statusEl.textContent = 'Resubmitting to Meta…'
         try {
-          await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
+          const r2 = await apiFetch(`/templates/${existing._id}/submit`, { method: 'POST' })
+          console.log('[appt-tmpl] resubmit response=', r2)
           if (statusEl) statusEl.textContent = '⏳ Resubmitted — pending Meta review'
           if (btn) btn.disabled = false
         } catch (e2) {
+          console.error('[appt-tmpl] resubmit error=', e2.message)
           if (statusEl) statusEl.textContent = '✕ Meta error: ' + e2.message
           if (btn) btn.disabled = false
         }
         return
       } else {
+        console.log('[appt-tmpl] status=pending, nothing to do')
         if (tmplInput) tmplInput.value = existing.name
         if (statusEl) statusEl.textContent = '⏳ Pending Meta review'
         if (btn) btn.disabled = false
@@ -2292,6 +2303,7 @@ async function registerApptTemplateModal() {
       }
     }
 
+    console.log('[appt-tmpl] no existing — POSTing /templates with name=', tmplName)
     if (statusEl) statusEl.textContent = 'Registering…'
     const res = await apiFetch('/templates', {
       method: 'POST',
@@ -2300,6 +2312,7 @@ async function registerApptTemplateModal() {
         body_text: bodyText, submit_to_meta: true,
       }),
     })
+    console.log('[appt-tmpl] POST /templates response=', JSON.stringify(res))
     const tpl = res.template
     if (tmplInput) tmplInput.value = tpl.name
 
@@ -2308,13 +2321,13 @@ async function registerApptTemplateModal() {
     await loadTmplSelectors()
 
     if (tpl.status === 'approved') {
+      console.log('[appt-tmpl] approved immediately!')
       if (statusEl) statusEl.textContent = '✓ Template approved and ready!'
       const sel = document.getElementById(`appt-${type}-tmpl-sel`)
       if (sel) { sel.value = tpl.name; onApptTmplSelChange(type) }
       setTimeout(closeApptTmplModal, 1500)
     } else if (res.meta_error) {
-      // Template saved to DB, but Meta submission failed
-      // Show clear error + link to WA Templates tab to manage it
+      console.error('[appt-tmpl] meta_error=', res.meta_error)
       if (statusEl) statusEl.innerHTML = `
         <span style="color:var(--danger)">⚠️ Saved but Meta error: ${res.meta_error}</span><br>
         <span style="color:var(--text-3);font-size:11px">Template saved as draft. Go to
@@ -2323,7 +2336,7 @@ async function registerApptTemplateModal() {
         </span>`
       if (btn) { btn.textContent = 'Close'; btn.onclick = closeApptTmplModal; btn.disabled = false }
     } else {
-      // Submitted to Meta, pending review
+      console.log('[appt-tmpl] submitted to Meta, status=', tpl.status)
       if (statusEl) statusEl.innerHTML = `⏳ Submitted to Meta — pending review.<br>
         <span style="font-size:11px;color:var(--text-3)">Check status in
           <a href="campaigns.html" target="_blank" style="color:var(--primary);font-weight:600">WA Templates</a> tab.
@@ -2331,6 +2344,7 @@ async function registerApptTemplateModal() {
       if (btn) { btn.textContent = 'Close'; btn.onclick = closeApptTmplModal; btn.disabled = false }
     }
   } catch (e) {
+    console.error('[appt-tmpl] caught error=', e.message, e)
     if (statusEl) statusEl.textContent = '✕ ' + e.message
     if (btn) btn.disabled = false
   }
